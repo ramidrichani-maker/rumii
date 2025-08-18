@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Home, Key, PlusCircle, Bed, Bath, Square } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -26,9 +27,11 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" size="lg">
-                Browse Properties for Sale
-              </Button>
+              <Link to="/purchase">
+                <Button className="w-full" size="lg">
+                  Browse Properties for Sale
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -43,9 +46,11 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="secondary" className="w-full" size="lg">
-                Find Rental Properties
-              </Button>
+              <Link to="/rent">
+                <Button variant="secondary" className="w-full" size="lg">
+                  Find Rental Properties
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
