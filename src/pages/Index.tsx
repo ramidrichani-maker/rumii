@@ -65,9 +65,11 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full" size="lg">
-                List Your Property
-              </Button>
+              <Link to="/list-property">
+                <Button variant="outline" className="w-full" size="lg">
+                  List Your Property
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
