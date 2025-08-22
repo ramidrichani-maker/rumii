@@ -95,6 +95,19 @@ const Purchase = () => {
               </div>
             </div>
 
+            {/* Amenities Filter */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Amenities</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                {['Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 'AC'].map((amenity) => (
+                  <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" className="rounded" />
+                    <span className="text-sm">{amenity}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             {/* Bedrooms Filter */}
             <div>
               <h3 className="text-lg font-semibold mb-4 text-foreground">
