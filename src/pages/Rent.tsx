@@ -90,7 +90,7 @@ const Rent = () => {
                 <Slider value={minSquareMeters} onValueChange={setMinSquareMeters} max={500} min={50} step={10} className="w-full" />
                 <div className="flex justify-between text-sm text-muted-foreground mt-2">
                   <span>50 m²</span>
-                  <span>10000 m²</span>
+                  <span>500 m²</span>
                 </div>
               </div>
             </div>
