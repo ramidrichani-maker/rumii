@@ -14,6 +14,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import PropertyMap from "@/components/PropertyMap";
 
 const propertyTypes = [
   "Flat", "Villa", "Land", "Beach House", "Chalet", 
@@ -37,6 +40,9 @@ const formSchema = z.object({
   listingType: z.enum(["rent", "sale"], {
     required_error: "Please select if this is for rent or sale",
   }),
+  price: z.string().min(1, "Price is required"),
+  yearBuilt: z.string().optional(),
+  lastRenovated: z.string().optional(),
   amenities: z.array(z.string()).default([]),
 });
 
@@ -45,6 +51,9 @@ type FormData = z.infer<typeof formSchema>;
 const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [coordinates, setCoordinates] = useState({ lat: 35.9078, lng: 14.4109 });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -71,12 +80,72 @@ const ListProperty = () => {
     form.setValue("amenities", updatedAmenities);
   };
 
-  const onSubmit = (data: FormData) => {
-    toast({
-      title: "Property Listed Successfully!",
-      description: "Your property has been submitted for review.",
-    });
-    console.log("Form data:", { ...data, files: uploadedFiles });
+  const onSubmit = async (data: FormData) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to list a property.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .insert({
+          user_id: user.id,
+          city: data.city,
+          address: data.address,
+          property_type: data.propertyType as any,
+          square_meters: parseInt(data.metersSquared),
+          bedrooms: parseInt(data.bedrooms),
+          bathrooms: parseInt(data.bathrooms),
+          listing_type: data.listingType as any,
+          price: parseFloat(data.price),
+          year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
+          last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
+          amenities: selectedAmenities,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Property Listed Successfully!",
+        description: "Your property has been submitted for admin approval.",
+      });
+
+      // Reset form
+      form.reset();
+      setSelectedAmenities([]);
+      setUploadedFiles([]);
+      
+    } catch (error) {
+      console.error('Error listing property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to list property. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLocationSelect = (lat: number, lng: number, address?: string) => {
+    setCoordinates({ lat, lng });
+    if (address) {
+      // Extract city from the address if possible
+      const addressParts = address.split(',');
+      const city = addressParts[addressParts.length - 2]?.trim() || addressParts[0]?.trim();
+      if (city && !form.getValues('city')) {
+        form.setValue('city', city);
+      }
+    }
   };
 
   return (
@@ -158,12 +227,44 @@ const ListProperty = () => {
                 </CardContent>
               </Card>
 
+              {/* Location Map */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Property Location</CardTitle>
+                  <p className="text-sm text-muted-foreground">Click on the map to pinpoint exact location</p>
+                </CardHeader>
+                <CardContent>
+                  <PropertyMap
+                    latitude={coordinates.lat}
+                    longitude={coordinates.lng}
+                    onLocationSelect={handleLocationSelect}
+                    height="250px"
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-8">
               {/* Property Details */}
               <Card>
                 <CardHeader>
                   <CardTitle>Property Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price ($)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="Enter price" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="metersSquared"
@@ -223,6 +324,34 @@ const ListProperty = () => {
                             ))}
                           </SelectContent>
                         </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="yearBuilt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Year Built (Optional)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="e.g. 2010" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="lastRenovated"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Renovated (Optional)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="e.g. 2020" {...field} />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -335,8 +464,8 @@ const ListProperty = () => {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit" size="lg" className="px-8">
-                List Property
+              <Button type="submit" size="lg" className="px-8" disabled={isSubmitting}>
+                {isSubmitting ? "Submitting..." : "List Property"}
               </Button>
             </div>
           </form>

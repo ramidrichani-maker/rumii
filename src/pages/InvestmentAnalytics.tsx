@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Calculator, TrendingUp, DollarSign, Percent } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import PropertyMap from '@/components/PropertyMap';
 
 interface CalculationResults {
   monthlyRental: number;
@@ -31,6 +32,7 @@ const InvestmentAnalytics = () => {
     monthlyExpenses: ''
   });
   
+  const [coordinates, setCoordinates] = useState({ lat: 35.9078, lng: 14.4109 });
   const [results, setResults] = useState<CalculationResults | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -46,6 +48,18 @@ const InvestmentAnalytics = () => {
       ...formData,
       [name]: value
     });
+  };
+
+  const handleLocationSelect = (lat: number, lng: number, address?: string) => {
+    setCoordinates({ lat, lng });
+    if (address) {
+      // Extract location from address for better calculations
+      const addressParts = address.split(',');
+      const location = addressParts[0]?.trim().toLowerCase();
+      if (location && !formData.location) {
+        setFormData(prev => ({ ...prev, location: 'suburban' })); // Default to suburban
+      }
+    }
   };
 
   const calculateInvestment = () => {
@@ -149,12 +163,23 @@ const InvestmentAnalytics = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Location Map */}
+              <div className="space-y-2">
+                <Label>Property Location</Label>
+                <PropertyMap
+                  latitude={coordinates.lat}
+                  longitude={coordinates.lng}
+                  onLocationSelect={handleLocationSelect}
+                  height="200px"
+                />
+              </div>
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Select onValueChange={(value) => handleSelectChange('location', value)}>
+                  <Label htmlFor="location">Location Type</Label>
+                  <Select onValueChange={(value) => handleSelectChange('location', value)} value={formData.location}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select location" />
+                      <SelectValue placeholder="Select location type" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="downtown">Downtown</SelectItem>
@@ -164,10 +189,9 @@ const InvestmentAnalytics = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="propertyType">Property Type</Label>
-                  <Select onValueChange={(value) => handleSelectChange('propertyType', value)}>
+                  <Select onValueChange={(value) => handleSelectChange('propertyType', value)} value={formData.propertyType}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>

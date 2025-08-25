@@ -85,7 +85,9 @@ export type Database = {
           id: string
           images: string[] | null
           last_renovated: number | null
+          latitude: number | null
           listing_type: Database["public"]["Enums"]["listing_type"]
+          longitude: number | null
           price: number | null
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
@@ -104,7 +106,9 @@ export type Database = {
           id?: string
           images?: string[] | null
           last_renovated?: number | null
+          latitude?: number | null
           listing_type: Database["public"]["Enums"]["listing_type"]
+          longitude?: number | null
           price?: number | null
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
@@ -123,7 +127,9 @@ export type Database = {
           id?: string
           images?: string[] | null
           last_renovated?: number | null
+          latitude?: number | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
+          longitude?: number | null
           price?: number | null
           property_type?: Database["public"]["Enums"]["property_type"]
           square_meters?: number
