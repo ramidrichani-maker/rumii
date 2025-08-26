@@ -7,12 +7,15 @@ import { MapPin, Locate, Search, Maximize2, Minimize2 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default markers in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+// Create custom icon to avoid default icon issues
+const defaultIcon = L.icon({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
 
 interface PropertyMapProps {
@@ -38,7 +41,7 @@ const LocationMarker: React.FC<LocationMarkerProps> = ({ position, onLocationSel
     },
   });
 
-  return position ? <Marker position={position} /> : null;
+  return position ? <Marker position={position} icon={defaultIcon} /> : null;
 };
 
 const PropertyMap: React.FC<PropertyMapProps> = ({
@@ -184,11 +187,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
               center={position}
               zoom={13}
               style={{ height: '100%', width: '100%' }}
-              key={`${position[0]}-${position[1]}`}
+              scrollWheelZoom={true}
+              attributionControl={true}
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                maxZoom={19}
               />
               <LocationMarker 
                 position={position} 
