@@ -53,7 +53,21 @@ const ListProperty = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [coordinates, setCoordinates] = useState({ lat: 35.9078, lng: 14.4109 });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuth();
+  const auth = useAuth();
+  
+  // Guard against auth context not being ready
+  if (!auth || auth.loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { user } = auth;
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),

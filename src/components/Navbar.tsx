@@ -16,7 +16,24 @@ import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 
 export const Navbar = () => {
-  const { user, profile, signOut } = useAuth();
+  const auth = useAuth();
+  
+  // Guard against auth context not being ready
+  if (!auth || auth.loading) {
+    return (
+      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center">
+          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+            <div className="w-full flex-1 md:w-auto md:flex-none">
+              <div className="animate-pulse h-8 w-20 bg-muted rounded"></div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  const { user, profile, signOut } = auth;
   const navigate = useNavigate();
   const { toast } = useToast();
 
