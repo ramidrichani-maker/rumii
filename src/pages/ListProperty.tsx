@@ -54,8 +54,16 @@ const ListProperty = () => {
   const [coordinates, setCoordinates] = useState({ lat: 35.9078, lng: 14.4109 });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const auth = useAuth();
+  const { user } = auth;
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      amenities: [],
+    },
+  });
   
-  // Guard against auth context not being ready
+  // Guard against auth context not being ready - AFTER all hooks
   if (!auth || auth.loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -66,15 +74,6 @@ const ListProperty = () => {
       </div>
     );
   }
-
-  const { user } = auth;
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      amenities: [],
-    },
-  });
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
