@@ -106,26 +106,26 @@ const ListProperty = () => {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-                        .from('properties')
-                        .insert({
-                          user_id: user.id,
-                          district: data.district,
-                          city: data.city,
-          address: data.address,
-          property_type: data.propertyType as any,
-          square_meters: parseInt(data.metersSquared),
-          bedrooms: parseInt(data.bedrooms),
-          bathrooms: parseInt(data.bathrooms),
-          listing_type: data.listingType as any,
-          price: parseFloat(data.price),
-          year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
-          last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
-          amenities: selectedAmenities,
-          latitude: coordinates.lat,
-          longitude: coordinates.lng,
-          status: 'pending'
-        });
+        const { error } = await supabase
+          .from('properties')
+          .insert({
+            user_id: user.id,
+            district: data.district,
+            city: data.city,
+            address: data.address,
+            property_type: data.propertyType.toLowerCase() as any,
+            square_meters: parseInt(data.metersSquared),
+            bedrooms: parseInt(data.bedrooms),
+            bathrooms: parseInt(data.bathrooms),
+            listing_type: data.listingType as any,
+            price: parseFloat(data.price),
+            year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
+            last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
+            amenities: selectedAmenities,
+            latitude: coordinates.lat,
+            longitude: coordinates.lng,
+            status: 'pending'
+          });
 
       if (error) throw error;
 
