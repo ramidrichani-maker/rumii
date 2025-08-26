@@ -1,27 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Calendar, Tractor } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, Home, Building, Crown, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import PropertySearchMap from "@/components/PropertySearchMap";
+import RangeSlider from "@/components/RangeSlider";
 
 const propertyTypes = [
-  { id: "flat", name: "Flat", icon: Building },
+  { id: "apartment", name: "Apartment", icon: Building },
   { id: "villa", name: "Villa", icon: Home },
-  { id: "land", name: "Land", icon: Trees },
-  { id: "beach-house", name: "Beach House", icon: Waves },
-  { id: "chalet", name: "Chalet", icon: Mountain },
+  { id: "house", name: "House", icon: Home },
+  { id: "studio", name: "Studio", icon: Building2 },
   { id: "penthouse", name: "Penthouse", icon: Crown },
-  { id: "rooftop", name: "Rooftop", icon: Building2 },
-  { id: "venue", name: "Venue", icon: Calendar },
-  { id: "farm", name: "Farm", icon: Tractor },
+  { id: "townhouse", name: "Townhouse", icon: Building },
+  { id: "duplex", name: "Duplex", icon: Building2 },
+  { id: "loft", name: "Loft", icon: Building2 },
+];
+
+const amenities = [
+  "Swimming Pool", "Gym", "Parking", "Balcony", "Garden", 
+  "Air Conditioning", "Heating", "Internet", "Security", 
+  "Elevator", "Furnished", "Pet Friendly", "Laundry", 
+  "Storage", "Terrace", "Sea View", "Mountain View"
 ];
 
 const Purchase = () => {
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
-  const [minSquareMeters, setMinSquareMeters] = useState([50]);
+  const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 500]);
   const [minBedrooms, setMinBedrooms] = useState(1);
+  const [minBathrooms, setMinBathrooms] = useState(1);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const togglePropertyType = (typeId: string) => {
     setSelectedPropertyTypes(prev =>
@@ -29,6 +43,75 @@ const Purchase = () => {
         ? prev.filter(id => id !== typeId)
         : [...prev, typeId]
     );
+  };
+
+  const toggleAmenity = (amenity: string) => {
+    setSelectedAmenities(prev => prev.includes(amenity) ? prev.filter(a => a !== amenity) : [...prev, amenity]);
+  };
+
+  const fetchProperties = async () => {
+    setIsLoading(true);
+    try {
+      let query = supabase
+        .from('properties')
+        .select('*')
+        .eq('listing_type', 'sale')
+        .eq('status', 'approved');
+
+      // Apply filters
+      if (selectedPropertyTypes.length > 0) {
+        query = query.in('property_type', selectedPropertyTypes as any);
+      }
+
+      // Square meters filter (handle 500+ case)
+      if (squareMetersRange[1] >= 500) {
+        query = query.gte('square_meters', squareMetersRange[0]);
+      } else {
+        query = query.gte('square_meters', squareMetersRange[0]).lte('square_meters', squareMetersRange[1]);
+      }
+
+      if (minBedrooms > 1) {
+        query = query.gte('bedrooms', minBedrooms);
+      }
+
+      if (minBathrooms > 1) {
+        query = query.gte('bathrooms', minBathrooms);
+      }
+
+      if (selectedAmenities.length > 0) {
+        query = query.contains('amenities', selectedAmenities);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setProperties(data || []);
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch properties. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const handleApplyFilters = () => {
+    fetchProperties();
+  };
+
+  const handleClearFilters = () => {
+    setSelectedPropertyTypes([]);
+    setSquareMetersRange([50, 500]);
+    setMinBedrooms(1);
+    setMinBathrooms(1);
+    setSelectedAmenities([]);
   };
 
   return (
@@ -75,35 +158,32 @@ const Purchase = () => {
             </div>
 
             {/* Square Meters Filter */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-foreground">
-                Minimum Square Meters: {minSquareMeters[0]} m²
-              </h3>
-              <div className="px-4">
-                <Slider
-                  value={minSquareMeters}
-                  onValueChange={setMinSquareMeters}
-                  max={500}
-                  min={50}
-                  step={10}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                  <span>50 m²</span>
-                  <span>500 m²</span>
-                </div>
-              </div>
-            </div>
+            <RangeSlider
+              value={squareMetersRange}
+              onValueChange={setSquareMetersRange}
+              min={50}
+              max={500}
+              step={10}
+              label="Square Meters Range"
+              unit=" m²"
+              maxLabel="500+ m²"
+            />
 
             {/* Amenities Filter */}
             <div>
               <h3 className="text-lg font-semibold mb-4 text-foreground">Amenities</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-                {['Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 'AC'].map((amenity) => (
-                  <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm">{amenity}</span>
-                  </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+                {amenities.map(amenity => (
+                  <div key={amenity} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={amenity}
+                      checked={selectedAmenities.includes(amenity)}
+                      onCheckedChange={() => toggleAmenity(amenity)}
+                    />
+                    <label htmlFor={amenity} className="text-sm cursor-pointer">
+                      {amenity}
+                    </label>
+                  </div>
                 ))}
               </div>
             </div>
@@ -130,27 +210,49 @@ const Purchase = () => {
               </div>
             </div>
 
+            {/* Bathrooms Filter */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">
+                Minimum Bathrooms: {minBathrooms}
+              </h3>
+              <div className="flex gap-3">
+                {[1, 2, 3, 4, 5].map((bathroom) => (
+                  <button
+                    key={bathroom}
+                    onClick={() => setMinBathrooms(bathroom)}
+                    className={`w-12 h-12 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      minBathrooms === bathroom
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background hover:border-primary/50"
+                    }`}
+                  >
+                    {bathroom}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="flex gap-4">
-              <Button size="lg" className="flex-1">
-                Apply Filters
+              <Button size="lg" className="flex-1" onClick={handleApplyFilters} disabled={isLoading}>
+                {isLoading ? "Searching..." : "Apply Filters"}
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => {
-                  setSelectedPropertyTypes([]);
-                  setMinSquareMeters([50]);
-                  setMinBedrooms(1);
-                }}
-              >
+              <Button variant="outline" size="lg" onClick={handleClearFilters}>
                 Clear All
               </Button>
             </div>
           </CardContent>
         </Card>
 
+        {/* Property Map */}
+        <div className="mb-8">
+          <PropertySearchMap 
+            properties={properties} 
+            height="400px"
+          />
+        </div>
+
         {/* Active Filters Display */}
-        {(selectedPropertyTypes.length > 0 || minSquareMeters[0] > 50 || minBedrooms > 1) && (
+        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 500 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0) && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-foreground">Active Filters:</h3>
             <div className="flex flex-wrap gap-2">
@@ -162,9 +264,9 @@ const Purchase = () => {
                   </Badge>
                 );
               })}
-              {minSquareMeters[0] > 50 && (
+              {(squareMetersRange[0] > 50 || squareMetersRange[1] < 500) && (
                 <Badge variant="secondary" className="px-3 py-1">
-                  Min {minSquareMeters[0]} m²
+                  {squareMetersRange[0]}-{squareMetersRange[1] >= 500 ? '500+' : squareMetersRange[1]} m²
                 </Badge>
               )}
               {minBedrooms > 1 && (
@@ -172,15 +274,31 @@ const Purchase = () => {
                   Min {minBedrooms} bedrooms
                 </Badge>
               )}
+              {minBathrooms > 1 && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  Min {minBathrooms} bathrooms
+                </Badge>
+              )}
+              {selectedAmenities.map(amenity => (
+                <Badge key={amenity} variant="secondary" className="px-3 py-1">
+                  {amenity}
+                </Badge>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Results Placeholder */}
+        {/* Results */}
         <div className="text-center py-12">
           <div className="text-6xl text-muted-foreground/30 mb-4">🏠</div>
-          <h3 className="text-xl font-semibold text-foreground mb-2">Properties will appear here</h3>
-          <p className="text-muted-foreground">Apply filters above to find properties that match your criteria</p>
+          <h3 className="text-xl font-semibold text-foreground mb-2">
+            {isLoading ? "Searching properties..." : `${properties.length} properties found`}
+          </h3>
+          <p className="text-muted-foreground">
+            {properties.length === 0 && !isLoading 
+              ? "No properties match your criteria. Try adjusting your filters." 
+              : "Properties are shown on the map above"}
+          </p>
         </div>
       </div>
     </div>

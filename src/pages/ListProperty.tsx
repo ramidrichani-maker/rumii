@@ -19,8 +19,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import PropertyMap from "@/components/PropertyMap";
 
 const propertyTypes = [
-  "Flat", "Villa", "Land", "Beach House", "Chalet", 
-  "Penthouse", "Rooftop", "Venue", "Farm"
+  "Apartment", "Villa", "House", "Studio", "Penthouse", 
+  "Townhouse", "Duplex", "Loft"
 ];
 
 const amenities = [
@@ -31,6 +31,7 @@ const amenities = [
 ];
 
 const formSchema = z.object({
+  district: z.string().min(1, "District is required"),
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Full address is required"),
   propertyType: z.string().min(1, "Property type is required"),
@@ -106,10 +107,11 @@ const ListProperty = () => {
     setIsSubmitting(true);
     try {
       const { error } = await supabase
-        .from('properties')
-        .insert({
-          user_id: user.id,
-          city: data.city,
+                        .from('properties')
+                        .insert({
+                          user_id: user.id,
+                          district: data.district,
+                          city: data.city,
           address: data.address,
           property_type: data.propertyType as any,
           square_meters: parseInt(data.metersSquared),
@@ -185,6 +187,20 @@ const ListProperty = () => {
                   <CardTitle>Basic Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="district"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>District</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter district" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="city"

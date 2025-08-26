@@ -18,6 +18,7 @@ const Auth = () => {
     confirmPassword: '',
     full_name: '',
     phone_number: '',
+    country: 'us',
     role: 'user'
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +39,22 @@ const Auth = () => {
       ...formData,
       role: value
     });
+  };
+
+  const handleCountryChange = (value: string) => {
+    setFormData({
+      ...formData,
+      country: value
+    });
+  };
+
+  const getCountryCode = (countryCode: string) => {
+    const codes: { [key: string]: string } = {
+      us: '+1', ca: '+1', uk: '+44', au: '+61', de: '+49', fr: '+33',
+      es: '+34', it: '+39', nl: '+31', se: '+46', no: '+47', dk: '+45',
+      mt: '+356', jp: '+81', sg: '+65', hk: '+852'
+    };
+    return codes[countryCode] || '+1';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -165,18 +182,50 @@ const Auth = () => {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone_number">Phone Number</Label>
-                    <Input
-                      id="phone_number"
-                      name="phone_number"
-                      type="tel"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.phone_number}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="country">Country</Label>
+                      <Select value={formData.country} onValueChange={handleCountryChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="us">🇺🇸 United States (+1)</SelectItem>
+                          <SelectItem value="uk">🇬🇧 United Kingdom (+44)</SelectItem>
+                          <SelectItem value="ca">🇨🇦 Canada (+1)</SelectItem>
+                          <SelectItem value="au">🇦🇺 Australia (+61)</SelectItem>
+                          <SelectItem value="de">🇩🇪 Germany (+49)</SelectItem>
+                          <SelectItem value="fr">🇫🇷 France (+33)</SelectItem>
+                          <SelectItem value="es">🇪🇸 Spain (+34)</SelectItem>
+                          <SelectItem value="it">🇮🇹 Italy (+39)</SelectItem>
+                          <SelectItem value="nl">🇳🇱 Netherlands (+31)</SelectItem>
+                          <SelectItem value="se">🇸🇪 Sweden (+46)</SelectItem>
+                          <SelectItem value="no">🇳🇴 Norway (+47)</SelectItem>
+                          <SelectItem value="dk">🇩🇰 Denmark (+45)</SelectItem>
+                          <SelectItem value="mt">🇲🇹 Malta (+356)</SelectItem>
+                          <SelectItem value="jp">🇯🇵 Japan (+81)</SelectItem>
+                          <SelectItem value="sg">🇸🇬 Singapore (+65)</SelectItem>
+                          <SelectItem value="hk">🇭🇰 Hong Kong (+852)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone_number">Phone Number</Label>
+                      <div className="flex gap-2">
+                        <div className="w-20 px-3 py-2 bg-muted rounded-md text-sm text-center">
+                          {getCountryCode(formData.country)}
+                        </div>
+                        <Input
+                          id="phone_number"
+                          name="phone_number"
+                          type="tel"
+                          placeholder="123-456-7890"
+                          value={formData.phone_number}
+                          onChange={handleInputChange}
+                          className="flex-1"
+                          required
+                        />
+                      </div>
+                    </div>
                   <div className="space-y-2">
                     <Label htmlFor="role">Account Type</Label>
                     <Select value={formData.role} onValueChange={handleRoleChange}>
