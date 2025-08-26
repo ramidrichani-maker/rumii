@@ -1,22 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Locate, Search, Maximize2, Minimize2 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
-// Create custom icon to avoid default icon issues
-const defaultIcon = L.icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
 
 interface PropertyMapProps {
   latitude?: number;
@@ -26,24 +14,6 @@ interface PropertyMapProps {
   className?: string;
 }
 
-interface LocationMarkerProps {
-  position: [number, number] | null;
-  onLocationSelect: (lat: number, lng: number) => void;
-  isPinPointMode: boolean;
-}
-
-const LocationMarker: React.FC<LocationMarkerProps> = ({ position, onLocationSelect, isPinPointMode }) => {
-  useMapEvents({
-    click(e) {
-      if (isPinPointMode) {
-        onLocationSelect(e.latlng.lat, e.latlng.lng);
-      }
-    },
-  });
-
-  return position ? <Marker position={position} icon={defaultIcon} /> : null;
-};
-
 const PropertyMap: React.FC<PropertyMapProps> = ({
   latitude = 35.9078,
   longitude = 14.4109, // Default to Malta
@@ -51,22 +21,93 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   height = "300px",
   className = ""
 }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const leafletMapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+  
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [position, setPosition] = useState<[number, number]>([latitude, longitude]);
   const [searchAddress, setSearchAddress] = useState('');
   const [isPinPointMode, setIsPinPointMode] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [mapInitialized, setMapInitialized] = useState(false);
 
+  // Initialize map
   useEffect(() => {
-    setPosition([latitude, longitude]);
-  }, [latitude, longitude]);
+    if (!mapRef.current || mapInitialized) return;
+
+    try {
+      // Create custom icon
+      const customIcon = L.icon({
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+      // Initialize map
+      const map = L.map(mapRef.current).setView(position, 13);
+      
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      // Add marker
+      const marker = L.marker(position, { icon: customIcon }).addTo(map);
+      
+      // Add click handler
+      map.on('click', (e: L.LeafletMouseEvent) => {
+        if (isPinPointMode) {
+          const { lat, lng } = e.latlng;
+          setPosition([lat, lng]);
+          onLocationSelect(lat, lng);
+          
+          // Move marker
+          if (markerRef.current) {
+            markerRef.current.setLatLng([lat, lng]);
+          }
+        }
+      });
+
+      leafletMapRef.current = map;
+      markerRef.current = marker;
+      setMapInitialized(true);
+
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
+
+    // Cleanup
+    return () => {
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+        markerRef.current = null;
+        setMapInitialized(false);
+      }
+    };
+  }, []);
+
+  // Update marker position when position changes
+  useEffect(() => {
+    if (markerRef.current && leafletMapRef.current) {
+      markerRef.current.setLatLng(position);
+      leafletMapRef.current.setView(position, leafletMapRef.current.getZoom());
+    }
+  }, [position]);
 
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setPosition([latitude, longitude]);
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          const newPosition: [number, number] = [latitude, longitude];
+          setPosition(newPosition);
           onLocationSelect(latitude, longitude);
         },
         (error) => {
@@ -84,7 +125,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     
     setIsSearching(true);
     try {
-      // Using Nominatim OpenStreetMap API for geocoding
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1`
       );
@@ -106,13 +146,14 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     }
   };
 
-  const handleLocationSelect = (lat: number, lng: number) => {
-    setPosition([lat, lng]);
-    onLocationSelect(lat, lng);
-  };
-
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+    // Re-initialize map size after fullscreen toggle
+    setTimeout(() => {
+      if (leafletMapRef.current) {
+        leafletMapRef.current.invalidateSize();
+      }
+    }, 100);
   };
 
   const togglePinPointMode = () => {
@@ -181,27 +222,12 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
             </div>
           </div>
 
-          {/* Map */}
-          <div style={{ height: mapHeight }} className="rounded-lg overflow-hidden border">
-            <MapContainer
-              center={position}
-              zoom={13}
-              style={{ height: '100%', width: '100%' }}
-              scrollWheelZoom={true}
-              attributionControl={true}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                maxZoom={19}
-              />
-              <LocationMarker 
-                position={position} 
-                onLocationSelect={handleLocationSelect}
-                isPinPointMode={isPinPointMode}
-              />
-            </MapContainer>
-          </div>
+          {/* Map Container */}
+          <div 
+            ref={mapRef}
+            style={{ height: mapHeight }} 
+            className="rounded-lg overflow-hidden border"
+          />
           
           {isPinPointMode && (
             <p className="text-sm text-muted-foreground mt-2 text-center">
