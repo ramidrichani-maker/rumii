@@ -20,6 +20,7 @@ interface CalculationResults {
 const InvestmentAnalytics = () => {
   const [formData, setFormData] = useState({
     location: '',
+    city: '',
     propertyType: '',
     squareMeters: '',
     yearBuilt: '',
@@ -79,12 +80,14 @@ const InvestmentAnalytics = () => {
       // Base rental calculation (this would typically use real market data)
       let baseRentalPerSqm = 15; // Base $15 per sqm
       
-      // Location multipliers
+      // District multipliers
       const locationMultipliers: { [key: string]: number } = {
-        'downtown': 1.5,
-        'midtown': 1.3,
-        'suburban': 1.0,
-        'rural': 0.8
+        'beirut': 1.5,
+        'jbeil': 1.2,
+        'batroun': 1.1,
+        'faqra': 1.3,
+        'faraya': 1.3,
+        'broumana': 1.2
       };
       
       // Property type multipliers
@@ -176,19 +179,40 @@ const InvestmentAnalytics = () => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location Type</Label>
+                  <Label htmlFor="location">District</Label>
                   <Select onValueChange={(value) => handleSelectChange('location', value)} value={formData.location}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select location type" />
+                      <SelectValue placeholder="Select district" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="downtown">Downtown</SelectItem>
-                      <SelectItem value="midtown">Midtown</SelectItem>
-                      <SelectItem value="suburban">Suburban</SelectItem>
-                      <SelectItem value="rural">Rural</SelectItem>
+                      <SelectItem value="beirut">Beirut</SelectItem>
+                      <SelectItem value="jbeil">Jbeil</SelectItem>
+                      <SelectItem value="batroun">Batroun</SelectItem>
+                      <SelectItem value="faqra">Faqra</SelectItem>
+                      <SelectItem value="faraya">Faraya</SelectItem>
+                      <SelectItem value="broumana">Broumana</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Select onValueChange={(value) => handleSelectChange('city', value)} value={formData.city}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select city" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beirut_city">Beirut City</SelectItem>
+                      <SelectItem value="tripoli">Tripoli</SelectItem>
+                      <SelectItem value="sidon">Sidon</SelectItem>
+                      <SelectItem value="tyre">Tyre</SelectItem>
+                      <SelectItem value="zahle">Zahle</SelectItem>
+                      <SelectItem value="jounieh">Jounieh</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="propertyType">Property Type</Label>
                   <Select onValueChange={(value) => handleSelectChange('propertyType', value)} value={formData.propertyType}>

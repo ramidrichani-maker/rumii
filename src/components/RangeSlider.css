@@ -1,0 +1,29 @@
+.range-slider [data-radix-collection-item] {
+  position: relative;
+}
+
+.range-slider [data-radix-collection-item]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: grab;
+  z-index: 10;
+}
+
+.range-slider [data-radix-collection-item]:active::before {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.range-slider [role="slider"]:focus-visible::before {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}

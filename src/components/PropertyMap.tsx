@@ -24,6 +24,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  const pinPointMarkerRef = useRef<L.Marker | null>(null);
   
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [position, setPosition] = useState<[number, number]>([latitude, longitude]);
@@ -67,10 +68,26 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           setPosition([lat, lng]);
           onLocationSelect(lat, lng);
           
-          // Move marker
-          if (markerRef.current) {
-            markerRef.current.setLatLng([lat, lng]);
+          // Remove existing pinpoint marker
+          if (pinPointMarkerRef.current) {
+            pinPointMarkerRef.current.remove();
           }
+          
+          // Create new pinpoint marker with custom pin icon
+          const pinIcon = L.icon({
+            iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#ef4444" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            `),
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32],
+          });
+          
+          pinPointMarkerRef.current = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
+          pinPointMarkerRef.current.bindPopup('Selected Property Location').openPopup();
         }
       });
 
@@ -88,6 +105,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
         markerRef.current = null;
+        pinPointMarkerRef.current = null;
         setMapInitialized(false);
       }
     };

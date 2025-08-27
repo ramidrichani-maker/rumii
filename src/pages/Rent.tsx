@@ -7,7 +7,7 @@ import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Ca
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import PropertySearchMap from "@/components/PropertySearchMap";
+import CompactPropertyMap from "@/components/CompactPropertyMap";
 import RangeSlider from "@/components/RangeSlider";
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
@@ -226,9 +226,10 @@ const Rent = () => {
 
         {/* Property Map */}
         <div className="mb-8">
-          <PropertySearchMap 
+          <CompactPropertyMap 
             properties={properties} 
-            height="400px"
+            height="300px"
+            defaultExpanded={false}
           />
         </div>
 

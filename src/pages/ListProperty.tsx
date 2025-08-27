@@ -31,7 +31,7 @@ const amenities = [
 ];
 
 const formSchema = z.object({
-  municipality: z.string().min(1, "Municipality is required"),
+  municipality: z.string().min(1, "District is required"),
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Full address is required"),
   propertyType: z.string().min(1, "Property type is required"),
@@ -192,9 +192,21 @@ const ListProperty = () => {
                     name="municipality"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Municipality</FormLabel>
+                        <FormLabel>District</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter municipality" {...field} />
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select district" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Beirut">Beirut</SelectItem>
+                              <SelectItem value="Jbeil">Jbeil</SelectItem>
+                              <SelectItem value="Batroun">Batroun</SelectItem>
+                              <SelectItem value="Faqra">Faqra</SelectItem>
+                              <SelectItem value="Faraya">Faraya</SelectItem>
+                              <SelectItem value="Broumana">Broumana</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

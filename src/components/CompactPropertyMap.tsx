@@ -24,18 +24,22 @@ interface CompactPropertyMapProps {
   properties: Property[];
   className?: string;
   onPropertySelect?: (property: Property) => void;
+  height?: string;
+  defaultExpanded?: boolean;
 }
 
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   properties = [],
   className = "",
-  onPropertySelect
+  onPropertySelect,
+  height = "250px",
+  defaultExpanded = false
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const [mapInitialized, setMapInitialized] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [searchAddress, setSearchAddress] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
@@ -189,7 +193,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     setIsExpanded(!isExpanded);
   };
 
-  const mapHeight = isExpanded ? "60vh" : "250px";
+  const mapHeight = isExpanded ? "60vh" : height;
   const mapClass = isExpanded ? "fixed inset-0 z-50 bg-background p-4" : className;
 
   return (
@@ -214,7 +218,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           {/* Search Controls */}
           <div className="flex gap-2 mb-3">
             <Input
-              placeholder="Search municipality..."
+              placeholder="Search district..."
               value={searchAddress}
               onChange={(e) => setSearchAddress(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && searchLocation()}
