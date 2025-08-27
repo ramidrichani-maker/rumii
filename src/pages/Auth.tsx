@@ -18,7 +18,7 @@ const Auth = () => {
     confirmPassword: '',
     full_name: '',
     phone_number: '',
-    country: 'us',
+    country: '+961',
     role: 'user'
   });
   const [isLoading, setIsLoading] = useState(false);

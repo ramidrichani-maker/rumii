@@ -82,13 +82,13 @@ export type Database = {
           bedrooms: number
           city: string
           created_at: string
-          district: string | null
           id: string
           images: string[] | null
           last_renovated: number | null
           latitude: number | null
           listing_type: Database["public"]["Enums"]["listing_type"]
           longitude: number | null
+          municipality: string | null
           price: number | null
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
@@ -104,13 +104,13 @@ export type Database = {
           bedrooms: number
           city: string
           created_at?: string
-          district?: string | null
           id?: string
           images?: string[] | null
           last_renovated?: number | null
           latitude?: number | null
           listing_type: Database["public"]["Enums"]["listing_type"]
           longitude?: number | null
+          municipality?: string | null
           price?: number | null
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
@@ -126,13 +126,13 @@ export type Database = {
           bedrooms?: number
           city?: string
           created_at?: string
-          district?: string | null
           id?: string
           images?: string[] | null
           last_renovated?: number | null
           latitude?: number | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
           longitude?: number | null
+          municipality?: string | null
           price?: number | null
           property_type?: Database["public"]["Enums"]["property_type"]
           square_meters?: number
@@ -148,6 +148,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user_account: {
+        Args: { _admin_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
@@ -155,6 +159,14 @@ export type Database = {
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      update_user_role: {
+        Args: {
+          _admin_id: string
+          _new_role: Database["public"]["Enums"]["user_role"]
           _user_id: string
         }
         Returns: boolean

@@ -15,8 +15,8 @@ interface PropertyMapProps {
 }
 
 const PropertyMap: React.FC<PropertyMapProps> = ({
-  latitude = 35.9078,
-  longitude = 14.4109, // Default to Malta
+  latitude = 33.8938,
+  longitude = 35.5018, // Default to Beirut, Lebanon
   onLocationSelect,
   height = "300px",
   className = ""

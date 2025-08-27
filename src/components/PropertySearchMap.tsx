@@ -54,8 +54,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
         popupAnchor: [0, -32],
       });
 
-      // Initialize map with Malta as default center
-      const map = L.map(mapRef.current).setView([35.9078, 14.4109], 12);
+      // Initialize map with Beirut, Lebanon as default center
+      const map = L.map(mapRef.current).setView([33.8938, 35.5018], 12);
       
       // Add tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

@@ -31,7 +31,7 @@ const amenities = [
 ];
 
 const formSchema = z.object({
-  district: z.string().min(1, "District is required"),
+  municipality: z.string().min(1, "Municipality is required"),
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Full address is required"),
   propertyType: z.string().min(1, "Property type is required"),
@@ -110,7 +110,7 @@ const ListProperty = () => {
           .from('properties')
           .insert({
             user_id: user.id,
-            district: data.district,
+            municipality: data.municipality,
             city: data.city,
             address: data.address,
             property_type: data.propertyType.toLowerCase() as any,
@@ -189,12 +189,12 @@ const ListProperty = () => {
                 <CardContent className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="district"
+                    name="municipality"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>District</FormLabel>
+                        <FormLabel>Municipality</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter district" {...field} />
+                          <Input placeholder="Enter municipality" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

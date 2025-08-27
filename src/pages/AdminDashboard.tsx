@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, CheckCircle, XCircle, Clock, Users, Home, Bell } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, Users, Home, Bell, Trash2, Shield, UserCheck } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -50,7 +51,7 @@ const AdminDashboard = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { toast } = useToast();
 
   // Redirect if not admin
@@ -153,6 +154,67 @@ const AdminDashboard = () => {
     }
     
     setIsLoading(false);
+  };
+
+  const updateUserRole = async (userId: string, newRole: string) => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.rpc('update_user_role', {
+        _user_id: userId,
+        _new_role: newRole as 'user' | 'agent' | 'admin',
+        _admin_id: user.id
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `User role updated to ${newRole}`,
+      });
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    if (!user) return;
+    
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.rpc('delete_user_account', {
+        _user_id: userId,
+        _admin_id: user.id
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const sendNotificationToAllUsers = async () => {
@@ -367,19 +429,62 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {users.map((user) => (
-                    <div key={user.id} className="border rounded-lg p-4">
+                  {users.map((currentUser) => (
+                    <div key={currentUser.id} className="border rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-semibold">{user.full_name}</h3>
-                          <p className="text-muted-foreground">{user.phone_number}</p>
+                          <h3 className="font-semibold">{currentUser.full_name}</h3>
+                          <p className="text-muted-foreground">{currentUser.phone_number}</p>
                           <p className="text-sm text-muted-foreground">
-                            Joined: {new Date(user.created_at).toLocaleDateString()}
+                            Joined: {new Date(currentUser.created_at).toLocaleDateString()}
                           </p>
                         </div>
-                        <Badge variant={user.role === 'admin' ? 'destructive' : user.role === 'agent' ? 'default' : 'secondary'}>
-                          {user.role}
-                        </Badge>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={currentUser.role === 'admin' ? 'destructive' : currentUser.role === 'agent' ? 'default' : 'secondary'}>
+                            {currentUser.role}
+                          </Badge>
+                          {currentUser.role !== 'admin' && (
+                            <div className="flex space-x-2">
+                              <Select
+                                defaultValue={currentUser.role}
+                                onValueChange={(value) => updateUserRole(currentUser.user_id, value)}
+                                disabled={isLoading}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user">
+                                    <div className="flex items-center space-x-2">
+                                      <Users className="h-4 w-4" />
+                                      <span>User</span>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="agent">
+                                    <div className="flex items-center space-x-2">
+                                      <UserCheck className="h-4 w-4" />
+                                      <span>Agent</span>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="admin">
+                                    <div className="flex items-center space-x-2">
+                                      <Shield className="h-4 w-4" />
+                                      <span>Admin</span>
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => deleteUser(currentUser.user_id)}
+                                disabled={isLoading}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
