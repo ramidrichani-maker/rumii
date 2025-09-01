@@ -327,11 +327,81 @@ const AdminDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Property Management</CardTitle>
-                <CardDescription>Review and approve property listings</CardDescription>
+                <CardDescription>Review and approve property listings submitted by users, agents, and admins</CardDescription>
               </CardHeader>
               <CardContent>
+                {/* Pending Properties Priority Section */}
+                {stats.pendingProperties > 0 && (
+                  <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Clock className="w-5 h-5 text-amber-600" />
+                      <h3 className="text-lg font-semibold text-amber-800">
+                        {stats.pendingProperties} Properties Awaiting Approval
+                      </h3>
+                    </div>
+                    <p className="text-amber-700 text-sm">
+                      These properties are submitted and waiting for your review. Once approved, they will be visible to all users on the platform.
+                    </p>
+                  </div>
+                )}
+
                 <div className="space-y-4">
-                  {properties.map((property) => (
+                  {/* Show pending properties first */}
+                  {properties
+                    .filter(p => p.status === 'pending')
+                    .map((property) => (
+                    <div key={property.id} className="border-2 border-amber-200 bg-amber-50/50 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h3 className="text-lg font-semibold">{property.address}</h3>
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                              NEEDS APPROVAL
+                            </Badge>
+                          </div>
+                          <p className="text-muted-foreground">{property.city}</p>
+                          <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                            <span>{property.property_type}</span>
+                            <span>{property.square_meters} m²</span>
+                            <span>{property.bedrooms} bed</span>
+                            <span>{property.bathrooms} bath</span>
+                            <span>{property.listing_type === 'rent' ? `$${property.price}/mo` : `$${property.price}`}</span>
+                          </div>
+                          <p className="text-sm mt-2">
+                            Listed by: {property.profiles?.full_name || 'Unknown'} ({property.profiles?.phone_number || 'N/A'})
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Submitted: {new Date(property.created_at).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updatePropertyStatus(property.id, 'approved')}
+                            disabled={isLoading}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Approve & Publish
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => setSelectedProperty(property)}
+                            disabled={isLoading}
+                          >
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Show approved/rejected properties */}
+                  {properties
+                    .filter(p => p.status !== 'pending')
+                    .map((property) => (
                     <div key={property.id} className="border rounded-lg p-4">
                       <div className="flex items-start justify-between mb-4">
                         <div>
@@ -347,36 +417,25 @@ const AdminDashboard = () => {
                           <p className="text-sm mt-2">
                             Listed by: {property.profiles?.full_name || 'Unknown'} ({property.profiles?.phone_number || 'N/A'})
                           </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {property.status === 'approved' ? 'Published' : 'Rejected'}: {new Date(property.created_at).toLocaleString()}
+                          </p>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Badge variant={getStatusBadgeVariant(property.status)}>
-                            {property.status}
+                            {property.status === 'approved' ? 'LIVE' : property.status.toUpperCase()}
                           </Badge>
-                          {property.status === 'pending' && (
-                            <div className="flex space-x-2">
-                              <Button
-                                size="sm"
-                                onClick={() => updatePropertyStatus(property.id, 'approved')}
-                                disabled={isLoading}
-                              >
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                Approve
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => setSelectedProperty(property)}
-                                disabled={isLoading}
-                              >
-                                <XCircle className="w-4 h-4 mr-1" />
-                                Reject
-                              </Button>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
                   ))}
+
+                  {properties.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Home className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No property listings submitted yet.</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Rejection Modal */}
