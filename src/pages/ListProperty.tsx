@@ -210,7 +210,28 @@ const ListProperty = () => {
                   <FormField control={form.control} name="propertyType" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel>Property Type</FormLabel>
+                        <FormLabel>Price ($)
+Meters Squared (m²)
+Number of Bedrooms
+Select bedrooms
+1 Bedroom
+2 Bedrooms
+3 Bedrooms
+4 Bedrooms
+5 Bedrooms
+6 Bedrooms
+7 Bedrooms
+8 Bedrooms
+Number of Bathrooms
+Select bathrooms
+1 Bathroom
+2 Bathrooms
+3 Bathrooms
+4 Bathrooms
+5 Bathrooms
+6 Bathrooms
+Year of Construction (Optional)
+Last Renovated (Optional)</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
