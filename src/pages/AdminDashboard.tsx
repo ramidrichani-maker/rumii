@@ -82,7 +82,8 @@ const AdminDashboard = () => {
           price,
           status,
           created_at,
-          profiles (
+          user_id,
+          profiles!inner (
             full_name,
             phone_number
           )
