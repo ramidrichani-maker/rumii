@@ -210,28 +210,7 @@ const ListProperty = () => {
                   <FormField control={form.control} name="propertyType" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel>Price ($)
-Meters Squared (m²)
-Number of Bedrooms
-Select bedrooms
-1 Bedroom
-2 Bedrooms
-3 Bedrooms
-4 Bedrooms
-5 Bedrooms
-6 Bedrooms
-7 Bedrooms
-8 Bedrooms
-Number of Bathrooms
-Select bathrooms
-1 Bathroom
-2 Bathrooms
-3 Bathrooms
-4 Bathrooms
-5 Bathrooms
-6 Bathrooms
-Year of Construction (Optional)
-Last Renovated (Optional)</FormLabel>
+                        <FormLabel></FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -291,7 +270,7 @@ Last Renovated (Optional)</FormLabel>
                   <FormField control={form.control} name="bedrooms" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel>Number of Bedrooms</FormLabel>
+                        <FormLabel>Bedrooms</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -310,7 +289,7 @@ Last Renovated (Optional)</FormLabel>
                   <FormField control={form.control} name="bathrooms" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel>Number of Bathrooms</FormLabel>
+                        <FormLabel>Bathrooms</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -329,7 +308,7 @@ Last Renovated (Optional)</FormLabel>
                   <FormField control={form.control} name="yearBuilt" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel>Year of construction (Optional)</FormLabel>
+                        <FormLabel>Year of Construction (Optional)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="e.g. 2010" {...field} />
                         </FormControl>
@@ -339,7 +318,7 @@ Last Renovated (Optional)</FormLabel>
                   <FormField control={form.control} name="lastRenovated" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel>Last Renovated (Optional)</FormLabel>
+                        <FormLabel>Last Renovation (Optional)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="e.g. 2020" {...field} />
                         </FormControl>
