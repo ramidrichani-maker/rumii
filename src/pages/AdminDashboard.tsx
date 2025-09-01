@@ -67,7 +67,7 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch properties with profiles
+      // Fetch properties first
       const { data: propertiesData, error: propertiesError } = await supabase
         .from('properties')
         .select(`
@@ -82,15 +82,16 @@ const AdminDashboard = () => {
           price,
           status,
           created_at,
-          user_id,
-          profiles!inner (
-            full_name,
-            phone_number
-          )
+          user_id
         `)
         .order('created_at', { ascending: false });
 
-      // Fetch users
+      // Fetch profiles separately
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, phone_number');
+
+      // Fetch users for user management
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
         .select('*')
@@ -98,13 +99,35 @@ const AdminDashboard = () => {
 
       if (propertiesError) {
         console.error('Error fetching properties:', propertiesError);
-      } else if (propertiesData) {
-        setProperties(propertiesData as unknown as PropertyWithProfile[]);
+        return;
+      }
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        return;
       }
 
       if (usersError) {
         console.error('Error fetching users:', usersError);
-      } else if (usersData) {
+        return;
+      }
+
+      // Manually join properties with profiles
+      if (propertiesData && profilesData) {
+        const propertiesWithProfiles = propertiesData.map(property => {
+          const profile = profilesData.find(p => p.user_id === property.user_id);
+          return {
+            ...property,
+            profiles: profile ? {
+              full_name: profile.full_name,
+              phone_number: profile.phone_number
+            } : null
+          };
+        });
+        setProperties(propertiesWithProfiles as PropertyWithProfile[]);
+      }
+
+      if (usersData) {
         setUsers(usersData);
       }
 
