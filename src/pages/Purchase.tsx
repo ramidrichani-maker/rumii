@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import CompactPropertyMap from "@/components/CompactPropertyMap";
+import PropertyDetailModal from "@/components/PropertyDetailModal";
 import RangeSlider from "@/components/RangeSlider";
 
 const propertyTypes = [
@@ -36,6 +37,8 @@ const Purchase = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const togglePropertyType = (typeId: string) => {
     setSelectedPropertyTypes(prev =>
@@ -112,6 +115,11 @@ const Purchase = () => {
     setMinBedrooms(1);
     setMinBathrooms(1);
     setSelectedAmenities([]);
+  };
+
+  const handlePropertySelect = (property: any) => {
+    setSelectedProperty(property);
+    setIsDetailModalOpen(true);
   };
 
   return (
@@ -249,6 +257,7 @@ const Purchase = () => {
             properties={properties} 
             height="300px"
             defaultExpanded={false}
+            onPropertySelect={handlePropertySelect}
           />
         </div>
 
@@ -301,6 +310,13 @@ const Purchase = () => {
               : "Properties are shown on the map above"}
           </p>
         </div>
+
+        {/* Property Detail Modal */}
+        <PropertyDetailModal
+          property={selectedProperty}
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+        />
       </div>
     </div>
   );

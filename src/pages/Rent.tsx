@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import CompactPropertyMap from "@/components/CompactPropertyMap";
+import PropertyDetailModal from "@/components/PropertyDetailModal";
 import RangeSlider from "@/components/RangeSlider";
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
@@ -34,6 +35,8 @@ const Rent = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const togglePropertyType = (typeId: string) => {
     setSelectedPropertyTypes(prev => prev.includes(typeId) ? prev.filter(id => id !== typeId) : [...prev, typeId]);
   };
@@ -105,6 +108,11 @@ const Rent = () => {
     setMinBedrooms(1);
     setMinBathrooms(1);
     setSelectedAmenities([]);
+  };
+
+  const handlePropertySelect = (property: any) => {
+    setSelectedProperty(property);
+    setIsDetailModalOpen(true);
   };
   return <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -230,6 +238,7 @@ const Rent = () => {
             properties={properties} 
             height="300px"
             defaultExpanded={false}
+            onPropertySelect={handlePropertySelect}
           />
         </div>
 
@@ -282,6 +291,13 @@ const Rent = () => {
               : "Properties are shown on the map above"}
           </p>
         </div>
+
+        {/* Property Detail Modal */}
+        <PropertyDetailModal
+          property={selectedProperty}
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+        />
       </div>
     </div>;
 };

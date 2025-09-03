@@ -12,12 +12,20 @@ interface Property {
   longitude: number;
   address: string;
   city: string;
+  municipality?: string;
   price: number;
   property_type: string;
   bedrooms: number;
   bathrooms: number;
   square_meters: number;
   listing_type: 'rent' | 'sale';
+  year_built?: number;
+  last_renovated?: number;
+  amenities: string[];
+  images: string[];
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  user_id: string;
 }
 
 interface CompactPropertyMapProps {
