@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import CompactPropertyMap from "@/components/CompactPropertyMap";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import RangeSlider from "@/components/RangeSlider";
+import PropertyCard from "@/components/PropertyCard";
 
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
@@ -298,18 +299,36 @@ const Purchase = () => {
           </div>
         )}
 
-        {/* Results */}
-        <div className="text-center py-12">
-          <div className="text-6xl text-muted-foreground/30 mb-4">🏠</div>
-          <h3 className="text-xl font-semibold text-foreground mb-2">
-            {isLoading ? "Searching properties..." : `${properties.length} properties found`}
-          </h3>
-          <p className="text-muted-foreground">
-            {properties.length === 0 && !isLoading 
-              ? "No properties match your criteria. Try adjusting your filters." 
-              : "Properties are shown on the map above"}
-          </p>
+        {/* Results Summary */}
+        <div className="text-center mb-6">
+          {isLoading ? (
+            <p className="text-muted-foreground">Loading properties...</p>
+          ) : properties.length > 0 ? (
+            <p className="text-muted-foreground">
+              Found {properties.length} {properties.length === 1 ? 'property' : 'properties'} for sale
+            </p>
+          ) : (
+            <p className="text-muted-foreground">
+              No properties match your current filters. Try adjusting your search criteria.
+            </p>
+          )}
         </div>
+
+        {/* Property Grid */}
+        {!isLoading && properties.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Sale</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {properties.map((property) => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  onClick={handlePropertySelect}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Property Detail Modal */}
         <PropertyDetailModal
