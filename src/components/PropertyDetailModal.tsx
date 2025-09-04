@@ -119,51 +119,62 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         {/* Images and Videos Carousel */}
         {property.images && property.images.length > 0 && (
           <div className="mb-6">
-            <Carousel className="w-full">
-              <CarouselContent>
-                {property.images.map((media, index) => (
-                  <CarouselItem key={index}>
-                    <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                      {isVideoUrl(media) ? (
-                        media.match(/\.(mp4|webm|ogg|mov|avi|wmv)$/i) ? (
-                          <video 
-                            controls 
-                            className="w-full h-full object-cover"
-                            poster=""
-                          >
-                            <source src={media} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
+            <div className="relative px-12">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {property.images.map((media, index) => (
+                    <CarouselItem key={index}>
+                      <div className="aspect-video bg-muted rounded-lg overflow-hidden border">
+                        {isVideoUrl(media) ? (
+                          media.match(/\.(mp4|webm|ogg|mov|avi|wmv)$/i) ? (
+                            <video 
+                              controls 
+                              className="w-full h-full object-cover"
+                              poster=""
+                            >
+                              <source src={media} type="video/mp4" />
+                              Your browser does not support the video tag.
+                            </video>
+                          ) : (
+                            <iframe
+                              src={getEmbedUrl(media)}
+                              className="w-full h-full"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          )
                         ) : (
-                          <iframe
-                            src={getEmbedUrl(media)}
-                            className="w-full h-full"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
+                          <img 
+                            src={media} 
+                            alt={`Property image ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Failed to load image:', media);
+                              (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTEwSDE4NVYxMjBIMTc1VjExMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTE2NSAxMzBIMjM1VjIwMEgxNjVWMTMwWiIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHA+PHRleHQgeD0iMjAwIiB5PSIxNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Q0EzQUYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9wPgo8L3N2Zz4K';
+                            }}
+                            onLoad={() => {
+                              console.log('Image loaded successfully:', media);
+                            }}
                           />
-                        )
-                      ) : (
-                        <img 
-                          src={media} 
-                          alt={`Property ${index + 1}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/placeholder.svg';
-                          }}
-                        />
-                      )}
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
+                        )}
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {property.images.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-2" />
+                    <CarouselNext className="right-2" />
+                  </>
+                )}
+              </Carousel>
+            </div>
+            <div className="text-center text-sm text-muted-foreground mt-2">
               {property.images.length > 1 && (
-                <>
-                  <CarouselPrevious />
-                  <CarouselNext />
-                </>
+                <span>{property.images.length} images</span>
               )}
-            </Carousel>
+            </div>
           </div>
         )}
 
