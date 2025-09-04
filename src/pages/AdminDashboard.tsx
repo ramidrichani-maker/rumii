@@ -32,20 +32,31 @@ const AdminDashboard = () => {
 
   const loadPendingProperties = async () => {
     try {
-      const { data, error } = await supabase
+      // Manual join to avoid relationship issues
+      const { data: properties, error: propsError } = await supabase
         .from('properties')
-        .select(`
-          *,
-          profiles!properties_user_id_fkey (
-            full_name,
-            phone_number
-          )
-        `)
+        .select('*')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPendingProperties(data || []);
+      if (propsError) throw propsError;
+
+      // Fetch profile data separately and merge
+      const propertiesWithProfiles = await Promise.all(
+        (properties || []).map(async (property) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, phone_number')
+            .eq('user_id', property.user_id)
+            .single();
+          
+          return {
+            ...property,
+            profiles: profile
+          };
+        })
+      );
+      setPendingProperties(propertiesWithProfiles || []);
       
       // Get stats
       const { data: allProps } = await supabase
