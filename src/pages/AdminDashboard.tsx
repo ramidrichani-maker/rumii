@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
+import UserRoleManager from "@/components/UserRoleManager";
+import UserAnalytics from "@/components/UserAnalytics";
 
 const AdminDashboard = () => {
   const [pendingProperties, setPendingProperties] = useState<any[]>([]);
@@ -168,7 +171,7 @@ const AdminDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage properties and users</p>
+          <p className="text-muted-foreground">Manage properties, users, and analytics</p>
         </div>
 
         {/* Stats */}
@@ -214,72 +217,99 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Pending Properties */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Pending Properties</CardTitle>
-            <CardDescription>Review and approve property listings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {pendingProperties.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No pending properties</p>
-            ) : (
-              <div className="space-y-4">
-                {pendingProperties.map((property) => (
-                  <div key={property.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <h3 className="font-semibold">{property.address}</h3>
-                        <p className="text-sm text-muted-foreground">{property.city}</p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>{property.property_type}</span>
-                          <span>{property.square_meters}m²</span>
-                          <span>{property.bedrooms} bed</span>
-                          <span>{property.bathrooms} bath</span>
-                          <span>${property.price?.toLocaleString()}</span>
+        {/* Tabbed Content */}
+        <Tabs defaultValue="properties" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="properties" className="flex items-center gap-2">
+              <Home className="w-4 h-4" />
+              Properties
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <UserCog className="w-4 h-4" />
+              User Management
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="properties">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pending Properties</CardTitle>
+                <CardDescription>Review and approve property listings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pendingProperties.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-8">No pending properties</p>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingProperties.map((property) => (
+                      <div key={property.id} className="border rounded-lg p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1">
+                            <h3 className="font-semibold">{property.address}</h3>
+                            <p className="text-sm text-muted-foreground">{property.city}</p>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span>{property.property_type}</span>
+                              <span>{property.square_meters}m²</span>
+                              <span>{property.bedrooms} bed</span>
+                              <span>{property.bathrooms} bath</span>
+                              <span>${property.price?.toLocaleString()}</span>
+                            </div>
+                            {property.profiles && (
+                              <p className="text-sm text-muted-foreground">
+                                Listed by: {property.profiles.full_name}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(property.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleViewProperty(property)}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              View Details
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleApproveProperty(property.id)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleRejectProperty(property.id)}
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Reject
+                            </Button>
+                          </div>
                         </div>
-                        {property.profiles && (
-                          <p className="text-sm text-muted-foreground">
-                            Listed by: {property.profiles.full_name}
-                          </p>
-                        )}
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(property.created_at).toLocaleDateString()}
-                        </p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleViewProperty(property)}
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View Details
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleApproveProperty(property.id)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleRejectProperty(property.id)}
-                        >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Reject
-                        </Button>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users">
+            <UserRoleManager users={users} onUserUpdated={loadUsers} />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <UserAnalytics />
+          </TabsContent>
+        </Tabs>
 
         {/* Property Detail Modal */}
         <PropertyDetailModal
