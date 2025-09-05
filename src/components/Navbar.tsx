@@ -1,27 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Home, User, LogOut, Settings, BarChart3, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
-
 export const Navbar = () => {
   const auth = useAuth();
-  
+
   // Guard against auth context not being ready
   if (!auth || auth.loading) {
-    return (
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    return <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <div className="w-full flex-1 md:w-auto md:flex-none">
@@ -29,32 +20,28 @@ export const Navbar = () => {
             </div>
           </div>
         </div>
-      </nav>
-    );
+      </nav>;
   }
-
-  const { user, profile, signOut } = auth;
+  const {
+    user,
+    profile,
+    signOut
+  } = auth;
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSignOut = async () => {
     await signOut();
     toast({
       title: "Signed out",
-      description: "You have been signed out successfully.",
+      description: "You have been signed out successfully."
     });
     navigate('/');
   };
-
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
-
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'admin':
@@ -65,14 +52,12 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-
-  return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  return <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <Home className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">RealEstate</span>
+            <span className="text-xl font-bold">Summit</span>
           </Link>
 
           <div className="flex items-center space-x-4">
@@ -83,8 +68,7 @@ export const Navbar = () => {
               </Button>
             </Link>
 
-            {user ? (
-              <>
+            {user ? <>
                 <NotificationBell />
                 
                 <DropdownMenu>
@@ -126,14 +110,12 @@ export const Navbar = () => {
                         <span>Investment Analytics</span>
                       </Link>
                     </DropdownMenuItem>
-                    {profile?.role === 'admin' && (
-                      <DropdownMenuItem asChild>
+                    {profile?.role === 'admin' && <DropdownMenuItem asChild>
                         <Link to="/admin" className="flex items-center">
                           <Shield className="mr-2 h-4 w-4" />
                           <span>Admin Dashboard</span>
                         </Link>
-                      </DropdownMenuItem>
-                    )}
+                      </DropdownMenuItem>}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
@@ -141,15 +123,11 @@ export const Navbar = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </>
-            ) : (
-              <Link to="/auth">
+              </> : <Link to="/auth">
                 <Button>Sign In</Button>
-              </Link>
-            )}
+              </Link>}
           </div>
         </div>
       </div>
-    </nav>
-  );
+    </nav>;
 };
