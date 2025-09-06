@@ -85,11 +85,40 @@ const ListProperty = () => {
       });
       return;
     }
+
     setIsSubmitting(true);
+    
     try {
-      const {
-        error
-      } = await supabase.from('properties').insert({
+      let imageUrls: string[] = [];
+
+      // Upload images to Supabase storage if there are any
+      if (uploadedFiles.length > 0) {
+        const uploadPromises = uploadedFiles.map(async (file, index) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
+          
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('property-images')
+            .upload(fileName, file);
+
+          if (uploadError) {
+            console.error('Error uploading image:', uploadError);
+            throw uploadError;
+          }
+
+          // Get public URL for the uploaded image
+          const { data: { publicUrl } } = supabase.storage
+            .from('property-images')
+            .getPublicUrl(fileName);
+
+          return publicUrl;
+        });
+
+        imageUrls = await Promise.all(uploadPromises);
+      }
+
+      // Insert property data with image URLs
+      const { error } = await supabase.from('properties').insert({
         user_id: user.id,
         municipality: data.municipality,
         city: data.city,
@@ -103,14 +132,17 @@ const ListProperty = () => {
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
+        images: imageUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         status: 'pending'
       });
+
       if (error) throw error;
+
       toast({
         title: "Property Listed Successfully!",
-        description: "Your property has been submitted for admin approval."
+        description: `Your property has been submitted for admin approval${imageUrls.length > 0 ? ` with ${imageUrls.length} image${imageUrls.length > 1 ? 's' : ''}` : ''}.`
       });
 
       // Reset form
@@ -371,14 +403,43 @@ const ListProperty = () => {
                   </div>
                 </div>
                 
-                {uploadedFiles.length > 0 && <div className="mt-4 space-y-2">
-                    {uploadedFiles.map((file, index) => <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <span className="text-sm">{file.name}</span>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => removeFile(index)}>
+                {uploadedFiles.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-sm font-medium">Selected Files:</h4>
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-background rounded flex items-center justify-center">
+                            {file.type.startsWith('image/') ? (
+                              <img 
+                                src={URL.createObjectURL(file)} 
+                                alt="Preview" 
+                                className="w-full h-full object-cover rounded"
+                              />
+                            ) : (
+                              <Upload className="w-6 h-6 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium">{file.name}</span>
+                            <p className="text-xs text-muted-foreground">
+                              {(file.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          </div>
+                        </div>
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => removeFile(index)}
+                          className="text-destructive hover:text-destructive"
+                        >
                           Remove
                         </Button>
-                      </div>)}
-                  </div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
