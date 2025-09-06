@@ -90,6 +90,7 @@ export type Database = {
           longitude: number | null
           municipality: string | null
           price: number | null
+          property_code: number
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
           status: Database["public"]["Enums"]["property_status"]
@@ -112,6 +113,7 @@ export type Database = {
           longitude?: number | null
           municipality?: string | null
           price?: number | null
+          property_code?: number
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
           status?: Database["public"]["Enums"]["property_status"]
@@ -134,12 +136,40 @@ export type Database = {
           longitude?: number | null
           municipality?: string | null
           price?: number | null
+          property_code?: number
           property_type?: Database["public"]["Enums"]["property_type"]
           square_meters?: number
           status?: Database["public"]["Enums"]["property_status"]
           updated_at?: string
           user_id?: string
           year_built?: number | null
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          id: string
+          ip_address: string | null
+          session_end: string | null
+          session_start: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          session_end?: string | null
+          session_start?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          session_end?: string | null
+          session_start?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -152,6 +182,25 @@ export type Database = {
         Args: { _admin_id: string; _user_id: string }
         Returns: boolean
       }
+      end_user_session: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      get_new_users_analytics: {
+        Args: { days_back?: number; period_type?: string }
+        Returns: {
+          count: number
+          period: string
+        }[]
+      }
+      get_session_analytics: {
+        Args: { days_back?: number; period_type?: string }
+        Returns: {
+          avg_duration_minutes: number
+          period: string
+          session_count: number
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
@@ -162,6 +211,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      start_user_session: {
+        Args: { _ip_address?: string; _user_agent?: string; _user_id: string }
+        Returns: string
       }
       update_user_role: {
         Args: {

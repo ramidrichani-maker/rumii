@@ -37,34 +37,57 @@ const UserAnalytics = () => {
   };
 
   const fetchNewUsersData = async () => {
-    // Since user_sessions table exists but RPC function doesn't, let's work with profiles directly
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('created_at')
-      .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-      .order('created_at', { ascending: true });
+    try {
+      const { data, error } = await supabase.rpc('get_new_users_analytics', {
+        period_type: selectedPeriod,
+        days_back: selectedPeriod === 'day' ? 30 : selectedPeriod === 'week' ? 56 : selectedPeriod === 'month' ? 365 : 720
+      });
 
-    if (!profilesError && profiles) {
-      const groupedData = groupDataByPeriod(profiles, selectedPeriod);
-      setNewUsersData(groupedData);
-    } else {
-      console.error('Error fetching new users data:', profilesError);
+      if (error) {
+        console.error('Error fetching new users data:', error);
+        // Fallback to manual query
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('created_at')
+          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+          .order('created_at', { ascending: true });
+
+        if (!profilesError && profiles) {
+          const groupedData = groupDataByPeriod(profiles, selectedPeriod);
+          setNewUsersData(groupedData);
+        }
+      } else {
+        setNewUsersData(data || []);
+      }
+    } catch (error) {
+      console.error('Error in fetchNewUsersData:', error);
       setNewUsersData([]);
     }
   };
 
   const fetchSessionData = async () => {
-    // Mock session data for now since user_sessions table seems empty
-    // In a real implementation, you would query the user_sessions table
-    const mockSessionData = [
-      { period: '2024-01-15', averageDuration: 25 },
-      { period: '2024-01-16', averageDuration: 32 },
-      { period: '2024-01-17', averageDuration: 28 },
-      { period: '2024-01-18', averageDuration: 41 },
-      { period: '2024-01-19', averageDuration: 35 },
-    ];
-    
-    setSessionData(mockSessionData);
+    try {
+      const { data, error } = await supabase.rpc('get_session_analytics', {
+        period_type: selectedPeriod,
+        days_back: selectedPeriod === 'day' ? 30 : selectedPeriod === 'week' ? 56 : selectedPeriod === 'month' ? 365 : 720
+      });
+
+      if (error) {
+        console.error('Error fetching session data:', error);
+        // Fallback to mock data if no sessions exist
+        setSessionData([]);
+      } else {
+        // Transform the data to match expected format
+        const transformedData = (data || []).map((item: any) => ({
+          period: item.period,
+          averageDuration: Number(item.avg_duration_minutes) || 0
+        }));
+        setSessionData(transformedData);
+      }
+    } catch (error) {
+      console.error('Error in fetchSessionData:', error);
+      setSessionData([]);
+    }
   };
 
   const groupDataByPeriod = (data: any[], period: string) => {

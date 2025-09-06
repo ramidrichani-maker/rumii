@@ -47,8 +47,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
+          // Start user session tracking
           setTimeout(async () => {
+            try {
+              await supabase.rpc('start_user_session', {
+                _user_id: session.user.id,
+                _ip_address: null, // Could be obtained from a service
+                _user_agent: navigator.userAgent
+              });
+            } catch (error) {
+              console.error('Error starting user session:', error);
+            }
+            
+            // Fetch user profile
             const { data: profileData } = await supabase
               .from('profiles')
               .select('*')
@@ -57,6 +68,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setProfile(profileData);
           }, 0);
         } else {
+          // End user session when logging out
+          if (user?.id) {
+            setTimeout(async () => {
+              try {
+                await supabase.rpc('end_user_session', {
+                  _user_id: user.id
+                });
+              } catch (error) {
+                console.error('Error ending user session:', error);
+              }
+            }, 0);
+          }
           setProfile(null);
         }
         setLoading(false);
@@ -109,6 +132,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    // End user session before signing out
+    if (user?.id) {
+      try {
+        await supabase.rpc('end_user_session', {
+          _user_id: user.id
+        });
+      } catch (error) {
+        console.error('Error ending user session:', error);
+      }
+    }
     await supabase.auth.signOut();
   };
 
