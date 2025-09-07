@@ -146,6 +146,96 @@ export type Database = {
         }
         Relationships: []
       }
+      property_agents: {
+        Row: {
+          agent_id: string
+          assigned_at: string
+          id: string
+          property_id: string
+        }
+        Insert: {
+          agent_id: string
+          assigned_at?: string
+          id?: string
+          property_id: string
+        }
+        Update: {
+          agent_id?: string
+          assigned_at?: string
+          id?: string
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_agents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "property_agents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_viewings: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          property_id: string
+          status: Database["public"]["Enums"]["viewing_status"]
+          updated_at: string
+          user_id: string
+          viewing_date: string
+          viewing_time: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          property_id: string
+          status?: Database["public"]["Enums"]["viewing_status"]
+          updated_at?: string
+          user_id: string
+          viewing_date: string
+          viewing_time: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          property_id?: string
+          status?: Database["public"]["Enums"]["viewing_status"]
+          updated_at?: string
+          user_id?: string
+          viewing_date?: string
+          viewing_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_viewings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "property_viewings_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_sessions: {
         Row: {
           id: string
@@ -238,6 +328,7 @@ export type Database = {
         | "duplex"
         | "loft"
       user_role: "user" | "agent" | "admin"
+      viewing_status: "pending" | "confirmed" | "completed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -378,6 +469,7 @@ export const Constants = {
         "loft",
       ],
       user_role: ["user", "agent", "admin"],
+      viewing_status: ["pending", "confirmed", "completed", "cancelled"],
     },
   },
 } as const

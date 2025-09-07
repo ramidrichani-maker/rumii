@@ -116,6 +116,12 @@ export const Navbar = () => {
                           <span>Admin Dashboard</span>
                         </Link>
                       </DropdownMenuItem>}
+                    {(profile?.role === 'agent' || profile?.role === 'admin') && <DropdownMenuItem asChild>
+                        <Link to="/agent-portal" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Agent Portal</span>
+                        </Link>
+                      </DropdownMenuItem>}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />

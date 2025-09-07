@@ -12,6 +12,7 @@ import ListProperty from "./pages/ListProperty";
 import Auth from "./pages/Auth";
 import InvestmentAnalytics from "./pages/InvestmentAnalytics";
 import AdminDashboard from "./pages/AdminDashboard";
+import AgentPortal from "./pages/AgentPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/list-property" element={<ListProperty />} />
             <Route path="/investment-analytics" element={<InvestmentAnalytics />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/agent-portal" element={<AgentPortal />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

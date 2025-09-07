@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Bed, Bath, Square, MapPin, Calendar } from "lucide-react";
+import ViewingBookingModal from "./ViewingBookingModal";
 
 interface Property {
   id: string;
@@ -27,6 +29,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
+  const [showBookingModal, setShowBookingModal] = useState(false);
   const formatPrice = (price: number, listingType: string) => {
     const formattedPrice = `$${price.toLocaleString()}`;
     return listingType === 'rent' ? `${formattedPrice}/mo` : formattedPrice;
@@ -86,7 +89,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+        <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-4">
           <div className="flex items-center">
             <Bed className="w-4 h-4 mr-1" />
             <span>{property.bedrooms} bed{property.bedrooms !== 1 ? 's' : ''}</span>
@@ -100,7 +103,32 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
             <span>{property.square_meters}m²</span>
           </div>
         </div>
+        
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="w-full flex items-center gap-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowBookingModal(true);
+          }}
+        >
+          <Calendar className="w-4 h-4" />
+          Request Viewing
+        </Button>
       </CardContent>
+      
+      <ViewingBookingModal
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+        property={{
+          id: property.id,
+          address: property.address,
+          property_type: property.property_type,
+          price: property.price,
+          listing_type: property.listing_type
+        }}
+      />
     </Card>
   );
 };
