@@ -168,7 +168,11 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
                         ? 'border-primary bg-primary/10' 
                         : 'hover:border-primary/50'
                     }`}
-                    onClick={() => setSelectedTime(time)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedTime(time);
+                    }}
                   >
                     <CardContent className="p-3 text-center">
                       <span className="font-medium">{formatTimeSlot(time)}</span>

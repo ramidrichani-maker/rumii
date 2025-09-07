@@ -47,7 +47,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   return (
     <Card 
       className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-      onClick={() => onClick(property)}
+      onClick={(e) => {
+        // Only trigger property details if not clicking on buttons or interactive elements
+        const target = e.target as HTMLElement;
+        if (!target.closest('button') && !target.closest('[role="button"]')) {
+          onClick(property);
+        }
+      }}
     >
       <div className="h-48 bg-muted rounded-t-lg overflow-hidden">
         {propertyImage ? (

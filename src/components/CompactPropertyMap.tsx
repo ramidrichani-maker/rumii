@@ -202,7 +202,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   };
 
   const mapHeight = isExpanded ? "60vh" : height;
-  const mapClass = isExpanded ? "fixed inset-0 z-50 bg-background p-4" : className;
+  const mapClass = isExpanded ? "fixed inset-0 z-40 bg-background p-4" : className;
 
   return (
     <div className={mapClass}>
@@ -216,11 +216,27 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             <Button
               size="sm"
               variant="outline"
-              onClick={toggleExpanded}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleExpanded();
+              }}
             >
               <Maximize2 className="h-4 w-4" />
             </Button>
           </div>
+          {isExpanded && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(false);
+              }}
+              className="mt-2"
+            >
+              Close Map
+            </Button>
+          )}
         </CardHeader>
         <CardContent className="pb-2">
           {/* Search Controls */}
