@@ -27,7 +27,7 @@ interface PropertyViewing {
   profiles: {
     full_name: string;
     phone_number: string;
-  };
+  } | null;
 }
 
 const AgentPortal = () => {
@@ -228,11 +228,11 @@ const AgentPortal = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-muted-foreground" />
-                          <span>{viewing.profiles.full_name}</span>
+                          <span>{viewing.profiles?.full_name || 'Unknown User'}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-muted-foreground">
-                            📞 {viewing.profiles.phone_number}
+                            📞 {viewing.profiles?.phone_number || 'No phone number'}
                           </span>
                         </div>
                       </div>
@@ -299,11 +299,11 @@ const AgentPortal = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-muted-foreground" />
-                          <span>{viewing.profiles.full_name}</span>
+                          <span>{viewing.profiles?.full_name || 'Unknown User'}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-muted-foreground">
-                            📞 {viewing.profiles.phone_number}
+                            📞 {viewing.profiles?.phone_number || 'No phone number'}
                           </span>
                         </div>
                       </div>
@@ -371,10 +371,10 @@ const AgentPortal = () => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <User className="w-4 h-4 text-muted-foreground" />
-                                  <span className="text-sm">{viewing.profiles.full_name}</span>
+                                  <span className="text-sm">{viewing.profiles?.full_name || 'Unknown User'}</span>
                                 </div>
                                 <div className="text-sm text-muted-foreground">
-                                  📞 {viewing.profiles.phone_number}
+                                  📞 {viewing.profiles?.phone_number || 'No phone number'}
                                 </div>
                               </div>
                             </CardContent>
@@ -426,11 +426,11 @@ const AgentPortal = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-muted-foreground" />
-                          <span>{viewing.profiles.full_name}</span>
+                          <span>{viewing.profiles?.full_name || 'Unknown User'}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-muted-foreground">
-                            📞 {viewing.profiles.phone_number}
+                            📞 {viewing.profiles?.phone_number || 'No phone number'}
                           </span>
                         </div>
                       </div>
