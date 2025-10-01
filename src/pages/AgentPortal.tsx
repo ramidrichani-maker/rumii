@@ -53,7 +53,7 @@ const AgentPortal = () => {
         .select(`
           *,
           properties(address, property_type, price, listing_type),
-          profiles(full_name, phone_number)
+          profiles!property_viewings_user_id_fkey(full_name, phone_number)
         `)
         .order('viewing_date', { ascending: true })
         .order('viewing_time', { ascending: true });
