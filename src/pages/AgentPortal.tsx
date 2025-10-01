@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Calendar, Clock, MapPin, User, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
+import { format } from "date-fns";
 
 interface PropertyViewing {
   id: string;
@@ -33,6 +35,7 @@ const AgentPortal = () => {
   const { toast } = useToast();
   const [viewings, setViewings] = useState<PropertyViewing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   // Check if user is agent or admin
   if (!user || (profile?.role !== 'agent' && profile?.role !== 'admin')) {
@@ -148,6 +151,15 @@ const AgentPortal = () => {
   const pendingViewings = viewings.filter(v => v.status === 'pending');
   const confirmedViewings = viewings.filter(v => v.status === 'confirmed');
   const pastViewings = viewings.filter(v => v.status === 'completed' || v.status === 'cancelled');
+  
+  const viewingsOnSelectedDate = selectedDate
+    ? confirmedViewings.filter(v => {
+        const viewingDate = new Date(v.viewing_date);
+        return viewingDate.toDateString() === selectedDate.toDateString();
+      })
+    : [];
+
+  const datesWithViewings = confirmedViewings.map(v => new Date(v.viewing_date));
 
   return (
     <div className="min-h-screen bg-background">
@@ -163,12 +175,15 @@ const AgentPortal = () => {
         </div>
 
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="pending">
               Pending Requests ({pendingViewings.length})
             </TabsTrigger>
             <TabsTrigger value="confirmed">
               Confirmed ({confirmedViewings.length})
+            </TabsTrigger>
+            <TabsTrigger value="calendar">
+              Calendar
             </TabsTrigger>
             <TabsTrigger value="past">
               Past Viewings ({pastViewings.length})
@@ -297,6 +312,80 @@ const AgentPortal = () => {
                 );
               })
             )}
+          </TabsContent>
+
+          <TabsContent value="calendar" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Viewing Calendar</CardTitle>
+                  <CardDescription>
+                    Select a date to view scheduled viewings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    className="rounded-md border pointer-events-auto"
+                    modifiers={{
+                      hasViewing: datesWithViewings
+                    }}
+                    modifiersClassNames={{
+                      hasViewing: "bg-primary/20 font-bold"
+                    }}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    Viewings on {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Selected Date'}
+                  </CardTitle>
+                  <CardDescription>
+                    {viewingsOnSelectedDate.length} viewing(s) scheduled
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {viewingsOnSelectedDate.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">
+                      No viewings scheduled for this date
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {viewingsOnSelectedDate.map((viewing) => {
+                        const { time } = formatDateTime(viewing.viewing_date, viewing.viewing_time);
+                        return (
+                          <Card key={viewing.id} className="border-green-200">
+                            <CardContent className="pt-4">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-primary" />
+                                  <span className="font-semibold">{time}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-sm">{viewing.properties.address}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <User className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-sm">{viewing.profiles.full_name}</span>
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  📞 {viewing.profiles.phone_number}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="past" className="space-y-4">
