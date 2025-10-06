@@ -58,8 +58,18 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         maxZoom: 19
       }).addTo(map);
 
-      // Add marker
-      const marker = L.marker(position, { icon: customIcon }).addTo(map);
+      // Add marker with draggable option
+      const marker = L.marker(position, { 
+        icon: customIcon,
+        draggable: true 
+      }).addTo(map);
+      
+      // Add drag event listener to marker
+      marker.on('dragend', () => {
+        const newPos = marker.getLatLng();
+        setPosition([newPos.lat, newPos.lng]);
+        onLocationSelect(newPos.lat, newPos.lng);
+      });
       
       // Add click handler
       map.on('click', (e: L.LeafletMouseEvent) => {
