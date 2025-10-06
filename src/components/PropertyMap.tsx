@@ -188,8 +188,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     }, 100);
   };
 
-  const togglePinPointMode = () => {
+  const togglePinPointMode = (e?: React.MouseEvent) => {
+    e?.preventDefault();
     setIsPinPointMode(!isPinPointMode);
+    // Remove focus from any input elements to prevent keyboard
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   };
 
   const mapHeight = isFullscreen ? "70vh" : height;
@@ -234,9 +239,11 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
               
               <Button 
                 onClick={togglePinPointMode}
+                onMouseDown={(e) => e.preventDefault()}
                 size="sm"
                 variant={isPinPointMode ? "default" : "outline"}
                 className="flex items-center gap-2"
+                type="button"
               >
                 <MapPin className="h-4 w-4" />
                 {isPinPointMode ? 'Click Map to Pin' : 'Enable Pinpoint'}
