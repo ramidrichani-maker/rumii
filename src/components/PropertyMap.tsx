@@ -86,8 +86,21 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
             popupAnchor: [0, -32],
           });
           
-          pinPointMarkerRef.current = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
-          pinPointMarkerRef.current.bindPopup('Selected Property Location').openPopup();
+          pinPointMarkerRef.current = L.marker([lat, lng], { 
+            icon: pinIcon,
+            draggable: true 
+          }).addTo(map);
+          
+          // Add drag event listener
+          pinPointMarkerRef.current.on('dragend', () => {
+            if (pinPointMarkerRef.current) {
+              const newPos = pinPointMarkerRef.current.getLatLng();
+              setPosition([newPos.lat, newPos.lng]);
+              onLocationSelect(newPos.lat, newPos.lng);
+            }
+          });
+          
+          pinPointMarkerRef.current.bindPopup('Drag me to adjust location').openPopup();
         }
       });
 
@@ -164,7 +177,8 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     }
   };
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = (e?: React.MouseEvent) => {
+    e?.preventDefault();
     setIsFullscreen(!isFullscreen);
     // Re-initialize map size after fullscreen toggle
     setTimeout(() => {
@@ -249,7 +263,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           
           {isPinPointMode && (
             <p className="text-sm text-muted-foreground mt-2 text-center">
-              Click anywhere on the map to set the property location
+              Click anywhere on the map to set the property location, then drag the pin to fine-tune
             </p>
           )}
         </CardContent>
