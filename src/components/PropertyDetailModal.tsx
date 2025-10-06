@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -18,9 +18,12 @@ import {
   DollarSign,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Eye
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import ViewingBookingModal from "@/components/ViewingBookingModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Property {
   id: string;
@@ -59,6 +62,9 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   onReject,
   isAdmin = false
 }) => {
+  const { user } = useAuth();
+  const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
+  
   if (!property) return null;
 
   const getStatusBadge = (status: string) => {
@@ -252,6 +258,20 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         </div>
 
+        {/* Request Viewing Button */}
+        {!isAdmin && user && property.status === 'approved' && (
+          <div className="pt-4 border-t">
+            <Button 
+              onClick={() => setIsViewingModalOpen(true)}
+              className="w-full"
+              size="lg"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              Request Viewing
+            </Button>
+          </div>
+        )}
+
         {/* Admin Actions */}
         {isAdmin && property.status === 'pending' && (
           <div className="flex gap-3 pt-4 border-t">
@@ -280,6 +300,21 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           For {property.listing_type === 'rent' ? 'Rent' : 'Sale'}
         </div>
       </DialogContent>
+
+      {/* Viewing Booking Modal */}
+      {property && (
+        <ViewingBookingModal
+          isOpen={isViewingModalOpen}
+          onClose={() => setIsViewingModalOpen(false)}
+          property={{
+            id: property.id,
+            address: property.address,
+            property_type: property.property_type,
+            price: property.price,
+            listing_type: property.listing_type
+          }}
+        />
+      )}
     </Dialog>
   );
 };
