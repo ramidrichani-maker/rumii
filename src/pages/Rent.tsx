@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Calendar, Tractor } from "lucide-react";
+import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -14,12 +14,17 @@ import PropertyCard from "@/components/PropertyCard";
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
   { id: "villa", name: "Villa", icon: Home },
-  { id: "house", name: "House", icon: Home },
-  { id: "studio", name: "Studio", icon: Building2 },
+  { id: "land", name: "Land", icon: Trees },
+  { id: "farm", name: "Farm", icon: Tractor },
+  { id: "beach house", name: "Beach House", icon: Waves },
   { id: "penthouse", name: "Penthouse", icon: Crown },
-  { id: "townhouse", name: "Townhouse", icon: Building },
-  { id: "duplex", name: "Duplex", icon: Building2 },
-  { id: "loft", name: "Loft", icon: Building2 },
+  { id: "chalet", name: "Chalet", icon: Mountain },
+  { id: "studio", name: "Studio", icon: Building2 },
+  { id: "commercial rental", name: "Commercial Rental", icon: Store },
+  { id: "rooftop", name: "Rooftop", icon: Building2 },
+  { id: "duplex", name: "Duplex", icon: House },
+  { id: "triplex", name: "Triplex", icon: Building },
+  { id: "venue", name: "Venue", icon: Sofa },
 ];
 const amenities = [
   "Swimming Pool", "Gym", "Parking", "Balcony", "Garden", 
