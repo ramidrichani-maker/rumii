@@ -72,7 +72,7 @@ const AgentPortal = () => {
     }
   };
 
-  const updateViewingStatus = async (viewingId: string, newStatus: 'confirmed' | 'cancelled') => {
+  const updateViewingStatus = async (viewingId: string, newStatus: 'confirmed' | 'cancelled' | 'successful') => {
     try {
       const { error } = await supabase
         .from('property_viewings')
@@ -95,6 +95,11 @@ const AgentPortal = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const isViewingPast = (viewingDate: string, viewingTime: string) => {
+    const viewingDateTime = new Date(`${viewingDate}T${viewingTime}`);
+    return viewingDateTime < new Date();
   };
 
   const getStatusBadge = (status: string) => {
@@ -148,9 +153,14 @@ const AgentPortal = () => {
     );
   }
 
-  const pendingViewings = viewings.filter(v => v.status === 'pending');
+  const pendingViewings = viewings.filter(v => v.status === 'pending' && !isViewingPast(v.viewing_date, v.viewing_time));
   const confirmedViewings = viewings.filter(v => v.status === 'confirmed');
-  const pastViewings = viewings.filter(v => v.status === 'completed' || v.status === 'cancelled');
+  const pastViewings = viewings.filter(v => 
+    isViewingPast(v.viewing_date, v.viewing_time) || 
+    v.status === 'completed' || 
+    v.status === 'cancelled' ||
+    v.status === 'successful'
+  );
   
   const viewingsOnSelectedDate = selectedDate
     ? confirmedViewings.filter(v => {
@@ -434,6 +444,27 @@ const AgentPortal = () => {
                           </span>
                         </div>
                       </div>
+
+                      {viewing.status === 'pending' && (
+                        <div className="mt-4 pt-4 border-t flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updateViewingStatus(viewing.id, 'successful')}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Mark Successful
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateViewingStatus(viewing.id, 'cancelled')}
+                          >
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Mark Cancelled
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
