@@ -16,7 +16,7 @@ interface PropertyViewing {
   id: string;
   viewing_date: string;
   viewing_time: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'successful';
   notes?: string;
   properties: {
     address: string;

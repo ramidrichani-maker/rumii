@@ -210,9 +210,39 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleUpdateViewingStatus = async (viewingId: string, status: 'successful' | 'cancelled') => {
+    try {
+      const { error } = await supabase
+        .from('property_viewings')
+        .update({ status })
+        .eq('id', viewingId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Viewing marked as ${status}`,
+      });
+
+      loadViewings();
+    } catch (error) {
+      console.error('Error updating viewing status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update viewing status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleViewProperty = (property: any) => {
     setSelectedProperty(property);
     setIsDetailModalOpen(true);
+  };
+
+  const isViewingPast = (viewingDate: string, viewingTime: string) => {
+    const viewingDateTime = new Date(`${viewingDate}T${viewingTime}`);
+    return viewingDateTime < new Date();
   };
 
   if (isLoading) {
@@ -432,6 +462,29 @@ const AdminDashboard = () => {
                               <div className="pt-2 border-t">
                                 <p className="text-muted-foreground text-sm">Notes</p>
                                 <p className="text-sm">{viewing.notes}</p>
+                              </div>
+                            )}
+
+                            {/* Action Buttons for Past Viewings */}
+                            {isViewingPast(viewing.viewing_date, viewing.viewing_time) && 
+                             viewing.status === 'pending' && (
+                              <div className="pt-3 border-t flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleUpdateViewingStatus(viewing.id, 'successful')}
+                                  className="bg-green-600 hover:bg-green-700"
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-1" />
+                                  Mark Successful
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleUpdateViewingStatus(viewing.id, 'cancelled')}
+                                >
+                                  <XCircle className="w-4 h-4 mr-1" />
+                                  Mark Cancelled
+                                </Button>
                               </div>
                             )}
                           </div>

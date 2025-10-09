@@ -335,7 +335,12 @@ export type Database = {
         | "duplex"
         | "loft"
       user_role: "user" | "agent" | "admin"
-      viewing_status: "pending" | "confirmed" | "completed" | "cancelled"
+      viewing_status:
+        | "pending"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
+        | "successful"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -476,7 +481,13 @@ export const Constants = {
         "loft",
       ],
       user_role: ["user", "agent", "admin"],
-      viewing_status: ["pending", "confirmed", "completed", "cancelled"],
+      viewing_status: [
+        "pending",
+        "confirmed",
+        "completed",
+        "cancelled",
+        "successful",
+      ],
     },
   },
 } as const
