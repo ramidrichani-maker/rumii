@@ -6,14 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
+import { format } from "date-fns";
 
 const AdminDashboard = () => {
   const [pendingProperties, setPendingProperties] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [viewings, setViewings] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalProperties: 0,
     pendingProperties: 0,
@@ -30,6 +32,7 @@ const AdminDashboard = () => {
     if (user) {
       loadPendingProperties();
       loadUsers();
+      loadViewings();
     }
   }, [user]);
 
@@ -97,6 +100,61 @@ const AdminDashboard = () => {
       setUsers(data || []);
     } catch (error) {
       console.error('Error loading users:', error);
+    }
+  };
+
+  const loadViewings = async () => {
+    try {
+      const { data: viewingsData, error } = await supabase
+        .from('property_viewings')
+        .select('*')
+        .order('viewing_date', { ascending: true })
+        .order('viewing_time', { ascending: true });
+
+      if (error) throw error;
+
+      // Fetch related property and agent data
+      const viewingsWithDetails = await Promise.all(
+        (viewingsData || []).map(async (viewing) => {
+          const { data: property } = await supabase
+            .from('properties')
+            .select('address, city, property_type, price, listing_type')
+            .eq('id', viewing.property_id)
+            .single();
+
+          let agentProfile = null;
+          if (viewing.agent_id) {
+            const { data: agent } = await supabase
+              .from('profiles')
+              .select('full_name, phone_number')
+              .eq('user_id', viewing.agent_id)
+              .single();
+            agentProfile = agent;
+          }
+
+          const { data: requester } = await supabase
+            .from('profiles')
+            .select('full_name, phone_number')
+            .eq('user_id', viewing.user_id)
+            .single();
+
+          return {
+            ...viewing,
+            property,
+            agent: agentProfile,
+            requester
+          };
+        })
+      );
+
+      setViewings(viewingsWithDetails);
+    } catch (error) {
+      console.error('Error loading viewings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load viewings",
+        variant: "destructive",
+      });
     }
   };
 
@@ -219,10 +277,14 @@ const AdminDashboard = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="properties" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Home className="w-4 h-4" />
               Properties
+            </TabsTrigger>
+            <TabsTrigger value="viewings" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Viewings
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <UserCog className="w-4 h-4" />
@@ -292,6 +354,83 @@ const AdminDashboard = () => {
                               <XCircle className="w-4 h-4 mr-1" />
                               Reject
                             </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="viewings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Scheduled Viewings</CardTitle>
+                <CardDescription>Manage property viewing appointments and agent assignments</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {viewings.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-8">No scheduled viewings</p>
+                ) : (
+                  <div className="space-y-4">
+                    {viewings.map((viewing) => (
+                      <div key={viewing.id} className="border rounded-lg p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold">{viewing.property?.address}</h3>
+                              <Badge variant={
+                                viewing.status === 'confirmed' ? 'default' :
+                                viewing.status === 'cancelled' ? 'destructive' :
+                                'secondary'
+                              }>
+                                {viewing.status}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{viewing.property?.city}</p>
+                            
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <p className="text-muted-foreground">Date & Time</p>
+                                <p className="font-medium">
+                                  {format(new Date(viewing.viewing_date), 'MMM dd, yyyy')} at {viewing.viewing_time}
+                                </p>
+                              </div>
+                              
+                              <div>
+                                <p className="text-muted-foreground">Property Details</p>
+                                <p className="font-medium">
+                                  {viewing.property?.property_type} - ${viewing.property?.price?.toLocaleString()} ({viewing.property?.listing_type})
+                                </p>
+                              </div>
+                              
+                              <div>
+                                <p className="text-muted-foreground">Requested by</p>
+                                <p className="font-medium">{viewing.requester?.full_name || 'Unknown'}</p>
+                                <p className="text-xs text-muted-foreground">{viewing.requester?.phone_number}</p>
+                              </div>
+                              
+                              <div>
+                                <p className="text-muted-foreground">Assigned Agent</p>
+                                {viewing.agent ? (
+                                  <>
+                                    <p className="font-medium">{viewing.agent.full_name}</p>
+                                    <p className="text-xs text-muted-foreground">{viewing.agent.phone_number}</p>
+                                  </>
+                                ) : (
+                                  <p className="text-sm text-amber-600">No agent assigned</p>
+                                )}
+                              </div>
+                            </div>
+
+                            {viewing.notes && (
+                              <div className="pt-2 border-t">
+                                <p className="text-muted-foreground text-sm">Notes</p>
+                                <p className="text-sm">{viewing.notes}</p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
