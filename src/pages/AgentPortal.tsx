@@ -16,7 +16,7 @@ interface PropertyViewing {
   id: string;
   viewing_date: string;
   viewing_time: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'successful' | 'interested' | 'uninterested';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'successful' | 'interested' | 'uninterested' | 'closed';
   notes?: string;
   properties: {
     address: string;
@@ -72,7 +72,7 @@ const AgentPortal = () => {
     }
   };
 
-  const updateViewingStatus = async (viewingId: string, newStatus: 'confirmed' | 'cancelled' | 'successful' | 'interested' | 'uninterested') => {
+  const updateViewingStatus = async (viewingId: string, newStatus: 'confirmed' | 'cancelled' | 'successful' | 'interested' | 'uninterested' | 'closed') => {
     try {
       const { error } = await supabase
         .from('property_viewings')
@@ -110,7 +110,8 @@ const AgentPortal = () => {
       cancelled: { variant: "destructive" as const, label: "Cancelled" },
       successful: { variant: "default" as const, label: "Successful" },
       interested: { variant: "default" as const, label: "Interested Buyer" },
-      uninterested: { variant: "outline" as const, label: "Uninterested" }
+      uninterested: { variant: "outline" as const, label: "Uninterested" },
+      closed: { variant: "default" as const, label: "Deal Closed" }
     };
     
     const config = statusConfig[status as keyof typeof statusConfig];
@@ -164,7 +165,8 @@ const AgentPortal = () => {
     v.status === 'cancelled' ||
     v.status === 'successful' ||
     v.status === 'interested' ||
-    v.status === 'uninterested'
+    v.status === 'uninterested' ||
+    v.status === 'closed'
   );
   
   const viewingsOnSelectedDate = selectedDate
@@ -467,6 +469,19 @@ const AgentPortal = () => {
                           >
                             <XCircle className="w-4 h-4 mr-1" />
                             Uninterested
+                          </Button>
+                        </div>
+                      )}
+
+                      {(viewing.status === 'interested' || viewing.status === 'uninterested') && (
+                        <div className="mt-4 pt-4 border-t flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updateViewingStatus(viewing.id, 'closed')}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Mark as Closed
                           </Button>
                         </div>
                       )}

@@ -10,6 +10,7 @@ import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Cal
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
+import { AgentViewingStats } from "@/components/AgentViewingStats";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -307,7 +308,7 @@ const AdminDashboard = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="properties" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Home className="w-4 h-4" />
               Properties
@@ -315,6 +316,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="viewings" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Viewings
+            </TabsTrigger>
+            <TabsTrigger value="agents" className="flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              Agent Stats
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <UserCog className="w-4 h-4" />
@@ -495,6 +500,10 @@ const AdminDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="agents">
+            <AgentViewingStats />
           </TabsContent>
 
           <TabsContent value="users">
