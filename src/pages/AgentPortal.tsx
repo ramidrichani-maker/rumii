@@ -16,7 +16,7 @@ interface PropertyViewing {
   id: string;
   viewing_date: string;
   viewing_time: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'successful';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'successful' | 'interested' | 'uninterested';
   notes?: string;
   properties: {
     address: string;
@@ -72,7 +72,7 @@ const AgentPortal = () => {
     }
   };
 
-  const updateViewingStatus = async (viewingId: string, newStatus: 'confirmed' | 'cancelled' | 'successful') => {
+  const updateViewingStatus = async (viewingId: string, newStatus: 'confirmed' | 'cancelled' | 'successful' | 'interested' | 'uninterested') => {
     try {
       const { error } = await supabase
         .from('property_viewings')
@@ -107,7 +107,10 @@ const AgentPortal = () => {
       pending: { variant: "secondary" as const, label: "Pending" },
       confirmed: { variant: "default" as const, label: "Confirmed" },
       completed: { variant: "outline" as const, label: "Completed" },
-      cancelled: { variant: "destructive" as const, label: "Cancelled" }
+      cancelled: { variant: "destructive" as const, label: "Cancelled" },
+      successful: { variant: "default" as const, label: "Successful" },
+      interested: { variant: "default" as const, label: "Interested Buyer" },
+      uninterested: { variant: "outline" as const, label: "Uninterested" }
     };
     
     const config = statusConfig[status as keyof typeof statusConfig];
@@ -159,7 +162,9 @@ const AgentPortal = () => {
     isViewingPast(v.viewing_date, v.viewing_time) || 
     v.status === 'completed' || 
     v.status === 'cancelled' ||
-    v.status === 'successful'
+    v.status === 'successful' ||
+    v.status === 'interested' ||
+    v.status === 'uninterested'
   );
   
   const viewingsOnSelectedDate = selectedDate
@@ -445,23 +450,23 @@ const AgentPortal = () => {
                         </div>
                       </div>
 
-                      {viewing.status === 'pending' && (
+                      {viewing.status === 'pending' && isViewingPast(viewing.viewing_date, viewing.viewing_time) && (
                         <div className="mt-4 pt-4 border-t flex gap-2">
                           <Button
                             size="sm"
-                            onClick={() => updateViewingStatus(viewing.id, 'successful')}
+                            onClick={() => updateViewingStatus(viewing.id, 'interested')}
                             className="bg-green-600 hover:bg-green-700"
                           >
                             <CheckCircle className="w-4 h-4 mr-1" />
-                            Mark Successful
+                            Interested Buyer
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => updateViewingStatus(viewing.id, 'cancelled')}
+                            onClick={() => updateViewingStatus(viewing.id, 'uninterested')}
                           >
                             <XCircle className="w-4 h-4 mr-1" />
-                            Mark Cancelled
+                            Uninterested
                           </Button>
                         </div>
                       )}
