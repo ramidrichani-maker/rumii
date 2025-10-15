@@ -99,7 +99,8 @@ const AgentPortal = () => {
 
   const isViewingPast = (viewingDate: string, viewingTime: string) => {
     const viewingDateTime = new Date(`${viewingDate}T${viewingTime}`);
-    return viewingDateTime < new Date();
+    const oneHourAfter = new Date(viewingDateTime.getTime() + 60 * 60 * 1000);
+    return oneHourAfter < new Date();
   };
 
   const getStatusBadge = (status: string) => {
@@ -452,16 +453,8 @@ const AgentPortal = () => {
                         </div>
                       </div>
 
-                      {viewing.status === 'pending' && isViewingPast(viewing.viewing_date, viewing.viewing_time) && (
+                      {viewing.status !== 'closed' && (
                         <div className="mt-4 pt-4 border-t flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => updateViewingStatus(viewing.id, 'interested')}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-1" />
-                            Interested Buyer
-                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
@@ -470,18 +463,21 @@ const AgentPortal = () => {
                             <XCircle className="w-4 h-4 mr-1" />
                             Uninterested
                           </Button>
-                        </div>
-                      )}
-
-                      {(viewing.status === 'interested' || viewing.status === 'uninterested') && (
-                        <div className="mt-4 pt-4 border-t flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updateViewingStatus(viewing.id, 'interested')}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Interested
+                          </Button>
                           <Button
                             size="sm"
                             onClick={() => updateViewingStatus(viewing.id, 'closed')}
                             className="bg-blue-600 hover:bg-blue-700"
                           >
                             <CheckCircle className="w-4 h-4 mr-1" />
-                            Mark as Closed
+                            Closed Deal
                           </Button>
                         </div>
                       )}
