@@ -11,6 +11,7 @@ import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
 import { AgentViewingStats } from "@/components/AgentViewingStats";
+import PendingMediaApproval from "@/components/PendingMediaApproval";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -308,10 +309,14 @@ const AdminDashboard = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="properties" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Home className="w-4 h-4" />
               Properties
+            </TabsTrigger>
+            <TabsTrigger value="media" className="flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              Media
             </TabsTrigger>
             <TabsTrigger value="viewings" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -395,6 +400,18 @@ const AdminDashboard = () => {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="media">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pending Media Approvals</CardTitle>
+                <CardDescription>Review and approve photos/videos uploaded by property owners</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PendingMediaApproval />
               </CardContent>
             </Card>
           </TabsContent>

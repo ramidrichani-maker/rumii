@@ -182,6 +182,47 @@ export type Database = {
           },
         ]
       }
+      property_media_pending: {
+        Row: {
+          created_at: string | null
+          id: string
+          media_type: string
+          media_url: string
+          property_id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          media_type: string
+          media_url: string
+          property_id: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          property_id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_media_pending_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_viewings: {
         Row: {
           agent_id: string | null
@@ -275,6 +316,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_property_media: {
+        Args: { media_id: string }
+        Returns: boolean
+      }
       delete_user_account: {
         Args: { _admin_id: string; _user_id: string }
         Returns: boolean
