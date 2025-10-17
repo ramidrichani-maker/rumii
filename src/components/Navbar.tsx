@@ -110,6 +110,12 @@ export const Navbar = () => {
                         <span>Investment Analytics</span>
                       </Link>
                     </DropdownMenuItem>
+                    {profile?.role === 'user' && <DropdownMenuItem asChild>
+                        <Link to="/my-viewings" className="flex items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>My Viewings</span>
+                        </Link>
+                      </DropdownMenuItem>}
                     {profile?.role === 'admin' && <DropdownMenuItem asChild>
                         <Link to="/admin" className="flex items-center">
                           <Shield className="mr-2 h-4 w-4" />
