@@ -18,7 +18,7 @@ const Auth = () => {
     confirmPassword: '',
     full_name: '',
     phone_number: '',
-    country: '+961',
+    country: 'lb',
     role: 'user'
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -52,9 +52,9 @@ const Auth = () => {
     const codes: { [key: string]: string } = {
       us: '+1', ca: '+1', uk: '+44', au: '+61', de: '+49', fr: '+33',
       es: '+34', it: '+39', nl: '+31', se: '+46', no: '+47', dk: '+45',
-      mt: '+356', jp: '+81', sg: '+65', hk: '+852'
+      mt: '+356', jp: '+81', sg: '+65', hk: '+852', lb: '+961'
     };
-    return codes[countryCode] || '+1';
+    return codes[countryCode] || '+961';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -189,6 +189,7 @@ const Auth = () => {
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="lb">🇱🇧 Lebanon (+961)</SelectItem>
                           <SelectItem value="us">🇺🇸 United States (+1)</SelectItem>
                           <SelectItem value="uk">🇬🇧 United Kingdom (+44)</SelectItem>
                           <SelectItem value="ca">🇨🇦 Canada (+1)</SelectItem>
