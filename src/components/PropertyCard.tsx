@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, MapPin, Calendar } from "lucide-react";
+import { Bed, Bath, Square, MapPin, Calendar, Heart } from "lucide-react";
 import ViewingBookingModal from "./ViewingBookingModal";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface Property {
   id: string;
@@ -30,6 +33,88 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user) {
+      checkFavoriteStatus();
+    }
+  }, [user, property.id]);
+
+  const checkFavoriteStatus = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('favorites')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('property_id', property.id)
+      .maybeSingle();
+    
+    if (!error && data) {
+      setIsFavorited(true);
+    }
+  };
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to favorite properties",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsTogglingFavorite(true);
+
+    try {
+      if (isFavorited) {
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('property_id', property.id);
+        
+        if (error) throw error;
+        
+        setIsFavorited(false);
+        toast({
+          title: "Removed from favorites",
+          description: "Property removed from your favorites"
+        });
+      } else {
+        const { error } = await supabase
+          .from('favorites')
+          .insert({
+            user_id: user.id,
+            property_id: property.id
+          });
+        
+        if (error) throw error;
+        
+        setIsFavorited(true);
+        toast({
+          title: "Added to favorites",
+          description: "Property added to your favorites"
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorite status",
+        variant: "destructive"
+      });
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  };
   const formatPrice = (price: number, listingType: string) => {
     const formattedPrice = `$${price.toLocaleString()}`;
     return listingType === 'rent' ? `${formattedPrice}/mo` : formattedPrice;
@@ -55,7 +140,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         }
       }}
     >
-      <div className="h-48 bg-muted rounded-t-lg overflow-hidden">
+      <div className="h-48 bg-muted rounded-t-lg overflow-hidden relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
+          onClick={toggleFavorite}
+          disabled={isTogglingFavorite}
+        >
+          <Heart 
+            className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
+          />
+        </Button>
         {propertyImage ? (
           <img 
             src={propertyImage} 

@@ -14,6 +14,7 @@ import InvestmentAnalytics from "./pages/InvestmentAnalytics";
 import AdminDashboard from "./pages/AdminDashboard";
 import AgentPortal from "./pages/AgentPortal";
 import ClientDashboard from "./pages/ClientDashboard";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/agent-portal" element={<AgentPortal />} />
             <Route path="/my-viewings" element={<ClientDashboard />} />
+            <Route path="/favorites" element={<Favorites />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
