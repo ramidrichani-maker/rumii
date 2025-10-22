@@ -8,10 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -55,6 +58,40 @@ const Auth = () => {
       mt: '+356', jp: '+81', sg: '+65', hk: '+852', lb: '+961'
     };
     return codes[countryCode] || '+961';
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Check your email",
+          description: "We've sent you a password reset link and a 6-digit verification code.",
+        });
+        setShowForgotPassword(false);
+        setResetEmail('');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -157,18 +194,50 @@ const Auth = () => {
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">
-              {isSignUp ? 'Create Account' : 'Sign In'}
+              {showForgotPassword ? 'Reset Password' : (isSignUp ? 'Create Account' : 'Sign In')}
             </CardTitle>
             <CardDescription className="text-center">
-              {isSignUp 
-                ? 'Enter your details to create your account' 
-                : 'Enter your email and password to sign in'
+              {showForgotPassword
+                ? 'Enter your email to receive a password reset link'
+                : (isSignUp 
+                  ? 'Enter your details to create your account' 
+                  : 'Enter your email and password to sign in')
               }
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {isSignUp && (
+            {showForgotPassword ? (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email">Email</Label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="john@example.com"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Sending..." : "Send Reset Link"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setResetEmail('');
+                  }}
+                >
+                  Back to Sign In
+                </Button>
+              </form>
+            ) : (
+              <>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {isSignUp && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="full_name">Full Name</Label>
@@ -298,33 +367,50 @@ const Auth = () => {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")}
               </Button>
-            </form>
 
-            <div className="mt-4 text-center text-sm">
-              {isSignUp ? (
-                <>
-                  Already have an account?{" "}
+              {!isSignUp && (
+                <div className="mt-2 text-center">
                   <Button
+                    type="button"
                     variant="link"
-                    className="p-0 h-auto font-normal"
-                    onClick={() => setIsSignUp(false)}
+                    className="text-sm p-0 h-auto font-normal"
+                    onClick={() => setShowForgotPassword(true)}
                   >
-                    Sign in
+                    Forgot password?
                   </Button>
-                </>
-              ) : (
-                <>
-                  Don't have an account?{" "}
-                  <Button
-                    variant="link"
-                    className="p-0 h-auto font-normal"
-                    onClick={() => setIsSignUp(true)}
-                  >
-                    Sign up
-                  </Button>
-                </>
-              )}
-            </div>
+                </div>
+                  )}
+                </form>
+
+                {!showForgotPassword && (
+                  <div className="mt-4 text-center text-sm">
+                    {isSignUp ? (
+                      <>
+                        Already have an account?{" "}
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto font-normal"
+                          onClick={() => setIsSignUp(false)}
+                        >
+                          Sign in
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        Don't have an account?{" "}
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto font-normal"
+                          onClick={() => setIsSignUp(true)}
+                        >
+                          Sign up
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
