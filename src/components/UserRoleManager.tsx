@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { UserCog, Shield, User } from "lucide-react";
+import { UserCog, Shield, User, Trash2 } from "lucide-react";
 
 interface UserRoleManagerProps {
   users: any[];
@@ -14,6 +15,8 @@ interface UserRoleManagerProps {
 
 const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
   const [changingRoles, setChangingRoles] = useState<Set<string>>(new Set());
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin') => {
     setChangingRoles(prev => new Set([...prev, userId]));
@@ -71,6 +74,38 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    
+    setDeletingUser(userToDelete.id);
+    
+    try {
+      const { data, error } = await supabase.rpc('delete_user_account', {
+        _user_id: userToDelete.id,
+        _admin_id: (await supabase.auth.getUser()).data.user?.id
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+
+      onUserUpdated();
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingUser(null);
+      setUserToDelete(null);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -109,11 +144,37 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => setUserToDelete({ id: user.user_id, name: user.full_name })}
+                  disabled={deletingUser === user.user_id || user.role === 'admin'}
+                  title={user.role === 'admin' ? "Cannot delete admin users" : "Delete user"}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
             </div>
           ))}
         </div>
       </CardContent>
+
+      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {userToDelete?.name}? This action cannot be undone and will remove all their data including properties, viewings, and favorites.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };
