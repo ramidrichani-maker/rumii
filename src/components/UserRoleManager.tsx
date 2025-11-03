@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { UserCog, Shield, User, Trash2 } from "lucide-react";
+import { UserCog, Shield, User, Trash2, Search } from "lucide-react";
 
 interface UserRoleManagerProps {
   users: any[];
@@ -17,6 +18,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
   const [changingRoles, setChangingRoles] = useState<Set<string>>(new Set());
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
   const [userToDelete, setUserToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin') => {
     setChangingRoles(prev => new Set([...prev, userId]));
@@ -74,6 +76,16 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     }
   };
 
+  const filteredUsers = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return users;
+    
+    return users.filter(user => 
+      user.full_name?.toLowerCase().includes(query) || 
+      user.phone_number?.toLowerCase().includes(query)
+    );
+  }, [users, searchQuery]);
+
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
     
@@ -113,8 +125,29 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
         <CardDescription>Manage user roles and permissions</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name or phone number..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value.slice(0, 100))}
+              className="pl-10"
+            />
+          </div>
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Found {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
         <div className="space-y-4">
-          {users.map((user) => (
+          {filteredUsers.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              No users found matching your search
+            </p>
+          ) : (
+            filteredUsers.map((user) => (
             <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -155,7 +188,8 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                 </Button>
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
       </CardContent>
 
