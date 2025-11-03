@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -17,6 +18,7 @@ import { format } from "date-fns";
 const AdminDashboard = () => {
   const [pendingProperties, setPendingProperties] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [agents, setAgents] = useState<any[]>([]);
   const [viewings, setViewings] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalProperties: 0,
@@ -34,6 +36,7 @@ const AdminDashboard = () => {
     if (user) {
       loadPendingProperties();
       loadUsers();
+      loadAgents();
       loadViewings();
     }
   }, [user]);
@@ -102,6 +105,21 @@ const AdminDashboard = () => {
       setUsers(data || []);
     } catch (error) {
       console.error('Error loading users:', error);
+    }
+  };
+
+  const loadAgents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('role', ['agent', 'admin'])
+        .order('full_name', { ascending: true });
+
+      if (error) throw error;
+      setAgents(data || []);
+    } catch (error) {
+      console.error('Error loading agents:', error);
     }
   };
 
@@ -232,6 +250,31 @@ const AdminDashboard = () => {
       toast({
         title: "Error",
         description: "Failed to update viewing status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAssignAgent = async (viewingId: string, agentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('property_viewings')
+        .update({ agent_id: agentId })
+        .eq('id', viewingId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Agent assigned successfully",
+      });
+
+      loadViewings();
+    } catch (error) {
+      console.error('Error assigning agent:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign agent",
         variant: "destructive",
       });
     }
@@ -468,14 +511,31 @@ const AdminDashboard = () => {
                               </div>
                               
                               <div>
-                                <p className="text-muted-foreground">Assigned Agent</p>
-                                {viewing.agent ? (
-                                  <>
-                                    <p className="font-medium">{viewing.agent.full_name}</p>
-                                    <p className="text-xs text-muted-foreground">{viewing.agent.phone_number}</p>
-                                  </>
-                                ) : (
-                                  <p className="text-sm text-amber-600">No agent assigned</p>
+                                <p className="text-muted-foreground mb-1">Assigned Agent</p>
+                                <Select
+                                  value={viewing.agent_id || "none"}
+                                  onValueChange={(value) => {
+                                    if (value !== "none") {
+                                      handleAssignAgent(viewing.id, value);
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select agent" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="none">No agent assigned</SelectItem>
+                                    {agents.map((agent) => (
+                                      <SelectItem key={agent.user_id} value={agent.user_id}>
+                                        {agent.full_name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                {viewing.agent && (
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {viewing.agent.phone_number}
+                                  </p>
                                 )}
                               </div>
                             </div>
