@@ -40,8 +40,8 @@ const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [coordinates, setCoordinates] = useState({
-    lat: 35.9078,
-    lng: 14.4109
+    lat: 33.8938,
+    lng: 35.5018
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const auth = useAuth();
