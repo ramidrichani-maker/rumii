@@ -345,18 +345,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      approve_property_media: {
-        Args: { media_id: string }
-        Returns: boolean
-      }
+      approve_property_media: { Args: { media_id: string }; Returns: boolean }
       delete_user_account: {
         Args: { _admin_id: string; _user_id: string }
         Returns: boolean
       }
-      end_user_session: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      end_user_session: { Args: { _user_id: string }; Returns: boolean }
       get_new_users_analytics: {
         Args: { days_back?: number; period_type?: string }
         Returns: {

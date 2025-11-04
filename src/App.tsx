@@ -16,6 +16,7 @@ import AgentPortal from "./pages/AgentPortal";
 import ClientDashboard from "./pages/ClientDashboard";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
+import MyListings from "./pages/MyListings";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/purchase" element={<Purchase />} />
             <Route path="/rent" element={<Rent />} />
             <Route path="/list-property" element={<ListProperty />} />
+            <Route path="/my-listings" element={<MyListings />} />
             <Route path="/investment-analytics" element={<InvestmentAnalytics />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/agent-portal" element={<AgentPortal />} />

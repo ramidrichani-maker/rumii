@@ -7,12 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2 } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
 import { AgentViewingStats } from "@/components/AgentViewingStats";
 import PendingMediaApproval from "@/components/PendingMediaApproval";
+import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -29,6 +30,8 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
   
   const { user } = useAuth();
 
@@ -285,6 +288,40 @@ const AdminDashboard = () => {
     setIsDetailModalOpen(true);
   };
 
+  const handleDeleteProperty = async (reason: string) => {
+    if (!propertyToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyToDelete.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Property deleted. Reason: ${reason}`,
+      });
+
+      loadPendingProperties();
+      setDeleteDialogOpen(false);
+      setPropertyToDelete(null);
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete property",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openDeleteDialog = (property: { id: string; address: string }) => {
+    setPropertyToDelete(property);
+    setDeleteDialogOpen(true);
+  };
+
   const isViewingPast = (viewingDate: string, viewingTime: string) => {
     const viewingDateTime = new Date(`${viewingDate}T${viewingTime}`);
     return viewingDateTime < new Date();
@@ -412,7 +449,7 @@ const AdminDashboard = () => {
                               {new Date(property.created_at).toLocaleDateString()}
                             </p>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-wrap">
                             <Button
                               size="sm"
                               variant="outline"
@@ -436,6 +473,14 @@ const AdminDashboard = () => {
                             >
                               <XCircle className="w-4 h-4 mr-1" />
                               Reject
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => openDeleteDialog({ id: property.id, address: property.address })}
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
                             </Button>
                           </div>
                         </div>
@@ -600,6 +645,14 @@ const AdminDashboard = () => {
           onApprove={handleApproveProperty}
           onReject={handleRejectProperty}
           isAdmin={true}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <PropertyDeleteDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onConfirm={handleDeleteProperty}
+          propertyAddress={propertyToDelete?.address || ""}
         />
       </div>
     </div>

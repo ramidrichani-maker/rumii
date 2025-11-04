@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { NotificationBell } from "@/components/NotificationBell";
-import { Calendar, Clock, MapPin, User, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, Trash2, Home as HomeIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import { format } from "date-fns";
+import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 
 interface PropertyViewing {
   id: string;
@@ -36,6 +37,9 @@ const AgentPortal = () => {
   const [viewings, setViewings] = useState<PropertyViewing[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [assignedProperties, setAssignedProperties] = useState<any[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
 
   // Check if user is agent or admin
   if (!user || (profile?.role !== 'agent' && profile?.role !== 'admin')) {
@@ -44,6 +48,7 @@ const AgentPortal = () => {
 
   useEffect(() => {
     fetchViewings();
+    fetchAssignedProperties();
   }, [user]);
 
   const fetchViewings = async () => {
@@ -69,6 +74,34 @@ const AgentPortal = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAssignedProperties = async () => {
+    if (!user) return;
+
+    try {
+      const { data: assignments, error: assignError } = await supabase
+        .from('property_agents')
+        .select('property_id')
+        .eq('agent_id', user.id);
+
+      if (assignError) throw assignError;
+
+      if (assignments && assignments.length > 0) {
+        const propertyIds = assignments.map(a => a.property_id);
+        
+        const { data: properties, error: propsError } = await supabase
+          .from('properties')
+          .select('*')
+          .in('id', propertyIds)
+          .order('created_at', { ascending: false });
+
+        if (propsError) throw propsError;
+        setAssignedProperties(properties || []);
+      }
+    } catch (error) {
+      console.error('Error fetching assigned properties:', error);
     }
   };
 
@@ -101,6 +134,40 @@ const AgentPortal = () => {
     const viewingDateTime = new Date(`${viewingDate}T${viewingTime}`);
     const oneHourAfter = new Date(viewingDateTime.getTime() + 60 * 60 * 1000);
     return oneHourAfter < new Date();
+  };
+
+  const handleDeleteProperty = async (reason: string) => {
+    if (!propertyToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyToDelete.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Property deleted. Reason: ${reason}`,
+      });
+
+      fetchAssignedProperties();
+      setDeleteDialogOpen(false);
+      setPropertyToDelete(null);
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete property",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openDeleteDialog = (property: { id: string; address: string }) => {
+    setPropertyToDelete(property);
+    setDeleteDialogOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -193,7 +260,7 @@ const AgentPortal = () => {
         </div>
 
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="pending">
               Pending Requests ({pendingViewings.length})
             </TabsTrigger>
@@ -202,6 +269,9 @@ const AgentPortal = () => {
             </TabsTrigger>
             <TabsTrigger value="calendar">
               Calendar
+            </TabsTrigger>
+            <TabsTrigger value="properties">
+              My Properties ({assignedProperties.length})
             </TabsTrigger>
             <TabsTrigger value="past">
               Past Viewings ({pastViewings.length})
@@ -406,6 +476,69 @@ const AgentPortal = () => {
             </div>
           </TabsContent>
 
+          <TabsContent value="properties" className="space-y-4">
+            {assignedProperties.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <p className="text-muted-foreground">No properties assigned to you</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {assignedProperties.map((property) => (
+                  <Card key={property.id} className="overflow-hidden">
+                    <div className="aspect-video relative bg-muted">
+                      {property.images && property.images.length > 0 ? (
+                        <img
+                          src={property.images[0]}
+                          alt={property.address}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <HomeIcon className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 right-2">
+                        <Badge>{property.status}</Badge>
+                      </div>
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="line-clamp-1">{property.address}</CardTitle>
+                      <CardDescription>
+                        {property.city} • {property.property_type}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            {property.square_meters}m² • {property.bedrooms} bed • {property.bathrooms} bath
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-2xl font-bold">
+                            ${property.price?.toLocaleString()}
+                            {property.listing_type === 'rent' && '/mo'}
+                          </span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="w-full"
+                          onClick={() => openDeleteDialog({ id: property.id, address: property.address })}
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete Property
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="past" className="space-y-4">
             {pastViewings.length === 0 ? (
               <Card>
@@ -489,6 +622,13 @@ const AgentPortal = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <PropertyDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteProperty}
+        propertyAddress={propertyToDelete?.address || ""}
+      />
     </div>
   );
 };

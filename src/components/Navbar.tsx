@@ -116,6 +116,12 @@ export const Navbar = () => {
                         <span>Favorites</span>
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/my-listings" className="flex items-center">
+                        <Home className="mr-2 h-4 w-4" />
+                        <span>My Listings</span>
+                      </Link>
+                    </DropdownMenuItem>
                     {profile?.role === 'user' && <DropdownMenuItem asChild>
                         <Link to="/my-viewings" className="flex items-center">
                           <Settings className="mr-2 h-4 w-4" />
