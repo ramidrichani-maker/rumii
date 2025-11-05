@@ -31,6 +31,7 @@ const formSchema = z.object({
     required_error: "Please select if this is for rent or sale"
   }),
   price: z.string().min(1, "Price is required"),
+  priceNegotiable: z.boolean().default(false),
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
   amenities: z.array(z.string()).default([])
@@ -51,7 +52,8 @@ const ListProperty = () => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amenities: []
+      amenities: [],
+      priceNegotiable: false
     }
   });
 
@@ -129,6 +131,7 @@ const ListProperty = () => {
         bathrooms: parseInt(data.bathrooms),
         listing_type: data.listingType as any,
         price: parseFloat(data.price),
+        price_negotiable: data.priceNegotiable,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
@@ -287,6 +290,22 @@ const ListProperty = () => {
                           <Input type="number" placeholder="Enter price" {...field} />
                         </FormControl>
                         <FormMessage />
+                      </FormItem>} />
+
+                  <FormField control={form.control} name="priceNegotiable" render={({
+                  field
+                }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="cursor-pointer">
+                            Price is negotiable
+                          </FormLabel>
+                        </div>
                       </FormItem>} />
 
                   <FormField control={form.control} name="metersSquared" render={({

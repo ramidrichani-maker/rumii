@@ -119,6 +119,7 @@ export type Database = {
           longitude: number | null
           municipality: string | null
           price: number | null
+          price_negotiable: boolean | null
           property_code: number
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
@@ -142,6 +143,7 @@ export type Database = {
           longitude?: number | null
           municipality?: string | null
           price?: number | null
+          price_negotiable?: boolean | null
           property_code?: number
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
@@ -165,6 +167,7 @@ export type Database = {
           longitude?: number | null
           municipality?: string | null
           price?: number | null
+          price_negotiable?: boolean | null
           property_code?: number
           property_type?: Database["public"]["Enums"]["property_type"]
           square_meters?: number
