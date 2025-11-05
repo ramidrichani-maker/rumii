@@ -19,11 +19,15 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Eye
+  Eye,
+  Trash2
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
+import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface Property {
   id: string;
@@ -51,6 +55,7 @@ interface PropertyDetailModalProps {
   onClose: () => void;
   onApprove?: (propertyId: string) => void;
   onReject?: (propertyId: string) => void;
+  onDelete?: () => void;
   isAdmin?: boolean;
 }
 
@@ -60,10 +65,12 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   onClose,
   onApprove,
   onReject,
+  onDelete,
   isAdmin = false
 }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   
   if (!property) return null;
 
@@ -101,6 +108,35 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
       return `https://player.vimeo.com/video/${videoId}`;
     }
     return url;
+  };
+
+  const handleDeleteProperty = async (reason: string) => {
+    if (!property) return;
+
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', property.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Property Deleted",
+        description: `Property has been deleted. Reason: ${reason}`
+      });
+
+      setDeleteDialogOpen(false);
+      onClose();
+      onDelete?.();
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete property. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -294,6 +330,21 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         )}
 
+        {/* Admin Delete Button */}
+        {profile?.role === 'admin' && property.status === 'approved' && (
+          <div className="pt-4 border-t">
+            <Button 
+              onClick={() => setDeleteDialogOpen(true)}
+              variant="destructive"
+              className="w-full"
+              size="lg"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Listing
+            </Button>
+          </div>
+        )}
+
         {/* Listing Info */}
         <div className="pt-4 border-t text-xs text-muted-foreground">
           Listed on {new Date(property.created_at).toLocaleDateString()} • 
@@ -313,6 +364,16 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             price: property.price,
             listing_type: property.listing_type
           }}
+        />
+      )}
+
+      {/* Property Delete Dialog */}
+      {property && (
+        <PropertyDeleteDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onConfirm={handleDeleteProperty}
+          propertyAddress={property.address}
         />
       )}
     </Dialog>

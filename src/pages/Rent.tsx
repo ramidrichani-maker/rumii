@@ -323,6 +323,10 @@ const Rent = () => {
           property={selectedProperty}
           isOpen={isDetailModalOpen}
           onClose={() => setIsDetailModalOpen(false)}
+          onDelete={() => {
+            setIsDetailModalOpen(false);
+            fetchProperties();
+          }}
         />
       </div>
     </div>
