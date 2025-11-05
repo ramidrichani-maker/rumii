@@ -113,11 +113,18 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   const handleDeleteProperty = async (reason: string) => {
     if (!property) return;
 
+    console.log('Starting delete for property:', property.id);
+    console.log('User role:', profile?.role);
+    console.log('Delete reason:', reason);
+
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('properties')
         .delete()
-        .eq('id', property.id);
+        .eq('id', property.id)
+        .select();
+
+      console.log('Delete response:', { data, error });
 
       if (error) throw error;
 
@@ -333,8 +340,12 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         {/* Admin Delete Button */}
         {profile?.role === 'admin' && property.status === 'approved' && (
           <div className="pt-4 border-t">
+            <p className="text-xs text-muted-foreground mb-2">Debug: Role = {profile?.role}, Status = {property.status}</p>
             <Button 
-              onClick={() => setDeleteDialogOpen(true)}
+              onClick={() => {
+                console.log('Delete button clicked', { profile, property });
+                setDeleteDialogOpen(true);
+              }}
               variant="destructive"
               className="w-full"
               size="lg"
