@@ -31,6 +31,8 @@ export const PropertyDeleteDialog = ({
 
   const handleConfirm = () => {
     const finalReason = deleteReason === "other" ? customReason : deleteReason;
+    // Optimistically close the dialog to avoid overlay freeze in controlled mode
+    onOpenChange(false);
     onConfirm(finalReason);
     // Reset state
     setDeleteReason("sold");
