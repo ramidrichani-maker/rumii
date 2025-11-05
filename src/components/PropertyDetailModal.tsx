@@ -113,18 +113,18 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   const handleDeleteProperty = async (reason: string) => {
     if (!property) return;
 
+    // Close parent modal early to avoid overlay stacking/freeze
+    try { onClose(); } catch {}
+
     console.log('Starting delete for property:', property.id);
     console.log('User role:', profile?.role);
     console.log('Delete reason:', reason);
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('properties')
         .delete()
-        .eq('id', property.id)
-        .select();
-
-      console.log('Delete response:', { data, error });
+        .eq('id', property.id);
 
       if (error) throw error;
 
@@ -132,10 +132,6 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         title: "Property Deleted",
         description: `Property has been deleted. Reason: ${reason}`
       });
-
-      setDeleteDialogOpen(false);
-      onClose();
-      onDelete?.();
     } catch (error) {
       console.error('Error deleting property:', error);
       toast({
@@ -143,6 +139,9 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         description: "Failed to delete property. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setDeleteDialogOpen(false);
+      onDelete?.();
     }
   };
 
