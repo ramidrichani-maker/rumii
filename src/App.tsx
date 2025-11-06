@@ -19,6 +19,7 @@ import Profile from "./pages/Profile";
 import MyListings from "./pages/MyListings";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import ChatAssistant from "./pages/ChatAssistant";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/chat" element={<ChatAssistant />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
