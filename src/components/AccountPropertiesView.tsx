@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { ChevronDown, ChevronRight, Home, DollarSign, MapPin, Eye } from "lucide-react";
+import { ChevronDown, ChevronRight, Home, DollarSign, MapPin, Eye, Trash2 } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
+import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 
 interface Property {
   id: string;
@@ -42,6 +43,8 @@ const AccountPropertiesView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
 
   useEffect(() => {
     loadAccountsWithProperties();
@@ -113,6 +116,40 @@ const AccountPropertiesView: React.FC = () => {
   const handleViewProperty = (property: Property) => {
     setSelectedProperty(property);
     setIsDetailModalOpen(true);
+  };
+
+  const openDeleteDialog = (property: { id: string; address: string }) => {
+    setPropertyToDelete(property);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteProperty = async (reason: string) => {
+    if (!propertyToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyToDelete.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Property Deleted",
+        description: `Property has been deleted. Reason: ${reason}`
+      });
+
+      loadAccountsWithProperties();
+      setDeleteDialogOpen(false);
+      setPropertyToDelete(null);
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete property. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isLoading) {
@@ -216,14 +253,24 @@ const AccountPropertiesView: React.FC = () => {
                                     </p>
                                   </div>
 
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleViewProperty(property)}
-                                  >
-                                    <Eye className="w-4 h-4 mr-1" />
-                                    View
-                                  </Button>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleViewProperty(property)}
+                                    >
+                                      <Eye className="w-4 h-4 mr-1" />
+                                      View
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      onClick={() => openDeleteDialog({ id: property.id, address: property.address })}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-1" />
+                                      Delete
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
                             ))}
@@ -246,6 +293,14 @@ const AccountPropertiesView: React.FC = () => {
         onClose={() => setIsDetailModalOpen(false)}
         onDelete={loadAccountsWithProperties}
         isAdmin={true}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <PropertyDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteProperty}
+        propertyAddress={propertyToDelete?.address || ""}
       />
     </>
   );
