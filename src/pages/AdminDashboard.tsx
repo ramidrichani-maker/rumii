@@ -7,13 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2 } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
 import { AgentViewingStats } from "@/components/AgentViewingStats";
 import PendingMediaApproval from "@/components/PendingMediaApproval";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
+import AccountPropertiesView from "@/components/AccountPropertiesView";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -389,10 +390,14 @@ const AdminDashboard = () => {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="properties" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Home className="w-4 h-4" />
               Properties
+            </TabsTrigger>
+            <TabsTrigger value="accounts" className="flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              Accounts
             </TabsTrigger>
             <TabsTrigger value="media" className="flex items-center gap-2">
               <Eye className="w-4 h-4" />
@@ -490,6 +495,10 @@ const AdminDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="accounts">
+            <AccountPropertiesView />
           </TabsContent>
 
           <TabsContent value="media">
