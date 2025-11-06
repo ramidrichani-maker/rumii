@@ -340,10 +340,7 @@ const Purchase = () => {
           property={selectedProperty}
           isOpen={isDetailModalOpen}
           onClose={() => setIsDetailModalOpen(false)}
-          onDelete={() => {
-            setIsDetailModalOpen(false);
-            fetchProperties();
-          }}
+          allowDelete={false}
         />
       </div>
     </div>

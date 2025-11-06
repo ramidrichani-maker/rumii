@@ -57,6 +57,7 @@ interface PropertyDetailModalProps {
   onReject?: (propertyId: string) => void;
   onDelete?: () => void;
   isAdmin?: boolean;
+  allowDelete?: boolean;
 }
 
 const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
@@ -66,7 +67,8 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   onApprove,
   onReject,
   onDelete,
-  isAdmin = false
+  isAdmin = false,
+  allowDelete = true
 }) => {
   const { user, profile } = useAuth();
   const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
@@ -337,9 +339,8 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         )}
 
         {/* Admin Delete Button */}
-        {profile?.role === 'admin' && property.status === 'approved' && (
+        {allowDelete && profile?.role === 'admin' && property.status === 'approved' && (
           <div className="pt-4 border-t">
-            <p className="text-xs text-muted-foreground mb-2">Debug: Role = {profile?.role}, Status = {property.status}</p>
             <Button 
               onClick={() => {
                 console.log('Delete button clicked', { profile, property });
