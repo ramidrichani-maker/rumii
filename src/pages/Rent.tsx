@@ -104,9 +104,13 @@ const Rent = () => {
     fetchProperties();
   }, []);
 
-  // Auto-fetch when filters change
+  // Auto-fetch when filters change with debounce
   useEffect(() => {
-    fetchProperties();
+    const timeoutId = setTimeout(() => {
+      fetchProperties();
+    }, 500); // 500ms debounce delay
+
+    return () => clearTimeout(timeoutId);
   }, [selectedPropertyTypes, squareMetersRange, minBedrooms, minBathrooms, selectedAmenities]);
 
   const handleClearFilters = () => {
