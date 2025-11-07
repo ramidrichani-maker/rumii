@@ -104,9 +104,10 @@ const Rent = () => {
     fetchProperties();
   }, []);
 
-  const handleApplyFilters = () => {
+  // Auto-fetch when filters change
+  useEffect(() => {
     fetchProperties();
-  };
+  }, [selectedPropertyTypes, squareMetersRange, minBedrooms, minBathrooms, selectedAmenities]);
 
   const handleClearFilters = () => {
     setSelectedPropertyTypes([]);
@@ -229,10 +230,7 @@ const Rent = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <Button size="lg" className="flex-1" onClick={handleApplyFilters} disabled={isLoading}>
-                {isLoading ? "Searching..." : "Apply Filters"}
-              </Button>
+            <div className="flex justify-end">
               <Button variant="outline" size="lg" onClick={handleClearFilters}>
                 Clear All
               </Button>
