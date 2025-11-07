@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, MapPin, Calendar, Heart } from "lucide-react";
+import { Bed, Bath, Square, MapPin, Calendar, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import ViewingBookingModal from "./ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,6 +35,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -120,14 +121,24 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     return listingType === 'rent' ? `${formattedPrice}/mo` : formattedPrice;
   };
 
-  const getPropertyImage = (images: string[]) => {
-    if (images && images.length > 0) {
-      return images[0];
-    }
-    return null;
+  const handlePreviousImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? property.images.length - 1 : prev - 1
+    );
   };
 
-  const propertyImage = getPropertyImage(property.images);
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => 
+      prev === property.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const hasMultipleImages = property.images && property.images.length > 1;
+  const currentImage = property.images && property.images.length > 0 
+    ? property.images[currentImageIndex] 
+    : null;
 
   return (
     <Card 
@@ -140,7 +151,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         }
       }}
     >
-      <div className="h-48 bg-muted rounded-t-lg overflow-hidden relative">
+      <div className="h-48 bg-muted rounded-t-lg overflow-hidden relative group">
         <Button
           variant="ghost"
           size="icon"
@@ -152,9 +163,46 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
             className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
           />
         </Button>
-        {propertyImage ? (
+        
+        {/* Image navigation arrows */}
+        {hasMultipleImages && (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handlePreviousImage}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handleNextImage}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+            
+            {/* Image indicator dots */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
+              {property.images.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                    index === currentImageIndex 
+                      ? 'bg-white w-4' 
+                      : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
+        {currentImage ? (
           <img 
-            src={propertyImage} 
+            src={currentImage} 
             alt={`${property.property_type} in ${property.city}`}
             className="w-full h-full object-cover"
             onError={(e) => {
