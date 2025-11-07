@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,6 +13,45 @@ serve(async (req) => {
     const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch approved properties from database
+    const { data: properties, error: dbError } = await supabase
+      .from("properties")
+      .select(`
+        id,
+        property_code,
+        property_type,
+        listing_type,
+        price,
+        bedrooms,
+        bathrooms,
+        square_meters,
+        address,
+        city,
+        municipality,
+        amenities,
+        year_built,
+        price_negotiable
+      `)
+      .eq("status", "approved")
+      .limit(50);
+
+    if (dbError) {
+      console.error("Database error:", dbError);
+    }
+
+    // Build property context for AI
+    const propertyContext = properties && properties.length > 0
+      ? `\n\nCurrent available properties in database:\n${properties.map(p => 
+          `- Property #${p.property_code}: ${p.property_type} for ${p.listing_type} at ${p.address}, ${p.city}${p.municipality ? `, ${p.municipality}` : ''}. Price: €${p.price}${p.price_negotiable ? ' (negotiable)' : ''}. ${p.bedrooms} beds, ${p.bathrooms} baths, ${p.square_meters}m². ${p.amenities?.length ? `Amenities: ${p.amenities.join(', ')}` : ''}`
+        ).join('\n')}`
+      : "\n\nNo properties currently available in the database.";
+
 
     const systemPrompt = `You are a helpful AI assistant for a real estate property listing platform. Your role is to:
 
@@ -29,7 +69,10 @@ Key information about the platform:
 - Property types include: apartments, houses, villas, commercial properties
 - Each listing shows: price, location, bedrooms, bathrooms, square meters, amenities, and images
 
-Be friendly, concise, and helpful. If you don't know something specific about a particular listing, suggest the user search or contact an agent.`;
+When users ask about available properties, refer to the property database context provided below and give specific, accurate information about actual listings.
+${propertyContext}
+
+Be friendly, concise, and helpful. When discussing specific properties, reference them by their property code number.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
