@@ -14,18 +14,13 @@ import PropertyCard from "@/components/PropertyCard";
 
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
-  { id: "villa", name: "Villa", icon: Home },
-  { id: "land", name: "Land", icon: Trees },
-  { id: "farm", name: "Farm", icon: Tractor },
-  { id: "beach house", name: "Beach House", icon: Waves },
-  { id: "penthouse", name: "Penthouse", icon: Crown },
-  { id: "chalet", name: "Chalet", icon: Mountain },
+  { id: "house", name: "House", icon: Home },
   { id: "studio", name: "Studio", icon: Building2 },
-  { id: "commercial rental", name: "Commercial Rental", icon: Store },
-  { id: "rooftop", name: "Rooftop", icon: Building2 },
-  { id: "duplex", name: "Duplex", icon: House },
-  { id: "triplex", name: "Triplex", icon: Building },
-  { id: "venue", name: "Venue", icon: Sofa },
+  { id: "villa", name: "Villa", icon: Crown },
+  { id: "penthouse", name: "Penthouse", icon: Mountain },
+  { id: "townhouse", name: "Townhouse", icon: House },
+  { id: "duplex", name: "Duplex", icon: Building },
+  { id: "loft", name: "Loft", icon: Sofa },
 ];
 
 const amenities = [
