@@ -32,7 +32,7 @@ const amenities = [
 
 const Purchase = () => {
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
-  const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 500]);
+  const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 1000]);
   const [minBedrooms, setMinBedrooms] = useState(1);
   const [minBathrooms, setMinBathrooms] = useState(1);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
@@ -67,8 +67,8 @@ const Purchase = () => {
         query = query.in('property_type', selectedPropertyTypes as any);
       }
 
-      // Square meters filter (handle 500+ case)
-      if (squareMetersRange[1] >= 500) {
+      // Square meters filter (handle 1000+ case)
+      if (squareMetersRange[1] >= 1000) {
         query = query.gte('square_meters', squareMetersRange[0]);
       } else {
         query = query.gte('square_meters', squareMetersRange[0]).lte('square_meters', squareMetersRange[1]);
@@ -117,7 +117,7 @@ const Purchase = () => {
 
   const handleClearFilters = () => {
     setSelectedPropertyTypes([]);
-    setSquareMetersRange([50, 500]);
+    setSquareMetersRange([50, 1000]);
     setMinBedrooms(1);
     setMinBathrooms(1);
     setSelectedAmenities([]);
@@ -176,11 +176,11 @@ const Purchase = () => {
               value={squareMetersRange}
               onValueChange={setSquareMetersRange}
               min={50}
-              max={500}
-              step={10}
+              max={1000}
+              step={5}
               label="Square Meters Range"
               unit=" m²"
-              maxLabel="500+ m²"
+              maxLabel="1,000+ m²"
             />
 
             {/* Amenities Filter */}
@@ -265,7 +265,7 @@ const Purchase = () => {
         </div>
 
         {/* Active Filters Display */}
-        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 500 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0) && (
+        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0) && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-foreground">Active Filters:</h3>
             <div className="flex flex-wrap gap-2">
@@ -277,9 +277,9 @@ const Purchase = () => {
                   </Badge>
                 );
               })}
-              {(squareMetersRange[0] > 50 || squareMetersRange[1] < 500) && (
+              {(squareMetersRange[0] > 50 || squareMetersRange[1] < 1000) && (
                 <Badge variant="secondary" className="px-3 py-1">
-                  {squareMetersRange[0]}-{squareMetersRange[1] >= 500 ? '500+' : squareMetersRange[1]} m²
+                  {squareMetersRange[0]}-{squareMetersRange[1] >= 1000 ? '1,000+' : squareMetersRange[1]} m²
                 </Badge>
               )}
               {minBedrooms > 1 && (
