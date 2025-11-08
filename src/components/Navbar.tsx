@@ -9,6 +9,8 @@ import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 export const Navbar = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Guard against auth context not being ready
   if (!auth || auth.loading) {
@@ -22,15 +24,8 @@ export const Navbar = () => {
         </div>
       </nav>;
   }
-  const {
-    user,
-    profile,
-    signOut
-  } = auth;
-  const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+
+  const { user, profile, signOut } = auth;
   const handleSignOut = async () => {
     await signOut();
     toast({
