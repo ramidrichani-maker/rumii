@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +23,7 @@ export const NotificationBell = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'viewings' | 'properties' | 'agents'>('all');
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -136,6 +138,33 @@ export const NotificationBell = () => {
     }
   };
 
+  const getNotificationCategory = (notification: Notification): string => {
+    const title = notification.title.toLowerCase();
+    const message = notification.message.toLowerCase();
+    
+    if (title.includes('viewing') || message.includes('viewing') || title.includes('appointment')) {
+      return 'viewings';
+    } else if (title.includes('property') || message.includes('property') || title.includes('listing') || title.includes('media')) {
+      return 'properties';
+    } else if (title.includes('agent') || message.includes('agent')) {
+      return 'agents';
+    }
+    return 'other';
+  };
+
+  const filteredNotifications = notifications.filter(notification => {
+    if (filter === 'all') return true;
+    return getNotificationCategory(notification) === filter;
+  });
+
+  const filteredUnreadCount = notifications.filter(n => {
+    if (!n.read) {
+      if (filter === 'all') return true;
+      return getNotificationCategory(n) === filter;
+    }
+    return false;
+  }).length;
+
   if (!user) return null;
 
   return (
@@ -156,9 +185,9 @@ export const NotificationBell = () => {
       <PopoverContent className="w-80 p-0" align="end">
         <Card className="border-0 shadow-none">
           <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-3">
               <CardTitle className="text-lg">Notifications</CardTitle>
-              {unreadCount > 0 && (
+              {filteredUnreadCount > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -169,16 +198,24 @@ export const NotificationBell = () => {
                 </Button>
               )}
             </div>
+            <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)} className="w-full">
+              <TabsList className="grid w-full grid-cols-4 h-9">
+                <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
+                <TabsTrigger value="viewings" className="text-xs">Viewings</TabsTrigger>
+                <TabsTrigger value="properties" className="text-xs">Properties</TabsTrigger>
+                <TabsTrigger value="agents" className="text-xs">Agents</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </CardHeader>
           <CardContent className="p-0">
             <div className="max-h-96 overflow-y-auto">
-              {notifications.length === 0 ? (
+              {filteredNotifications.length === 0 ? (
                 <div className="p-4 text-center text-muted-foreground">
-                  No notifications yet
+                  {filter === 'all' ? 'No notifications yet' : `No ${filter} notifications`}
                 </div>
               ) : (
                 <div className="divide-y">
-                  {notifications.map((notification) => (
+                  {filteredNotifications.map((notification) => (
                     <div
                       key={notification.id}
                       className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
