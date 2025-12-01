@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Notification {
   id: string;
@@ -23,6 +24,7 @@ export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
@@ -114,6 +116,26 @@ export const NotificationBell = () => {
     setUnreadCount(0);
   };
 
+  const handleNotificationClick = async (notification: Notification) => {
+    // Mark as read
+    await markAsRead(notification.id);
+    
+    // Close popover
+    setIsOpen(false);
+    
+    // Navigate based on notification type
+    const type = notification.type.toLowerCase();
+    if (type.includes('viewing') || type.includes('appointment')) {
+      navigate('/client-dashboard');
+    } else if (type.includes('property') || type.includes('listing')) {
+      navigate('/my-listings');
+    } else if (type.includes('agent')) {
+      navigate('/agent-portal');
+    } else if (type.includes('media')) {
+      navigate('/my-listings');
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -159,9 +181,10 @@ export const NotificationBell = () => {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-muted/50 transition-colors ${
+                      className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
                         !notification.read ? 'bg-muted/30' : ''
                       }`}
+                      onClick={() => handleNotificationClick(notification)}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
