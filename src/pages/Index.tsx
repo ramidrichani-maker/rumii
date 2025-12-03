@@ -16,9 +16,9 @@ const Index = () => {
         </div>
         
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <Card className="hover:shadow-lg transition-shadow duration-300">
+          <Card className="group animate-enter hover-scale hover:shadow-xl transition-all duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
                 <Home className="w-8 h-8 text-primary" />
               </div>
               <CardTitle className="text-2xl">Purchase</CardTitle>
@@ -35,9 +35,9 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow duration-300">
+          <Card className="group animate-enter hover-scale hover:shadow-xl transition-all duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-secondary/80 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-secondary/80 rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
                 <Key className="w-8 h-8 text-secondary-foreground" />
               </div>
               <CardTitle className="text-2xl">Rent</CardTitle>
@@ -54,9 +54,9 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow duration-300">
+          <Card className="group animate-enter hover-scale hover:shadow-xl transition-all duration-300">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
                 <PlusCircle className="w-8 h-8 text-accent-foreground" />
               </div>
               <CardTitle className="text-2xl">List Property</CardTitle>
