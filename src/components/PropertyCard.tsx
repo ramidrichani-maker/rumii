@@ -142,7 +142,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
   return (
     <Card 
-      className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      className="animate-fade-in hover-scale hover:shadow-xl transition-all duration-300 cursor-pointer"
       onClick={(e) => {
         // Only trigger property details if not clicking on buttons or interactive elements
         const target = e.target as HTMLElement;
