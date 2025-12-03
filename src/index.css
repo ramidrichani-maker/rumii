@@ -21,9 +21,11 @@ All colors MUST be HSL.
     --popover-foreground: 30 15% 30%;
 
     --primary: 30 20% 65%;
+    --primary-hover: 30 20% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 92%;
+    --secondary-hover: 0 0% 88%;
     --secondary-foreground: 30 15% 30%;
 
     --muted: 0 0% 95%;
@@ -69,9 +71,11 @@ All colors MUST be HSL.
     --popover-foreground: 0 0% 95%;
 
     --primary: 200 50% 60%;
+    --primary-hover: 200 50% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 30 10% 25%;
+    --secondary-hover: 30 10% 30%;
     --secondary-foreground: 0 0% 95%;
 
     --muted: 30 10% 25%;
