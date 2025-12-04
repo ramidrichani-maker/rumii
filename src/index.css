@@ -108,7 +108,16 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground;
-    background: linear-gradient(180deg, hsl(200 50% 85%) 0%, hsl(0 0% 100%) 100%);
+    background:
+      radial-gradient(circle at 0 0, hsl(30 20% 92%) 0, transparent 55%),
+      radial-gradient(circle at 100% 100%, hsl(30 20% 96%) 0, transparent 55%),
+      repeating-linear-gradient(
+        135deg,
+        hsl(30 20% 88%) 0,
+        hsl(30 20% 88%) 1px,
+        hsl(30 20% 96%) 1px,
+        hsl(30 20% 96%) 4px
+      );
     min-height: 100vh;
   }
 }
