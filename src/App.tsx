@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +24,27 @@ import ChatAssistant from "./pages/ChatAssistant";
 import { FloatingChatWidget } from "./components/FloatingChatWidget";
 
 const queryClient = new QueryClient();
+
+const RouteProgress = () => {
+  const location = useLocation();
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    setIsActive(true);
+    const timeout = setTimeout(() => setIsActive(false), 450);
+    return () => clearTimeout(timeout);
+  }, [location.pathname]);
+
+  return (
+    <div className="h-0.5 w-full overflow-hidden">
+      <div
+        className={`h-full bg-gradient-to-r from-primary via-primary/70 to-primary/20 transition-transform duration-500 ease-out origin-left ${
+          isActive ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0"
+        }`}
+      />
+    </div>
+  );
+};
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -61,6 +83,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Navbar />
+          <RouteProgress />
           <FloatingChatWidget />
           <AppRoutes />
         </BrowserRouter>
