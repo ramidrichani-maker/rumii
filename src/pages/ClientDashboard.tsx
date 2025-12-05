@@ -268,7 +268,7 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 px-4 pb-12">
+    <div className="min-h-screen bg-transparent pt-20 px-4 pb-12">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">My Dashboard</h1>

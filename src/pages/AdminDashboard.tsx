@@ -329,7 +329,7 @@ const AdminDashboard = () => {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-background flex items-center justify-center">
+    return <div className="min-h-screen bg-transparent flex items-center justify-center">
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-2">Loading Admin Dashboard...</h2>
         <p className="text-muted-foreground">Please wait while we load your data</p>
@@ -338,7 +338,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
