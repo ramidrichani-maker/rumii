@@ -122,7 +122,7 @@ const Rent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">

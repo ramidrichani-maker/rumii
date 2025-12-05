@@ -182,7 +182,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8">
           <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
