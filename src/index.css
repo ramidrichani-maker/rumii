@@ -101,6 +101,27 @@ All colors MUST be HSL.
   }
 }
 
+@keyframes engraving-shimmer {
+ 0% {
+   background-position:
+     0 0,
+     100% 100%,
+     0 0;
+ }
+ 50% {
+   background-position:
+     -10px 6px,
+     100% 100%,
+     0 6px;
+ }
+ 100% {
+   background-position:
+     0 0,
+     100% 100%,
+     0 0;
+ }
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -109,7 +130,7 @@ All colors MUST be HSL.
   body {
     @apply text-foreground;
     background:
-      radial-gradient(circle at 0 0, hsl(30 20% 92%) 0, transparent 55%),
+      radial-gradient(circle at -10% 0, hsl(30 20% 90%) 0, transparent 65%),
       radial-gradient(circle at 100% 100%, hsl(30 20% 96%) 0, transparent 55%),
       repeating-linear-gradient(
         135deg,
@@ -118,6 +139,23 @@ All colors MUST be HSL.
         hsl(30 20% 96%) 1px,
         hsl(30 20% 96%) 4px
       );
+    background-position:
+      0 0,
+      100% 100%,
+      0 0;
+    background-size:
+      auto,
+      auto,
+      120px 120px;
+    background-attachment: fixed;
+    animation: engraving-shimmer 40s ease-in-out infinite;
     min-height: 100vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+    background-attachment: scroll;
   }
 }
