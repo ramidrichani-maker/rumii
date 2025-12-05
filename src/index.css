@@ -102,24 +102,30 @@ All colors MUST be HSL.
 }
 
 @keyframes engraving-shimmer {
- 0% {
-   background-position:
-     0 0,
-     100% 100%,
-     0 0;
- }
- 50% {
-   background-position:
-     -10px 6px,
-     100% 100%,
-     0 6px;
- }
- 100% {
-   background-position:
-     0 0,
-     100% 100%,
-     0 0;
- }
+  0% {
+    background-position:
+      0 0,
+      100% 0,
+      50% 100%,
+      0 0,
+      0 0;
+  }
+  50% {
+    background-position:
+      -8px 4px,
+      108% 4px,
+      50% 104%,
+      4px 4px,
+      -4px 4px;
+  }
+  100% {
+    background-position:
+      0 0,
+      100% 0,
+      50% 100%,
+      0 0,
+      0 0;
+  }
 }
 
 @layer base {
@@ -130,22 +136,34 @@ All colors MUST be HSL.
   body {
     @apply text-foreground;
     background:
-      radial-gradient(circle at -10% 0, hsl(30 20% 90%) 0, transparent 65%),
-      radial-gradient(circle at 100% 100%, hsl(30 20% 96%) 0, transparent 55%),
+      radial-gradient(circle at 0 0, hsl(30 20% 92%) 0, transparent 60%),
+      radial-gradient(circle at 100% 0, hsl(30 20% 92%) 0, transparent 60%),
+      radial-gradient(circle at 50% 100%, hsl(30 20% 96%) 0, transparent 65%),
+      repeating-linear-gradient(
+        45deg,
+        hsl(30 20% 90%) 0,
+        hsl(30 20% 90%) 1px,
+        hsl(30 20% 98%) 1px,
+        hsl(30 20% 98%) 6px
+      ),
       repeating-linear-gradient(
         135deg,
         hsl(30 20% 88%) 0,
         hsl(30 20% 88%) 1px,
         hsl(30 20% 96%) 1px,
-        hsl(30 20% 96%) 4px
+        hsl(30 20% 96%) 6px
       );
     background-position:
       0 0,
-      100% 100%,
+      100% 0,
+      50% 100%,
+      0 0,
       0 0;
     background-size:
       auto,
       auto,
+      auto,
+      120px 120px,
       120px 120px;
     background-attachment: fixed;
     animation: engraving-shimmer 40s ease-in-out infinite;
