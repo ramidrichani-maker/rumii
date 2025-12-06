@@ -134,6 +134,7 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground;
+    scroll-padding-top: 5rem;
     background:
       radial-gradient(circle at 0 0, hsl(30 20% 92%) 0, transparent 60%),
       radial-gradient(circle at 100% 0, hsl(30 20% 92%) 0, transparent 60%),
