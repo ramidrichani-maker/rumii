@@ -11,6 +11,7 @@ import CompactPropertyMap from "@/components/CompactPropertyMap";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import RangeSlider from "@/components/RangeSlider";
 import PropertyCard from "@/components/PropertyCard";
+import ScrollReveal from "@/components/ScrollReveal";
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
   { id: "house", name: "House", icon: Home },
@@ -124,14 +125,16 @@ const Rent = () => {
   return (
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Properties for Rent</h1>
-          <p className="text-lg text-muted-foreground">Find and filter rental properties that match your criteria</p>
-        </div>
+        <ScrollReveal animation="fade-up">
+          <div className="mb-8">
+            <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Link>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Properties for Rent</h1>
+            <p className="text-lg text-muted-foreground">Find and filter rental properties that match your criteria</p>
+          </div>
+        </ScrollReveal>
 
         {/* Filters Section */}
         <Card className="mb-8">
@@ -302,14 +305,17 @@ const Rent = () => {
         {/* Property Grid */}
         {!isLoading && properties.length > 0 && (
           <div className="mb-8">
-            <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
+            <ScrollReveal animation="fade-up">
+              <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
+            </ScrollReveal>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {properties.map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  onClick={handlePropertySelect}
-                />
+              {properties.map((property, index) => (
+                <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
+                  <PropertyCard
+                    property={property}
+                    onClick={handlePropertySelect}
+                  />
+                </ScrollReveal>
               ))}
             </div>
           </div>
