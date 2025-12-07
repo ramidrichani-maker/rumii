@@ -128,7 +128,7 @@ const ListProperty = () => {
         property_type: data.propertyType.toLowerCase() as any,
         square_meters: parseInt(data.metersSquared),
         bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseInt(data.bathrooms),
+        bathrooms: parseFloat(data.bathrooms),
         listing_type: data.listingType as any,
         price: parseFloat(data.price),
         price_negotiable: data.priceNegotiable,
@@ -341,18 +341,18 @@ const ListProperty = () => {
                   field
                 }) => <FormItem>
                         <FormLabel>Bathrooms</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select bathrooms" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {[1, 2, 3, 4, 5, 6].map(num => <SelectItem key={num} value={num.toString()}>
-                                {num} {num === 1 ? 'Bathroom' : 'Bathrooms'}
-                              </SelectItem>)}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.5" 
+                            min="0.5"
+                            placeholder="e.g. 2 or 1.5" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Use .5 for half baths (toilet only, no shower)
+                        </p>
                         <FormMessage />
                       </FormItem>} />
 
