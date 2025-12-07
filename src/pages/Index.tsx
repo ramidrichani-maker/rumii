@@ -1,11 +1,60 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Home, Key, PlusCircle, Bed, Bath, Square } from "lucide-react";
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Property {
+  id: string;
+  address: string;
+  city: string;
+  price: number;
+  listing_type: string;
+  property_type: string;
+  bedrooms: number;
+  bathrooms: number;
+  square_meters: number;
+  images: string[];
+}
 
 const Index = () => {
+  const [featuredRentals, setFeaturedRentals] = useState<Property[]>([]);
+  const [featuredSales, setFeaturedSales] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadFeaturedProperties();
+  }, []);
+
+  const loadFeaturedProperties = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('id, address, city, price, listing_type, property_type, bedrooms, bathrooms, square_meters, images, featured_section')
+        .eq('status', 'approved')
+        .not('featured_section', 'is', null);
+
+      if (error) throw error;
+
+      setFeaturedRentals((data || []).filter(p => p.featured_section === 'featured_rentals'));
+      setFeaturedSales((data || []).filter(p => p.featured_section === 'properties_for_sale'));
+    } catch (error) {
+      console.error('Error loading featured properties:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatPrice = (price: number, listingType: string) => {
+    if (listingType === 'rent') {
+      return `$${price?.toLocaleString()}/mo`;
+    }
+    return `$${price?.toLocaleString()}`;
+  };
+
   return (
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-16">
@@ -83,273 +132,125 @@ const Index = () => {
           </ScrollReveal>
         </div>
         
-        {/* Popular Listings Section */}
-        <div className="mt-24">
-        <ScrollReveal animation="fade-up">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-foreground">Popular Listings</h2>
-            <p className="text-lg text-muted-foreground">
-              Discover the most sought-after properties in your area
-            </p>
-          </div>
-        </ScrollReveal>
-          
-          {/* Rental Properties Row */}
-          <div className="mb-16">
-            <ScrollReveal animation="fade-right">
-              <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Rentals</h3>
+        {/* Popular Listings Section - Only show if there are featured properties */}
+        {!isLoading && (featuredRentals.length > 0 || featuredSales.length > 0) && (
+          <div className="mt-24">
+            <ScrollReveal animation="fade-up">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold mb-4 text-foreground">Popular Listings</h2>
+                <p className="text-lg text-muted-foreground">
+                  Discover the most sought-after properties in your area
+                </p>
+              </div>
             </ScrollReveal>
-            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-              <ScrollReveal animation="fade-up" delay={100}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge variant="secondary">For Rent</Badge>
-                      <span className="text-2xl font-bold text-primary">$2,500/mo</span>
-                    </div>
-                    <CardTitle className="text-lg">Modern Downtown Apartment</CardTitle>
-                    <CardDescription>123 Main St, Downtown</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>2 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>2 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>1,200 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
+            
+            {/* Rental Properties Row */}
+            {featuredRentals.length > 0 && (
+              <div className="mb-16">
+                <ScrollReveal animation="fade-right">
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Rentals</h3>
+                </ScrollReveal>
+                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {featuredRentals.map((property, index) => (
+                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
+                      <Link to={`/rent`}>
+                        <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer">
+                          <div 
+                            className="h-48 bg-muted rounded-t-lg bg-cover bg-center"
+                            style={{
+                              backgroundImage: property.images?.[0] 
+                                ? `url(${property.images[0]})` 
+                                : undefined
+                            }}
+                          />
+                          <CardHeader className="pb-2">
+                            <div className="flex justify-between items-start mb-2">
+                              <Badge variant="secondary">For Rent</Badge>
+                              <span className="text-2xl font-bold text-primary">
+                                {formatPrice(property.price, property.listing_type)}
+                              </span>
+                            </div>
+                            <CardTitle className="text-lg">{property.address}</CardTitle>
+                            <CardDescription>{property.city}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                              <div className="flex items-center">
+                                <Bed className="w-4 h-4 mr-1" />
+                                <span>{property.bedrooms} bed</span>
+                              </div>
+                              <div className="flex items-center">
+                                <Bath className="w-4 h-4 mr-1" />
+                                <span>{property.bathrooms} bath</span>
+                              </div>
+                              <div className="flex items-center">
+                                <Square className="w-4 h-4 mr-1" />
+                                <span>{property.square_meters}m²</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            )}
 
-              <ScrollReveal animation="fade-up" delay={200}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge variant="secondary">For Rent</Badge>
-                      <span className="text-2xl font-bold text-primary">$3,200/mo</span>
-                    </div>
-                    <CardTitle className="text-lg">Luxury Condo with View</CardTitle>
-                    <CardDescription>456 Oak Ave, Midtown</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>3 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>2 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>1,800 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-
-              <ScrollReveal animation="fade-up" delay={300}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge variant="secondary">For Rent</Badge>
-                      <span className="text-2xl font-bold text-primary">$1,800/mo</span>
-                    </div>
-                    <CardTitle className="text-lg">Cozy Studio Loft</CardTitle>
-                    <CardDescription>789 Elm St, Arts District</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>1 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>1 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>850 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-
-              <ScrollReveal animation="fade-up" delay={400}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge variant="secondary">For Rent</Badge>
-                      <span className="text-2xl font-bold text-primary">$2,900/mo</span>
-                    </div>
-                    <CardTitle className="text-lg">Garden Apartment</CardTitle>
-                    <CardDescription>321 Pine Rd, Suburban</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>2 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>2 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>1,400 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-            </div>
+            {/* Properties for Sale Row */}
+            {featuredSales.length > 0 && (
+              <div>
+                <ScrollReveal animation="fade-left">
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Sale</h3>
+                </ScrollReveal>
+                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {featuredSales.map((property, index) => (
+                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
+                      <Link to={`/purchase`}>
+                        <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer">
+                          <div 
+                            className="h-48 bg-muted rounded-t-lg bg-cover bg-center"
+                            style={{
+                              backgroundImage: property.images?.[0] 
+                                ? `url(${property.images[0]})` 
+                                : undefined
+                            }}
+                          />
+                          <CardHeader className="pb-2">
+                            <div className="flex justify-between items-start mb-2">
+                              <Badge>For Sale</Badge>
+                              <span className="text-2xl font-bold text-primary">
+                                {formatPrice(property.price, property.listing_type)}
+                              </span>
+                            </div>
+                            <CardTitle className="text-lg">{property.address}</CardTitle>
+                            <CardDescription>{property.city}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                              <div className="flex items-center">
+                                <Bed className="w-4 h-4 mr-1" />
+                                <span>{property.bedrooms} bed</span>
+                              </div>
+                              <div className="flex items-center">
+                                <Bath className="w-4 h-4 mr-1" />
+                                <span>{property.bathrooms} bath</span>
+                              </div>
+                              <div className="flex items-center">
+                                <Square className="w-4 h-4 mr-1" />
+                                <span>{property.square_meters}m²</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Properties for Sale Row */}
-          <div>
-            <ScrollReveal animation="fade-left">
-              <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Sale</h3>
-            </ScrollReveal>
-            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-              <ScrollReveal animation="fade-up" delay={100}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge>For Sale</Badge>
-                      <span className="text-2xl font-bold text-primary">$450,000</span>
-                    </div>
-                    <CardTitle className="text-lg">Victorian Family Home</CardTitle>
-                    <CardDescription>567 Maple Dr, Historic District</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>4 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>3 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>2,500 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-
-              <ScrollReveal animation="fade-up" delay={200}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge>For Sale</Badge>
-                      <span className="text-2xl font-bold text-primary">$275,000</span>
-                    </div>
-                    <CardTitle className="text-lg">Starter Home with Yard</CardTitle>
-                    <CardDescription>890 Cedar Ln, Northside</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>3 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>2 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>1,600 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-
-              <ScrollReveal animation="fade-up" delay={300}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge>For Sale</Badge>
-                      <span className="text-2xl font-bold text-primary">$750,000</span>
-                    </div>
-                    <CardTitle className="text-lg">Executive Estate</CardTitle>
-                    <CardDescription>234 Summit Way, Hillside</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>5 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>4 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>3,200 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-
-              <ScrollReveal animation="fade-up" delay={400}>
-                <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                  <div className="h-48 bg-muted rounded-t-lg"></div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge>For Sale</Badge>
-                      <span className="text-2xl font-bold text-primary">$325,000</span>
-                    </div>
-                    <CardTitle className="text-lg">Modern Townhouse</CardTitle>
-                    <CardDescription>678 River View, Waterfront</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Bed className="w-4 h-4 mr-1" />
-                        <span>3 bed</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Bath className="w-4 h-4 mr-1" />
-                        <span>2.5 bath</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Square className="w-4 h-4 mr-1" />
-                        <span>1,900 sqft</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
