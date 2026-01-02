@@ -73,6 +73,78 @@ export type Database = {
         }
         Relationships: []
       }
+      photography_requests: {
+        Row: {
+          admin_notes: string | null
+          assigned_agent_id: string | null
+          bathrooms: number | null
+          bedrooms: number | null
+          city: string
+          created_at: string
+          email: string
+          full_name: string
+          full_service_listing: boolean
+          id: string
+          municipality: string | null
+          phone_number: string
+          preferred_date: string | null
+          preferred_time: string | null
+          property_address: string
+          property_size_sqm: number | null
+          property_type: string
+          special_requirements: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          assigned_agent_id?: string | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          city: string
+          created_at?: string
+          email: string
+          full_name: string
+          full_service_listing?: boolean
+          id?: string
+          municipality?: string | null
+          phone_number: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          property_address: string
+          property_size_sqm?: number | null
+          property_type: string
+          special_requirements?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          assigned_agent_id?: string | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          city?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          full_service_listing?: boolean
+          id?: string
+          municipality?: string | null
+          phone_number?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          property_address?: string
+          property_size_sqm?: number | null
+          property_type?: string
+          special_requirements?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

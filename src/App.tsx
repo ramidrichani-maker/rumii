@@ -21,6 +21,7 @@ import MyListings from "./pages/MyListings";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import ChatAssistant from "./pages/ChatAssistant";
+import RequestPhotography from "./pages/RequestPhotography";
 import { FloatingChatWidget } from "./components/FloatingChatWidget";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const AppRoutes = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/chat" element={<ChatAssistant />} />
+          <Route path="/request-photography" element={<RequestPhotography />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

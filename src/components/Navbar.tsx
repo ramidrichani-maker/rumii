@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -56,6 +56,12 @@ export const Navbar = () => {
           </Link>
 
           <div className="flex items-center space-x-4">
+            <Link to="/request-photography">
+              <Button variant="ghost" size="sm" className="hidden md:flex">
+                <Camera className="w-4 h-4 mr-2" />
+                Photography Service
+              </Button>
+            </Link>
             <Link to="/investment-analytics">
               <Button variant="ghost" size="sm" className="hidden md:flex">
                 <BarChart3 className="w-4 h-4 mr-2" />
