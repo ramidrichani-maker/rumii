@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Upload, Home } from "lucide-react";
+import { ArrowLeft, Upload, Home, Camera } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -459,6 +459,25 @@ const ListProperty = () => {
                     ))}
                   </div>
                 )}
+
+                {/* Photography Service CTA */}
+                <div className="mt-6 p-4 border rounded-lg bg-primary/5 border-primary/20">
+                  <div className="flex items-start gap-3">
+                    <Camera className="h-5 w-5 text-primary mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-sm">Don't have photos?</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Our professional photography team can come to your property and capture stunning images for your listing.
+                      </p>
+                      <Link to="/request-photography">
+                        <Button variant="outline" size="sm" className="mt-3">
+                          <Camera className="w-4 h-4 mr-2" />
+                          Request Photography Service
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
