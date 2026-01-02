@@ -49,9 +49,7 @@ const ListProperty = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const auth = useAuth();
-  const {
-    user
-  } = auth;
+  const { user, profile } = auth;
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -124,7 +122,7 @@ const ListProperty = () => {
       }
 
       // Insert property data with image URLs
-      const { error } = await supabase.from('properties').insert({
+      const { data: propertyData, error } = await supabase.from('properties').insert({
         user_id: user.id,
         municipality: data.municipality,
         city: data.city,
@@ -143,9 +141,28 @@ const ListProperty = () => {
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         status: 'pending'
-      });
+      }).select('id').single();
 
       if (error) throw error;
+
+      // Record broker agreement for legal purposes
+      const agreementText = "By listing this property, I agree that Summit will act as my exclusive real estate broker. This includes providing professional agents, marketing services, property viewings, and facilitating the rental or sale process on my behalf. I have read and agree to the full Terms of Service.";
+      
+      const { error: agreementError } = await supabase.from('broker_agreements').insert({
+        user_id: user.id,
+        property_id: propertyData?.id || null,
+        full_name: profile?.full_name || user.email || '',
+        email: user.email || '',
+        terms_version: '1.0',
+        agreement_text: agreementText,
+        ip_address: null, // Could be captured via API if needed
+        user_agent: navigator.userAgent
+      });
+
+      if (agreementError) {
+        console.error('Error recording agreement:', agreementError);
+        // Don't fail the whole submission if agreement logging fails
+      }
 
       toast({
         title: "Property Listed Successfully!",
