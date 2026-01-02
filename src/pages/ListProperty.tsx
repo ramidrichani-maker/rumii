@@ -34,7 +34,10 @@ const formSchema = z.object({
   priceNegotiable: z.boolean().default(false),
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
-  amenities: z.array(z.string()).default([])
+  amenities: z.array(z.string()).default([]),
+  brokerAgreement: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the broker terms to list your property"
+  })
 });
 type FormData = z.infer<typeof formSchema>;
 const ListProperty = () => {
@@ -53,7 +56,8 @@ const ListProperty = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       amenities: [],
-      priceNegotiable: false
+      priceNegotiable: false,
+      brokerAgreement: false
     }
   });
 
@@ -496,6 +500,40 @@ const ListProperty = () => {
                       </Label>
                     </div>)}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Broker Agreement */}
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle>Broker Agreement</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="brokerAgreement"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-muted/30">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="cursor-pointer font-medium">
+                          I agree to the broker terms
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          By listing this property, I agree that Summit will act as my exclusive real estate broker. 
+                          This includes providing professional agents, marketing services, property viewings, 
+                          and facilitating the rental or sale process on my behalf.
+                        </p>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 
