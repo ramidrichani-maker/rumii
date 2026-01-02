@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      broker_agreements: {
+        Row: {
+          agreed_at: string
+          agreement_text: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          ip_address: string | null
+          property_id: string | null
+          terms_version: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          agreed_at?: string
+          agreement_text: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          ip_address?: string | null
+          property_id?: string | null
+          terms_version?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          agreed_at?: string
+          agreement_text?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          ip_address?: string | null
+          property_id?: string | null
+          terms_version?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_agreements_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string | null
