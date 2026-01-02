@@ -527,7 +527,10 @@ const ListProperty = () => {
                         <p className="text-sm text-muted-foreground">
                           By listing this property, I agree that Summit will act as my exclusive real estate broker. 
                           This includes providing professional agents, marketing services, property viewings, 
-                          and facilitating the rental or sale process on my behalf.
+                          and facilitating the rental or sale process on my behalf.{" "}
+                          <Link to="/terms-of-service" className="text-primary hover:underline" target="_blank">
+                            Read full Terms of Service
+                          </Link>
                         </p>
                         <FormMessage />
                       </div>
