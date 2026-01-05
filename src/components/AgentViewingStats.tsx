@@ -9,6 +9,8 @@ import { format } from "date-fns";
 interface AgentStats {
   agentId: string;
   agentName: string;
+  agencyId: string | null;
+  agencyName: string | null;
   totalViewings: number;
   upcomingViewings: number;
   pastViewings: number;
@@ -18,33 +20,52 @@ interface AgentStats {
   viewings: any[];
 }
 
-// Placeholder agencies - you can extend this with a real agencies table later
-const AGENCIES = [
-  { id: "all", name: "All Agencies" },
-  { id: "summit", name: "Summit Real Estate" },
-  { id: "prime", name: "Prime Properties" },
-  { id: "elite", name: "Elite Realty" },
-  { id: "coastal", name: "Coastal Homes" },
-];
+interface Agency {
+  id: string;
+  name: string;
+}
 
 export const AgentViewingStats = () => {
   const [agentStats, setAgentStats] = useState<AgentStats[]>([]);
+  const [agencies, setAgencies] = useState<Agency[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAgency, setSelectedAgency] = useState("all");
 
   useEffect(() => {
+    loadAgencies();
     loadAgentStats();
   }, []);
 
+  const loadAgencies = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('agencies')
+        .select('id, name')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      setAgencies(data || []);
+    } catch (error) {
+      console.error('Error loading agencies:', error);
+    }
+  };
+
   const loadAgentStats = async () => {
     try {
-      // Get all agents
+      // Get all agents with their agency info
       const { data: agents, error: agentsError } = await supabase
         .from('profiles')
-        .select('user_id, full_name')
+        .select('user_id, full_name, agency_id')
         .in('role', ['agent', 'admin']);
 
       if (agentsError) throw agentsError;
+
+      // Get agency names
+      const { data: agencyData } = await supabase
+        .from('agencies')
+        .select('id, name');
+
+      const agencyMap = new Map((agencyData || []).map(a => [a.id, a.name]));
 
       // Get all viewings
       const { data: viewings, error: viewingsError } = await supabase
@@ -76,6 +97,8 @@ export const AgentViewingStats = () => {
         return {
           agentId: agent.user_id,
           agentName: agent.full_name || 'Unknown Agent',
+          agencyId: agent.agency_id || null,
+          agencyName: agent.agency_id ? agencyMap.get(agent.agency_id) || null : null,
           totalViewings: agentViewings.length,
           upcomingViewings: upcoming.length,
           pastViewings: past.length,
@@ -135,10 +158,10 @@ export const AgentViewingStats = () => {
     );
   }
 
-  // Filter agents based on selected agency (placeholder logic - all agents shown when no real agency data)
+  // Filter agents based on selected agency
   const filteredAgentStats = selectedAgency === "all" 
     ? agentStats 
-    : agentStats; // In a real implementation, filter by agency_id
+    : agentStats.filter(agent => agent.agencyId === selectedAgency);
 
   return (
     <div className="space-y-6">
@@ -160,7 +183,8 @@ export const AgentViewingStats = () => {
                   <SelectValue placeholder="Select agency" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AGENCIES.map((agency) => (
+                  <SelectItem value="all">All Agencies</SelectItem>
+                  {agencies.map((agency) => (
                     <SelectItem key={agency.id} value={agency.id}>
                       {agency.name}
                     </SelectItem>

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2 } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
@@ -17,6 +17,7 @@ import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import AccountPropertiesView from "@/components/AccountPropertiesView";
 import FeaturedListingsManager from "@/components/FeaturedListingsManager";
 import PhotographyRequestsManager from "@/components/PhotographyRequestsManager";
+import { AgencyManager } from "@/components/AgencyManager";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -509,7 +510,7 @@ const AdminDashboard = () => {
               User & Viewings Management
             </h2>
             <Tabs defaultValue="users" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="users" className="flex items-center gap-1 text-xs sm:text-sm">
                   <UserCog className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Users</span>
@@ -517,6 +518,10 @@ const AdminDashboard = () => {
                 <TabsTrigger value="accounts" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Building className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Accounts</span>
+                </TabsTrigger>
+                <TabsTrigger value="agencies" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Agencies</span>
                 </TabsTrigger>
                 <TabsTrigger value="viewings" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -533,6 +538,12 @@ const AdminDashboard = () => {
               <TabsContent value="accounts">
                 <div className="max-h-[500px] overflow-y-auto">
                   <AccountPropertiesView />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="agencies">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <AgencyManager />
                 </div>
               </TabsContent>
 
