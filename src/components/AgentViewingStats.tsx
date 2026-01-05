@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Clock, MapPin, User, TrendingUp } from "lucide-react";
+import { Calendar, Clock, MapPin, User, TrendingUp, Building2 } from "lucide-react";
 import { format } from "date-fns";
 
 interface AgentStats {
@@ -17,9 +18,19 @@ interface AgentStats {
   viewings: any[];
 }
 
+// Placeholder agencies - you can extend this with a real agencies table later
+const AGENCIES = [
+  { id: "all", name: "All Agencies" },
+  { id: "summit", name: "Summit Real Estate" },
+  { id: "prime", name: "Prime Properties" },
+  { id: "elite", name: "Elite Realty" },
+  { id: "coastal", name: "Coastal Homes" },
+];
+
 export const AgentViewingStats = () => {
   const [agentStats, setAgentStats] = useState<AgentStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAgency, setSelectedAgency] = useState("all");
 
   useEffect(() => {
     loadAgentStats();
@@ -124,9 +135,44 @@ export const AgentViewingStats = () => {
     );
   }
 
+  // Filter agents based on selected agency (placeholder logic - all agents shown when no real agency data)
+  const filteredAgentStats = selectedAgency === "all" 
+    ? agentStats 
+    : agentStats; // In a real implementation, filter by agency_id
+
   return (
     <div className="space-y-6">
-      {agentStats.map(agent => (
+      {/* Agency Filter */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="w-5 h-5" />
+                Agent Performance
+              </CardTitle>
+              <CardDescription>Filter by real estate agency to view specific agent stats</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Agency:</span>
+              <Select value={selectedAgency} onValueChange={setSelectedAgency}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select agency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AGENCIES.map((agency) => (
+                    <SelectItem key={agency.id} value={agency.id}>
+                      {agency.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {filteredAgentStats.map(agent => (
         <Card key={agent.agentId}>
           <CardHeader>
             <div className="flex items-center justify-between">
