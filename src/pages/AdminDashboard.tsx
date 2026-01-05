@@ -390,208 +390,190 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Tabbed Content */}
-        <Tabs defaultValue="properties" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9">
-            <TabsTrigger value="properties" className="flex items-center gap-2">
-              <Home className="w-4 h-4" />
-              Properties
-            </TabsTrigger>
-            <TabsTrigger value="featured" className="flex items-center gap-2">
-              <Star className="w-4 h-4" />
-              Featured
-            </TabsTrigger>
-            <TabsTrigger value="photography" className="flex items-center gap-2">
-              <Camera className="w-4 h-4" />
-              Photography
-            </TabsTrigger>
-            <TabsTrigger value="accounts" className="flex items-center gap-2">
-              <Building className="w-4 h-4" />
-              Accounts
-            </TabsTrigger>
-            <TabsTrigger value="media" className="flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              Media
-            </TabsTrigger>
-            <TabsTrigger value="viewings" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Viewings
-            </TabsTrigger>
-            <TabsTrigger value="agents" className="flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              Agent Stats
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <UserCog className="w-4 h-4" />
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Column 1: Properties, Featured, Photography, Media */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Home className="w-5 h-5" />
+              Property Management
+            </h2>
+            <Tabs defaultValue="properties" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Home className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Properties</span>
+                </TabsTrigger>
+                <TabsTrigger value="featured" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Featured</span>
+                </TabsTrigger>
+                <TabsTrigger value="photography" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Photos</span>
+                </TabsTrigger>
+                <TabsTrigger value="media" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Media</span>
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="properties">
-            <Card>
-              <CardHeader>
-                <CardTitle>Pending Properties</CardTitle>
-                <CardDescription>Review and approve property listings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {pendingProperties.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No pending properties</p>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingProperties.map((property) => (
-                      <div key={property.id} className="border rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <h3 className="font-semibold">{property.address}</h3>
-                            <p className="text-sm text-muted-foreground">{property.city}</p>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span>{property.property_type}</span>
-                              <span>{property.square_meters}m²</span>
-                              <span>{property.bedrooms} bed</span>
-                              <span>{property.bathrooms} bath</span>
-                              <span>${property.price?.toLocaleString()}</span>
+              <TabsContent value="properties">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Pending Properties</CardTitle>
+                    <CardDescription>Review and approve property listings</CardDescription>
+                  </CardHeader>
+                  <CardContent className="max-h-[500px] overflow-y-auto">
+                    {pendingProperties.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">No pending properties</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {pendingProperties.map((property) => (
+                          <div key={property.id} className="border rounded-lg p-4">
+                            <div className="flex items-start justify-between flex-wrap gap-2">
+                              <div className="space-y-1">
+                                <h3 className="font-semibold">{property.address}</h3>
+                                <p className="text-sm text-muted-foreground">{property.city}</p>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+                                  <span>{property.property_type}</span>
+                                  <span>{property.square_meters}m²</span>
+                                  <span>{property.bedrooms} bed</span>
+                                  <span>${property.price?.toLocaleString()}</span>
+                                </div>
+                                {property.profiles && (
+                                  <p className="text-sm text-muted-foreground">
+                                    Listed by: {property.profiles.full_name}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex gap-2 flex-wrap">
+                                <Button size="sm" variant="outline" onClick={() => handleViewProperty(property)}>
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button size="sm" onClick={() => handleApproveProperty(property.id)} className="bg-green-600 hover:bg-green-700">
+                                  <CheckCircle className="w-4 h-4" />
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={() => handleRejectProperty(property.id)}>
+                                  <XCircle className="w-4 h-4" />
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={() => openDeleteDialog({ id: property.id, address: property.address })}>
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </div>
-                            {property.profiles && (
-                              <p className="text-sm text-muted-foreground">
-                                Listed by: {property.profiles.full_name}
-                              </p>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(property.created_at).toLocaleDateString()}
-                            </p>
                           </div>
-                          <div className="flex gap-2 flex-wrap">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleViewProperty(property)}
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View Details
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => handleApproveProperty(property.id)}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleRejectProperty(property.id)}
-                            >
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Reject
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => openDeleteDialog({ id: property.id, address: property.address })}
-                            >
-                              <Trash2 className="w-4 h-4 mr-1" />
-                              Delete
-                            </Button>
-                          </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-          <TabsContent value="featured">
-            <Card>
-              <CardHeader>
-                <CardTitle>Featured Listings</CardTitle>
-                <CardDescription>Choose which properties appear on the homepage</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FeaturedListingsManager />
-              </CardContent>
-            </Card>
-          </TabsContent>
+              <TabsContent value="featured">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Featured Listings</CardTitle>
+                    <CardDescription>Choose which properties appear on the homepage</CardDescription>
+                  </CardHeader>
+                  <CardContent className="max-h-[500px] overflow-y-auto">
+                    <FeaturedListingsManager />
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-          <TabsContent value="photography">
-            <PhotographyRequestsManager />
-          </TabsContent>
+              <TabsContent value="photography">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <PhotographyRequestsManager />
+                </div>
+              </TabsContent>
 
-          <TabsContent value="accounts">
-            <AccountPropertiesView />
-          </TabsContent>
+              <TabsContent value="media">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Pending Media Approvals</CardTitle>
+                    <CardDescription>Review and approve photos/videos</CardDescription>
+                  </CardHeader>
+                  <CardContent className="max-h-[500px] overflow-y-auto">
+                    <PendingMediaApproval />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
 
-          <TabsContent value="media">
-            <Card>
-              <CardHeader>
-                <CardTitle>Pending Media Approvals</CardTitle>
-                <CardDescription>Review and approve photos/videos uploaded by property owners</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PendingMediaApproval />
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {/* Column 2: Users, Accounts, Viewings */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              User & Viewings Management
+            </h2>
+            <Tabs defaultValue="users" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="users" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <UserCog className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Users</span>
+                </TabsTrigger>
+                <TabsTrigger value="accounts" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Building className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Accounts</span>
+                </TabsTrigger>
+                <TabsTrigger value="viewings" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Viewings</span>
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="viewings">
-            <Card>
-              <CardHeader>
-                <CardTitle>Scheduled Viewings</CardTitle>
-                <CardDescription>Manage property viewing appointments and agent assignments</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {viewings.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No scheduled viewings</p>
-                ) : (
-                  <div className="space-y-4">
-                    {viewings.map((viewing) => (
-                      <div key={viewing.id} className="border rounded-lg p-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="space-y-2 flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="font-semibold">{viewing.property?.address}</h3>
-                              <Badge variant="outline" className="font-normal">
-                                {viewing.requester?.full_name || 'Unknown User'}
-                              </Badge>
-                              <Badge variant={
-                                viewing.status === 'confirmed' ? 'default' :
-                                viewing.status === 'cancelled' ? 'destructive' :
-                                'secondary'
-                              }>
-                                {viewing.status}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{viewing.property?.city}</p>
-                            
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <p className="text-muted-foreground">Date & Time</p>
-                                <p className="font-medium">
-                                  {format(new Date(viewing.viewing_date), 'MMM dd, yyyy')} at {viewing.viewing_time}
-                                </p>
+              <TabsContent value="users">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <UserRoleManager users={users} onUserUpdated={loadUsers} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="accounts">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <AccountPropertiesView />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="viewings">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Scheduled Viewings</CardTitle>
+                    <CardDescription>Manage viewing appointments</CardDescription>
+                  </CardHeader>
+                  <CardContent className="max-h-[500px] overflow-y-auto">
+                    {viewings.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">No scheduled viewings</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {viewings.map((viewing) => (
+                          <div key={viewing.id} className="border rounded-lg p-3">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="font-semibold text-sm">{viewing.property?.address}</h3>
+                                <Badge variant={
+                                  viewing.status === 'confirmed' ? 'default' :
+                                  viewing.status === 'cancelled' ? 'destructive' :
+                                  'secondary'
+                                } className="text-xs">
+                                  {viewing.status}
+                                </Badge>
                               </div>
-                              
-                              <div>
-                                <p className="text-muted-foreground">Property Details</p>
-                                <p className="font-medium">
-                                  {viewing.property?.property_type} - ${viewing.property?.price?.toLocaleString()} ({viewing.property?.listing_type})
-                                </p>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <p className="text-muted-foreground text-xs">Date & Time</p>
+                                  <p className="font-medium text-xs">
+                                    {format(new Date(viewing.viewing_date), 'MMM dd, yyyy')} at {viewing.viewing_time}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground text-xs">Requested by</p>
+                                  <p className="font-medium text-xs">{viewing.requester?.full_name || 'Unknown'}</p>
+                                </div>
                               </div>
-                              
                               <div>
-                                <p className="text-muted-foreground">Requested by</p>
-                                <p className="font-medium">{viewing.requester?.full_name || 'Unknown'}</p>
-                                <p className="text-xs text-muted-foreground">{viewing.requester?.phone_number}</p>
-                              </div>
-                              
-                              <div>
-                                <p className="text-muted-foreground mb-1">Assigned Agent</p>
+                                <p className="text-muted-foreground text-xs mb-1">Assigned Agent</p>
                                 <Select
                                   value={viewing.agent_id || "none"}
                                   onValueChange={(value) => {
@@ -600,7 +582,7 @@ const AdminDashboard = () => {
                                     }
                                   }}
                                 >
-                                  <SelectTrigger className="w-full">
+                                  <SelectTrigger className="w-full h-8 text-xs">
                                     <SelectValue placeholder="Select agent" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -612,65 +594,68 @@ const AdminDashboard = () => {
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                {viewing.agent && (
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {viewing.agent.phone_number}
-                                  </p>
-                                )}
                               </div>
+                              {isViewingPast(viewing.viewing_date, viewing.viewing_time) && 
+                               viewing.status === 'pending' && (
+                                <div className="pt-2 border-t flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleUpdateViewingStatus(viewing.id, 'successful')}
+                                    className="bg-green-600 hover:bg-green-700 text-xs h-7"
+                                  >
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Successful
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleUpdateViewingStatus(viewing.id, 'cancelled')}
+                                    className="text-xs h-7"
+                                  >
+                                    <XCircle className="w-3 h-3 mr-1" />
+                                    Cancelled
+                                  </Button>
+                                </div>
+                              )}
                             </div>
-
-                            {viewing.notes && (
-                              <div className="pt-2 border-t">
-                                <p className="text-muted-foreground text-sm">Notes</p>
-                                <p className="text-sm">{viewing.notes}</p>
-                              </div>
-                            )}
-
-                            {/* Action Buttons for Past Viewings */}
-                            {isViewingPast(viewing.viewing_date, viewing.viewing_time) && 
-                             viewing.status === 'pending' && (
-                              <div className="pt-3 border-t flex gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleUpdateViewingStatus(viewing.id, 'successful')}
-                                  className="bg-green-600 hover:bg-green-700"
-                                >
-                                  <CheckCircle className="w-4 h-4 mr-1" />
-                                  Mark Successful
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => handleUpdateViewingStatus(viewing.id, 'cancelled')}
-                                >
-                                  <XCircle className="w-4 h-4 mr-1" />
-                                  Mark Cancelled
-                                </Button>
-                              </div>
-                            )}
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
 
-          <TabsContent value="agents">
-            <AgentViewingStats />
-          </TabsContent>
+        {/* Bottom Section: Agent Stats and Analytics */}
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <TrendingUp className="w-5 h-5" />
+            Analytics & Agent Performance
+          </h2>
+          <Tabs defaultValue="agents" className="space-y-4">
+            <TabsList className="w-auto">
+              <TabsTrigger value="agents" className="flex items-center gap-2">
+                <Eye className="w-4 h-4" />
+                Agent Stats
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Analytics
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="users">
-            <UserRoleManager users={users} onUserUpdated={loadUsers} />
-          </TabsContent>
+            <TabsContent value="agents">
+              <AgentViewingStats />
+            </TabsContent>
 
-          <TabsContent value="analytics">
-            <UserAnalytics />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="analytics">
+              <UserAnalytics />
+            </TabsContent>
+          </Tabs>
+        </div>
 
         {/* Property Detail Modal */}
         <PropertyDetailModal
