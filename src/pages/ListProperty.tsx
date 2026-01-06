@@ -69,8 +69,8 @@ const ListProperty = () => {
       </div>;
   }
 
-  // Redirect agents to admin portal
-  if (profile?.role === 'agent' || profile?.role === 'admin') {
+  // Redirect agents to agent portal (not admin dashboard)
+  if (profile?.role === 'agent') {
     return (
       <div className="min-h-screen bg-transparent">
         <div className="container mx-auto px-4 py-8">
@@ -89,11 +89,11 @@ const ListProperty = () => {
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-muted-foreground">
-                As an agent, you can list properties through the Admin Dashboard where your listings will be automatically associated with your agency.
+                As an agent, you can list properties through the Agent Portal where your listings will be automatically associated with your agency.
               </p>
-              <Link to="/admin">
+              <Link to="/agent-portal">
                 <Button className="w-full">
-                  Go to Admin Dashboard
+                  Go to Agent Portal
                 </Button>
               </Link>
             </CardContent>
