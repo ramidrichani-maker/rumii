@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { NotificationBell } from "@/components/NotificationBell";
-import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, Trash2, Home as HomeIcon } from "lucide-react";
+import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, Trash2, Home as HomeIcon, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import { format } from "date-fns";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
+import AgentPropertyForm from "@/components/AgentPropertyForm";
 
 interface PropertyViewing {
   id: string;
@@ -260,9 +261,13 @@ const AgentPortal = () => {
         </div>
 
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="add" className="flex items-center gap-1">
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">List Property</span>
+            </TabsTrigger>
             <TabsTrigger value="pending">
-              Pending Requests ({pendingViewings.length})
+              Pending ({pendingViewings.length})
             </TabsTrigger>
             <TabsTrigger value="confirmed">
               Confirmed ({confirmedViewings.length})
@@ -274,9 +279,21 @@ const AgentPortal = () => {
               My Properties ({assignedProperties.length})
             </TabsTrigger>
             <TabsTrigger value="past">
-              Past Viewings ({pastViewings.length})
+              Past ({pastViewings.length})
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="add" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>List a New Property</CardTitle>
+                <CardDescription>Add a property listing under your agency</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AgentPropertyForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="pending" className="space-y-4">
             {pendingViewings.length === 0 ? (
