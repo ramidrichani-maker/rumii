@@ -8,6 +8,7 @@ interface Profile {
   full_name: string;
   phone_number: string;
   role: 'user' | 'agent' | 'admin';
+  agency_id: string | null;
   created_at: string;
   updated_at: string;
 }

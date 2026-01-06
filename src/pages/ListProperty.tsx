@@ -68,6 +68,40 @@ const ListProperty = () => {
         </div>
       </div>;
   }
+
+  // Redirect agents to admin portal
+  if (profile?.role === 'agent' || profile?.role === 'admin') {
+    return (
+      <div className="min-h-screen bg-transparent">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
+            </Link>
+          </div>
+          <Card className="max-w-lg mx-auto">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Home className="w-6 h-6 text-primary" />
+              </div>
+              <CardTitle>Agent Portal Access</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <p className="text-muted-foreground">
+                As an agent, you can list properties through the Admin Dashboard where your listings will be automatically associated with your agency.
+              </p>
+              <Link to="/admin">
+                <Button className="w-full">
+                  Go to Admin Dashboard
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     setUploadedFiles(prev => [...prev, ...files]);

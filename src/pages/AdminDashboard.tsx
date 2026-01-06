@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2 } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Plus } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
@@ -18,6 +18,7 @@ import AccountPropertiesView from "@/components/AccountPropertiesView";
 import FeaturedListingsManager from "@/components/FeaturedListingsManager";
 import PhotographyRequestsManager from "@/components/PhotographyRequestsManager";
 import { AgencyManager } from "@/components/AgencyManager";
+import AgentPropertyForm from "@/components/AgentPropertyForm";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -400,7 +401,11 @@ const AdminDashboard = () => {
               Property Management
             </h2>
             <Tabs defaultValue="properties" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="add" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Add</span>
+                </TabsTrigger>
                 <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Home className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Properties</span>
@@ -418,6 +423,18 @@ const AdminDashboard = () => {
                   <span className="hidden sm:inline">Media</span>
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="add">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Add New Property</CardTitle>
+                    <CardDescription>List a new property under your agency</CardDescription>
+                  </CardHeader>
+                  <CardContent className="max-h-[600px] overflow-y-auto">
+                    <AgentPropertyForm />
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
               <TabsContent value="properties">
                 <Card>
