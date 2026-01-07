@@ -35,7 +35,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     fetchAgencies();
   }, []);
 
-  const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin') => {
+  const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin' | 'agency_manager') => {
     setChangingRoles(prev => new Set([...prev, userId]));
     
     try {
@@ -49,7 +49,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
 
       toast({
         title: "Success",
-        description: `User role updated to ${newRole}`,
+        description: `User role updated to ${newRole === 'agency_manager' ? 'Agency Manager' : newRole}`,
       });
 
       onUserUpdated();
@@ -106,6 +106,8 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     switch (role) {
       case 'admin':
         return <Shield className="w-4 h-4" />;
+      case 'agency_manager':
+        return <Building2 className="w-4 h-4" />;
       case 'agent':
         return <UserCog className="w-4 h-4" />;
       default:
@@ -117,11 +119,18 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     switch (role) {
       case 'admin':
         return 'destructive';
+      case 'agency_manager':
+        return 'default';
       case 'agent':
         return 'secondary';
       default:
         return 'outline';
     }
+  };
+
+  const getRoleDisplayName = (role: string) => {
+    if (role === 'agency_manager') return 'Agency Manager';
+    return role.charAt(0).toUpperCase() + role.slice(1);
   };
 
   const filteredUsers = useMemo(() => {
@@ -204,9 +213,9 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                       <h3 className="font-medium">{user.full_name}</h3>
                       <Badge variant={getRoleBadgeVariant(user.role)} className="flex items-center gap-1">
                         {getRoleIcon(user.role)}
-                        {user.role}
+                        {getRoleDisplayName(user.role)}
                       </Badge>
-                      {user.role === 'agent' && userAgency && (
+                      {(user.role === 'agent' || user.role === 'agency_manager') && userAgency && (
                         <Badge variant="outline" className="flex items-center gap-1">
                           <Building2 className="w-3 h-3" />
                           {userAgency.name}
@@ -221,19 +230,20 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                   <div className="flex items-center gap-2">
                     <Select
                       value={user.role}
-                      onValueChange={(newRole) => handleRoleChange(user.user_id, newRole as 'user' | 'agent' | 'admin')}
+                      onValueChange={(newRole) => handleRoleChange(user.user_id, newRole as 'user' | 'agent' | 'admin' | 'agency_manager')}
                       disabled={changingRoles.has(user.user_id)}
                     >
-                      <SelectTrigger className="w-32">
+                      <SelectTrigger className="w-40">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="user">User</SelectItem>
                         <SelectItem value="agent">Agent</SelectItem>
+                        <SelectItem value="agency_manager">Agency Manager</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
-                    {user.role === 'agent' && (
+                    {(user.role === 'agent' || user.role === 'agency_manager') && (
                       <Select
                         value={user.agency_id || "none"}
                         onValueChange={(value) => handleAgencyChange(user.user_id, value === "none" ? null : value)}

@@ -7,7 +7,7 @@ interface Profile {
   user_id: string;
   full_name: string;
   phone_number: string;
-  role: 'user' | 'agent' | 'admin';
+  role: 'user' | 'agent' | 'admin' | 'agency_manager';
   agency_id: string | null;
   created_at: string;
   updated_at: string;

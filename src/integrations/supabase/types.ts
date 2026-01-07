@@ -114,6 +114,54 @@ export type Database = {
           },
         ]
       }
+      featured_requests: {
+        Row: {
+          admin_notes: string | null
+          agency_id: string
+          created_at: string
+          id: string
+          property_id: string
+          requested_by: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          agency_id: string
+          created_at?: string
+          id?: string
+          property_id: string
+          requested_by: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          agency_id?: string
+          created_at?: string
+          id?: string
+          property_id?: string
+          requested_by?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_requests_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "featured_requests_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -260,6 +308,7 @@ export type Database = {
       properties: {
         Row: {
           address: string
+          agency_id: string | null
           amenities: string[] | null
           bathrooms: number
           bedrooms: number
@@ -285,6 +334,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          agency_id?: string | null
           amenities?: string[] | null
           bathrooms: number
           bedrooms: number
@@ -310,6 +360,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          agency_id?: string | null
           amenities?: string[] | null
           bathrooms?: number
           bedrooms?: number
@@ -333,7 +384,15 @@ export type Database = {
           user_id?: string
           year_built?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "properties_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       property_agents: {
         Row: {
@@ -562,7 +621,7 @@ export type Database = {
         | "townhouse"
         | "duplex"
         | "loft"
-      user_role: "user" | "agent" | "admin"
+      user_role: "user" | "agent" | "admin" | "agency_manager"
       viewing_status:
         | "pending"
         | "confirmed"
@@ -711,7 +770,7 @@ export const Constants = {
         "duplex",
         "loft",
       ],
-      user_role: ["user", "agent", "admin"],
+      user_role: ["user", "agent", "admin", "agency_manager"],
       viewing_status: [
         "pending",
         "confirmed",

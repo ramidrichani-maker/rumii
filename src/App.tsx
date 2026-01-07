@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import InvestmentAnalytics from "./pages/InvestmentAnalytics";
 import AdminDashboard from "./pages/AdminDashboard";
 import AgentPortal from "./pages/AgentPortal";
+import AgencyPortal from "./pages/AgencyPortal";
 import ClientDashboard from "./pages/ClientDashboard";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
@@ -64,6 +65,7 @@ const AppRoutes = () => {
           <Route path="/investment-analytics" element={<InvestmentAnalytics />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/agent-portal" element={<AgentPortal />} />
+          <Route path="/agency-portal" element={<AgencyPortal />} />
           <Route path="/my-viewings" element={<ClientDashboard />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/profile" element={<Profile />} />
