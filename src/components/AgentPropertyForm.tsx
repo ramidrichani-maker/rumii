@@ -148,6 +148,7 @@ const AgentPropertyForm = () => {
       // Insert property - agent listings are auto-approved
       const { data: propertyData, error } = await supabase.from('properties').insert({
         user_id: user.id,
+        agency_id: profile?.agency_id || null,
         municipality: data.municipality,
         city: data.city,
         address: data.address,
