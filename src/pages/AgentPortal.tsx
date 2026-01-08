@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { NotificationBell } from "@/components/NotificationBell";
-import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, Trash2, Home as HomeIcon, Plus } from "lucide-react";
+import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, Trash2, Home as HomeIcon, Plus, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -39,6 +39,8 @@ const AgentPortal = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [assignedProperties, setAssignedProperties] = useState<any[]>([]);
+  const [featuredRequests, setFeaturedRequests] = useState<any[]>([]);
+  const [requestingFeature, setRequestingFeature] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
 
@@ -50,6 +52,7 @@ const AgentPortal = () => {
   useEffect(() => {
     fetchViewings();
     fetchAssignedProperties();
+    fetchFeaturedRequests();
   }, [user]);
 
   const fetchViewings = async () => {
@@ -103,6 +106,63 @@ const AgentPortal = () => {
       }
     } catch (error) {
       console.error('Error fetching assigned properties:', error);
+    }
+  };
+
+  const fetchFeaturedRequests = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('featured_requests')
+        .select('id, property_id, status, admin_notes, created_at')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setFeaturedRequests(data || []);
+    } catch (error) {
+      console.error('Error fetching featured requests:', error);
+    }
+  };
+
+  const handleRequestFeature = async (propertyId: string) => {
+    if (!user || !profile?.agency_id) {
+      toast({
+        title: "Error",
+        description: "You must be assigned to an agency to request features",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setRequestingFeature(propertyId);
+    
+    try {
+      const { error } = await supabase
+        .from('featured_requests')
+        .insert({
+          property_id: propertyId,
+          agency_id: profile.agency_id,
+          requested_by: user.id
+        });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Feature request submitted for admin approval"
+      });
+      
+      fetchFeaturedRequests();
+    } catch (error) {
+      console.error('Error requesting feature:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit feature request",
+        variant: "destructive"
+      });
+    } finally {
+      setRequestingFeature(null);
     }
   };
 
@@ -502,56 +562,88 @@ const AgentPortal = () => {
               </Card>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {assignedProperties.map((property) => (
-                  <Card key={property.id} className="overflow-hidden">
-                    <div className="aspect-video relative bg-muted">
-                      {property.images && property.images.length > 0 ? (
-                        <img
-                          src={property.images[0]}
-                          alt={property.address}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <HomeIcon className="h-12 w-12 text-muted-foreground" />
+                {assignedProperties.map((property) => {
+                  const hasPendingRequest = featuredRequests.some(
+                    r => r.property_id === property.id && r.status === 'pending'
+                  );
+                  const isApproved = featuredRequests.some(
+                    r => r.property_id === property.id && r.status === 'approved'
+                  );
+                  
+                  return (
+                    <Card key={property.id} className="overflow-hidden">
+                      <div className="aspect-video relative bg-muted">
+                        {property.images && property.images.length > 0 ? (
+                          <img
+                            src={property.images[0]}
+                            alt={property.address}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full">
+                            <HomeIcon className="h-12 w-12 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2 flex gap-1">
+                          <Badge>{property.status}</Badge>
+                          {property.featured_section && (
+                            <Badge variant="default" className="bg-amber-500">
+                              <Star className="w-3 h-3 mr-1" />
+                              Featured
+                            </Badge>
+                          )}
                         </div>
-                      )}
-                      <div className="absolute top-2 right-2">
-                        <Badge>{property.status}</Badge>
                       </div>
-                    </div>
-                    <CardHeader>
-                      <CardTitle className="line-clamp-1">{property.address}</CardTitle>
-                      <CardDescription>
-                        {property.city} • {property.property_type}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            {property.square_meters}m² • {property.bedrooms} bed • {property.bathrooms} bath
-                          </span>
+                      <CardHeader>
+                        <CardTitle className="line-clamp-1">{property.address}</CardTitle>
+                        <CardDescription>
+                          {property.city} • {property.property_type}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              {property.square_meters}m² • {property.bedrooms} bed • {property.bathrooms} bath
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-2xl font-bold">
+                              ${property.price?.toLocaleString()}
+                              {property.listing_type === 'rent' && '/mo'}
+                            </span>
+                          </div>
+                          <div className="flex gap-2">
+                            {!property.featured_section && !hasPendingRequest && !isApproved && profile?.agency_id && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex-1"
+                                onClick={() => handleRequestFeature(property.id)}
+                                disabled={requestingFeature === property.id}
+                              >
+                                <Star className="w-4 h-4 mr-1" />
+                                {requestingFeature === property.id ? 'Requesting...' : 'Request Feature'}
+                              </Button>
+                            )}
+                            {hasPendingRequest && (
+                              <Badge variant="secondary" className="flex-1 justify-center py-2">
+                                Request Pending
+                              </Badge>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => openDeleteDialog({ id: property.id, address: property.address })}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-2xl font-bold">
-                            ${property.price?.toLocaleString()}
-                            {property.listing_type === 'rent' && '/mo'}
-                          </span>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          className="w-full"
-                          onClick={() => openDeleteDialog({ id: property.id, address: property.address })}
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete Property
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </TabsContent>
