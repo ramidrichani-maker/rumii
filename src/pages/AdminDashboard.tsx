@@ -19,6 +19,7 @@ import FeaturedListingsManager from "@/components/FeaturedListingsManager";
 import PhotographyRequestsManager from "@/components/PhotographyRequestsManager";
 import { AgencyManager } from "@/components/AgencyManager";
 import FeatureRequestsManager from "@/components/FeatureRequestsManager";
+import { ServicePricingManager } from "@/components/ServicePricingManager";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -477,15 +478,18 @@ const AdminDashboard = () => {
               </TabsContent>
 
               <TabsContent value="featured">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Featured Listings</CardTitle>
-                    <CardDescription>Choose which properties appear on the homepage</CardDescription>
-                  </CardHeader>
-                  <CardContent className="max-h-[500px] overflow-y-auto">
-                    <FeaturedListingsManager />
-                  </CardContent>
-                </Card>
+                <div className="space-y-4 max-h-[500px] overflow-y-auto">
+                  <ServicePricingManager />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Featured Listings</CardTitle>
+                      <CardDescription>Choose which properties appear on the homepage</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <FeaturedListingsManager />
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
 
               <TabsContent value="feature-requests">

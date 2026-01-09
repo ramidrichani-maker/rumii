@@ -430,6 +430,116 @@ export type Database = {
           },
         ]
       }
+      property_ai_jobs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          original_media_url: string
+          palette: string
+          property_id: string
+          replicate_output_urls: string[] | null
+          replicate_run_id: string | null
+          requestor_user_id: string | null
+          status: string
+          style: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          original_media_url: string
+          palette: string
+          property_id: string
+          replicate_output_urls?: string[] | null
+          replicate_run_id?: string | null
+          requestor_user_id?: string | null
+          status?: string
+          style: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          original_media_url?: string
+          palette?: string
+          property_id?: string
+          replicate_output_urls?: string[] | null
+          replicate_run_id?: string | null
+          requestor_user_id?: string | null
+          status?: string
+          style?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_ai_jobs_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_generated_images: {
+        Row: {
+          approved: boolean
+          created_at: string
+          created_by: string | null
+          height: number | null
+          id: string
+          job_id: string | null
+          media_url: string | null
+          mime_type: string | null
+          property_id: string
+          storage_path: string
+          width: number | null
+        }
+        Insert: {
+          approved?: boolean
+          created_at?: string
+          created_by?: string | null
+          height?: number | null
+          id?: string
+          job_id?: string | null
+          media_url?: string | null
+          mime_type?: string | null
+          property_id: string
+          storage_path: string
+          width?: number | null
+        }
+        Update: {
+          approved?: boolean
+          created_at?: string
+          created_by?: string | null
+          height?: number | null
+          id?: string
+          job_id?: string | null
+          media_url?: string | null
+          mime_type?: string | null
+          property_id?: string
+          storage_path?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_generated_images_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "property_ai_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_generated_images_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_media_pending: {
         Row: {
           created_at: string | null
@@ -531,6 +641,33 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      service_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
       }
       user_sessions: {
         Row: {
