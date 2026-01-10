@@ -26,6 +26,7 @@ interface ParsedProperty {
   last_renovated?: number;
   amenities?: string[];
   agency_name?: string;
+  agent_email?: string;
   latitude?: number;
   longitude?: number;
   valid: boolean;
@@ -48,12 +49,37 @@ export const BulkPropertyImport = () => {
   const [importProgress, setImportProgress] = useState(0);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [agencies, setAgencies] = useState<{ id: string; name: string }[]>([]);
+  const [agents, setAgents] = useState<{ user_id: string; email: string; full_name: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
 
   const loadAgencies = async () => {
     const { data } = await supabase.from('agencies').select('id, name');
     setAgencies(data || []);
+  };
+
+  const loadAgents = async () => {
+    // Get agents/admins from profiles
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('user_id, full_name')
+      .in('role', ['agent', 'admin']);
+    
+    if (!profiles) {
+      setAgents([]);
+      return;
+    }
+
+    // Get emails from auth - we need to fetch user emails separately
+    // Since we can't directly access auth.users, we'll match by user_id
+    // For now, store what we have and match by checking the email in the CSV
+    const agentsWithInfo = profiles.map(p => ({
+      user_id: p.user_id,
+      email: '', // Will be matched during import
+      full_name: p.full_name
+    }));
+    
+    setAgents(agentsWithInfo);
   };
 
   const parseCSV = (text: string): string[][] => {
@@ -117,6 +143,8 @@ export const BulkPropertyImport = () => {
 
     const amenitiesStr = getValue('amenities');
     const amenities = amenitiesStr ? amenitiesStr.split(';').map(a => a.trim()).filter(Boolean) : [];
+    
+    const agentEmail = getValue('agentemail') || getValue('agent_email') || getValue('agent');
 
     return {
       row: rowIndex + 2,
@@ -134,6 +162,7 @@ export const BulkPropertyImport = () => {
       last_renovated: getValue('lastrenovated') || getValue('last_renovated') ? Number(getValue('lastrenovated') || getValue('last_renovated')) : undefined,
       amenities,
       agency_name: getValue('agency') || getValue('agencyname') || getValue('agency_name') || undefined,
+      agent_email: agentEmail || undefined,
       latitude: getValue('latitude') || getValue('lat') ? Number(getValue('latitude') || getValue('lat')) : undefined,
       longitude: getValue('longitude') || getValue('lng') || getValue('lon') ? Number(getValue('longitude') || getValue('lng') || getValue('lon')) : undefined,
       valid: errors.length === 0,
@@ -160,6 +189,7 @@ export const BulkPropertyImport = () => {
     setImportResult(null);
 
     await loadAgencies();
+    await loadAgents();
 
     try {
       const text = await selectedFile.text();
@@ -225,7 +255,7 @@ export const BulkPropertyImport = () => {
           }
         }
 
-        const { error } = await supabase.from('properties').insert({
+        const { data: insertedProperty, error } = await supabase.from('properties').insert({
           user_id: user.id,
           agency_id: agencyId,
           municipality: prop.municipality || null,
@@ -245,9 +275,24 @@ export const BulkPropertyImport = () => {
           longitude: prop.longitude || null,
           status: 'approved',
           images: []
-        });
+        }).select('id').single();
 
         if (error) throw error;
+
+        // Assign agent if agent_email is provided
+        if (prop.agent_email && insertedProperty) {
+          // Find the agent by email using our database function
+          const { data: agentData } = await supabase
+            .rpc('get_agent_by_email', { _email: prop.agent_email });
+          
+          if (agentData && agentData.length > 0 && agentData[0].user_id) {
+            await supabase.from('property_agents').insert({
+              property_id: insertedProperty.id,
+              agent_id: agentData[0].user_id
+            });
+          }
+        }
+
         result.success++;
       } catch (error) {
         result.failed++;
@@ -275,12 +320,12 @@ export const BulkPropertyImport = () => {
     const headers = [
       'city', 'address', 'property_type', 'square_meters', 'bedrooms', 'bathrooms',
       'listing_type', 'price', 'price_negotiable', 'municipality', 'year_built',
-      'last_renovated', 'amenities', 'agency_name', 'latitude', 'longitude'
+      'last_renovated', 'amenities', 'agency_name', 'agent_email', 'latitude', 'longitude'
     ];
     const exampleRow = [
       'Beirut', '123 Main Street, Downtown', 'apartment', '150', '3', '2',
       'sale', '250000', 'true', 'Beirut', '2015',
-      '2022', 'Swimming Pool;Gym;Parking', 'Example Agency', '33.8938', '35.5018'
+      '2022', 'Swimming Pool;Gym;Parking', 'Example Agency', 'agent@example.com', '33.8938', '35.5018'
     ];
     
     const csv = [headers.join(','), exampleRow.join(',')].join('\n');
