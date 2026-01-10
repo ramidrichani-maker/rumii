@@ -115,8 +115,9 @@ export const AdminPropertyForm = () => {
   };
 
   const handleAgencyChange = (agencyId: string) => {
-    form.setValue("agencyId", agencyId);
-    const agency = agencies.find(a => a.id === agencyId);
+    const actualId = agencyId === "none" ? "" : agencyId;
+    form.setValue("agencyId", actualId);
+    const agency = agencies.find(a => a.id === actualId);
     setSelectedAgency(agency || null);
   };
 
@@ -225,14 +226,14 @@ export const AdminPropertyForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Agency (Optional)</FormLabel>
-                    <Select onValueChange={handleAgencyChange} value={field.value}>
+                    <Select onValueChange={handleAgencyChange} value={field.value || "none"}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select an agency (optional)" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">No Agency</SelectItem>
+                        <SelectItem value="none">No Agency</SelectItem>
                         {agencies.map(agency => (
                           <SelectItem key={agency.id} value={agency.id}>
                             {agency.name}
