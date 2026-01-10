@@ -27,6 +27,7 @@ interface ParsedProperty {
   amenities?: string[];
   agency_name?: string;
   agent_email?: string;
+  images?: string[];
   latitude?: number;
   longitude?: number;
   valid: boolean;
@@ -145,6 +146,10 @@ export const BulkPropertyImport = () => {
     const amenities = amenitiesStr ? amenitiesStr.split(';').map(a => a.trim()).filter(Boolean) : [];
     
     const agentEmail = getValue('agentemail') || getValue('agent_email') || getValue('agent');
+    
+    // Parse image URLs (semicolon-separated)
+    const imagesStr = getValue('images') || getValue('image_urls') || getValue('imageurls');
+    const images = imagesStr ? imagesStr.split(';').map(url => url.trim()).filter(Boolean) : [];
 
     return {
       row: rowIndex + 2,
@@ -163,6 +168,7 @@ export const BulkPropertyImport = () => {
       amenities,
       agency_name: getValue('agency') || getValue('agencyname') || getValue('agency_name') || undefined,
       agent_email: agentEmail || undefined,
+      images: images.length > 0 ? images : undefined,
       latitude: getValue('latitude') || getValue('lat') ? Number(getValue('latitude') || getValue('lat')) : undefined,
       longitude: getValue('longitude') || getValue('lng') || getValue('lon') ? Number(getValue('longitude') || getValue('lng') || getValue('lon')) : undefined,
       valid: errors.length === 0,
@@ -274,7 +280,7 @@ export const BulkPropertyImport = () => {
           latitude: prop.latitude || null,
           longitude: prop.longitude || null,
           status: 'approved',
-          images: []
+          images: prop.images || []
         }).select('id').single();
 
         if (error) throw error;
@@ -320,12 +326,12 @@ export const BulkPropertyImport = () => {
     const headers = [
       'city', 'address', 'property_type', 'square_meters', 'bedrooms', 'bathrooms',
       'listing_type', 'price', 'price_negotiable', 'municipality', 'year_built',
-      'last_renovated', 'amenities', 'agency_name', 'agent_email', 'latitude', 'longitude'
+      'last_renovated', 'amenities', 'agency_name', 'agent_email', 'images', 'latitude', 'longitude'
     ];
     const exampleRow = [
       'Beirut', '123 Main Street, Downtown', 'apartment', '150', '3', '2',
       'sale', '250000', 'true', 'Beirut', '2015',
-      '2022', 'Swimming Pool;Gym;Parking', 'Example Agency', 'agent@example.com', '33.8938', '35.5018'
+      '2022', 'Swimming Pool;Gym;Parking', 'Example Agency', 'agent@example.com', 'https://example.com/img1.jpg;https://example.com/img2.jpg', '33.8938', '35.5018'
     ];
     
     const csv = [headers.join(','), exampleRow.join(',')].join('\n');
@@ -445,6 +451,9 @@ export const BulkPropertyImport = () => {
                         </div>
                         <div className="ml-6 text-sm text-muted-foreground">
                           {prop.city} • {prop.property_type} • {prop.listing_type} • ${prop.price.toLocaleString()}
+                          {prop.images && prop.images.length > 0 && (
+                            <span className="ml-2 text-primary">• {prop.images.length} image(s)</span>
+                          )}
                         </div>
                         {!prop.valid && (
                           <div className="ml-6 mt-1 text-sm text-destructive">
