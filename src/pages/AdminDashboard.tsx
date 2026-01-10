@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
@@ -21,6 +21,7 @@ import { AgencyManager } from "@/components/AgencyManager";
 import FeatureRequestsManager from "@/components/FeatureRequestsManager";
 import { ServicePricingManager } from "@/components/ServicePricingManager";
 import { AdminPropertyForm } from "@/components/AdminPropertyForm";
+import { BulkPropertyImport } from "@/components/BulkPropertyImport";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -403,7 +404,7 @@ const AdminDashboard = () => {
               Property Management
             </h2>
             <Tabs defaultValue="properties" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-6">
+              <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Home className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Pending</span>
@@ -411,6 +412,10 @@ const AdminDashboard = () => {
                 <TabsTrigger value="add-property" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Add</span>
+                </TabsTrigger>
+                <TabsTrigger value="bulk-import" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Import</span>
                 </TabsTrigger>
                 <TabsTrigger value="featured" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Star className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -490,6 +495,18 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent className="max-h-[600px] overflow-y-auto">
                     <AdminPropertyForm />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="bulk-import">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Bulk Import Properties</CardTitle>
+                    <CardDescription>Import multiple properties from a CSV file</CardDescription>
+                  </CardHeader>
+                  <CardContent className="max-h-[600px] overflow-y-auto">
+                    <BulkPropertyImport />
                   </CardContent>
                 </Card>
               </TabsContent>
