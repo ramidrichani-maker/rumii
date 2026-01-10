@@ -707,6 +707,13 @@ export type Database = {
         Returns: boolean
       }
       end_user_session: { Args: { _user_id: string }; Returns: boolean }
+      get_agent_by_email: {
+        Args: { _email: string }
+        Returns: {
+          full_name: string
+          user_id: string
+        }[]
+      }
       get_new_users_analytics: {
         Args: { days_back?: number; period_type?: string }
         Returns: {
