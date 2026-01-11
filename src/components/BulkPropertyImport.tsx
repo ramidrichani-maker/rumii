@@ -437,7 +437,27 @@ export const BulkPropertyImport = () => {
                     key={idx}
                     className={`p-3 rounded-lg border ${prop.valid ? 'bg-green-500/10 border-green-500/20' : 'bg-destructive/10 border-destructive/20'}`}
                   >
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-3">
+                      {/* Thumbnail preview */}
+                      {prop.images && prop.images.length > 0 ? (
+                        <div className="shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                          <img
+                            src={prop.images[0]}
+                            alt={`Preview for ${prop.address}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              target.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No preview</div>';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="shrink-0 w-16 h-16 rounded-md border bg-muted flex items-center justify-center">
+                          <span className="text-xs text-muted-foreground text-center px-1">No image</span>
+                        </div>
+                      )}
+                      
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           {prop.valid ? (
