@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Download, X, Loader2 } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Download, X, Loader2, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 interface ParsedProperty {
   row: number;
@@ -53,9 +57,26 @@ export const BulkPropertyImport = () => {
   const [agencies, setAgencies] = useState<{ id: string; name: string }[]>([]);
   const [agents, setAgents] = useState<{ user_id: string; email: string; full_name: string }[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [exportListingTypes, setExportListingTypes] = useState<string[]>(['rent', 'sale']);
+  const [exportPropertyTypes, setExportPropertyTypes] = useState<string[]>([...PROPERTY_TYPES]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+
+  const toggleExportListingType = (type: string) => {
+    setExportListingTypes(prev => 
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
+  };
+
+  const toggleExportPropertyType = (type: string) => {
+    setExportPropertyTypes(prev => 
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
+  };
+
+  const selectAllPropertyTypes = () => setExportPropertyTypes([...PROPERTY_TYPES]);
+  const clearAllPropertyTypes = () => setExportPropertyTypes([]);
 
   const loadAgencies = async () => {
     const { data } = await supabase.from('agencies').select('id, name');
@@ -374,23 +395,43 @@ export const BulkPropertyImport = () => {
   };
 
   const exportProperties = async () => {
+    if (exportListingTypes.length === 0 && exportPropertyTypes.length === 0) {
+      toast({
+        title: "No Filters Selected",
+        description: "Please select at least one listing type or property type to export",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsExporting(true);
     try {
-      // Fetch all properties with agency info
-      const { data: properties, error } = await supabase
+      // Build query with filters
+      let query = supabase
         .from('properties')
         .select(`
           *,
           agencies:agency_id (name)
-        `)
-        .order('created_at', { ascending: false });
+        `);
+      
+      // Apply listing type filter
+      if (exportListingTypes.length > 0 && exportListingTypes.length < 2) {
+        query = query.in('listing_type', exportListingTypes as ("rent" | "sale")[]);
+      }
+      
+      // Apply property type filter
+      if (exportPropertyTypes.length > 0 && exportPropertyTypes.length < PROPERTY_TYPES.length) {
+        query = query.in('property_type', exportPropertyTypes as ("apartment" | "duplex" | "house" | "loft" | "penthouse" | "studio" | "townhouse" | "villa")[]);
+      }
+      
+      const { data: properties, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
 
       if (!properties || properties.length === 0) {
         toast({
           title: "No Properties",
-          description: "There are no properties to export",
+          description: "No properties match the selected filters",
           variant: "destructive"
         });
         return;
@@ -553,19 +594,103 @@ export const BulkPropertyImport = () => {
               Download Template
             </Button>
 
-            <Button variant="outline" onClick={exportProperties} disabled={isExporting}>
-              {isExporting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Exporting...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4 mr-2" />
-                  Export All Properties
-                </>
-              )}
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" disabled={isExporting}>
+                  {isExporting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Filter className="w-4 h-4 mr-2" />
+                      Export Properties
+                      {(exportListingTypes.length < 2 || exportPropertyTypes.length < PROPERTY_TYPES.length) && (
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          Filtered
+                        </Badge>
+                      )}
+                    </>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="start">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Listing Type</h4>
+                    <div className="flex gap-4">
+                      <div className="flex items-center gap-2">
+                        <Checkbox 
+                          id="export-rent" 
+                          checked={exportListingTypes.includes('rent')}
+                          onCheckedChange={() => toggleExportListingType('rent')}
+                        />
+                        <Label htmlFor="export-rent" className="text-sm">For Rent</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Checkbox 
+                          id="export-sale" 
+                          checked={exportListingTypes.includes('sale')}
+                          onCheckedChange={() => toggleExportListingType('sale')}
+                        />
+                        <Label htmlFor="export-sale" className="text-sm">For Sale</Label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">Property Types</h4>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={selectAllPropertyTypes}>
+                          All
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={clearAllPropertyTypes}>
+                          None
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                      {PROPERTY_TYPES.map(type => (
+                        <div key={type} className="flex items-center gap-2">
+                          <Checkbox 
+                            id={`export-${type}`}
+                            checked={exportPropertyTypes.includes(type)}
+                            onCheckedChange={() => toggleExportPropertyType(type)}
+                          />
+                          <Label htmlFor={`export-${type}`} className="text-sm capitalize">
+                            {type.replace(/_/g, ' ')}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <Button 
+                    className="w-full" 
+                    onClick={exportProperties}
+                    disabled={isExporting || (exportListingTypes.length === 0 && exportPropertyTypes.length === 0)}
+                  >
+                    {isExporting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Export CSV
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             
             <input
               ref={fileInputRef}
