@@ -47,6 +47,7 @@ export const BulkPropertyImport = () => {
   const [parsedData, setParsedData] = useState<ParsedProperty[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [agencies, setAgencies] = useState<{ id: string; name: string }[]>([]);
@@ -372,6 +373,127 @@ export const BulkPropertyImport = () => {
     URL.revokeObjectURL(url);
   };
 
+  const exportProperties = async () => {
+    setIsExporting(true);
+    try {
+      // Fetch all properties with agency info
+      const { data: properties, error } = await supabase
+        .from('properties')
+        .select(`
+          *,
+          agencies:agency_id (name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (!properties || properties.length === 0) {
+        toast({
+          title: "No Properties",
+          description: "There are no properties to export",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Get property agents for each property
+      const { data: propertyAgents } = await supabase
+        .from('property_agents')
+        .select('property_id, agent_id');
+
+      // Create a map of property_id to agent emails (we'll use agent_id for now)
+      const agentMap = new Map<string, string>();
+      if (propertyAgents) {
+        for (const pa of propertyAgents) {
+          // Get agent email using the RPC function
+          const { data: agentData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('user_id', pa.agent_id)
+            .single();
+          
+          if (agentData) {
+            agentMap.set(pa.property_id, agentData.full_name);
+          }
+        }
+      }
+
+      // CSV headers
+      const headers = [
+        'property_code', 'city', 'address', 'property_type', 'square_meters', 'bedrooms', 'bathrooms',
+        'listing_type', 'price', 'price_negotiable', 'municipality', 'year_built',
+        'last_renovated', 'amenities', 'agency_name', 'agent_name', 'images', 'latitude', 'longitude', 'status', 'created_at'
+      ];
+
+      // Escape CSV value
+      const escapeCSV = (value: string | number | boolean | null | undefined): string => {
+        if (value === null || value === undefined) return '';
+        const str = String(value);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      // Convert properties to CSV rows
+      const rows = properties.map(prop => {
+        const agencyName = prop.agencies && typeof prop.agencies === 'object' && 'name' in prop.agencies 
+          ? (prop.agencies as { name: string }).name 
+          : '';
+        const agentName = agentMap.get(prop.id) || '';
+        const amenitiesStr = (prop.amenities || []).join(';');
+        const imagesStr = (prop.images || []).join(';');
+        
+        return [
+          escapeCSV(prop.property_code),
+          escapeCSV(prop.city),
+          escapeCSV(prop.address),
+          escapeCSV(prop.property_type),
+          escapeCSV(prop.square_meters),
+          escapeCSV(prop.bedrooms),
+          escapeCSV(prop.bathrooms),
+          escapeCSV(prop.listing_type),
+          escapeCSV(prop.price),
+          escapeCSV(prop.price_negotiable),
+          escapeCSV(prop.municipality),
+          escapeCSV(prop.year_built),
+          escapeCSV(prop.last_renovated),
+          escapeCSV(amenitiesStr),
+          escapeCSV(agencyName),
+          escapeCSV(agentName),
+          escapeCSV(imagesStr),
+          escapeCSV(prop.latitude),
+          escapeCSV(prop.longitude),
+          escapeCSV(prop.status),
+          escapeCSV(prop.created_at)
+        ].join(',');
+      });
+
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `properties_export_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export Complete",
+        description: `Successfully exported ${properties.length} properties`
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export Failed",
+        description: error instanceof Error ? error.message : "Failed to export properties",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const resetImport = () => {
     setFile(null);
     setParsedData([]);
@@ -429,6 +551,20 @@ export const BulkPropertyImport = () => {
             <Button variant="outline" onClick={downloadTemplate}>
               <Download className="w-4 h-4 mr-2" />
               Download Template
+            </Button>
+
+            <Button variant="outline" onClick={exportProperties} disabled={isExporting}>
+              {isExporting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export All Properties
+                </>
+              )}
             </Button>
             
             <input
