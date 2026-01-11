@@ -51,7 +51,9 @@ export const BulkPropertyImport = () => {
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [agencies, setAgencies] = useState<{ id: string; name: string }[]>([]);
   const [agents, setAgents] = useState<{ user_id: string; email: string; full_name: string }[]>([]);
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
 
   const loadAgencies = async () => {
@@ -176,10 +178,7 @@ export const BulkPropertyImport = () => {
     };
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
-
+  const processFile = async (selectedFile: File) => {
     if (!selectedFile.name.endsWith('.csv')) {
       toast({
         title: "Invalid File",
@@ -219,6 +218,35 @@ export const BulkPropertyImport = () => {
       });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+    await processFile(selectedFile);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile) {
+      await processFile(droppedFile);
     }
   };
 
@@ -370,6 +398,33 @@ export const BulkPropertyImport = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Drag and drop zone */}
+          <div
+            ref={dropZoneRef}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              isDragOver 
+                ? 'border-primary bg-primary/5' 
+                : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+            }`}
+          >
+            <div className="flex flex-col items-center gap-3">
+              <div className={`p-3 rounded-full ${isDragOver ? 'bg-primary/10' : 'bg-muted'}`}>
+                <Upload className={`w-6 h-6 ${isDragOver ? 'text-primary' : 'text-muted-foreground'}`} />
+              </div>
+              <div>
+                <p className="font-medium">
+                  {isDragOver ? 'Drop your CSV file here' : 'Drag and drop your CSV file here'}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  or click the button below to browse
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-wrap gap-3">
             <Button variant="outline" onClick={downloadTemplate}>
               <Download className="w-4 h-4 mr-2" />
