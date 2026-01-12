@@ -45,6 +45,7 @@ interface ImportResult {
 }
 
 const PROPERTY_TYPES = ["apartment", "villa", "land", "farm", "beach house", "penthouse", "chalet", "studio", "commercial rental", "rooftop", "duplex", "triplex", "venue"];
+const PROPERTY_STATUSES = ["pending", "approved", "rejected"] as const;
 
 export const BulkPropertyImport = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -59,6 +60,7 @@ export const BulkPropertyImport = () => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [exportListingTypes, setExportListingTypes] = useState<string[]>(['rent', 'sale']);
   const [exportPropertyTypes, setExportPropertyTypes] = useState<string[]>([...PROPERTY_TYPES]);
+  const [exportStatuses, setExportStatuses] = useState<string[]>([...PROPERTY_STATUSES]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
@@ -77,6 +79,12 @@ export const BulkPropertyImport = () => {
 
   const selectAllPropertyTypes = () => setExportPropertyTypes([...PROPERTY_TYPES]);
   const clearAllPropertyTypes = () => setExportPropertyTypes([]);
+
+  const toggleExportStatus = (status: string) => {
+    setExportStatuses(prev => 
+      prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
+    );
+  };
 
   const loadAgencies = async () => {
     const { data } = await supabase.from('agencies').select('id, name');
@@ -395,10 +403,10 @@ export const BulkPropertyImport = () => {
   };
 
   const exportProperties = async () => {
-    if (exportListingTypes.length === 0 && exportPropertyTypes.length === 0) {
+    if (exportListingTypes.length === 0 || exportPropertyTypes.length === 0 || exportStatuses.length === 0) {
       toast({
         title: "No Filters Selected",
-        description: "Please select at least one listing type or property type to export",
+        description: "Please select at least one option for each filter category",
         variant: "destructive"
       });
       return;
@@ -422,6 +430,11 @@ export const BulkPropertyImport = () => {
       // Apply property type filter
       if (exportPropertyTypes.length > 0 && exportPropertyTypes.length < PROPERTY_TYPES.length) {
         query = query.in('property_type', exportPropertyTypes as ("apartment" | "duplex" | "house" | "loft" | "penthouse" | "studio" | "townhouse" | "villa")[]);
+      }
+      
+      // Apply status filter
+      if (exportStatuses.length > 0 && exportStatuses.length < PROPERTY_STATUSES.length) {
+        query = query.in('status', exportStatuses as ("pending" | "approved" | "rejected")[]);
       }
       
       const { data: properties, error } = await query.order('created_at', { ascending: false });
@@ -606,7 +619,7 @@ export const BulkPropertyImport = () => {
                     <>
                       <Filter className="w-4 h-4 mr-2" />
                       Export Properties
-                      {(exportListingTypes.length < 2 || exportPropertyTypes.length < PROPERTY_TYPES.length) && (
+                      {(exportListingTypes.length < 2 || exportPropertyTypes.length < PROPERTY_TYPES.length || exportStatuses.length < PROPERTY_STATUSES.length) && (
                         <Badge variant="secondary" className="ml-2 text-xs">
                           Filtered
                         </Badge>
@@ -671,10 +684,30 @@ export const BulkPropertyImport = () => {
 
                   <Separator />
 
+                  <div>
+                    <h4 className="font-medium mb-2">Property Status</h4>
+                    <div className="flex gap-4 flex-wrap">
+                      {PROPERTY_STATUSES.map(status => (
+                        <div key={status} className="flex items-center gap-2">
+                          <Checkbox 
+                            id={`export-status-${status}`}
+                            checked={exportStatuses.includes(status)}
+                            onCheckedChange={() => toggleExportStatus(status)}
+                          />
+                          <Label htmlFor={`export-status-${status}`} className="text-sm capitalize">
+                            {status}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   <Button 
                     className="w-full" 
                     onClick={exportProperties}
-                    disabled={isExporting || (exportListingTypes.length === 0 && exportPropertyTypes.length === 0)}
+                    disabled={isExporting || exportListingTypes.length === 0 || exportPropertyTypes.length === 0 || exportStatuses.length === 0}
                   >
                     {isExporting ? (
                       <>
