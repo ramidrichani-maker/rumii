@@ -2,3 +2,6 @@ project_id = "kubhguqlihooofnyvdpq"
 
 [functions.chat]
 verify_jwt = false
+
+[functions.generate-room-design]
+verify_jwt = false
