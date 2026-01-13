@@ -35,6 +35,114 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_design_variants: {
+        Row: {
+          approved: boolean | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          created_by: string | null
+          design_id: string
+          height: number | null
+          id: string
+          job_id: string | null
+          media_url: string | null
+          mime_type: string | null
+          palette: string | null
+          property_id: string | null
+          storage_path: string | null
+          style: string | null
+          width: number | null
+        }
+        Insert: {
+          approved?: boolean | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          design_id: string
+          height?: number | null
+          id?: string
+          job_id?: string | null
+          media_url?: string | null
+          mime_type?: string | null
+          palette?: string | null
+          property_id?: string | null
+          storage_path?: string | null
+          style?: string | null
+          width?: number | null
+        }
+        Update: {
+          approved?: boolean | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          design_id?: string
+          height?: number | null
+          id?: string
+          job_id?: string | null
+          media_url?: string | null
+          mime_type?: string | null
+          palette?: string | null
+          property_id?: string | null
+          storage_path?: string | null
+          style?: string | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_design_variants_design_id_fkey"
+            columns: ["design_id"]
+            isOneToOne: false
+            referencedRelation: "ai_designs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_design_variants_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "property_ai_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_designs: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          key: string
+          metadata: Json | null
+          name: string
+          palettes: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          metadata?: Json | null
+          name: string
+          palettes?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          metadata?: Json | null
+          name?: string
+          palettes?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       broker_agreements: {
         Row: {
           agreed_at: string
@@ -729,10 +837,12 @@ export type Database = {
           session_count: number
         }[]
       }
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["user_role"]
-      }
+      get_user_role:
+        | { Args: never; Returns: string }
+        | {
+            Args: { _user_id: string }
+            Returns: Database["public"]["Enums"]["user_role"]
+          }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["user_role"]
