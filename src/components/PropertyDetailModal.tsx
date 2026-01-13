@@ -20,15 +20,16 @@ import {
   XCircle,
   Clock,
   Eye,
-  Trash2
+  Trash2,
+  Sparkles
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
+import AIRoomDesigner from "@/components/AIRoomDesigner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-
 interface Property {
   id: string;
   address: string;
@@ -73,6 +74,8 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   const { user, profile } = useAuth();
   const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [showAIDesigner, setShowAIDesigner] = useState(false);
+  const [selectedImageForAI, setSelectedImageForAI] = useState<string | null>(null);
   
   if (!property) return null;
 
@@ -301,6 +304,64 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             )}
           </div>
         </div>
+
+        {/* AI Room Staging Section */}
+        {user && property.images && property.images.length > 0 && (
+          <div className="pt-4 border-t">
+            {!showAIDesigner ? (
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  AI Room Staging
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Transform unfurnished rooms into beautifully designed spaces using AI
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {property.images.filter(img => !img.match(/\.(mp4|webm|ogg|mov|avi|wmv)$/i)).slice(0, 4).map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setSelectedImageForAI(image);
+                        setShowAIDesigner(true);
+                      }}
+                      className="relative aspect-video rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors group"
+                    >
+                      <img src={image} alt={`Room ${index + 1}`} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Sparkles className="h-6 w-6 text-white" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : selectedImageForAI && (
+              <div className="space-y-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowAIDesigner(false);
+                    setSelectedImageForAI(null);
+                  }}
+                >
+                  ← Back to images
+                </Button>
+                <AIRoomDesigner
+                  propertyId={property.id}
+                  imageUrl={selectedImageForAI}
+                  onImageGenerated={(url) => {
+                    console.log("Generated image:", url);
+                    toast({
+                      title: "Design Generated",
+                      description: "AI room design has been created and saved.",
+                    });
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Request Viewing Button */}
         {!isAdmin && user && property.status === 'approved' && (
