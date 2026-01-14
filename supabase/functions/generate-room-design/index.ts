@@ -176,7 +176,7 @@ serve(async (req) => {
     try {
       // Use adirik/interior-design model for room transformation
       const output = await replicate.run(
-        "adirik/interior-design:76604baddc85b1b4616e1c6475eca080da339c8875bd4996705571.e24ad6c0",
+        "adirik/interior-design:76604baddc85b1b4616e1c6475eca080da339c8875bd4996705440e57e24ad6c0",
         {
           input: {
             image: imageUrl,
