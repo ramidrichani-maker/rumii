@@ -151,11 +151,11 @@ serve(async (req) => {
     const selectedStyle = stylePrompts[style] || stylePrompts.modern;
     const selectedPalette = palettePrompts[palette] || palettePrompts.neutral;
 
-    const prompt = `Transform this unfurnished room into a beautifully furnished living space. Apply ${selectedStyle}. Use ${selectedPalette}. High quality interior photography, realistic lighting, professional home staging. Keep the room structure and windows exactly as they are.`;
+    const prompt = `Transform this room into a beautifully furnished space with ${selectedStyle}. Use ${selectedPalette}. Professional interior photography, realistic lighting.`;
 
     console.log("Starting room design generation with prompt:", prompt);
 
-    // Create job record
+    // Create job record with 'pending' status first
     const { data: jobData, error: jobError } = await supabase
       .from("property_ai_jobs")
       .insert({
@@ -163,7 +163,7 @@ serve(async (req) => {
         original_media_url: imageUrl,
         style: style || "modern",
         palette: palette || "neutral",
-        status: "processing",
+        status: "pending",
         requestor_user_id: userId,
       })
       .select()
@@ -173,76 +173,91 @@ serve(async (req) => {
       console.error("Error creating job:", jobError);
     }
 
-    // Use jagilley/controlnet-hough for interior design with image input
-    const output = await replicate.run(
-      "jagilley/controlnet-hough:854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56f33571d3",
-      {
-        input: {
-          image: imageUrl,
-          prompt: prompt,
-          num_samples: "1",
-          image_resolution: "768",
-          ddim_steps: 30,
-          scale: 9,
-          a_prompt: "best quality, extremely detailed, realistic interior photography",
-          n_prompt: "blurry, distorted, low quality, cartoon, anime, drawing, text, watermark, ugly, longbody, lowres, bad anatomy",
-        },
-      }
-    );
+    try {
+      // Use adirik/interior-design model for room transformation
+      const output = await replicate.run(
+        "adirik/interior-design:76604baddc85b1b4616e1c6475eca080da339c8875bd4996705571.e24ad6c0",
+        {
+          input: {
+            image: imageUrl,
+            prompt: prompt,
+            guidance_scale: 15,
+            negative_prompt: "lowres, watermark, banner, logo, contactinfo, text, deformed, blurry, blur, out of focus, out of frame, surreal, ugly",
+            prompt_strength: 0.8,
+            num_inference_steps: 50,
+          },
+        }
+      );
 
-    console.log("Generation completed:", output);
+      console.log("Generation completed:", output);
 
-    const outputUrls = Array.isArray(output) ? output : [output];
-    
-    // Update job with results
-    if (jobData) {
-      await supabase
-        .from("property_ai_jobs")
-        .update({ 
-          replicate_run_id: jobData.id,
-          status: "completed",
-          replicate_output_urls: outputUrls,
-        })
-        .eq("id", jobData.id);
+      const outputUrls = Array.isArray(output) ? output : [output];
+      
+      // Update job with results
+      if (jobData) {
+        await supabase
+          .from("property_ai_jobs")
+          .update({ 
+            replicate_run_id: jobData.id,
+            status: "completed",
+            replicate_output_urls: outputUrls,
+          })
+          .eq("id", jobData.id);
 
-      // Save generated images
-      for (let i = 0; i < outputUrls.length; i++) {
-        try {
-          const imgResponse = await fetch(outputUrls[i]);
-          const imgBlob = await imgResponse.blob();
-          const fileName = `${propertyId}/${Date.now()}_${i}.png`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from("ai-generated")
-            .upload(fileName, imgBlob, { contentType: "image/png" });
-          
-          if (!uploadError) {
-            const { data: urlData } = supabase.storage
-              .from("ai-generated")
-              .getPublicUrl(fileName);
+        // Save generated images
+        for (let i = 0; i < outputUrls.length; i++) {
+          try {
+            const imgResponse = await fetch(outputUrls[i]);
+            const imgBlob = await imgResponse.blob();
+            const fileName = `${propertyId}/${Date.now()}_${i}.png`;
             
-            await supabase.from("property_generated_images").insert({
-              property_id: propertyId,
-              storage_path: fileName,
-              media_url: urlData?.publicUrl || outputUrls[i],
-              created_by: userId,
-              job_id: jobData.id,
-            });
+            const { error: uploadError } = await supabase.storage
+              .from("ai-generated")
+              .upload(fileName, imgBlob, { contentType: "image/png" });
+            
+            if (!uploadError) {
+              const { data: urlData } = supabase.storage
+                .from("ai-generated")
+                .getPublicUrl(fileName);
+              
+              await supabase.from("property_generated_images").insert({
+                property_id: propertyId,
+                storage_path: fileName,
+                media_url: urlData?.publicUrl || outputUrls[i],
+                created_by: userId,
+                job_id: jobData.id,
+              });
+            }
+          } catch (saveErr) {
+            console.error("Error saving generated image:", saveErr);
           }
-        } catch (saveErr) {
-          console.error("Error saving generated image:", saveErr);
         }
       }
-    }
 
-    return new Response(
-      JSON.stringify({
-        status: "succeeded",
-        output: outputUrls,
-        jobId: jobData?.id,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+      return new Response(
+        JSON.stringify({
+          status: "succeeded",
+          output: outputUrls,
+          jobId: jobData?.id,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } catch (replicateError) {
+      console.error("Replicate API error:", replicateError);
+      
+      // Update job status to failed
+      if (jobData) {
+        await supabase
+          .from("property_ai_jobs")
+          .update({ 
+            status: "failed",
+            error_message: replicateError instanceof Error ? replicateError.message : "Unknown error",
+          })
+          .eq("id", jobData.id);
+      }
+      
+      throw replicateError;
+    }
   } catch (error) {
     console.error("Error in generate-room-design:", error);
     return new Response(
