@@ -100,7 +100,7 @@ export default function AIRoomDesigner({ propertyId, imageUrl, onImageGenerated 
     try {
       setIsGenerating(true);
       setGeneratedImage(null);
-      setProgress("Starting...");
+      setProgress("Generating design...");
 
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -132,11 +132,23 @@ export default function AIRoomDesigner({ propertyId, imageUrl, onImageGenerated 
         throw new Error(data.error);
       }
 
-      setPredictionId(data.predictionId);
-      toast.info("Generation started! This may take 30-60 seconds.");
+      // Handle synchronous response (replicate.run waits for completion)
+      if (data.status === "succeeded" && data.output) {
+        const output = Array.isArray(data.output) ? data.output[0] : data.output;
+        setGeneratedImage(output);
+        setIsGenerating(false);
+        toast.success("Room design generated successfully!");
+        onImageGenerated?.(output);
+      } else if (data.predictionId) {
+        // Fallback for async polling if needed
+        setPredictionId(data.predictionId);
+        toast.info("Generation started! This may take 30-60 seconds.");
+      } else {
+        throw new Error("Unexpected response from server");
+      }
     } catch (error) {
       console.error("Error generating design:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to start generation");
+      toast.error(error instanceof Error ? error.message : "Failed to generate design");
       setIsGenerating(false);
     }
   };
