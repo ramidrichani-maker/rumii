@@ -173,33 +173,72 @@ serve(async (req) => {
       console.error("Error creating job:", jobError);
     }
 
-    // Use img2img model for room staging
-    const prediction = await replicate.predictions.create({
-      model: "stability-ai/sdxl",
-      input: {
-        prompt: prompt,
-        image: imageUrl,
-        prompt_strength: 0.65,
-        num_inference_steps: 30,
-        guidance_scale: 7.5,
-        negative_prompt: "blurry, distorted, low quality, cartoon, anime, drawing, text, watermark, ugly furniture, bad perspective",
-      },
-    });
+    // Use jagilley/controlnet-hough for interior design with image input
+    const output = await replicate.run(
+      "jagilley/controlnet-hough:854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56f33571d3",
+      {
+        input: {
+          image: imageUrl,
+          prompt: prompt,
+          num_samples: "1",
+          image_resolution: "768",
+          ddim_steps: 30,
+          scale: 9,
+          a_prompt: "best quality, extremely detailed, realistic interior photography",
+          n_prompt: "blurry, distorted, low quality, cartoon, anime, drawing, text, watermark, ugly, longbody, lowres, bad anatomy",
+        },
+      }
+    );
 
-    console.log("Prediction created:", prediction.id);
+    console.log("Generation completed:", output);
 
-    // Update job with replicate ID
+    const outputUrls = Array.isArray(output) ? output : [output];
+    
+    // Update job with results
     if (jobData) {
       await supabase
         .from("property_ai_jobs")
-        .update({ replicate_run_id: prediction.id })
+        .update({ 
+          replicate_run_id: jobData.id,
+          status: "completed",
+          replicate_output_urls: outputUrls,
+        })
         .eq("id", jobData.id);
+
+      // Save generated images
+      for (let i = 0; i < outputUrls.length; i++) {
+        try {
+          const imgResponse = await fetch(outputUrls[i]);
+          const imgBlob = await imgResponse.blob();
+          const fileName = `${propertyId}/${Date.now()}_${i}.png`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from("ai-generated")
+            .upload(fileName, imgBlob, { contentType: "image/png" });
+          
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage
+              .from("ai-generated")
+              .getPublicUrl(fileName);
+            
+            await supabase.from("property_generated_images").insert({
+              property_id: propertyId,
+              storage_path: fileName,
+              media_url: urlData?.publicUrl || outputUrls[i],
+              created_by: userId,
+              job_id: jobData.id,
+            });
+          }
+        } catch (saveErr) {
+          console.error("Error saving generated image:", saveErr);
+        }
+      }
     }
 
     return new Response(
       JSON.stringify({
-        predictionId: prediction.id,
-        status: prediction.status,
+        status: "succeeded",
+        output: outputUrls,
         jobId: jobData?.id,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
