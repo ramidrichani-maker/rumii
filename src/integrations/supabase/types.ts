@@ -436,6 +436,7 @@ export type Database = {
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
           status: Database["public"]["Enums"]["property_status"]
+          unfurnished: boolean
           updated_at: string
           user_id: string
           year_built: number | null
@@ -462,6 +463,7 @@ export type Database = {
           property_type: Database["public"]["Enums"]["property_type"]
           square_meters: number
           status?: Database["public"]["Enums"]["property_status"]
+          unfurnished?: boolean
           updated_at?: string
           user_id: string
           year_built?: number | null
@@ -488,6 +490,7 @@ export type Database = {
           property_type?: Database["public"]["Enums"]["property_type"]
           square_meters?: number
           status?: Database["public"]["Enums"]["property_status"]
+          unfurnished?: boolean
           updated_at?: string
           user_id?: string
           year_built?: number | null

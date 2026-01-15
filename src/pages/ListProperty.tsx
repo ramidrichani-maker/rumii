@@ -32,6 +32,7 @@ const formSchema = z.object({
   }),
   price: z.string().min(1, "Price is required"),
   priceNegotiable: z.boolean().default(false),
+  unfurnished: z.boolean().default(false),
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
   amenities: z.array(z.string()).default([]),
@@ -55,6 +56,7 @@ const ListProperty = () => {
     defaultValues: {
       amenities: [],
       priceNegotiable: false,
+      unfurnished: false,
       brokerAgreement: false
     }
   });
@@ -168,6 +170,7 @@ const ListProperty = () => {
         listing_type: data.listingType as any,
         price: parseFloat(data.price),
         price_negotiable: data.priceNegotiable,
+        unfurnished: data.unfurnished,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
@@ -360,6 +363,25 @@ const ListProperty = () => {
                           <FormLabel className="cursor-pointer">
                             Price is negotiable
                           </FormLabel>
+                        </div>
+                      </FormItem>} />
+
+                  <FormField control={form.control} name="unfurnished" render={({
+                  field
+                }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="cursor-pointer">
+                            Property is unfurnished
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            Check this if the property does not include furniture
+                          </p>
                         </div>
                       </FormItem>} />
 
