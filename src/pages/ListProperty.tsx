@@ -19,6 +19,28 @@ import { useAuth } from "@/contexts/AuthContext";
 import PropertyMap from "@/components/PropertyMap";
 const propertyTypes = ["Apartment", "Villa", "Land", "Farm", "Beach House", "Penthouse", "Chalet", "Studio", "Commercial Rental", "Rooftop", "Duplex", "Triplex", "Venue"];
 const amenities = ["Swimming Pool", "Gym", "Parking", "Balcony", "Garden", "Air Conditioning", "Heating", "Internet", "Security", "Elevator", "Furnished", "Pet Friendly", "Laundry", "Storage", "Terrace", "Sea View", "Mountain View"];
+const roomTypes = [
+  "Entrance",
+  "Bedroom", 
+  "Salon",
+  "Living Room",
+  "Dining Room",
+  "Kitchen",
+  "Bathroom",
+  "Toilet",
+  "Terrace",
+  "Balcony",
+  "Roof",
+  "Maid's Room",
+  "Maid's Bathroom",
+  "Storage Room",
+  "Corridor"
+];
+
+interface UploadedImage {
+  file: File;
+  roomType: string;
+}
 const formSchema = z.object({
   municipality: z.string().min(1, "District is required"),
   city: z.string().min(1, "City is required"),
@@ -43,6 +65,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
@@ -106,10 +129,21 @@ const ListProperty = () => {
   }
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files]);
+    const newImages: UploadedImage[] = files.map(file => ({
+      file,
+      roomType: '' // Initially no room type selected
+    }));
+    setUploadedImages(prev => [...prev, ...newImages]);
   };
+
+  const updateImageRoomType = (index: number, roomType: string) => {
+    setUploadedImages(prev => prev.map((img, i) => 
+      i === index ? { ...img, roomType } : img
+    ));
+  };
+
   const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
   const handleAmenityToggle = (amenity: string) => {
     const updatedAmenities = selectedAmenities.includes(amenity) ? selectedAmenities.filter(a => a !== amenity) : [...selectedAmenities, amenity];
@@ -129,13 +163,27 @@ const ListProperty = () => {
     setIsSubmitting(true);
     
     try {
+      // Check if all images have room types assigned
+      const unassignedImages = uploadedImages.filter(img => !img.roomType);
+      if (unassignedImages.length > 0) {
+        toast({
+          title: "Room Types Required",
+          description: "Please select a room type for all uploaded images.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       let imageUrls: string[] = [];
 
       // Upload images to Supabase storage if there are any
-      if (uploadedFiles.length > 0) {
-        const uploadPromises = uploadedFiles.map(async (file, index) => {
+      if (uploadedImages.length > 0) {
+        const uploadPromises = uploadedImages.map(async (uploadedImage, index) => {
+          const file = uploadedImage.file;
+          const roomType = uploadedImage.roomType.toLowerCase().replace(/['\s]/g, '-');
           const fileExt = file.name.split('.').pop();
-          const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
+          const fileName = `${user.id}/${Date.now()}_${roomType}_${index}.${fileExt}`;
           
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('property-images')
@@ -209,7 +257,7 @@ const ListProperty = () => {
       // Reset form
       form.reset();
       setSelectedAmenities([]);
-      setUploadedFiles([]);
+      setUploadedImages([]);
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
@@ -499,16 +547,17 @@ const ListProperty = () => {
                   </div>
                 </div>
                 
-                {uploadedFiles.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    <h4 className="text-sm font-medium">Selected Files:</h4>
-                    {uploadedFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-background rounded flex items-center justify-center">
-                            {file.type.startsWith('image/') ? (
+                {uploadedImages.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    <h4 className="text-sm font-medium">Selected Files ({uploadedImages.length}):</h4>
+                    <p className="text-xs text-muted-foreground">Please select a room type for each image</p>
+                    {uploadedImages.map((uploadedImage, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="w-16 h-16 bg-background rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
+                            {uploadedImage.file.type.startsWith('image/') ? (
                               <img 
-                                src={URL.createObjectURL(file)} 
+                                src={URL.createObjectURL(uploadedImage.file)} 
                                 alt="Preview" 
                                 className="w-full h-full object-cover rounded"
                               />
@@ -516,22 +565,39 @@ const ListProperty = () => {
                               <Upload className="w-6 h-6 text-muted-foreground" />
                             )}
                           </div>
-                          <div>
-                            <span className="text-sm font-medium">{file.name}</span>
+                          <div className="min-w-0 flex-1">
+                            <span className="text-sm font-medium truncate block">{uploadedImage.file.name}</span>
                             <p className="text-xs text-muted-foreground">
-                              {(file.size / 1024 / 1024).toFixed(2)} MB
+                              {(uploadedImage.file.size / 1024 / 1024).toFixed(2)} MB
                             </p>
                           </div>
                         </div>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => removeFile(index)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          Remove
-                        </Button>
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <Select
+                            value={uploadedImage.roomType}
+                            onValueChange={(value) => updateImageRoomType(index, value)}
+                          >
+                            <SelectTrigger className={`w-[160px] ${!uploadedImage.roomType ? 'border-destructive' : ''}`}>
+                              <SelectValue placeholder="Select room type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {roomTypes.map(roomType => (
+                                <SelectItem key={roomType} value={roomType}>
+                                  {roomType}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeFile(index)}
+                            className="text-destructive hover:text-destructive flex-shrink-0"
+                          >
+                            Remove
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
