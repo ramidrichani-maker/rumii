@@ -10,6 +10,7 @@ interface RangeSliderProps {
   step: number;
   label: string;
   unit?: string;
+  prefix?: string;
   maxLabel?: string;
 }
 
@@ -21,13 +22,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   step,
   label,
   unit = '',
+  prefix = '',
   maxLabel
 }) => {
   const formatValue = (val: number) => {
     if (val >= max && maxLabel) {
       return maxLabel;
     }
-    return `${val}${unit}`;
+    return `${prefix}${val.toLocaleString()}${unit}`;
   };
 
   return (
@@ -54,8 +56,8 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
           </div>
         </div>
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>{min}{unit}</span>
-          <span>{maxLabel || `${max}${unit}`}</span>
+          <span>{prefix}{min.toLocaleString()}{unit}</span>
+          <span>{maxLabel || `${prefix}${max.toLocaleString()}${unit}`}</span>
         </div>
       </div>
     </div>
