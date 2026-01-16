@@ -34,6 +34,7 @@ const amenities = [
 const Purchase = () => {
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 1000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
   const [minBedrooms, setMinBedrooms] = useState(1);
   const [minBathrooms, setMinBathrooms] = useState(1);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
@@ -92,6 +93,13 @@ const Purchase = () => {
         query = query.eq('unfurnished', true);
       }
 
+      // Price filter
+      if (priceRange[0] > 0) {
+        query = query.gte('price', priceRange[0]);
+      }
+      if (priceRange[1] < 5000000) {
+        query = query.lte('price', priceRange[1]);
+      }
       const { data, error } = await query;
 
       if (error) throw error;
@@ -119,11 +127,12 @@ const Purchase = () => {
     }, 500); // 500ms debounce delay
 
     return () => clearTimeout(timeoutId);
-  }, [selectedPropertyTypes, squareMetersRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly]);
+  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly]);
 
   const handleClearFilters = () => {
     setSelectedPropertyTypes([]);
     setSquareMetersRange([50, 1000]);
+    setPriceRange([0, 5000000]);
     setMinBedrooms(1);
     setMinBathrooms(1);
     setSelectedAmenities([]);
@@ -192,6 +201,18 @@ const Purchase = () => {
               maxLabel="1,000+ m²"
             />
 
+            {/* Price Range Filter */}
+            <RangeSlider
+              value={priceRange}
+              onValueChange={setPriceRange}
+              min={0}
+              max={5000000}
+              step={50000}
+              label="Price Range"
+              unit="$"
+              prefix="$"
+              maxLabel="$5M+"
+            />
             {/* Amenities Filter */}
             <div>
               <h3 className="text-lg font-semibold mb-4 text-foreground">Amenities</h3>
@@ -289,7 +310,7 @@ const Purchase = () => {
         </div>
 
         {/* Active Filters Display */}
-        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0 || unfurnishedOnly) && (
+        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || priceRange[0] > 0 || priceRange[1] < 5000000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0 || unfurnishedOnly) && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-foreground">Active Filters:</h3>
             <div className="flex flex-wrap gap-2">
@@ -304,6 +325,11 @@ const Purchase = () => {
               {(squareMetersRange[0] > 50 || squareMetersRange[1] < 1000) && (
                 <Badge variant="secondary" className="px-3 py-1">
                   {squareMetersRange[0]}-{squareMetersRange[1] >= 1000 ? '1,000+' : squareMetersRange[1]} m²
+                </Badge>
+              )}
+              {(priceRange[0] > 0 || priceRange[1] < 5000000) && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  ${priceRange[0].toLocaleString()}-{priceRange[1] >= 5000000 ? '$5M+' : `$${priceRange[1].toLocaleString()}`}
                 </Badge>
               )}
               {minBedrooms > 1 && (
