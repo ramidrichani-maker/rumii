@@ -37,6 +37,7 @@ const Purchase = () => {
   const [minBedrooms, setMinBedrooms] = useState(1);
   const [minBathrooms, setMinBathrooms] = useState(1);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [unfurnishedOnly, setUnfurnishedOnly] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
@@ -87,6 +88,10 @@ const Purchase = () => {
         query = query.contains('amenities', selectedAmenities);
       }
 
+      if (unfurnishedOnly) {
+        query = query.eq('unfurnished', true);
+      }
+
       const { data, error } = await query;
 
       if (error) throw error;
@@ -114,7 +119,7 @@ const Purchase = () => {
     }, 500); // 500ms debounce delay
 
     return () => clearTimeout(timeoutId);
-  }, [selectedPropertyTypes, squareMetersRange, minBedrooms, minBathrooms, selectedAmenities]);
+  }, [selectedPropertyTypes, squareMetersRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly]);
 
   const handleClearFilters = () => {
     setSelectedPropertyTypes([]);
@@ -122,6 +127,7 @@ const Purchase = () => {
     setMinBedrooms(1);
     setMinBathrooms(1);
     setSelectedAmenities([]);
+    setUnfurnishedOnly(false);
   };
 
   const handlePropertySelect = (property: any) => {
@@ -249,6 +255,21 @@ const Purchase = () => {
               </div>
             </div>
 
+            {/* Unfurnished Filter */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Furnishing</h3>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="unfurnished-filter"
+                  checked={unfurnishedOnly}
+                  onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
+                />
+                <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
+                  Show only unfurnished properties
+                </label>
+              </div>
+            </div>
+
             <div className="flex justify-end">
               <Button variant="outline" size="lg" onClick={handleClearFilters}>
                 Clear All
@@ -268,7 +289,7 @@ const Purchase = () => {
         </div>
 
         {/* Active Filters Display */}
-        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0) && (
+        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0 || unfurnishedOnly) && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-foreground">Active Filters:</h3>
             <div className="flex flex-wrap gap-2">
@@ -300,6 +321,11 @@ const Purchase = () => {
                   {amenity}
                 </Badge>
               ))}
+              {unfurnishedOnly && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  Unfurnished only
+                </Badge>
+              )}
             </div>
           </div>
         )}
