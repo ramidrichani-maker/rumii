@@ -1,0 +1,467 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Sparkles, RefreshCw, Check, X, Image as ImageIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface GeneratedImage {
+  id: string;
+  property_id: string;
+  storage_path: string;
+  media_url: string | null;
+  style: string | null;
+  palette: string | null;
+  approved: boolean;
+  created_at: string;
+}
+
+interface Property {
+  id: string;
+  address: string;
+  city: string;
+  images: string[] | null;
+}
+
+const STYLES = [
+  { value: "modern", label: "Modern" },
+  { value: "scandinavian", label: "Scandinavian" },
+  { value: "industrial", label: "Industrial" },
+  { value: "bohemian", label: "Bohemian" },
+  { value: "mediterranean", label: "Mediterranean" },
+  { value: "luxury", label: "Luxury" },
+  { value: "minimalist", label: "Minimalist" },
+  { value: "traditional", label: "Traditional" },
+];
+
+const PALETTES = [
+  { value: "neutral", label: "Neutral" },
+  { value: "warm", label: "Warm" },
+  { value: "cool", label: "Cool" },
+  { value: "earth", label: "Earth Tones" },
+  { value: "monochrome", label: "Monochrome" },
+  { value: "vibrant", label: "Vibrant" },
+];
+
+export default function AdminAIRoomDesigner() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
+  const [style, setStyle] = useState("modern");
+  const [palette, setPalette] = useState("neutral");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [progress, setProgress] = useState<string>("Starting...");
+  const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
+  const [isLoadingImages, setIsLoadingImages] = useState(false);
+
+  // Load approved properties
+  useEffect(() => {
+    const loadProperties = async () => {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("id, address, city, images")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading properties:", error);
+        return;
+      }
+
+      setProperties(data || []);
+    };
+
+    loadProperties();
+  }, []);
+
+  // Load generated images for selected property
+  useEffect(() => {
+    if (!selectedPropertyId) {
+      setGeneratedImages([]);
+      return;
+    }
+
+    const loadGeneratedImages = async () => {
+      setIsLoadingImages(true);
+      const { data, error } = await supabase
+        .from("property_generated_images")
+        .select("*")
+        .eq("property_id", selectedPropertyId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading generated images:", error);
+      } else {
+        setGeneratedImages(data || []);
+      }
+      setIsLoadingImages(false);
+    };
+
+    loadGeneratedImages();
+  }, [selectedPropertyId, generatedImage]);
+
+  // Update selected property when ID changes
+  useEffect(() => {
+    if (selectedPropertyId) {
+      const prop = properties.find(p => p.id === selectedPropertyId);
+      setSelectedProperty(prop || null);
+      setSelectedImageUrl("");
+    } else {
+      setSelectedProperty(null);
+    }
+  }, [selectedPropertyId, properties]);
+
+  const handleGenerate = async () => {
+    if (!selectedImageUrl || !selectedPropertyId) {
+      toast.error("Please select a property and image first");
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+      setGeneratedImage(null);
+      setProgress("Generating design...");
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please log in to use AI design features");
+        setIsGenerating(false);
+        return;
+      }
+
+      const response = await fetch(
+        "https://kubhguqlihooofnyvdpq.supabase.co/functions/v1/generate-room-design",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            imageUrl: selectedImageUrl,
+            propertyId: selectedPropertyId,
+            style,
+            palette,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.status === "succeeded" && data.output) {
+        const output = Array.isArray(data.output) ? data.output[0] : data.output;
+        setGeneratedImage(output);
+        setIsGenerating(false);
+        toast.success("Room design generated successfully!");
+      } else {
+        throw new Error("Unexpected response from server");
+      }
+    } catch (error) {
+      console.error("Error generating design:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to generate design");
+      setIsGenerating(false);
+    }
+  };
+
+  const handleApproveImage = async (imageId: string) => {
+    try {
+      const { error } = await supabase
+        .from("property_generated_images")
+        .update({ approved: true })
+        .eq("id", imageId);
+
+      if (error) throw error;
+
+      toast.success("Design approved! It will now be shown to customers.");
+      setGeneratedImages(prev => 
+        prev.map(img => img.id === imageId ? { ...img, approved: true } : img)
+      );
+    } catch (error) {
+      console.error("Error approving image:", error);
+      toast.error("Failed to approve design");
+    }
+  };
+
+  const handleRejectImage = async (imageId: string) => {
+    try {
+      const { error } = await supabase
+        .from("property_generated_images")
+        .delete()
+        .eq("id", imageId);
+
+      if (error) throw error;
+
+      toast.success("Design removed.");
+      setGeneratedImages(prev => prev.filter(img => img.id !== imageId));
+    } catch (error) {
+      console.error("Error removing image:", error);
+      toast.error("Failed to remove design");
+    }
+  };
+
+  const handleUnapproveImage = async (imageId: string) => {
+    try {
+      const { error } = await supabase
+        .from("property_generated_images")
+        .update({ approved: false })
+        .eq("id", imageId);
+
+      if (error) throw error;
+
+      toast.success("Design unapproved.");
+      setGeneratedImages(prev => 
+        prev.map(img => img.id === imageId ? { ...img, approved: false } : img)
+      );
+    } catch (error) {
+      console.error("Error unapproving image:", error);
+      toast.error("Failed to unapprove design");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Property Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            AI Room Designer
+          </CardTitle>
+          <CardDescription>
+            Generate AI-furnished room designs for properties. Approved designs will be shown to customers.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Property Selector */}
+          <div className="space-y-2">
+            <Label>Select Property</Label>
+            <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a property..." />
+              </SelectTrigger>
+              <SelectContent>
+                {properties.map((property) => (
+                  <SelectItem key={property.id} value={property.id}>
+                    {property.address}, {property.city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Image Selection */}
+          {selectedProperty && selectedProperty.images && selectedProperty.images.length > 0 && (
+            <div className="space-y-2">
+              <Label>Select Room Image</Label>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                {selectedProperty.images
+                  .filter(img => !img.match(/\.(mp4|webm|ogg|mov|avi|wmv)$/i))
+                  .map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageUrl(image)}
+                      className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-colors ${
+                        selectedImageUrl === image 
+                          ? "border-primary ring-2 ring-primary/30" 
+                          : "border-transparent hover:border-muted-foreground/30"
+                      }`}
+                    >
+                      <img src={image} alt={`Room ${index + 1}`} className="w-full h-full object-cover" />
+                      {selectedImageUrl === image && (
+                        <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                          <Check className="h-6 w-6 text-primary" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Style and Palette Selection */}
+          {selectedImageUrl && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Design Style</Label>
+                  <Select value={style} onValueChange={setStyle} disabled={isGenerating}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STYLES.map((s) => (
+                        <SelectItem key={s.value} value={s.value}>
+                          {s.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Color Palette</Label>
+                  <Select value={palette} onValueChange={setPalette} disabled={isGenerating}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PALETTES.map((p) => (
+                        <SelectItem key={p.value} value={p.value}>
+                          {p.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Preview and Generate */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Original Image</Label>
+                  <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                    <img
+                      src={selectedImageUrl}
+                      alt="Original room"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Generated Design</Label>
+                  <div className="relative aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                    {generatedImage ? (
+                      <img
+                        src={generatedImage}
+                        alt="AI Generated design"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : isGenerating ? (
+                      <div className="text-center">
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground mt-2">{progress}</p>
+                      </div>
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        <ImageIcon className="h-8 w-8 mx-auto" />
+                        <p className="text-sm mt-2">Click generate to create design</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Generate Button */}
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating || !selectedImageUrl}
+                className="w-full"
+                size="lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {progress}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate Design
+                  </>
+                )}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Generated Images List */}
+      {selectedPropertyId && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ImageIcon className="h-5 w-5" />
+              Generated Designs for This Property
+            </CardTitle>
+            <CardDescription>
+              Approve designs to make them visible to customers. Customers will see designs matching their selected style and palette.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingImages ? (
+              <div className="text-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+              </div>
+            ) : generatedImages.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No AI designs generated yet for this property.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {generatedImages.map((img) => (
+                  <div key={img.id} className="border rounded-lg overflow-hidden">
+                    <div className="relative aspect-video">
+                      <img
+                        src={img.media_url || ""}
+                        alt="Generated design"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-2 left-2 flex gap-1">
+                        <Badge variant={img.approved ? "default" : "secondary"}>
+                          {img.approved ? "Approved" : "Pending"}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="p-3 space-y-2">
+                      <div className="flex gap-2 text-xs text-muted-foreground">
+                        <Badge variant="outline">{img.style || "modern"}</Badge>
+                        <Badge variant="outline">{img.palette || "neutral"}</Badge>
+                      </div>
+                      <div className="flex gap-2">
+                        {img.approved ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUnapproveImage(img.id)}
+                            className="flex-1"
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Unapprove
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => handleApproveImage(img.id)}
+                            className="flex-1"
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Approve
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleRejectImage(img.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

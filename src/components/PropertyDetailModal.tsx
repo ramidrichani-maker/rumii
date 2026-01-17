@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -21,15 +21,24 @@ import {
   Clock,
   Eye,
   Trash2,
-  Sparkles
+  Sparkles,
+  Image as ImageIcon
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
-import AIRoomDesigner from "@/components/AIRoomDesigner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+
+interface ApprovedDesign {
+  id: string;
+  media_url: string | null;
+  style: string | null;
+  palette: string | null;
+}
 interface Property {
   id: string;
   address: string;
@@ -74,8 +83,39 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   const { user, profile } = useAuth();
   const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [showAIDesigner, setShowAIDesigner] = useState(false);
-  const [selectedImageForAI, setSelectedImageForAI] = useState<string | null>(null);
+  const [approvedDesigns, setApprovedDesigns] = useState<ApprovedDesign[]>([]);
+  const [selectedStyle, setSelectedStyle] = useState<string>("modern");
+  const [selectedPalette, setSelectedPalette] = useState<string>("neutral");
+  const [matchingDesign, setMatchingDesign] = useState<ApprovedDesign | null>(null);
+  const [showDesignViewer, setShowDesignViewer] = useState(false);
+
+  // Load approved AI designs for this property
+  useEffect(() => {
+    if (!property?.id || !isOpen) return;
+
+    const loadApprovedDesigns = async () => {
+      const { data, error } = await supabase
+        .from("property_generated_images")
+        .select("id, media_url, style, palette")
+        .eq("property_id", property.id)
+        .eq("approved", true);
+
+      if (!error && data) {
+        setApprovedDesigns(data);
+        // Find matching design for default style/palette
+        const matching = data.find(d => d.style === selectedStyle && d.palette === selectedPalette);
+        setMatchingDesign(matching || null);
+      }
+    };
+
+    loadApprovedDesigns();
+  }, [property?.id, isOpen]);
+
+  // Update matching design when style/palette changes
+  useEffect(() => {
+    const matching = approvedDesigns.find(d => d.style === selectedStyle && d.palette === selectedPalette);
+    setMatchingDesign(matching || null);
+  }, [selectedStyle, selectedPalette, approvedDesigns]);
   
   if (!property) return null;
 
@@ -305,61 +345,99 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         </div>
 
-        {/* AI Room Staging Section */}
-        {user && property.images && property.images.length > 0 && (
+        {/* AI Room Staging Section - Shows approved designs to customers */}
+        {!isAdmin && approvedDesigns.length > 0 && (
           <div className="pt-4 border-t">
-            {!showAIDesigner ? (
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  AI Room Staging
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Transform unfurnished rooms into beautifully designed spaces using AI
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {property.images.filter(img => !img.match(/\.(mp4|webm|ogg|mov|avi|wmv)$/i)).slice(0, 4).map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setSelectedImageForAI(image);
-                        setShowAIDesigner(true);
-                      }}
-                      className="relative aspect-video rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors group"
-                    >
-                      <img src={image} alt={`Room ${index + 1}`} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Sparkles className="h-6 w-6 text-white" />
-                      </div>
-                    </button>
-                  ))}
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                AI Room Staging
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                See how this property could look with different furniture styles
+              </p>
+              
+              {/* Style and Palette Selection */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm">Design Style</Label>
+                  <Select value={selectedStyle} onValueChange={setSelectedStyle}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="modern">Modern</SelectItem>
+                      <SelectItem value="scandinavian">Scandinavian</SelectItem>
+                      <SelectItem value="industrial">Industrial</SelectItem>
+                      <SelectItem value="bohemian">Bohemian</SelectItem>
+                      <SelectItem value="mediterranean">Mediterranean</SelectItem>
+                      <SelectItem value="luxury">Luxury</SelectItem>
+                      <SelectItem value="minimalist">Minimalist</SelectItem>
+                      <SelectItem value="traditional">Traditional</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">Color Palette</Label>
+                  <Select value={selectedPalette} onValueChange={setSelectedPalette}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="neutral">Neutral</SelectItem>
+                      <SelectItem value="warm">Warm</SelectItem>
+                      <SelectItem value="cool">Cool</SelectItem>
+                      <SelectItem value="earth">Earth Tones</SelectItem>
+                      <SelectItem value="monochrome">Monochrome</SelectItem>
+                      <SelectItem value="vibrant">Vibrant</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            ) : selectedImageForAI && (
-              <div className="space-y-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setShowAIDesigner(false);
-                    setSelectedImageForAI(null);
-                  }}
-                >
-                  ← Back to images
-                </Button>
-                <AIRoomDesigner
-                  propertyId={property.id}
-                  imageUrl={selectedImageForAI}
-                  onImageGenerated={(url) => {
-                    console.log("Generated image:", url);
-                    toast({
-                      title: "Design Generated",
-                      description: "AI room design has been created and saved.",
-                    });
-                  }}
-                />
-              </div>
-            )}
+
+              {/* Display matching design or message */}
+              {matchingDesign && matchingDesign.media_url ? (
+                <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                  <img
+                    src={matchingDesign.media_url}
+                    alt="AI Generated room design"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 left-2 bg-primary/90 text-primary-foreground px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    AI Staged
+                  </div>
+                </div>
+              ) : (
+                <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">
+                  <div className="text-center text-muted-foreground">
+                    <ImageIcon className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-sm">No design available for this style/palette combination</p>
+                    <p className="text-xs mt-1">Try selecting a different style or color palette</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Show available combinations */}
+              {approvedDesigns.length > 1 && (
+                <div className="flex flex-wrap gap-1">
+                  <span className="text-xs text-muted-foreground">Available designs:</span>
+                  {approvedDesigns.map((design) => (
+                    <Badge 
+                      key={design.id} 
+                      variant="outline" 
+                      className="text-xs cursor-pointer hover:bg-muted"
+                      onClick={() => {
+                        if (design.style) setSelectedStyle(design.style);
+                        if (design.palette) setSelectedPalette(design.palette);
+                      }}
+                    >
+                      {design.style}/{design.palette}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
