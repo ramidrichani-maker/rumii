@@ -77,7 +77,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { action, predictionId, imageUrl, propertyId, style, palette } = body;
+    const { action, predictionId, imageUrl, propertyId, style, palette, roomType } = body;
 
     const replicate = new Replicate({ auth: REPLICATE_API_KEY });
 
@@ -138,7 +138,7 @@ serve(async (req) => {
                 .from("ai-generated")
                 .getPublicUrl(fileName);
               
-              // Save to generated images table with style and palette
+              // Save to generated images table with style, palette, and room type
               await supabase.from("property_generated_images").insert({
                 property_id: propertyId,
                 storage_path: fileName,
@@ -147,6 +147,7 @@ serve(async (req) => {
                 job_id: predictionId,
                 style: style || "modern",
                 palette: palette || "neutral",
+                room_type: roomType || null,
               });
             }
           } catch (saveErr) {
@@ -277,6 +278,7 @@ serve(async (req) => {
                 job_id: jobData.id,
                 style: style || "modern",
                 palette: palette || "neutral",
+                room_type: roomType || null,
               });
             }
           } catch (saveErr) {

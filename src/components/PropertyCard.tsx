@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, MapPin, Calendar, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bed, Bath, Square, MapPin, Calendar, Heart, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import ViewingBookingModal from "./ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +24,7 @@ interface Property {
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   user_id: string;
+  unfurnished?: boolean;
 }
 
 interface PropertyCardProps {
@@ -36,8 +37,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [hasAIDesigns, setHasAIDesigns] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Check if unfurnished property has AI designs
+  useEffect(() => {
+    if (property.unfurnished) {
+      const checkAIDesigns = async () => {
+        const { count } = await supabase
+          .from('property_generated_images')
+          .select('id', { count: 'exact', head: true })
+          .eq('property_id', property.id)
+          .eq('approved', true);
+        
+        setHasAIDesigns((count || 0) > 0);
+      };
+      checkAIDesigns();
+    }
+  }, [property.id, property.unfurnished]);
 
   useEffect(() => {
     if (user) {
@@ -163,6 +181,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
             className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
           />
         </Button>
+
+        {/* AI Staging badge for unfurnished properties */}
+        {property.unfurnished && hasAIDesigns && (
+          <Badge className="absolute top-2 left-2 z-10 bg-primary/90 text-primary-foreground flex items-center gap-1">
+            <Sparkles className="w-3 h-3" />
+            AI Staging
+          </Badge>
+        )}
         
         {/* Image navigation arrows */}
         {hasMultipleImages && (

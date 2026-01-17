@@ -38,7 +38,22 @@ interface ApprovedDesign {
   media_url: string | null;
   style: string | null;
   palette: string | null;
+  room_type: string | null;
 }
+
+const ROOM_TYPE_LABELS: Record<string, string> = {
+  bedroom: "Bedroom",
+  living_room: "Living Room",
+  salon: "Salon",
+  kitchen: "Kitchen",
+  bathroom: "Bathroom",
+  toilet: "Toilet",
+  terrace: "Terrace",
+  balcony: "Balcony",
+  glass_curtain_balcony: "Closed Glass Curtain Balcony",
+  garden: "Garden",
+};
+
 interface Property {
   id: string;
   address: string;
@@ -57,6 +72,7 @@ interface Property {
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   user_id: string;
+  unfurnished?: boolean;
 }
 
 interface PropertyDetailModalProps {
@@ -96,7 +112,7 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
     const loadApprovedDesigns = async () => {
       const { data, error } = await supabase
         .from("property_generated_images")
-        .select("id, media_url, style, palette")
+        .select("id, media_url, style, palette, room_type")
         .eq("property_id", property.id)
         .eq("approved", true);
 
@@ -345,98 +361,150 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         </div>
 
-        {/* AI Room Staging Section - Shows approved designs to customers */}
-        {!isAdmin && approvedDesigns.length > 0 && (
+        {/* AI Room Staging Section - Shows approved designs to customers for unfurnished properties */}
+        {!isAdmin && property.unfurnished && approvedDesigns.length > 0 && (
           <div className="pt-4 border-t">
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                AI Room Staging
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                See how this property could look with different furniture styles
-              </p>
-              
-              {/* Style and Palette Selection */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-sm">Design Style</Label>
-                  <Select value={selectedStyle} onValueChange={setSelectedStyle}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="modern">Modern</SelectItem>
-                      <SelectItem value="scandinavian">Scandinavian</SelectItem>
-                      <SelectItem value="industrial">Industrial</SelectItem>
-                      <SelectItem value="bohemian">Bohemian</SelectItem>
-                      <SelectItem value="mediterranean">Mediterranean</SelectItem>
-                      <SelectItem value="luxury">Luxury</SelectItem>
-                      <SelectItem value="minimalist">Minimalist</SelectItem>
-                      <SelectItem value="traditional">Traditional</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm">Color Palette</Label>
-                  <Select value={selectedPalette} onValueChange={setSelectedPalette}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="neutral">Neutral</SelectItem>
-                      <SelectItem value="warm">Warm</SelectItem>
-                      <SelectItem value="cool">Cool</SelectItem>
-                      <SelectItem value="earth">Earth Tones</SelectItem>
-                      <SelectItem value="monochrome">Monochrome</SelectItem>
-                      <SelectItem value="vibrant">Vibrant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  AI Room Staging
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  See how this unfurnished property could look with different furniture styles and colors
+                </p>
               </div>
+              
+              {/* Get unique style/palette combinations (max 3) */}
+              {(() => {
+                const uniqueCombos = Array.from(
+                  new Set(approvedDesigns.map(d => `${d.style}|${d.palette}`))
+                ).slice(0, 3).map(combo => {
+                  const [style, palette] = combo.split("|");
+                  return { style, palette };
+                });
 
-              {/* Display matching design or message */}
-              {matchingDesign && matchingDesign.media_url ? (
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
-                  <img
-                    src={matchingDesign.media_url}
-                    alt="AI Generated room design"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 left-2 bg-primary/90 text-primary-foreground px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
-                    <Sparkles className="h-3 w-3" />
-                    AI Staged
-                  </div>
-                </div>
-              ) : (
-                <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">
-                  <div className="text-center text-muted-foreground">
-                    <ImageIcon className="h-8 w-8 mx-auto mb-2" />
-                    <p className="text-sm">No design available for this style/palette combination</p>
-                    <p className="text-xs mt-1">Try selecting a different style or color palette</p>
-                  </div>
-                </div>
-              )}
+                const availableStyles = Array.from(new Set(uniqueCombos.map(c => c.style)));
+                const availablePalettes = Array.from(new Set(uniqueCombos.map(c => c.palette)));
 
-              {/* Show available combinations */}
-              {approvedDesigns.length > 1 && (
-                <div className="flex flex-wrap gap-1">
-                  <span className="text-xs text-muted-foreground">Available designs:</span>
-                  {approvedDesigns.map((design) => (
-                    <Badge 
-                      key={design.id} 
-                      variant="outline" 
-                      className="text-xs cursor-pointer hover:bg-muted"
-                      onClick={() => {
-                        if (design.style) setSelectedStyle(design.style);
-                        if (design.palette) setSelectedPalette(design.palette);
-                      }}
-                    >
-                      {design.style}/{design.palette}
-                    </Badge>
-                  ))}
-                </div>
-              )}
+                // Get designs matching current selection
+                const matchingDesigns = approvedDesigns.filter(
+                  d => d.style === selectedStyle && d.palette === selectedPalette
+                );
+
+                // Group matching designs by room type with numbering
+                const getRoomTypeLabel = (roomType: string | null, index: number, allOfType: ApprovedDesign[]) => {
+                  const label = roomType ? (ROOM_TYPE_LABELS[roomType] || roomType) : "Room";
+                  if (allOfType.length > 1) {
+                    return `${label} ${index + 1}`;
+                  }
+                  return label;
+                };
+
+                return (
+                  <>
+                    {/* Style and Palette Selection - Limited to 3 options each */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm">Design Style ({availableStyles.length} options)</Label>
+                        <Select 
+                          value={availableStyles.includes(selectedStyle) ? selectedStyle : availableStyles[0] || "modern"} 
+                          onValueChange={setSelectedStyle}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableStyles.map(style => (
+                              <SelectItem key={style} value={style}>
+                                {style.charAt(0).toUpperCase() + style.slice(1)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Color Palette ({availablePalettes.length} options)</Label>
+                        <Select 
+                          value={availablePalettes.includes(selectedPalette) ? selectedPalette : availablePalettes[0] || "neutral"} 
+                          onValueChange={setSelectedPalette}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availablePalettes.map(palette => (
+                              <SelectItem key={palette} value={palette}>
+                                {palette.charAt(0).toUpperCase() + palette.slice(1)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Display matching designs by room type */}
+                    {matchingDesigns.length > 0 ? (
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground">
+                          Showing {matchingDesigns.length} room(s) in {selectedStyle} style with {selectedPalette} palette:
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {matchingDesigns.map((design, index) => {
+                            const sameTypeDesigns = matchingDesigns.filter(d => d.room_type === design.room_type);
+                            const typeIndex = sameTypeDesigns.findIndex(d => d.id === design.id);
+                            
+                            return (
+                              <div key={design.id} className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                                <img
+                                  src={design.media_url || ""}
+                                  alt={`AI Generated ${design.room_type} design`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                                  <p className="text-white text-xs font-medium">
+                                    {getRoomTypeLabel(design.room_type, typeIndex, sameTypeDesigns)}
+                                  </p>
+                                </div>
+                                <div className="absolute top-2 left-2 bg-primary/90 text-primary-foreground px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1">
+                                  <Sparkles className="h-2.5 w-2.5" />
+                                  AI
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">
+                        <div className="text-center text-muted-foreground">
+                          <ImageIcon className="h-8 w-8 mx-auto mb-2" />
+                          <p className="text-sm">No designs available for this combination</p>
+                          <p className="text-xs mt-1">Try a different style or color palette</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Show available combinations */}
+                    <div className="flex flex-wrap gap-1 items-center">
+                      <span className="text-xs text-muted-foreground">Quick select:</span>
+                      {uniqueCombos.map((combo, idx) => (
+                        <Badge 
+                          key={idx}
+                          variant={combo.style === selectedStyle && combo.palette === selectedPalette ? "default" : "outline"}
+                          className="text-xs cursor-pointer hover:bg-primary/10"
+                          onClick={() => {
+                            setSelectedStyle(combo.style);
+                            setSelectedPalette(combo.palette);
+                          }}
+                        >
+                          {combo.style}/{combo.palette}
+                        </Badge>
+                      ))}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         )}

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, RefreshCw, Check, X, Image as ImageIcon } from "lucide-react";
+import { Loader2, Sparkles, Check, X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ interface GeneratedImage {
   media_url: string | null;
   style: string | null;
   palette: string | null;
+  room_type: string | null;
   approved: boolean;
   created_at: string;
 }
@@ -24,6 +25,7 @@ interface Property {
   address: string;
   city: string;
   images: string[] | null;
+  unfurnished: boolean;
 }
 
 const STYLES = [
@@ -46,6 +48,19 @@ const PALETTES = [
   { value: "vibrant", label: "Vibrant" },
 ];
 
+const ROOM_TYPES = [
+  { value: "bedroom", label: "Bedroom" },
+  { value: "living_room", label: "Living Room" },
+  { value: "salon", label: "Salon" },
+  { value: "kitchen", label: "Kitchen" },
+  { value: "bathroom", label: "Bathroom" },
+  { value: "toilet", label: "Toilet" },
+  { value: "terrace", label: "Terrace" },
+  { value: "balcony", label: "Balcony" },
+  { value: "glass_curtain_balcony", label: "Closed Glass Curtain Balcony" },
+  { value: "garden", label: "Garden" },
+];
+
 export default function AdminAIRoomDesigner() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
@@ -53,19 +68,21 @@ export default function AdminAIRoomDesigner() {
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
   const [style, setStyle] = useState("modern");
   const [palette, setPalette] = useState("neutral");
+  const [roomType, setRoomType] = useState("living_room");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("Starting...");
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
 
-  // Load approved properties
+  // Load unfurnished properties only
   useEffect(() => {
     const loadProperties = async () => {
       const { data, error } = await supabase
         .from("properties")
-        .select("id, address, city, images")
+        .select("id, address, city, images, unfurnished")
         .eq("status", "approved")
+        .eq("unfurnished", true)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -116,6 +133,41 @@ export default function AdminAIRoomDesigner() {
     }
   }, [selectedPropertyId, properties]);
 
+  // Get the next room type label with number if duplicate
+  const getRoomTypeLabel = (roomTypeValue: string, existingImages: GeneratedImage[]) => {
+    const sameTypeImages = existingImages.filter(img => img.room_type === roomTypeValue);
+    const roomLabel = ROOM_TYPES.find(r => r.value === roomTypeValue)?.label || roomTypeValue;
+    if (sameTypeImages.length > 0) {
+      return `${roomLabel} ${sameTypeImages.length + 1}`;
+    }
+    return roomLabel;
+  };
+
+  // Format room type display with number
+  const formatRoomTypeDisplay = (roomTypeValue: string | null, imageId: string) => {
+    if (!roomTypeValue) return "Unknown";
+    const roomLabel = ROOM_TYPES.find(r => r.value === roomTypeValue)?.label || roomTypeValue;
+    
+    // Count how many images of this type come before this one
+    const sameTypeImages = generatedImages.filter(img => img.room_type === roomTypeValue);
+    if (sameTypeImages.length > 1) {
+      const index = sameTypeImages.findIndex(img => img.id === imageId) + 1;
+      return `${roomLabel} ${index}`;
+    }
+    return roomLabel;
+  };
+
+  // Count approved designs by style/palette combination
+  const getApprovedCombinations = () => {
+    const approved = generatedImages.filter(img => img.approved);
+    const combinations: Record<string, number> = {};
+    approved.forEach(img => {
+      const key = `${img.style}/${img.palette}`;
+      combinations[key] = (combinations[key] || 0) + 1;
+    });
+    return combinations;
+  };
+
   const handleGenerate = async () => {
     if (!selectedImageUrl || !selectedPropertyId) {
       toast.error("Please select a property and image first");
@@ -147,6 +199,7 @@ export default function AdminAIRoomDesigner() {
             propertyId: selectedPropertyId,
             style,
             palette,
+            roomType,
           }),
         }
       );
@@ -161,7 +214,7 @@ export default function AdminAIRoomDesigner() {
         const output = Array.isArray(data.output) ? data.output[0] : data.output;
         setGeneratedImage(output);
         setIsGenerating(false);
-        toast.success("Room design generated successfully!");
+        toast.success(`Room design generated for ${ROOM_TYPES.find(r => r.value === roomType)?.label}!`);
       } else {
         throw new Error("Unexpected response from server");
       }
@@ -227,6 +280,8 @@ export default function AdminAIRoomDesigner() {
     }
   };
 
+  const approvedCombinations = getApprovedCombinations();
+
   return (
     <div className="space-y-6">
       {/* Property Selection */}
@@ -234,29 +289,55 @@ export default function AdminAIRoomDesigner() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            AI Room Designer
+            AI Room Designer for Unfurnished Properties
           </CardTitle>
           <CardDescription>
-            Generate AI-furnished room designs for properties. Approved designs will be shown to customers.
+            Generate AI-furnished room designs for unfurnished properties. Select the room type for each image.
+            Approved designs will be shown to customers who can choose from up to 3 style/palette combinations.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Property Selector */}
           <div className="space-y-2">
-            <Label>Select Property</Label>
+            <Label>Select Unfurnished Property</Label>
             <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
               <SelectTrigger>
-                <SelectValue placeholder="Choose a property..." />
+                <SelectValue placeholder="Choose an unfurnished property..." />
               </SelectTrigger>
               <SelectContent>
-                {properties.map((property) => (
-                  <SelectItem key={property.id} value={property.id}>
-                    {property.address}, {property.city}
-                  </SelectItem>
-                ))}
+                {properties.length === 0 ? (
+                  <div className="p-2 text-center text-muted-foreground text-sm">
+                    No unfurnished properties found
+                  </div>
+                ) : (
+                  properties.map((property) => (
+                    <SelectItem key={property.id} value={property.id}>
+                      {property.address}, {property.city}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
+
+          {/* Show approved combinations summary */}
+          {selectedPropertyId && Object.keys(approvedCombinations).length > 0 && (
+            <div className="p-3 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">Approved Style/Palette Combinations:</p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(approvedCombinations).map(([combo, count]) => (
+                  <Badge key={combo} variant="secondary">
+                    {combo}: {count} room(s)
+                  </Badge>
+                ))}
+              </div>
+              {Object.keys(approvedCombinations).length >= 3 && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  ✓ 3 combinations available for customers
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Image Selection */}
           {selectedProperty && selectedProperty.images && selectedProperty.images.length > 0 && (
@@ -287,10 +368,25 @@ export default function AdminAIRoomDesigner() {
             </div>
           )}
 
-          {/* Style and Palette Selection */}
+          {/* Room Type, Style and Palette Selection */}
           {selectedImageUrl && (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Room Type *</Label>
+                  <Select value={roomType} onValueChange={setRoomType} disabled={isGenerating}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROOM_TYPES.map((r) => (
+                        <SelectItem key={r.value} value={r.value}>
+                          {r.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="space-y-2">
                   <Label>Design Style</Label>
                   <Select value={style} onValueChange={setStyle} disabled={isGenerating}>
@@ -336,7 +432,7 @@ export default function AdminAIRoomDesigner() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Generated Design</Label>
+                  <Label>Generated Design ({ROOM_TYPES.find(r => r.value === roomType)?.label})</Label>
                   <div className="relative aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center">
                     {generatedImage ? (
                       <img
@@ -374,7 +470,7 @@ export default function AdminAIRoomDesigner() {
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Design
+                    Generate {ROOM_TYPES.find(r => r.value === roomType)?.label} Design
                   </>
                 )}
               </Button>
@@ -392,7 +488,7 @@ export default function AdminAIRoomDesigner() {
               Generated Designs for This Property
             </CardTitle>
             <CardDescription>
-              Approve designs to make them visible to customers. Customers will see designs matching their selected style and palette.
+              Approve designs to make them visible to customers. Create at least 3 different style/palette combinations for variety.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -414,10 +510,15 @@ export default function AdminAIRoomDesigner() {
                         alt="Generated design"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute top-2 left-2 flex gap-1">
+                      <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
                         <Badge variant={img.approved ? "default" : "secondary"}>
                           {img.approved ? "Approved" : "Pending"}
                         </Badge>
+                        {img.room_type && (
+                          <Badge variant="outline" className="bg-background/80">
+                            {formatRoomTypeDisplay(img.room_type, img.id)}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <div className="p-3 space-y-2">
