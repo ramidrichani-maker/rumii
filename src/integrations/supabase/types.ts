@@ -604,8 +604,10 @@ export type Database = {
           job_id: string | null
           media_url: string | null
           mime_type: string | null
+          palette: string | null
           property_id: string
           storage_path: string
+          style: string | null
           width: number | null
         }
         Insert: {
@@ -617,8 +619,10 @@ export type Database = {
           job_id?: string | null
           media_url?: string | null
           mime_type?: string | null
+          palette?: string | null
           property_id: string
           storage_path: string
+          style?: string | null
           width?: number | null
         }
         Update: {
@@ -630,8 +634,10 @@ export type Database = {
           job_id?: string | null
           media_url?: string | null
           mime_type?: string | null
+          palette?: string | null
           property_id?: string
           storage_path?: string
+          style?: string | null
           width?: number | null
         }
         Relationships: [

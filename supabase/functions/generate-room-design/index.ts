@@ -45,6 +45,32 @@ serve(async (req) => {
     const userId = claimsData.claims.sub as string;
     console.log(`Room design request from user: ${userId}`);
 
+    // Create service role client for admin check and operations
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Check if user is admin - ONLY admins can generate AI designs
+    const { data: isAdmin, error: roleError } = await supabaseService
+      .rpc("has_role", { _user_id: userId, _role: "admin" });
+
+    if (roleError) {
+      console.error("Error checking admin role:", roleError);
+      return new Response(
+        JSON.stringify({ error: "Failed to verify permissions" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!isAdmin) {
+      console.error("Unauthorized: User", userId, "is not an admin");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized: Only admins can generate AI room designs" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log("Admin role verified for user:", userId);
+
     const REPLICATE_API_KEY = Deno.env.get("REPLICATE_API_KEY");
     if (!REPLICATE_API_KEY) {
       throw new Error("REPLICATE_API_KEY is not configured");
@@ -55,12 +81,11 @@ serve(async (req) => {
 
     const replicate = new Replicate({ auth: REPLICATE_API_KEY });
 
-    // Validate property ownership BEFORE using service role (skip for status checks)
-    // Validate property ownership BEFORE using service role
+    // Verify property exists
     if (propertyId) {
-      const { data: property, error: propError } = await supabaseAuth
+      const { data: property, error: propError } = await supabaseService
         .from("properties")
-        .select("id, user_id")
+        .select("id")
         .eq("id", propertyId)
         .single();
 
@@ -72,19 +97,11 @@ serve(async (req) => {
         );
       }
 
-      if (property.user_id !== userId) {
-        console.error("Unauthorized: User", userId, "does not own property", propertyId);
-        return new Response(
-          JSON.stringify({ error: "Unauthorized: You do not own this property" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      console.log("Property ownership verified for property:", propertyId);
+      console.log("Property verified:", propertyId);
     }
 
-    // Now safe to proceed with service role
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Use service role client for all operations
+    const supabase = supabaseService;
 
     // Check prediction status
     if (action === "status" && predictionId) {
@@ -121,13 +138,15 @@ serve(async (req) => {
                 .from("ai-generated")
                 .getPublicUrl(fileName);
               
-              // Save to generated images table
+              // Save to generated images table with style and palette
               await supabase.from("property_generated_images").insert({
                 property_id: propertyId,
                 storage_path: fileName,
                 media_url: urlData?.publicUrl || outputUrls[i],
                 created_by: userId,
                 job_id: predictionId,
+                style: style || "modern",
+                palette: palette || "neutral",
               });
             }
           } catch (saveErr) {
@@ -256,6 +275,8 @@ serve(async (req) => {
                 media_url: urlData?.publicUrl || outputUrls[i],
                 created_by: userId,
                 job_id: jobData.id,
+                style: style || "modern",
+                palette: palette || "neutral",
               });
             }
           } catch (saveErr) {
