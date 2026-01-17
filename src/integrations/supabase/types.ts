@@ -606,6 +606,7 @@ export type Database = {
           mime_type: string | null
           palette: string | null
           property_id: string
+          room_type: string | null
           storage_path: string
           style: string | null
           width: number | null
@@ -621,6 +622,7 @@ export type Database = {
           mime_type?: string | null
           palette?: string | null
           property_id: string
+          room_type?: string | null
           storage_path: string
           style?: string | null
           width?: number | null
@@ -636,6 +638,7 @@ export type Database = {
           mime_type?: string | null
           palette?: string | null
           property_id?: string
+          room_type?: string | null
           storage_path?: string
           style?: string | null
           width?: number | null
