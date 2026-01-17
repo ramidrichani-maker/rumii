@@ -54,6 +54,36 @@ serve(async (req) => {
     const { action, predictionId, imageUrl, propertyId, style, palette } = body;
 
     const replicate = new Replicate({ auth: REPLICATE_API_KEY });
+
+    // Validate property ownership BEFORE using service role (skip for status checks)
+    // Validate property ownership BEFORE using service role
+    if (propertyId) {
+      const { data: property, error: propError } = await supabaseAuth
+        .from("properties")
+        .select("id, user_id")
+        .eq("id", propertyId)
+        .single();
+
+      if (propError || !property) {
+        console.error("Property not found:", propertyId, propError);
+        return new Response(
+          JSON.stringify({ error: "Property not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (property.user_id !== userId) {
+        console.error("Unauthorized: User", userId, "does not own property", propertyId);
+        return new Response(
+          JSON.stringify({ error: "Unauthorized: You do not own this property" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      console.log("Property ownership verified for property:", propertyId);
+    }
+
+    // Now safe to proceed with service role
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check prediction status
