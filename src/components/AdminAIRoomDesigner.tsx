@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Loader2, Sparkles, Check, X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -72,8 +73,10 @@ export default function AdminAIRoomDesigner() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("Starting...");
+  const [progressPercent, setProgressPercent] = useState(0);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load unfurnished properties only
   useEffect(() => {
@@ -177,7 +180,13 @@ export default function AdminAIRoomDesigner() {
     try {
       setIsGenerating(true);
       setGeneratedImage(null);
-      setProgress("Generating design...");
+      setProgress("Initializing AI...");
+      setProgressPercent(0);
+
+      // Clear any existing interval
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
 
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -186,8 +195,29 @@ export default function AdminAIRoomDesigner() {
         return;
       }
 
+      // Progress steps with timing
+      const progressSteps = [
+        { text: "Initializing AI...", percent: 5 },
+        { text: "Analyzing room layout...", percent: 15 },
+        { text: "Understanding room dimensions...", percent: 25 },
+        { text: "Applying design style...", percent: 40 },
+        { text: "Generating furniture placement...", percent: 55 },
+        { text: "Adding decor and accessories...", percent: 70 },
+        { text: "Enhancing lighting and shadows...", percent: 82 },
+        { text: "Finalizing high-resolution image...", percent: 92 },
+      ];
+
+      let stepIndex = 0;
+      progressIntervalRef.current = setInterval(() => {
+        if (stepIndex < progressSteps.length) {
+          setProgress(progressSteps[stepIndex].text);
+          setProgressPercent(progressSteps[stepIndex].percent);
+          stepIndex++;
+        }
+      }, 2000);
+
       const response = await fetch(
-        "https://kubhguqlihooofnyvdpq.supabase.co/functions/v1/generate-room-design",
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-room-design`,
         {
           method: "POST",
           headers: {
@@ -204,24 +234,47 @@ export default function AdminAIRoomDesigner() {
         }
       );
 
+      // Clear the progress interval
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+
       const data = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
+      if (!response.ok || data.error) {
+        throw new Error(data.error || `Server error: ${response.status}`);
       }
 
       if (data.status === "succeeded" && data.output) {
         const output = Array.isArray(data.output) ? data.output[0] : data.output;
+        setProgressPercent(100);
+        setProgress("Complete!");
         setGeneratedImage(output);
         setIsGenerating(false);
         toast.success(`Room design generated for ${ROOM_TYPES.find(r => r.value === roomType)?.label}!`);
+        
+        // Refresh the generated images list
+        const { data: newImages } = await supabase
+          .from("property_generated_images")
+          .select("*")
+          .eq("property_id", selectedPropertyId)
+          .order("created_at", { ascending: false });
+        if (newImages) setGeneratedImages(newImages);
       } else {
         throw new Error("Unexpected response from server");
       }
     } catch (error) {
+      // Clear the progress interval on error
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
       console.error("Error generating design:", error);
       toast.error(error instanceof Error ? error.message : "Failed to generate design");
       setIsGenerating(false);
+      setProgress("Failed");
+      setProgressPercent(0);
     }
   };
 
@@ -441,9 +494,11 @@ export default function AdminAIRoomDesigner() {
                         className="w-full h-full object-cover"
                       />
                     ) : isGenerating ? (
-                      <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground mt-2">{progress}</p>
+                      <div className="text-center px-6 w-full">
+                        <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary mb-3" />
+                        <p className="text-sm font-medium text-foreground mb-2">{progress}</p>
+                        <Progress value={progressPercent} className="h-2 mb-1" />
+                        <p className="text-xs text-muted-foreground">{progressPercent}% complete</p>
                       </div>
                     ) : (
                       <div className="text-center text-muted-foreground">
