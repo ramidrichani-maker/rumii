@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import Replicate from "https://esm.sh/replicate@0.25.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,6 +24,11 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    
+    if (!lovableApiKey) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
     
     // Validate user token
     const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
@@ -70,15 +74,8 @@ serve(async (req) => {
 
     console.log("Admin role verified for user:", userId);
 
-    const REPLICATE_API_KEY = Deno.env.get("REPLICATE_API_KEY");
-    if (!REPLICATE_API_KEY) {
-      throw new Error("REPLICATE_API_KEY is not configured");
-    }
-
     const body = await req.json();
-    const { action, predictionId, imageUrl, propertyId, style, palette, roomType } = body;
-
-    const replicate = new Replicate({ auth: REPLICATE_API_KEY });
+    const { imageUrl, propertyId, style, palette, roomType } = body;
 
     // Verify property exists
     if (propertyId) {
@@ -102,72 +99,6 @@ serve(async (req) => {
     // Use service role client for all operations
     const supabase = supabaseService;
 
-    // Check prediction status
-    if (action === "status" && predictionId) {
-      console.log("Checking status for prediction:", predictionId);
-      const prediction = await replicate.predictions.get(predictionId);
-      
-      // If completed, save to database and storage
-      if (prediction.status === "succeeded" && prediction.output) {
-        const outputUrls = Array.isArray(prediction.output) ? prediction.output : [prediction.output];
-        
-        // Update job status
-        await supabase
-          .from("property_ai_jobs")
-          .update({
-            status: "completed",
-            replicate_output_urls: outputUrls,
-          })
-          .eq("replicate_run_id", predictionId);
-
-        // Download and save generated images to storage
-        for (let i = 0; i < outputUrls.length; i++) {
-          try {
-            const imgResponse = await fetch(outputUrls[i]);
-            const imgBlob = await imgResponse.blob();
-            const fileName = `${propertyId}/${Date.now()}_${i}.png`;
-            
-            const { error: uploadError } = await supabase.storage
-              .from("ai-generated")
-              .upload(fileName, imgBlob, { contentType: "image/png" });
-            
-            if (!uploadError) {
-              // Get public URL
-              const { data: urlData } = supabase.storage
-                .from("ai-generated")
-                .getPublicUrl(fileName);
-              
-              // Save to generated images table with style, palette, and room type
-              await supabase.from("property_generated_images").insert({
-                property_id: propertyId,
-                storage_path: fileName,
-                media_url: urlData?.publicUrl || outputUrls[i],
-                created_by: userId,
-                job_id: predictionId,
-                style: style || "modern",
-                palette: palette || "neutral",
-                room_type: roomType || null,
-              });
-            }
-          } catch (saveErr) {
-            console.error("Error saving generated image:", saveErr);
-          }
-        }
-      } else if (prediction.status === "failed") {
-        await supabase
-          .from("property_ai_jobs")
-          .update({
-            status: "failed",
-            error_message: prediction.error || "Generation failed",
-          })
-          .eq("replicate_run_id", predictionId);
-      }
-      
-      return new Response(JSON.stringify(prediction), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     // Start new generation
     if (!imageUrl) {
       return new Response(
@@ -178,29 +109,51 @@ serve(async (req) => {
 
     // Build prompt based on style and palette
     const stylePrompts: Record<string, string> = {
-      modern: "modern minimalist interior design, clean lines, neutral colors, contemporary furniture",
-      scandinavian: "scandinavian interior design, light wood, white walls, cozy textiles, hygge style",
-      industrial: "industrial loft interior design, exposed brick, metal accents, raw materials",
-      bohemian: "bohemian interior design, colorful patterns, plants, eclectic furniture, artistic",
-      mediterranean: "mediterranean interior design, terracotta, arched doorways, warm earth tones",
-      luxury: "luxury high-end interior design, marble, gold accents, designer furniture, opulent",
-      minimalist: "minimalist interior design, white space, essential furniture only, zen-like",
-      traditional: "traditional classic interior design, elegant furniture, rich fabrics, warm tones",
+      modern: "modern minimalist interior design with clean lines, neutral colors, and contemporary furniture",
+      scandinavian: "Scandinavian interior design with light wood, white walls, cozy textiles, and hygge aesthetics",
+      industrial: "industrial loft interior design with exposed brick, metal accents, and raw materials",
+      bohemian: "bohemian eclectic interior design with colorful textiles, plants, and layered patterns",
+      mediterranean: "Mediterranean interior design with terracotta, natural textures, arched doorways, and warm tones",
+      luxury: "luxury high-end interior design with marble, gold accents, designer furniture, and opulent details",
+      minimalist: "minimalist interior design with white space, essential furniture only, and zen-like atmosphere",
+      traditional: "traditional classic interior design with elegant furniture, rich fabrics, and warm tones",
+      coastal: "coastal beach house interior design with light blues, whites, natural textures, and ocean-inspired decor",
+      japandi: "Japandi interior design blending Japanese minimalism with Scandinavian functionality and natural materials",
+      artdeco: "Art Deco interior design with geometric patterns, bold colors, luxurious materials, and glamorous accents",
     };
 
     const palettePrompts: Record<string, string> = {
-      neutral: "neutral color palette, beige, cream, gray, white tones",
-      warm: "warm color palette, terracotta, rust, amber, golden tones",
-      cool: "cool color palette, blues, greens, gray-blue tones",
-      earth: "earthy color palette, browns, greens, natural tones",
-      monochrome: "monochromatic color scheme, shades of gray and black",
-      vibrant: "vibrant colorful palette, bold accent colors",
+      neutral: "neutral color palette with beige, cream, taupe, and soft grays",
+      warm: "warm color palette with terracotta, burnt orange, warm browns, and golden yellows",
+      cool: "cool color palette with blues, greens, and soft purples",
+      earth: "earthy color palette with olive green, rust, brown, and sand tones",
+      monochrome: "monochromatic black, white, and gray color scheme",
+      vibrant: "vibrant colorful palette with bold accent colors and striking contrasts",
+      pastel: "soft pastel color palette with blush pink, mint green, and lavender",
+      natural: "natural organic color palette inspired by wood, stone, and foliage",
+    };
+
+    const roomTypePrompts: Record<string, string> = {
+      living: "living room with comfortable seating, coffee table, and entertainment area",
+      bedroom: "bedroom with bed, nightstands, and cozy sleeping space",
+      kitchen: "kitchen with modern appliances, countertops, and dining area",
+      bathroom: "bathroom with elegant fixtures, vanity, and spa-like atmosphere",
+      dining: "dining room with dining table, chairs, and ambient lighting",
+      office: "home office with desk, chair, shelving, and productive workspace",
+      outdoor: "outdoor patio or balcony with comfortable seating and plants",
     };
 
     const selectedStyle = stylePrompts[style] || stylePrompts.modern;
     const selectedPalette = palettePrompts[palette] || palettePrompts.neutral;
+    const selectedRoom = roomTypePrompts[roomType || "living"] || roomTypePrompts.living;
 
-    const prompt = `Transform this room into a beautifully furnished space with ${selectedStyle}. Use ${selectedPalette}. Professional interior photography, realistic lighting.`;
+    const prompt = `Transform this empty unfurnished room into a beautifully designed ${selectedRoom}. 
+Apply ${selectedStyle} with a ${selectedPalette}. 
+The room should look professionally staged, warm, and inviting. 
+Maintain the same room structure, windows, and architectural features but add appropriate furniture, 
+decor, lighting, and accessories that match the design style. 
+Make it photorealistic and suitable for a real estate listing.
+Ultra high resolution, professional interior photography.`;
 
     console.log("Starting room design generation with prompt:", prompt);
 
@@ -223,79 +176,160 @@ serve(async (req) => {
     }
 
     try {
-      // Use adirik/interior-design model for room transformation
-      const output = await replicate.run(
-        "adirik/interior-design:76604baddc85b1b4616e1c6475eca080da339c8875bd4996705440484a6eac38",
-        {
-          input: {
-            image: imageUrl,
-            prompt: prompt,
-            guidance_scale: 15,
-            negative_prompt: "lowres, watermark, banner, logo, contactinfo, text, deformed, blurry, blur, out of focus, out of frame, surreal, ugly",
-            prompt_strength: 0.8,
-            num_inference_steps: 50,
-          },
+      // Call Lovable AI Gateway with image editing capability
+      console.log("Calling Lovable AI Gateway...");
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${lovableApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-image-preview",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: prompt,
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: imageUrl,
+                  },
+                },
+              ],
+            },
+          ],
+          modalities: ["image", "text"],
+        }),
+      });
+
+      if (!aiResponse.ok) {
+        if (aiResponse.status === 429) {
+          // Update job status to failed
+          if (jobData) {
+            await supabase
+              .from("property_ai_jobs")
+              .update({ 
+                status: "failed",
+                error_message: "Rate limit exceeded",
+              })
+              .eq("id", jobData.id);
+          }
+          return new Response(
+            JSON.stringify({ error: "Rate limit exceeded. Please try again in a few moments." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
-      );
+        if (aiResponse.status === 402) {
+          // Update job status to failed
+          if (jobData) {
+            await supabase
+              .from("property_ai_jobs")
+              .update({ 
+                status: "failed",
+                error_message: "AI credits exhausted",
+              })
+              .eq("id", jobData.id);
+          }
+          return new Response(
+            JSON.stringify({ error: "AI credits exhausted. Please add funds to your Lovable workspace." }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const errorText = await aiResponse.text();
+        console.error("AI Gateway error:", aiResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${aiResponse.status} - ${errorText}`);
+      }
 
-      console.log("Generation completed:", output);
+      const aiData = await aiResponse.json();
+      console.log("AI Response received");
 
-      const outputUrls = Array.isArray(output) ? output : [output];
+      // Extract the generated image from the response
+      const generatedImageBase64 = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
       
+      if (!generatedImageBase64) {
+        console.error("No image in AI response:", JSON.stringify(aiData).substring(0, 1000));
+        throw new Error("No image generated by AI. The model may not have produced an image for this request.");
+      }
+
+      // Convert base64 to blob for storage
+      const base64Data = generatedImageBase64.replace(/^data:image\/\w+;base64,/, "");
+      const imageBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const fileName = `${propertyId}/${style || 'modern'}_${palette || 'neutral'}_${roomType || 'living'}_${timestamp}.png`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from("ai-generated")
+        .upload(fileName, imageBytes, {
+          contentType: "image/png",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        throw new Error(`Failed to upload image: ${uploadError.message}`);
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("ai-generated")
+        .getPublicUrl(fileName);
+
+      const publicUrl = urlData?.publicUrl;
+      console.log("Image uploaded:", publicUrl);
+
       // Update job with results
       if (jobData) {
         await supabase
           .from("property_ai_jobs")
           .update({ 
-            replicate_run_id: jobData.id,
             status: "completed",
-            replicate_output_urls: outputUrls,
+            replicate_output_urls: [publicUrl],
           })
           .eq("id", jobData.id);
-
-        // Save generated images
-        for (let i = 0; i < outputUrls.length; i++) {
-          try {
-            const imgResponse = await fetch(outputUrls[i]);
-            const imgBlob = await imgResponse.blob();
-            const fileName = `${propertyId}/${Date.now()}_${i}.png`;
-            
-            const { error: uploadError } = await supabase.storage
-              .from("ai-generated")
-              .upload(fileName, imgBlob, { contentType: "image/png" });
-            
-            if (!uploadError) {
-              const { data: urlData } = supabase.storage
-                .from("ai-generated")
-                .getPublicUrl(fileName);
-              
-              await supabase.from("property_generated_images").insert({
-                property_id: propertyId,
-                storage_path: fileName,
-                media_url: urlData?.publicUrl || outputUrls[i],
-                created_by: userId,
-                job_id: jobData.id,
-                style: style || "modern",
-                palette: palette || "neutral",
-                room_type: roomType || null,
-              });
-            }
-          } catch (saveErr) {
-            console.error("Error saving generated image:", saveErr);
-          }
-        }
       }
+
+      // Save to generated images table
+      const { data: savedImage, error: saveError } = await supabase
+        .from("property_generated_images")
+        .insert({
+          property_id: propertyId,
+          storage_path: fileName,
+          media_url: publicUrl,
+          created_by: userId,
+          job_id: jobData?.id,
+          style: style || "modern",
+          palette: palette || "neutral",
+          room_type: roomType || "living",
+          approved: false,
+        })
+        .select()
+        .single();
+
+      if (saveError) {
+        console.error("Database save error:", saveError);
+      }
+
+      console.log("Image saved to database:", savedImage?.id);
 
       return new Response(
         JSON.stringify({
           status: "succeeded",
-          output: outputUrls,
+          output: [publicUrl],
           jobId: jobData?.id,
+          imageId: savedImage?.id,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    } catch (replicateError) {
-      console.error("Replicate API error:", replicateError);
+    } catch (aiError) {
+      console.error("AI Generation error:", aiError);
       
       // Update job status to failed
       if (jobData) {
@@ -303,12 +337,12 @@ serve(async (req) => {
           .from("property_ai_jobs")
           .update({ 
             status: "failed",
-            error_message: replicateError instanceof Error ? replicateError.message : "Unknown error",
+            error_message: aiError instanceof Error ? aiError.message : "Unknown error",
           })
           .eq("id", jobData.id);
       }
       
-      throw replicateError;
+      throw aiError;
     }
   } catch (error) {
     console.error("Error in generate-room-design:", error);
