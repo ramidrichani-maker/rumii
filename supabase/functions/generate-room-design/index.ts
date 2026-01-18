@@ -46,7 +46,6 @@ serve(async (req) => {
     console.log(`Room design request from user: ${userId}`);
 
     // Create service role client for admin check and operations
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check if user is admin - ONLY admins can generate AI designs
