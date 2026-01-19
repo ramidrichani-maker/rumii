@@ -75,7 +75,7 @@ serve(async (req) => {
     console.log("Admin role verified for user:", userId);
 
     const body = await req.json();
-    const { imageUrl, propertyId, style, palette, roomType } = body;
+    const { imageUrl, propertyId, style, palette, roomType, adminNotes } = body;
 
     // Verify property exists
     if (propertyId) {
@@ -147,7 +147,8 @@ serve(async (req) => {
     const selectedPalette = palettePrompts[palette] || palettePrompts.neutral;
     const selectedRoom = roomTypePrompts[roomType || "living"] || roomTypePrompts.living;
 
-    const prompt = `Transform this empty unfurnished room into a beautifully designed ${selectedRoom}. 
+    // Build the main prompt
+    let prompt = `Transform this empty unfurnished room into a beautifully designed ${selectedRoom}. 
 Apply ${selectedStyle} with a ${selectedPalette}. 
 
 CRITICAL CONSTRAINTS - DO NOT MODIFY:
@@ -162,7 +163,17 @@ YOU MAY ONLY:
 - Add decor items (art, plants, rugs, curtains)
 - Add lighting fixtures (lamps, ceiling lights)
 - Enhance wall colors/textures within the style
-- Add accessories that match the design aesthetic
+- Add accessories that match the design aesthetic`;
+
+    // Add admin custom instructions if provided
+    if (adminNotes && adminNotes.trim()) {
+      prompt += `
+
+ADDITIONAL SPECIFIC INSTRUCTIONS FROM ADMIN:
+${adminNotes.trim()}`;
+    }
+
+    prompt += `
 
 The room should look professionally staged, warm, and inviting.
 Make it photorealistic and suitable for a real estate listing.
