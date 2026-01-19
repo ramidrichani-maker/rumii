@@ -149,9 +149,22 @@ serve(async (req) => {
 
     const prompt = `Transform this empty unfurnished room into a beautifully designed ${selectedRoom}. 
 Apply ${selectedStyle} with a ${selectedPalette}. 
-The room should look professionally staged, warm, and inviting. 
-Maintain the same room structure, windows, and architectural features but add appropriate furniture, 
-decor, lighting, and accessories that match the design style. 
+
+CRITICAL CONSTRAINTS - DO NOT MODIFY:
+- Keep ALL windows in their EXACT original positions, sizes, and shapes
+- Keep ALL doors in their EXACT original positions and sizes  
+- Keep ALL walls, corners, and room dimensions EXACTLY as shown
+- Keep the floor plan and ceiling structure unchanged
+- Keep any architectural features (columns, beams, alcoves) in place
+
+YOU MAY ONLY:
+- Add furniture appropriate for the room type
+- Add decor items (art, plants, rugs, curtains)
+- Add lighting fixtures (lamps, ceiling lights)
+- Enhance wall colors/textures within the style
+- Add accessories that match the design aesthetic
+
+The room should look professionally staged, warm, and inviting.
 Make it photorealistic and suitable for a real estate listing.
 Ultra high resolution, professional interior photography.`;
 
