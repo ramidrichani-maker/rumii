@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -70,6 +71,7 @@ export default function AdminAIRoomDesigner() {
   const [style, setStyle] = useState("modern");
   const [palette, setPalette] = useState("neutral");
   const [roomType, setRoomType] = useState("living_room");
+  const [adminNotes, setAdminNotes] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("Starting...");
@@ -230,6 +232,7 @@ export default function AdminAIRoomDesigner() {
             style,
             palette,
             roomType,
+            adminNotes: adminNotes.trim() || undefined,
           }),
         }
       );
@@ -472,7 +475,20 @@ export default function AdminAIRoomDesigner() {
                 </div>
               </div>
 
-              {/* Preview and Generate */}
+              {/* Admin Notes/Instructions */}
+              <div className="space-y-2">
+                <Label>Custom Instructions for AI (Optional)</Label>
+                <Textarea 
+                  placeholder="Add specific instructions for the AI, e.g., 'Add a large L-shaped sofa facing the window', 'Include warm pendant lighting above the dining area', 'Make sure to add plants near the balcony door'..."
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  disabled={isGenerating}
+                  className="min-h-[80px]"
+                />
+                <p className="text-xs text-muted-foreground">
+                  These notes will guide the AI in generating the design. Be specific about furniture placement, lighting, or any particular elements you want included.
+                </p>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Original Image</Label>
