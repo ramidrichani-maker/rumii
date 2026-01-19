@@ -111,26 +111,13 @@ serve(async (req) => {
     const stylePrompts: Record<string, string> = {
       modern: "modern minimalist interior design with clean lines, neutral colors, and contemporary furniture",
       scandinavian: "Scandinavian interior design with light wood, white walls, cozy textiles, and hygge aesthetics",
-      industrial: "industrial loft interior design with exposed brick, metal accents, and raw materials",
-      bohemian: "bohemian eclectic interior design with colorful textiles, plants, and layered patterns",
-      mediterranean: "Mediterranean interior design with terracotta, natural textures, arched doorways, and warm tones",
       luxury: "luxury high-end interior design with marble, gold accents, designer furniture, and opulent details",
-      minimalist: "minimalist interior design with white space, essential furniture only, and zen-like atmosphere",
-      traditional: "traditional classic interior design with elegant furniture, rich fabrics, and warm tones",
-      coastal: "coastal beach house interior design with light blues, whites, natural textures, and ocean-inspired decor",
-      japandi: "Japandi interior design blending Japanese minimalism with Scandinavian functionality and natural materials",
-      artdeco: "Art Deco interior design with geometric patterns, bold colors, luxurious materials, and glamorous accents",
     };
 
     const palettePrompts: Record<string, string> = {
       neutral: "neutral color palette with beige, cream, taupe, and soft grays",
       warm: "warm color palette with terracotta, burnt orange, warm browns, and golden yellows",
       cool: "cool color palette with blues, greens, and soft purples",
-      earth: "earthy color palette with olive green, rust, brown, and sand tones",
-      monochrome: "monochromatic black, white, and gray color scheme",
-      vibrant: "vibrant colorful palette with bold accent colors and striking contrasts",
-      pastel: "soft pastel color palette with blush pink, mint green, and lavender",
-      natural: "natural organic color palette inspired by wood, stone, and foliage",
     };
 
     const roomTypePrompts: Record<string, string> = {
@@ -151,21 +138,36 @@ serve(async (req) => {
     let prompt = `Transform this empty unfurnished room into a beautifully designed ${selectedRoom}. 
 Apply ${selectedStyle} with a ${selectedPalette}. 
 
-CRITICAL CONSTRAINTS - DO NOT MODIFY:
-- Keep ALL windows in their EXACT original positions, sizes, and shapes
-- Keep ALL doors in their EXACT original positions and sizes  
-- Keep ALL walls, corners, and room dimensions EXACTLY as shown
-- Keep the floor plan and ceiling structure unchanged
-- Keep any architectural features (columns, beams, alcoves) in place
+ABSOLUTE REQUIREMENTS - THE ROOM STRUCTURE IS SACRED:
+- The room layout, dimensions, and structure must remain EXACTLY as shown in the original image
+- DO NOT move, resize, reshape, or alter ANY windows - keep them in their exact positions
+- DO NOT move, resize, or alter ANY doors - keep them in their exact positions  
+- DO NOT change wall positions, angles, or room shape
+- DO NOT alter the ceiling height, shape, or any ceiling features
+- DO NOT modify floor dimensions or room proportions
+- DO NOT change any architectural elements (columns, beams, alcoves, niches)
+- The perspective and camera angle must match the original exactly
 
-YOU MAY ONLY:
-- Add furniture appropriate for the room type
-- Add decor items (art, plants, rugs, curtains)
-- Add lighting fixtures (lamps, ceiling lights)
-- Enhance wall colors/textures within the style
-- Add accessories that match the design aesthetic`;
+YOU ARE ONLY ALLOWED TO ADD:
+- Furniture appropriate for the room type (beds, sofas, tables, chairs, etc.)
+- Decor items (artwork, plants, rugs, curtains, cushions)
+- Lighting fixtures (floor lamps, table lamps, pendant lights, ceiling fixtures)
+- Wall treatments (paint colors, wallpaper) that match the style
+- Accessories and styling elements that complement the design`;
 
     // Add admin custom instructions if provided
+    if (adminNotes && adminNotes.trim()) {
+      prompt += `
+
+ADDITIONAL SPECIFIC INSTRUCTIONS FROM ADMIN:
+${adminNotes.trim()}`;
+    }
+
+    prompt += `
+
+The final result must look like the SAME room with furniture and decor added.
+Make it photorealistic, professionally staged, warm and inviting.
+Suitable for a real estate listing. Ultra high resolution, professional interior photography.`;
     if (adminNotes && adminNotes.trim()) {
       prompt += `
 

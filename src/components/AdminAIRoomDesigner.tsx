@@ -33,21 +33,13 @@ interface Property {
 const STYLES = [
   { value: "modern", label: "Modern" },
   { value: "scandinavian", label: "Scandinavian" },
-  { value: "industrial", label: "Industrial" },
-  { value: "bohemian", label: "Bohemian" },
-  { value: "mediterranean", label: "Mediterranean" },
   { value: "luxury", label: "Luxury" },
-  { value: "minimalist", label: "Minimalist" },
-  { value: "traditional", label: "Traditional" },
 ];
 
 const PALETTES = [
   { value: "neutral", label: "Neutral" },
   { value: "warm", label: "Warm" },
   { value: "cool", label: "Cool" },
-  { value: "earth", label: "Earth Tones" },
-  { value: "monochrome", label: "Monochrome" },
-  { value: "vibrant", label: "Vibrant" },
 ];
 
 const ROOM_TYPES = [
