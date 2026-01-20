@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2 } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2, ListChecks } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
@@ -23,6 +23,7 @@ import { ServicePricingManager } from "@/components/ServicePricingManager";
 import { AdminPropertyForm } from "@/components/AdminPropertyForm";
 import { BulkPropertyImport } from "@/components/BulkPropertyImport";
 import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
+import { AdminPropertyListingsManager } from "@/components/AdminPropertyListingsManager";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -405,10 +406,14 @@ const AdminDashboard = () => {
               Property Management
             </h2>
             <Tabs defaultValue="properties" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-8">
+              <TabsList className="grid w-full grid-cols-9">
                 <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Home className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Pending</span>
+                </TabsTrigger>
+                <TabsTrigger value="all-listings" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <ListChecks className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">All</span>
                 </TabsTrigger>
                 <TabsTrigger value="add-property" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -490,6 +495,12 @@ const AdminDashboard = () => {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="all-listings">
+                <div className="max-h-[600px] overflow-y-auto">
+                  <AdminPropertyListingsManager />
+                </div>
               </TabsContent>
 
               <TabsContent value="add-property">
