@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,8 @@ import PropertyDetailModal from "@/components/PropertyDetailModal";
 import RangeSlider from "@/components/RangeSlider";
 import PropertyCard from "@/components/PropertyCard";
 import ScrollReveal from "@/components/ScrollReveal";
+import { usePolygonFilter } from "@/hooks/usePolygonFilter";
+
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
   { id: "house", name: "House", icon: Home },
@@ -22,6 +24,7 @@ const propertyTypes = [
   { id: "duplex", name: "Duplex", icon: Building },
   { id: "loft", name: "Loft", icon: Sofa },
 ];
+
 const amenities = [
   "Swimming Pool", "Gym", "Parking", "Balcony", "Garden", 
   "Air Conditioning", "Heating", "Internet", "Security", 
@@ -41,6 +44,9 @@ const Rent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
+
   const togglePropertyType = (typeId: string) => {
     setSelectedPropertyTypes(prev => prev.includes(typeId) ? prev.filter(id => id !== typeId) : [...prev, typeId]);
   };
@@ -131,12 +137,20 @@ const Rent = () => {
     setMinBathrooms(1);
     setSelectedAmenities([]);
     setUnfurnishedOnly(false);
+    clearPolygon();
   };
 
   const handlePropertySelect = (property: any) => {
     setSelectedProperty(property);
     setIsDetailModalOpen(true);
   };
+
+  const handleDrawnAreaChange = useCallback((polygon: { latitude: number; longitude: number }[] | null) => {
+    setDrawnPolygon(polygon);
+  }, [setDrawnPolygon]);
+
+  // Filter properties by drawn polygon
+  const filteredProperties = filterPropertiesByPolygon(properties);
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -286,15 +300,17 @@ const Rent = () => {
         {/* Property Map */}
         <div className="mb-8">
           <CompactPropertyMap 
-            properties={properties} 
+            properties={filteredProperties} 
             height="300px"
             defaultExpanded={false}
             onPropertySelect={handlePropertySelect}
+            onDrawnAreaChange={handleDrawnAreaChange}
+            enableDrawing={true}
           />
         </div>
 
         {/* Active Filters Display */}
-        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || priceRange[0] > 0 || priceRange[1] < 10000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0 || unfurnishedOnly) && (
+        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || priceRange[0] > 0 || priceRange[1] < 10000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0 || unfurnishedOnly || hasDrawnArea) && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 text-foreground">Active Filters:</h3>
             <div className="flex flex-wrap gap-2">
@@ -336,6 +352,11 @@ const Rent = () => {
                   Unfurnished only
                 </Badge>
               )}
+              {hasDrawnArea && (
+                <Badge variant="secondary" className="px-3 py-1 bg-primary/10 text-primary">
+                  Custom drawn area
+                </Badge>
+              )}
             </div>
           </div>
         )}
@@ -344,9 +365,10 @@ const Rent = () => {
         <div className="text-center mb-6">
           {isLoading ? (
             <p className="text-muted-foreground">Loading properties...</p>
-          ) : properties.length > 0 ? (
+          ) : filteredProperties.length > 0 ? (
             <p className="text-muted-foreground">
-              Found {properties.length} {properties.length === 1 ? 'property' : 'properties'} for rent
+              Found {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} for rent
+              {hasDrawnArea && ` in selected area`}
             </p>
           ) : (
             <p className="text-muted-foreground">
@@ -356,13 +378,13 @@ const Rent = () => {
         </div>
 
         {/* Property Grid */}
-        {!isLoading && properties.length > 0 && (
+        {!isLoading && filteredProperties.length > 0 && (
           <div className="mb-8">
             <ScrollReveal animation="fade-up">
               <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
             </ScrollReveal>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {properties.map((property, index) => (
+              {filteredProperties.map((property, index) => (
                 <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                   <PropertyCard
                     property={property}
