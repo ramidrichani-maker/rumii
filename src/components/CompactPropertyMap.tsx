@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Locate, Search, Maximize2 } from 'lucide-react';
+import { MapPin, Locate, Search, Maximize2, PenTool, Trash2 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
 
 interface Property {
   id: string;
@@ -28,12 +30,19 @@ interface Property {
   user_id: string;
 }
 
+interface DrawnPolygonCoordinate {
+  latitude: number;
+  longitude: number;
+}
+
 interface CompactPropertyMapProps {
   properties: Property[];
   className?: string;
   onPropertySelect?: (property: Property) => void;
   height?: string;
   defaultExpanded?: boolean;
+  onDrawnAreaChange?: (polygon: DrawnPolygonCoordinate[] | null) => void;
+  enableDrawing?: boolean;
 }
 
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
@@ -41,15 +50,22 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   className = "",
   onPropertySelect,
   height = "250px",
-  defaultExpanded = false
+  defaultExpanded = false,
+  onDrawnAreaChange,
+  enableDrawing = true
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
+  const drawControlRef = useRef<L.Control.Draw | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [searchAddress, setSearchAddress] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [isDrawingMode, setIsDrawingMode] = useState(false);
+  const [hasDrawnArea, setHasDrawnArea] = useState(false);
+  const drawHandlerRef = useRef<L.Draw.Polygon | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -66,6 +82,42 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         maxZoom: 20
       }).addTo(map);
 
+      // Initialize feature group for drawn items
+      const drawnItems = new L.FeatureGroup();
+      map.addLayer(drawnItems);
+      drawnItemsRef.current = drawnItems;
+
+      // Handle draw created event
+      map.on(L.Draw.Event.CREATED, (event: any) => {
+        const layer = event.layer;
+        
+        // Clear previous drawings
+        drawnItems.clearLayers();
+        
+        // Add new layer
+        drawnItems.addLayer(layer);
+        
+        // Extract polygon coordinates
+        if (layer instanceof L.Polygon) {
+          const latLngs = layer.getLatLngs()[0] as L.LatLng[];
+          const coordinates: DrawnPolygonCoordinate[] = latLngs.map(latLng => ({
+            latitude: latLng.lat,
+            longitude: latLng.lng
+          }));
+          
+          setHasDrawnArea(true);
+          onDrawnAreaChange?.(coordinates);
+        }
+        
+        setIsDrawingMode(false);
+      });
+
+      // Handle draw deleted event
+      map.on(L.Draw.Event.DELETED, () => {
+        setHasDrawnArea(false);
+        onDrawnAreaChange?.(null);
+      });
+
       leafletMapRef.current = map;
       setMapInitialized(true);
 
@@ -78,6 +130,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
         markersRef.current = [];
+        drawnItemsRef.current = null;
         setMapInitialized(false);
       }
     };
@@ -202,6 +255,50 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     setIsExpanded(!isExpanded);
   };
 
+  const startDrawing = useCallback(() => {
+    if (!leafletMapRef.current || !mapInitialized) return;
+    
+    setIsDrawingMode(true);
+    
+    // Create polygon draw handler
+    const drawHandler = new (L.Draw as any).Polygon(leafletMapRef.current, {
+      shapeOptions: {
+        color: 'hsl(var(--primary))',
+        fillColor: 'hsl(var(--primary))',
+        fillOpacity: 0.2,
+        weight: 2
+      },
+      showArea: true,
+      metric: true
+    });
+    
+    drawHandlerRef.current = drawHandler;
+    drawHandler.enable();
+  }, [mapInitialized]);
+
+  const clearDrawnArea = useCallback(() => {
+    if (drawnItemsRef.current) {
+      drawnItemsRef.current.clearLayers();
+    }
+    setHasDrawnArea(false);
+    setIsDrawingMode(false);
+    onDrawnAreaChange?.(null);
+    
+    // Disable any active draw handler
+    if (drawHandlerRef.current) {
+      drawHandlerRef.current.disable();
+      drawHandlerRef.current = null;
+    }
+  }, [onDrawnAreaChange]);
+
+  const cancelDrawing = useCallback(() => {
+    setIsDrawingMode(false);
+    if (drawHandlerRef.current) {
+      drawHandlerRef.current.disable();
+      drawHandlerRef.current = null;
+    }
+  }, []);
+
   const mapHeight = isExpanded ? "60vh" : height;
   const mapClass = isExpanded ? "fixed inset-0 z-40 bg-background p-4" : className;
 
@@ -213,18 +310,61 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             <CardTitle className="flex items-center gap-2 text-sm">
               <MapPin className="h-4 w-4" />
               Map View ({properties.length})
+              {hasDrawnArea && (
+                <span className="text-xs text-primary font-normal">(Filtered by area)</span>
+              )}
             </CardTitle>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleExpanded();
-              }}
-            >
-              <Maximize2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {enableDrawing && (
+                <>
+                  {isDrawingMode ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={cancelDrawing}
+                      className="text-xs"
+                    >
+                      Cancel
+                    </Button>
+                  ) : hasDrawnArea ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={clearDrawnArea}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Clear Area
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={startDrawing}
+                    >
+                      <PenTool className="h-4 w-4 mr-1" />
+                      Draw Area
+                    </Button>
+                  )}
+                </>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleExpanded();
+                }}
+              >
+                <Maximize2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
+          {isDrawingMode && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Click on the map to draw a polygon around your desired search area. Click the first point to close the shape.
+            </p>
+          )}
           {isExpanded && (
             <Button
               size="sm"
