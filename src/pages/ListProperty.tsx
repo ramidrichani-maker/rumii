@@ -301,7 +301,7 @@ const ListProperty = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Basic Information */}
-              <Card>
+              <Card className="relative z-10">
                 <CardHeader>
                   <CardTitle>Basic Information</CardTitle>
                 </CardHeader>
@@ -370,7 +370,7 @@ const ListProperty = () => {
               </Card>
 
               {/* Location Map */}
-              <Card>
+              <Card className="relative z-0">
                 <CardHeader>
                   <CardTitle>Property Location</CardTitle>
                   <p className="text-sm text-muted-foreground">Click on the map to pinpoint exact location</p>
