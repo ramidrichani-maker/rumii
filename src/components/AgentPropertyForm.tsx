@@ -20,7 +20,28 @@ import PropertyMap from "@/components/PropertyMap";
 
 const propertyTypes = ["Apartment", "Villa", "Land", "Farm", "Beach House", "Penthouse", "Chalet", "Studio", "Commercial Rental", "Rooftop", "Duplex", "Triplex", "Venue"];
 const amenities = ["Swimming Pool", "Gym", "Parking", "Balcony", "Garden", "Air Conditioning", "Heating", "Internet", "Security", "Elevator", "Furnished", "Pet Friendly", "Laundry", "Storage", "Terrace", "Sea View", "Mountain View"];
+const roomTypes = [
+  "Entrance",
+  "Bedroom", 
+  "Salon",
+  "Living Room",
+  "Dining Room",
+  "Kitchen",
+  "Bathroom",
+  "Toilet",
+  "Terrace",
+  "Balcony",
+  "Roof",
+  "Maid's Room",
+  "Maid's Bathroom",
+  "Storage Room",
+  "Corridor"
+];
 
+interface UploadedImage {
+  file: File;
+  roomType: string;
+}
 const formSchema = z.object({
   municipality: z.string().min(1, "District is required"),
   city: z.string().min(1, "City is required"),
@@ -34,6 +55,7 @@ const formSchema = z.object({
   }),
   price: z.string().min(1, "Price is required"),
   priceNegotiable: z.boolean().default(false),
+  unfurnished: z.boolean().default(false),
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
   amenities: z.array(z.string()).default([])
@@ -48,7 +70,7 @@ interface Agency {
 
 const AgentPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -61,7 +83,8 @@ const AgentPropertyForm = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       amenities: [],
-      priceNegotiable: false
+      priceNegotiable: false,
+      unfurnished: false
     }
   });
 
@@ -83,11 +106,21 @@ const AgentPropertyForm = () => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files]);
+    const newImages: UploadedImage[] = files.map(file => ({
+      file,
+      roomType: '' // Initially no room type selected
+    }));
+    setUploadedImages(prev => [...prev, ...newImages]);
+  };
+
+  const updateImageRoomType = (index: number, roomType: string) => {
+    setUploadedImages(prev => prev.map((img, i) => 
+      i === index ? { ...img, roomType } : img
+    ));
   };
 
   const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleAmenityToggle = (amenity: string) => {
@@ -122,12 +155,26 @@ const AgentPropertyForm = () => {
     setIsSubmitting(true);
     
     try {
+      // Check if all images have room types assigned
+      const unassignedImages = uploadedImages.filter(img => !img.roomType);
+      if (unassignedImages.length > 0) {
+        toast({
+          title: "Room Types Required",
+          description: "Please select a room type for all uploaded images.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       let imageUrls: string[] = [];
 
-      if (uploadedFiles.length > 0) {
-        const uploadPromises = uploadedFiles.map(async (file, index) => {
+      if (uploadedImages.length > 0) {
+        const uploadPromises = uploadedImages.map(async (uploadedImage, index) => {
+          const file = uploadedImage.file;
+          const roomType = uploadedImage.roomType.toLowerCase().replace(/['\s]/g, '-');
           const fileExt = file.name.split('.').pop();
-          const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
+          const fileName = `${user.id}/${Date.now()}_${roomType}_${index}.${fileExt}`;
           
           const { error: uploadError } = await supabase.storage
             .from('property-images')
@@ -159,6 +206,7 @@ const AgentPropertyForm = () => {
         listing_type: data.listingType as any,
         price: parseFloat(data.price),
         price_negotiable: data.priceNegotiable,
+        unfurnished: data.unfurnished,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
@@ -186,7 +234,7 @@ const AgentPropertyForm = () => {
       // Reset form
       form.reset();
       setSelectedAmenities([]);
-      setUploadedFiles([]);
+      setUploadedImages([]);
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
@@ -393,6 +441,15 @@ const AgentPropertyForm = () => {
                   <FormLabel className="cursor-pointer">Price is negotiable</FormLabel>
                 </FormItem>
               )} />
+
+              <FormField control={form.control} name="unfurnished" render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <FormLabel className="cursor-pointer">Property is unfurnished</FormLabel>
+                </FormItem>
+              )} />
             </CardContent>
           </Card>
 
@@ -433,6 +490,7 @@ const AgentPropertyForm = () => {
                 <Label htmlFor="agent-file-upload" className="cursor-pointer">
                   <span className="text-primary hover:text-primary/80">Click to upload</span>
                 </Label>
+                <p className="text-xs text-muted-foreground mt-1">You must select a room type for each image</p>
                 <Input 
                   id="agent-file-upload" 
                   type="file" 
@@ -443,14 +501,29 @@ const AgentPropertyForm = () => {
                 />
               </div>
               
-              {uploadedFiles.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  {uploadedFiles.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                      <span className="text-sm truncate">{file.name}</span>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => removeFile(index)}>
-                        Remove
-                      </Button>
+              {uploadedImages.length > 0 && (
+                <div className="mt-3 space-y-3">
+                  {uploadedImages.map((uploadedImage, index) => (
+                    <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted rounded gap-2">
+                      <span className="text-sm truncate flex-shrink-0">{uploadedImage.file.name}</span>
+                      <div className="flex items-center gap-2 flex-1 sm:justify-end">
+                        <Select 
+                          value={uploadedImage.roomType} 
+                          onValueChange={(value) => updateImageRoomType(index, value)}
+                        >
+                          <SelectTrigger className={`w-[160px] ${!uploadedImage.roomType ? 'border-destructive' : ''}`}>
+                            <SelectValue placeholder="Select room type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {roomTypes.map(type => (
+                              <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removeFile(index)}>
+                          Remove
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
