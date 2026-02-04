@@ -52,11 +52,10 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       // Initialize map
       const map = L.map(mapRef.current).setView(position, 13);
       
-      // Add tile layer with English labels
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
+      // Add tile layer with English labels (Esri World Street Map)
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
       }).addTo(map);
 
       // Add marker with draggable option
