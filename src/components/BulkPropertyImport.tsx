@@ -44,7 +44,7 @@ interface ImportResult {
   errors: { row: number; error: string }[];
 }
 
-const PROPERTY_TYPES = ["apartment", "villa", "land", "farm", "beach house", "penthouse", "chalet", "studio", "commercial rental", "rooftop", "duplex", "triplex", "venue"];
+const PROPERTY_TYPES = ["apartment", "villa", "beach house", "chalet", "duplex", "triplex", "penthouse", "commercial rental", "farm house", "building", "venue", "studio", "rooftop", "land"];
 const PROPERTY_STATUSES = ["pending", "approved", "rejected"] as const;
 
 export const BulkPropertyImport = () => {
