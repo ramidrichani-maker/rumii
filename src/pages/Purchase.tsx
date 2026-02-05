@@ -16,13 +16,19 @@ import { usePolygonFilter } from "@/hooks/usePolygonFilter";
 
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
-  { id: "house", name: "House", icon: Home },
-  { id: "studio", name: "Studio", icon: Building2 },
   { id: "villa", name: "Villa", icon: Crown },
-  { id: "penthouse", name: "Penthouse", icon: Mountain },
-  { id: "townhouse", name: "Townhouse", icon: House },
+  { id: "beach house", name: "Beach House", icon: Waves },
+  { id: "chalet", name: "Chalet", icon: Home },
   { id: "duplex", name: "Duplex", icon: Building },
-  { id: "loft", name: "Loft", icon: Sofa },
+  { id: "triplex", name: "Triplex", icon: Building },
+  { id: "penthouse", name: "Penthouse", icon: Mountain },
+  { id: "commercial rental", name: "Commercial Rental", icon: Store },
+  { id: "farm house", name: "Farm House", icon: Tractor },
+  { id: "building", name: "Building", icon: Building2 },
+  { id: "venue", name: "Venue", icon: Building2 },
+  { id: "studio", name: "Studio", icon: Building2 },
+  { id: "rooftop", name: "Rooftop", icon: Mountain },
+  { id: "land", name: "Land", icon: Trees },
 ];
 
 const amenities = [

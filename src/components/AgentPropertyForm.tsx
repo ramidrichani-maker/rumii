@@ -18,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PropertyMap from "@/components/PropertyMap";
 
-const propertyTypes = ["Apartment", "Villa", "Land", "Farm", "Beach House", "Penthouse", "Chalet", "Studio", "Commercial Rental", "Rooftop", "Duplex", "Triplex", "Venue"];
+const propertyTypes = ["Apartment", "Villa", "Beach House", "Chalet", "Duplex", "Triplex", "Penthouse", "Commercial Rental", "Farm House", "Building", "Venue", "Studio", "Rooftop", "Land"];
 const amenities = ["Swimming Pool", "Gym", "Parking", "Balcony", "Garden", "Air Conditioning", "Heating", "Internet", "Security", "Elevator", "Furnished", "Pet Friendly", "Laundry", "Storage", "Terrace", "Sea View", "Mountain View"];
 const roomTypes = [
   "Entrance",
