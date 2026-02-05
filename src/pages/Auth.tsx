@@ -4,25 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    full_name: '',
-    phone_number: '',
-    country: 'lb',
-    role: 'user'
+    full_name: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   
@@ -37,27 +34,58 @@ const Auth = () => {
     });
   };
 
-  const handleRoleChange = (value: string) => {
-    setFormData({
-      ...formData,
-      role: value
-    });
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleCountryChange = (value: string) => {
-    setFormData({
-      ...formData,
-      country: value
-    });
-  };
-
-  const getCountryCode = (countryCode: string) => {
-    const codes: { [key: string]: string } = {
-      us: '+1', ca: '+1', uk: '+44', au: '+61', de: '+49', fr: '+33',
-      es: '+34', it: '+39', nl: '+31', se: '+46', no: '+47', dk: '+45',
-      mt: '+356', jp: '+81', sg: '+65', hk: '+852', lb: '+961'
-    };
-    return codes[countryCode] || '+961';
+  const handleAppleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -106,22 +134,24 @@ const Auth = () => {
             description: "Passwords do not match",
             variant: "destructive"
           });
+          setIsLoading(false);
           return;
         }
 
-        if (!formData.full_name || !formData.phone_number) {
+        if (!formData.full_name) {
           toast({
             title: "Error",
             description: "Please fill in all required fields",
             variant: "destructive"
           });
+          setIsLoading(false);
           return;
         }
 
         const { error } = await signUp(formData.email, formData.password, {
           full_name: formData.full_name,
-          phone_number: formData.phone_number,
-          role: formData.role
+          phone_number: '',
+          role: 'user'
         });
 
         if (error) {
@@ -200,8 +230,8 @@ const Auth = () => {
               {showForgotPassword
                 ? 'Enter your email to receive a password reset link'
                 : (isSignUp 
-                  ? 'Enter your details to create your account' 
-                  : 'Enter your email and password to sign in')
+                  ? 'Choose how you want to create your account' 
+                  : 'Choose how you want to sign in')
               }
             </CardDescription>
           </CardHeader>
@@ -234,182 +264,219 @@ const Auth = () => {
                   Back to Sign In
                 </Button>
               </form>
-            ) : (
+            ) : showEmailForm ? (
               <>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {isSignUp && (
-                <>
+                    <div className="space-y-2">
+                      <Label htmlFor="full_name">Full Name</Label>
+                      <Input
+                        id="full_name"
+                        name="full_name"
+                        type="text"
+                        placeholder="John Doe"
+                        value={formData.full_name}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  )}
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      id="full_name"
-                      name="full_name"
-                      type="text"
-                      placeholder="John Doe"
-                      value={formData.full_name}
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="john@example.com"
+                      value={formData.email}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Select value={formData.country} onValueChange={handleCountryChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="lb">🇱🇧 Lebanon (+961)</SelectItem>
-                          <SelectItem value="us">🇺🇸 United States (+1)</SelectItem>
-                          <SelectItem value="uk">🇬🇧 United Kingdom (+44)</SelectItem>
-                          <SelectItem value="ca">🇨🇦 Canada (+1)</SelectItem>
-                          <SelectItem value="au">🇦🇺 Australia (+61)</SelectItem>
-                          <SelectItem value="de">🇩🇪 Germany (+49)</SelectItem>
-                          <SelectItem value="fr">🇫🇷 France (+33)</SelectItem>
-                          <SelectItem value="es">🇪🇸 Spain (+34)</SelectItem>
-                          <SelectItem value="it">🇮🇹 Italy (+39)</SelectItem>
-                          <SelectItem value="nl">🇳🇱 Netherlands (+31)</SelectItem>
-                          <SelectItem value="se">🇸🇪 Sweden (+46)</SelectItem>
-                          <SelectItem value="no">🇳🇴 Norway (+47)</SelectItem>
-                          <SelectItem value="dk">🇩🇰 Denmark (+45)</SelectItem>
-                          <SelectItem value="mt">🇲🇹 Malta (+356)</SelectItem>
-                          <SelectItem value="jp">🇯🇵 Japan (+81)</SelectItem>
-                          <SelectItem value="sg">🇸🇬 Singapore (+65)</SelectItem>
-                          <SelectItem value="hk">🇭🇰 Hong Kong (+852)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone_number">Phone Number</Label>
-                      <div className="flex gap-2">
-                        <div className="w-20 px-3 py-2 bg-muted rounded-md text-sm text-center">
-                          {getCountryCode(formData.country)}
-                        </div>
-                        <Input
-                          id="phone_number"
-                          name="phone_number"
-                          type="tel"
-                          placeholder="123-456-7890"
-                          value={formData.phone_number}
-                          onChange={handleInputChange}
-                          className="flex-1"
-                          required
-                        />
-                      </div>
-                    </div>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="role">Account Type</Label>
-                    <Select value={formData.role} onValueChange={handleRoleChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select account type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="agent">Agent</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
                   </div>
-                </>
-              )}
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+
+                  {isSignUp && (
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Confirm Password</Label>
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")}
                   </Button>
-                </div>
-              </div>
 
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-              )}
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")}
-              </Button>
-
-              {!isSignUp && (
-                <div className="mt-2 text-center">
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="text-sm p-0 h-auto font-normal"
-                    onClick={() => setShowForgotPassword(true)}
-                  >
-                    Forgot password?
-                  </Button>
-                </div>
+                  {!isSignUp && (
+                    <div className="mt-2 text-center">
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="text-sm p-0 h-auto font-normal"
+                        onClick={() => setShowForgotPassword(true)}
+                      >
+                        Forgot password?
+                      </Button>
+                    </div>
                   )}
                 </form>
 
-                {!showForgotPassword && (
-                  <div className="mt-4 text-center text-sm">
-                    {isSignUp ? (
-                      <>
-                        Already have an account?{" "}
-                        <Button
-                          variant="link"
-                          className="p-0 h-auto font-normal"
-                          onClick={() => setIsSignUp(false)}
-                        >
-                          Sign in
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        Don't have an account?{" "}
-                        <Button
-                          variant="link"
-                          className="p-0 h-auto font-normal"
-                          onClick={() => setIsSignUp(true)}
-                        >
-                          Sign up
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                )}
+                <div className="mt-4">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setShowEmailForm(false)}
+                  >
+                    Back to options
+                  </Button>
+                </div>
+
+                <div className="mt-4 text-center text-sm">
+                  {isSignUp ? (
+                    <>
+                      Already have an account?{" "}
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto font-normal"
+                        onClick={() => setIsSignUp(false)}
+                      >
+                        Sign in
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      Don't have an account?{" "}
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto font-normal"
+                        onClick={() => setIsSignUp(true)}
+                      >
+                        Sign up
+                      </Button>
+                    </>
+                  )}
+                </div>
               </>
+            ) : (
+              <div className="space-y-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-3"
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoading}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+                  </svg>
+                  Continue with Google
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-3"
+                  onClick={handleAppleSignIn}
+                  disabled={isLoading}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                  Continue with Apple
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">Or</span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-3"
+                  onClick={() => setShowEmailForm(true)}
+                >
+                  <Mail className="w-5 h-5" />
+                  Continue with Email
+                </Button>
+
+                <div className="mt-4 text-center text-sm">
+                  {isSignUp ? (
+                    <>
+                      Already have an account?{" "}
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto font-normal"
+                        onClick={() => setIsSignUp(false)}
+                      >
+                        Sign in
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      Don't have an account?{" "}
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto font-normal"
+                        onClick={() => setIsSignUp(true)}
+                      >
+                        Sign up
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
