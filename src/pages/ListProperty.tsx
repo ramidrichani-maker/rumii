@@ -57,6 +57,8 @@ const formSchema = z.object({
   unfurnished: z.boolean().default(false),
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
+  floors: z.string().optional(),
+  apartmentsCount: z.string().optional(),
   amenities: z.array(z.string()).default([]),
   brokerAgreement: z.boolean().refine((val) => val === true, {
     message: "You must agree to the broker terms to list your property"
@@ -221,6 +223,8 @@ const ListProperty = () => {
         unfurnished: data.unfurnished,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
+        floors: data.floors ? parseInt(data.floors) : null,
+        apartments_count: data.apartmentsCount ? parseInt(data.apartmentsCount) : null,
         amenities: selectedAmenities,
         images: imageUrls,
         latitude: coordinates.lat,
@@ -500,6 +504,30 @@ const ListProperty = () => {
                         </FormControl>
                         <FormMessage />
                       </FormItem>} />
+
+                  {form.watch('propertyType') === 'building' && (
+                    <>
+                      <FormField control={form.control} name="floors" render={({
+                        field
+                      }) => <FormItem>
+                              <FormLabel>Number of Floors</FormLabel>
+                              <FormControl>
+                                <Input type="number" min="1" placeholder="e.g. 5" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>} />
+
+                      <FormField control={form.control} name="apartmentsCount" render={({
+                        field
+                      }) => <FormItem>
+                              <FormLabel>Number of Apartments</FormLabel>
+                              <FormControl>
+                                <Input type="number" min="1" placeholder="e.g. 20" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>} />
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </div>

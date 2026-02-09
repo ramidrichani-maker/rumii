@@ -58,6 +58,8 @@ const formSchema = z.object({
   unfurnished: z.boolean().default(false),
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
+  floors: z.string().optional(),
+  apartmentsCount: z.string().optional(),
   amenities: z.array(z.string()).default([])
 });
 
@@ -209,6 +211,8 @@ const AgentPropertyForm = () => {
         unfurnished: data.unfurnished,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
+        floors: data.floors ? parseInt(data.floors) : null,
+        apartments_count: data.apartmentsCount ? parseInt(data.apartmentsCount) : null,
         amenities: selectedAmenities,
         images: imageUrls,
         latitude: coordinates.lat,
@@ -432,6 +436,30 @@ const AgentPropertyForm = () => {
                   </FormItem>
                 )} />
               </div>
+
+              {form.watch('propertyType') === 'building' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField control={form.control} name="floors" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Floors</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="1" placeholder="e.g. 5" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="apartmentsCount" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Apartments</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="1" placeholder="e.g. 20" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              )}
 
               <FormField control={form.control} name="priceNegotiable" render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0">
