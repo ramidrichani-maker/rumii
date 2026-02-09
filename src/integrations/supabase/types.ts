@@ -418,11 +418,13 @@ export type Database = {
           address: string
           agency_id: string | null
           amenities: string[] | null
+          apartments_count: number | null
           bathrooms: number
           bedrooms: number
           city: string
           created_at: string
           featured_section: string | null
+          floors: number | null
           id: string
           images: string[] | null
           last_renovated: number | null
@@ -445,11 +447,13 @@ export type Database = {
           address: string
           agency_id?: string | null
           amenities?: string[] | null
+          apartments_count?: number | null
           bathrooms: number
           bedrooms: number
           city: string
           created_at?: string
           featured_section?: string | null
+          floors?: number | null
           id?: string
           images?: string[] | null
           last_renovated?: number | null
@@ -472,11 +476,13 @@ export type Database = {
           address?: string
           agency_id?: string | null
           amenities?: string[] | null
+          apartments_count?: number | null
           bathrooms?: number
           bedrooms?: number
           city?: string
           created_at?: string
           featured_section?: string | null
+          floors?: number | null
           id?: string
           images?: string[] | null
           last_renovated?: number | null
