@@ -437,28 +437,28 @@ const AgentPropertyForm = () => {
                 )} />
               </div>
 
-              {form.watch('propertyType') === 'building' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField control={form.control} name="floors" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Number of Floors</FormLabel>
-                      <FormControl>
-                        <Input type="number" min="1" placeholder="e.g. 5" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+              {['building', 'villa'].includes(form.watch('propertyType')) && (
+                <FormField control={form.control} name="floors" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Number of Floors</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="1" placeholder="e.g. 5" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              )}
 
-                  <FormField control={form.control} name="apartmentsCount" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Number of Apartments</FormLabel>
-                      <FormControl>
-                        <Input type="number" min="1" placeholder="e.g. 20" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                </div>
+              {form.watch('propertyType') === 'building' && (
+                <FormField control={form.control} name="apartmentsCount" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Number of Apartments</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="1" placeholder="e.g. 20" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
               )}
 
               <FormField control={form.control} name="priceNegotiable" render={({ field }) => (
