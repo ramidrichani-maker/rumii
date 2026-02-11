@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -121,6 +121,12 @@ export const Navbar = () => {
                       <Link to="/my-listings" className="flex items-center">
                         <Home className="mr-2 h-4 w-4" />
                         <span>My Listings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/list-property" className="flex items-center">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        <span>List Property</span>
                       </Link>
                     </DropdownMenuItem>
                     {profile?.role === 'user' && <DropdownMenuItem asChild>
