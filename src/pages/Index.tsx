@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Key, PlusCircle, Bed, Bath, Square } from "lucide-react";
+import { Bed, Bath, Square } from "lucide-react";
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
+import HeroSearch from "@/components/HeroSearch";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Property {
@@ -59,78 +59,17 @@ const Index = () => {
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-16">
         <ScrollReveal animation="fade-up">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h1 className="text-5xl font-bold mb-4 text-foreground">Find Your Perfect Property</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Whether you're looking to buy, rent, or list a property, we've got you covered.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+              Whether you're looking to buy or rent, we've got you covered.
             </p>
           </div>
         </ScrollReveal>
-        
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <ScrollReveal animation="fade-up" delay={100}>
-            <Card className="group hover-scale hover:shadow-xl transition-all duration-300 h-full">
-              <CardHeader className="text-center">
-                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
-                  <Home className="w-8 h-8 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">Purchase</CardTitle>
-                <CardDescription>
-                  Find and buy your dream home with our extensive property listings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/purchase">
-                  <Button className="w-full" size="lg">
-                    Browse Properties for Sale
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </ScrollReveal>
 
-          <ScrollReveal animation="fade-up" delay={200}>
-            <Card className="group hover-scale hover:shadow-xl transition-all duration-300 h-full">
-              <CardHeader className="text-center">
-                <div className="mx-auto w-16 h-16 bg-secondary/80 rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
-                  <Key className="w-8 h-8 text-secondary-foreground" />
-                </div>
-                <CardTitle className="text-2xl">Rent</CardTitle>
-                <CardDescription>
-                  Discover rental properties that match your lifestyle and budget
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/rent">
-                  <Button variant="secondary" className="w-full" size="lg">
-                    Find Rental Properties
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </ScrollReveal>
-
-          <ScrollReveal animation="fade-up" delay={300}>
-            <Card className="group hover-scale hover:shadow-xl transition-all duration-300 h-full">
-              <CardHeader className="text-center">
-                <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
-                  <PlusCircle className="w-8 h-8 text-accent-foreground" />
-                </div>
-                <CardTitle className="text-2xl">List Property</CardTitle>
-                <CardDescription>
-                  List your property and connect with potential buyers or tenants
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/list-property">
-                  <Button variant="outline" className="w-full" size="lg">
-                    List Your Property
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </ScrollReveal>
-        </div>
+        <ScrollReveal animation="fade-up" delay={150}>
+          <HeroSearch />
+        </ScrollReveal>
         
         {/* Popular Listings Section - Only show if there are featured properties */}
         {!isLoading && (featuredRentals.length > 0 || featuredSales.length > 0) && (

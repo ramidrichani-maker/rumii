@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import CompactPropertyMap from "@/components/CompactPropertyMap";
@@ -39,6 +39,8 @@ const amenities = [
 ];
 
 const Rent = () => {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 1000]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
@@ -106,6 +108,11 @@ const Rent = () => {
         query = query.lte('price', priceRange[1]);
       }
 
+      // Location search filter
+      if (searchQuery) {
+        query = query.or(`city.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,municipality.ilike.%${searchQuery}%`);
+      }
+
       const { data, error } = await query;
 
       if (error) throw error;
@@ -133,7 +140,7 @@ const Rent = () => {
     }, 500); // 500ms debounce delay
 
     return () => clearTimeout(timeoutId);
-  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly]);
+  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery]);
 
   const handleClearFilters = () => {
     setSelectedPropertyTypes([]);
