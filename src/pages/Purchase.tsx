@@ -12,6 +12,7 @@ import PropertyDetailModal from "@/components/PropertyDetailModal";
 import RangeSlider from "@/components/RangeSlider";
 import PropertyCard from "@/components/PropertyCard";
 import ScrollReveal from "@/components/ScrollReveal";
+import LocationSearchBar from "@/components/LocationSearchBar";
 import { usePolygonFilter } from "@/hooks/usePolygonFilter";
 
 const propertyTypes = [
@@ -39,8 +40,10 @@ const amenities = [
 ];
 
 const Purchase = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
+  const [locationInput, setLocationInput] = useState(searchQuery);
+  const [radius, setRadius] = useState(1);
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 1000]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
@@ -146,6 +149,17 @@ const Purchase = () => {
     return () => clearTimeout(timeoutId);
   }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery]);
 
+  const handleLocationChange = (value: string) => {
+    setLocationInput(value);
+    const newParams = new URLSearchParams(searchParams);
+    if (value) {
+      newParams.set('search', value);
+    } else {
+      newParams.delete('search');
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
   const handleClearFilters = () => {
     setSelectedPropertyTypes([]);
     setSquareMetersRange([50, 1000]);
@@ -182,6 +196,14 @@ const Purchase = () => {
             <p className="text-lg text-muted-foreground">Find and filter properties that match your buying criteria</p>
           </div>
         </ScrollReveal>
+
+        {/* Location Search Bar */}
+        <LocationSearchBar
+          location={locationInput}
+          onLocationChange={handleLocationChange}
+          radius={radius}
+          onRadiusChange={setRadius}
+        />
 
         {/* Filters Section */}
         <Card className="mb-8">
