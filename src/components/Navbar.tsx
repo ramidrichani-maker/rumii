@@ -52,7 +52,7 @@ export const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <Home className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">Summit</span>
+            <span className="text-xl font-bold">Oracle Estates</span>
           </Link>
 
           <div className="flex items-center space-x-4">
