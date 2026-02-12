@@ -49,6 +49,8 @@ const Purchase = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
   const [minBedrooms, setMinBedrooms] = useState(1);
   const [minBathrooms, setMinBathrooms] = useState(1);
+  const [barMinBedrooms, setBarMinBedrooms] = useState('');
+  const [barMaxBedrooms, setBarMaxBedrooms] = useState('');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [unfurnishedOnly, setUnfurnishedOnly] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
@@ -203,6 +205,10 @@ const Purchase = () => {
           onLocationChange={handleLocationChange}
           radius={radius}
           onRadiusChange={setRadius}
+          minBedrooms={barMinBedrooms}
+          maxBedrooms={barMaxBedrooms}
+          onMinBedroomsChange={setBarMinBedrooms}
+          onMaxBedroomsChange={setBarMaxBedrooms}
         />
 
         {/* Filters Section */}

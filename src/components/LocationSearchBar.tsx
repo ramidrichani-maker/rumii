@@ -1,13 +1,20 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { MapPin, ChevronDown } from 'lucide-react';
+import { MapPin, ChevronDown, BedDouble } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const radiusOptions = [
   { label: '+0.2 km', value: 0.2 },
@@ -20,14 +27,29 @@ const radiusOptions = [
   { label: '+10 km', value: 10 },
 ];
 
+const bedroomOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
+
 interface LocationSearchBarProps {
   location: string;
   onLocationChange: (location: string) => void;
   radius: number;
   onRadiusChange: (radius: number) => void;
+  minBedrooms: string;
+  maxBedrooms: string;
+  onMinBedroomsChange: (value: string) => void;
+  onMaxBedroomsChange: (value: string) => void;
 }
 
-const LocationSearchBar = ({ location, onLocationChange, radius, onRadiusChange }: LocationSearchBarProps) => {
+const LocationSearchBar = ({
+  location,
+  onLocationChange,
+  radius,
+  onRadiusChange,
+  minBedrooms,
+  maxBedrooms,
+  onMinBedroomsChange,
+  onMaxBedroomsChange,
+}: LocationSearchBarProps) => {
   const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
 
   return (
@@ -43,6 +65,8 @@ const LocationSearchBar = ({ location, onLocationChange, radius, onRadiusChange 
             className="pl-10 h-12 text-base"
           />
         </div>
+
+        {/* Radius Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-12 px-4 gap-2 min-w-[130px]">
@@ -50,7 +74,7 @@ const LocationSearchBar = ({ location, onLocationChange, radius, onRadiusChange 
               <ChevronDown className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="bg-popover z-50">
             {radiusOptions.map((option) => (
               <DropdownMenuItem
                 key={option.value}
@@ -62,6 +86,62 @@ const LocationSearchBar = ({ location, onLocationChange, radius, onRadiusChange 
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Bedrooms Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[140px]">
+              <BedDouble className="w-4 h-4" />
+              <span className="text-sm font-medium">Bedrooms</span>
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
+            <div className="space-y-4">
+              {/* Min Bedrooms */}
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Min</p>
+                <div className="flex flex-wrap gap-2">
+                  {bedroomOptions.map((opt) => (
+                    <button
+                      key={`min-${opt}`}
+                      onClick={() => onMinBedroomsChange(minBedrooms === opt ? '' : opt)}
+                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                        minBedrooms === opt
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-background hover:border-primary/50'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Max Bedrooms */}
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Max</p>
+                <div className="flex flex-wrap gap-2">
+                  {bedroomOptions.map((opt) => (
+                    <button
+                      key={`max-${opt}`}
+                      onClick={() => onMaxBedroomsChange(maxBedrooms === opt ? '' : opt)}
+                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                        maxBedrooms === opt
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-background hover:border-primary/50'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
