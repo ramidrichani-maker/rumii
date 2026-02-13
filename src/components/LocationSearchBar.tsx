@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { MapPin, ChevronDown, BedDouble } from 'lucide-react';
+import { MapPin, ChevronDown, BedDouble, DollarSign } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +29,25 @@ const radiusOptions = [
 
 const bedroomOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
 
+const generatePriceOptions = (): number[] => {
+  const prices: number[] = [];
+  for (let p = 10000; p < 250000; p += 10000) prices.push(p);
+  for (let p = 250000; p < 500000; p += 25000) prices.push(p);
+  for (let p = 500000; p < 1000000; p += 50000) prices.push(p);
+  for (let p = 1000000; p < 3000000; p += 100000) prices.push(p);
+  for (let p = 3000000; p < 5000000; p += 250000) prices.push(p);
+  for (let p = 5000000; p <= 10000000; p += 500000) prices.push(p);
+  return prices;
+};
+
+const priceOptions = generatePriceOptions();
+
+const formatPrice = (value: number): string => {
+  if (value >= 1000000) return `$${(value / 1000000).toFixed(value % 1000000 === 0 ? 0 : 1)}M`;
+  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+  return `$${value}`;
+};
+
 interface LocationSearchBarProps {
   location: string;
   onLocationChange: (location: string) => void;
@@ -38,6 +57,10 @@ interface LocationSearchBarProps {
   maxBedrooms: string;
   onMinBedroomsChange: (value: string) => void;
   onMaxBedroomsChange: (value: string) => void;
+  barMinPrice: string;
+  barMaxPrice: string;
+  onBarMinPriceChange: (value: string) => void;
+  onBarMaxPriceChange: (value: string) => void;
 }
 
 const LocationSearchBar = ({
@@ -49,6 +72,10 @@ const LocationSearchBar = ({
   maxBedrooms,
   onMinBedroomsChange,
   onMaxBedroomsChange,
+  barMinPrice,
+  barMaxPrice,
+  onBarMinPriceChange,
+  onBarMaxPriceChange,
 }: LocationSearchBarProps) => {
   const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
 
@@ -137,6 +164,89 @@ const LocationSearchBar = ({
                       {opt}
                     </button>
                   ))}
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Price Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[120px]">
+              <DollarSign className="w-4 h-4" />
+              <span className="text-sm font-medium">Price</span>
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 bg-popover z-50 p-4">
+            <div className="space-y-4">
+              {/* Min Price */}
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Min</p>
+                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                  <button
+                    onClick={() => onBarMinPriceChange(barMinPrice === '' ? '' : '')}
+                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                      barMinPrice === ''
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    No min
+                  </button>
+                  {priceOptions.map((price) => {
+                    const val = String(price);
+                    return (
+                      <button
+                        key={`min-${price}`}
+                        onClick={() => onBarMinPriceChange(barMinPrice === val ? '' : val)}
+                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                          barMinPrice === val
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background hover:border-primary/50'
+                        }`}
+                      >
+                        {formatPrice(price)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Max Price */}
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Max</p>
+                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                  <button
+                    onClick={() => onBarMaxPriceChange(barMaxPrice === '' ? '' : '')}
+                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                      barMaxPrice === ''
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    No max
+                  </button>
+                  {priceOptions.map((price) => {
+                    const val = String(price);
+                    return (
+                      <button
+                        key={`max-${price}`}
+                        onClick={() => onBarMaxPriceChange(barMaxPrice === val ? '' : val)}
+                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                          barMaxPrice === val
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background hover:border-primary/50'
+                        }`}
+                      >
+                        {formatPrice(price)}
+                        {price === 10000000 ? '+' : ''}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
