@@ -367,6 +367,8 @@ const Purchase = () => {
                 onPropertySelect={handlePropertySelect}
                 onDrawnAreaChange={handleDrawnAreaChange}
                 enableDrawing={true}
+                initialSearchLocation={locationInput}
+                searchRadius={radius}
               />
             </div>
           )}
@@ -405,6 +407,8 @@ const Purchase = () => {
               onPropertySelect={handlePropertySelect}
               onDrawnAreaChange={handleDrawnAreaChange}
               enableDrawing={true}
+              initialSearchLocation={locationInput}
+              searchRadius={radius}
             />
           )}
         </div>
