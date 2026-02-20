@@ -373,24 +373,31 @@ const Purchase = () => {
         </div>
 
         {/* Fullscreen Map Overlay */}
-        {showMap && mapFullscreen && (
-          <div className="fixed inset-0 z-50 bg-background">
-            <div className="absolute top-4 right-4 z-[1000] flex gap-1">
-              <button
-                onClick={() => setMapFullscreen(false)}
-                className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
-                title="Exit fullscreen"
-              >
-                <Minimize2 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => { setMapFullscreen(false); setShowMap(false); }}
-                className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
-                title="Close map"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+        <div
+          className={`fixed inset-0 z-50 bg-background transition-all duration-500 ease-in-out ${
+            showMap && mapFullscreen
+              ? "opacity-100 scale-100 pointer-events-auto"
+              : "opacity-0 scale-95 pointer-events-none"
+          }`}
+          style={{ transformOrigin: "right center" }}
+        >
+          <div className="absolute top-4 right-4 z-[1000] flex gap-1">
+            <button
+              onClick={() => setMapFullscreen(false)}
+              className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+              title="Exit fullscreen"
+            >
+              <Minimize2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => { setMapFullscreen(false); setShowMap(false); }}
+              className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+              title="Close map"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          {showMap && (
             <CompactPropertyMap
               properties={filteredProperties}
               height="100vh"
@@ -399,8 +406,8 @@ const Purchase = () => {
               onDrawnAreaChange={handleDrawnAreaChange}
               enableDrawing={true}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Property Detail Modal */}
         <PropertyDetailModal
