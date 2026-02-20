@@ -362,6 +362,8 @@ const Rent = () => {
                 onPropertySelect={handlePropertySelect}
                 onDrawnAreaChange={handleDrawnAreaChange}
                 enableDrawing={true}
+                initialSearchLocation={locationInput}
+                searchRadius={radius}
               />
             </div>
           )}
@@ -400,6 +402,8 @@ const Rent = () => {
               onPropertySelect={handlePropertySelect}
               onDrawnAreaChange={handleDrawnAreaChange}
               enableDrawing={true}
+              initialSearchLocation={locationInput}
+              searchRadius={radius}
             />
           )}
         </div>

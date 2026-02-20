@@ -43,6 +43,10 @@ interface CompactPropertyMapProps {
   defaultExpanded?: boolean;
   onDrawnAreaChange?: (polygon: DrawnPolygonCoordinate[] | null) => void;
   enableDrawing?: boolean;
+  /** Pre-fill location from search bar — when set, map pans there and draws a radius circle */
+  initialSearchLocation?: string;
+  /** Radius in km to draw around the searched location */
+  searchRadius?: number;
 }
 
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
@@ -52,13 +56,16 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   height = "250px",
   defaultExpanded = false,
   onDrawnAreaChange,
-  enableDrawing = true
+  enableDrawing = true,
+  initialSearchLocation = '',
+  searchRadius = 1,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
   const drawControlRef = useRef<L.Control.Draw | null>(null);
+  const searchCircleRef = useRef<L.Circle | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [searchAddress, setSearchAddress] = useState('');
@@ -131,6 +138,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         leafletMapRef.current = null;
         markersRef.current = [];
         drawnItemsRef.current = null;
+        searchCircleRef.current = null;
         setMapInitialized(false);
       }
     };
@@ -211,6 +219,50 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       }, 100);
     }
   }, [isExpanded]);
+
+  // Draw a circle for the searched location when map is ready
+  useEffect(() => {
+    if (!mapInitialized || !leafletMapRef.current || !initialSearchLocation?.trim()) return;
+
+    const drawLocationCircle = async () => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(initialSearchLocation + ', Lebanon')}&limit=1`
+        );
+        const data = await response.json();
+        if (!data || data.length === 0) return;
+
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        const radiusMeters = searchRadius * 1000;
+
+        // Remove any previous circle
+        if (searchCircleRef.current) {
+          searchCircleRef.current.remove();
+          searchCircleRef.current = null;
+        }
+
+        // Draw circle
+        const circle = L.circle([lat, lon], {
+          radius: radiusMeters,
+          color: 'hsl(30, 20%, 55%)',
+          fillColor: 'hsl(30, 20%, 65%)',
+          fillOpacity: 0.15,
+          weight: 2,
+          dashArray: '6 4',
+        }).addTo(leafletMapRef.current!);
+
+        searchCircleRef.current = circle;
+
+        // Fit map to circle bounds
+        leafletMapRef.current!.fitBounds(circle.getBounds(), { padding: [20, 20] });
+      } catch (err) {
+        console.error('Error drawing location circle:', err);
+      }
+    };
+
+    drawLocationCircle();
+  }, [mapInitialized, initialSearchLocation, searchRadius]);
 
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
