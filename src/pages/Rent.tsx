@@ -211,7 +211,6 @@ const Rent = () => {
           barMaxPrice={barMaxPrice}
           onBarMinPriceChange={setBarMinPrice}
           onBarMaxPriceChange={setBarMaxPrice}
-          listingType="rent"
         />
 
         {/* Filters Section */}
