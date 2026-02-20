@@ -215,6 +215,7 @@ const Purchase = () => {
           barMaxPrice={barMaxPrice}
           onBarMinPriceChange={setBarMinPrice}
           onBarMaxPriceChange={setBarMaxPrice}
+          listingType="sale"
         />
 
         {/* Filters Section */}
