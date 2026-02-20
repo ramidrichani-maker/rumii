@@ -211,6 +211,8 @@ const Rent = () => {
           barMaxPrice={barMaxPrice}
           onBarMinPriceChange={setBarMinPrice}
           onBarMaxPriceChange={setBarMaxPrice}
+          selectedPropertyTypes={selectedPropertyTypes}
+          onPropertyTypesChange={setSelectedPropertyTypes}
         />
 
         {/* Filters Section */}
