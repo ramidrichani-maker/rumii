@@ -268,136 +268,17 @@ const Rent = () => {
           onKeywordsChange={setKeywords}
         />
 
-        {/* Filters Section */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-2xl">Filter Properties</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            {/* Property Type Filter */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-foreground">Property Type</h3>
-              <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-3">
-                {propertyTypes.map(type => {
-                const Icon = type.icon;
-                const isSelected = selectedPropertyTypes.includes(type.id);
-                return <button key={type.id} onClick={() => togglePropertyType(type.id)} className={`p-4 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${isSelected ? "border-primary bg-primary/10 text-primary" : "border-border bg-background hover:border-primary/50"}`}>
-                      <Icon className="w-6 h-6 mx-auto mb-2" />
-                      <span className="text-xs font-medium">{type.name}</span>
-                    </button>;
-              })}
-              </div>
-            </div>
-
-            {/* Square Meters Filter */}
-            <RangeSlider
-              value={squareMetersRange}
-              onValueChange={setSquareMetersRange}
-              min={50}
-              max={1000}
-              step={5}
-              label="Square Meters Range"
-              unit=" m²"
-              maxLabel="1,000+ m²"
-            />
-
-            {/* Price Range Filter */}
-            <RangeSlider
-              value={priceRange}
-              onValueChange={setPriceRange}
-              min={0}
-              max={10000}
-              step={100}
-              label="Monthly Rent Range"
-              unit="$"
-              prefix="$"
-              maxLabel="$10,000+/mo"
-            />
-            {/* Amenities Filter */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-foreground">Amenities</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
-                {amenities.map(amenity => (
-                  <div key={amenity} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={amenity}
-                      checked={selectedAmenities.includes(amenity)}
-                      onCheckedChange={() => toggleAmenity(amenity)}
-                    />
-                    <label htmlFor={amenity} className="text-sm cursor-pointer">
-                      {amenity}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bedrooms Filter */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-foreground">
-                Minimum Bedrooms: {minBedrooms}
-              </h3>
-              <div className="flex gap-3">
-                {[1, 2, 3, 4, 5].map(bedroom => (
-                  <button 
-                    key={bedroom} 
-                    onClick={() => setMinBedrooms(bedroom)} 
-                    className={`w-12 h-12 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      minBedrooms === bedroom 
-                        ? "border-primary bg-primary text-primary-foreground" 
-                        : "border-border bg-background hover:border-primary/50"
-                    }`}
-                  >
-                    {bedroom}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Bathrooms Filter */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-foreground">
-                Minimum Bathrooms: {minBathrooms}
-              </h3>
-              <div className="flex gap-3">
-                {[1, 2, 3, 4, 5].map(bathroom => (
-                  <button 
-                    key={bathroom} 
-                    onClick={() => setMinBathrooms(bathroom)} 
-                    className={`w-12 h-12 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      minBathrooms === bathroom 
-                        ? "border-primary bg-primary text-primary-foreground" 
-                        : "border-border bg-background hover:border-primary/50"
-                    }`}
-                  >
-                    {bathroom}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Unfurnished Filter */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-foreground">Furnishing</h3>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="unfurnished-filter"
-                  checked={unfurnishedOnly}
-                  onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
-                />
-                <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
-                  Show only unfurnished properties
-                </label>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Button variant="outline" size="lg" onClick={handleClearFilters}>
-                Clear All
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Unfurnished Filter */}
+        <div className="mb-8 flex items-center space-x-2">
+          <Checkbox
+            id="unfurnished-filter"
+            checked={unfurnishedOnly}
+            onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
+          />
+          <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
+            Show only unfurnished properties
+          </label>
+        </div>
 
         {/* Property Map */}
         <div className="mb-8">
@@ -410,58 +291,6 @@ const Rent = () => {
             enableDrawing={true}
           />
         </div>
-
-        {/* Active Filters Display */}
-        {(selectedPropertyTypes.length > 0 || squareMetersRange[0] > 50 || squareMetersRange[1] < 1000 || priceRange[0] > 0 || priceRange[1] < 10000 || minBedrooms > 1 || minBathrooms > 1 || selectedAmenities.length > 0 || unfurnishedOnly || hasDrawnArea) && (
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-foreground">Active Filters:</h3>
-            <div className="flex flex-wrap gap-2">
-              {selectedPropertyTypes.map(typeId => {
-                const type = propertyTypes.find(t => t.id === typeId);
-                return (
-                  <Badge key={typeId} variant="secondary" className="px-3 py-1">
-                    {type?.name}
-                  </Badge>
-                );
-              })}
-              {(squareMetersRange[0] > 50 || squareMetersRange[1] < 1000) && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  {squareMetersRange[0]}-{squareMetersRange[1] >= 1000 ? '1,000+' : squareMetersRange[1]} m²
-                </Badge>
-              )}
-              {(priceRange[0] > 0 || priceRange[1] < 10000) && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  ${priceRange[0].toLocaleString()}-{priceRange[1] >= 10000 ? '$10,000+' : `$${priceRange[1].toLocaleString()}`}/mo
-                </Badge>
-              )}
-              {minBedrooms > 1 && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  Min {minBedrooms} bedrooms
-                </Badge>
-              )}
-              {minBathrooms > 1 && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  Min {minBathrooms} bathrooms
-                </Badge>
-              )}
-              {selectedAmenities.map(amenity => (
-                <Badge key={amenity} variant="secondary" className="px-3 py-1">
-                  {amenity}
-                </Badge>
-              ))}
-              {unfurnishedOnly && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  Unfurnished only
-                </Badge>
-              )}
-              {hasDrawnArea && (
-                <Badge variant="secondary" className="px-3 py-1 bg-primary/10 text-primary">
-                  Custom drawn area
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Results Summary */}
         <div className="text-center mb-6">
