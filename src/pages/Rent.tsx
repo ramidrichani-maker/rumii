@@ -103,9 +103,7 @@ const Rent = () => {
         query = query.gte('bathrooms', minBathrooms);
       }
 
-      if (selectedAmenities.length > 0) {
-        query = query.contains('amenities', selectedAmenities);
-      }
+      // Note: amenities filter is handled below together with must-haves and features
 
       if (unfurnishedOnly) {
         query = query.eq('unfurnished', true);
@@ -122,6 +120,49 @@ const Rent = () => {
       // Location search filter
       if (searchQuery) {
         query = query.or(`city.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,municipality.ilike.%${searchQuery}%`);
+      }
+
+      // Search bar bedrooms filter
+      const parsedBarMinBed = barMinBedrooms ? parseInt(barMinBedrooms) : null;
+      const parsedBarMaxBed = barMaxBedrooms ? parseInt(barMaxBedrooms) : null;
+      if (parsedBarMinBed && parsedBarMinBed > 0) {
+        query = query.gte('bedrooms', parsedBarMinBed);
+      }
+      if (parsedBarMaxBed && parsedBarMaxBed > 0) {
+        query = query.lte('bedrooms', parsedBarMaxBed);
+      }
+
+      // Search bar price filter
+      const parsedBarMinPrice = barMinPrice ? parseInt(barMinPrice.replace(/[^0-9]/g, '')) : null;
+      const parsedBarMaxPrice = barMaxPrice ? parseInt(barMaxPrice.replace(/[^0-9]/g, '')) : null;
+      if (parsedBarMinPrice && parsedBarMinPrice > 0) {
+        query = query.gte('price', parsedBarMinPrice);
+      }
+      if (parsedBarMaxPrice && parsedBarMaxPrice > 0) {
+        query = query.lte('price', parsedBarMaxPrice);
+      }
+
+      // Must-haves & features filter (stored in amenities array)
+      const allAmenityFilters = [...selectedAmenities, ...selectedMustHaves, ...selectedFeatures];
+      if (allAmenityFilters.length > 0) {
+        const unique = [...new Set(allAmenityFilters)];
+        query = query.contains('amenities', unique);
+      }
+
+      // Added to Oracle (date filter)
+      if (addedToOracle && addedToOracle !== 'anytime') {
+        const daysMap: Record<string, number> = { '24h': 1, '3d': 3, '7d': 7, '14d': 14, '30d': 30 };
+        const days = daysMap[addedToOracle];
+        if (days) {
+          const sinceDate = new Date();
+          sinceDate.setDate(sinceDate.getDate() - days);
+          query = query.gte('created_at', sinceDate.toISOString());
+        }
+      }
+
+      // Keywords filter
+      if (keywords.trim()) {
+        query = query.or(`address.ilike.%${keywords.trim()}%,city.ilike.%${keywords.trim()}%,municipality.ilike.%${keywords.trim()}%`);
       }
 
       const { data, error } = await query;
@@ -151,7 +192,7 @@ const Rent = () => {
     }, 500); // 500ms debounce delay
 
     return () => clearTimeout(timeoutId);
-  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery]);
+  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords]);
 
   const handleLocationChange = (value: string) => {
     setLocationInput(value);
