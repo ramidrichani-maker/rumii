@@ -56,6 +56,8 @@ const Rent = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedMustHaves, setSelectedMustHaves] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [addedToOracle, setAddedToOracle] = useState('');
+  const [keywords, setKeywords] = useState('');
   const [unfurnishedOnly, setUnfurnishedOnly] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -219,6 +221,10 @@ const Rent = () => {
           onMustHavesChange={setSelectedMustHaves}
           selectedFeatures={selectedFeatures}
           onFeaturesChange={setSelectedFeatures}
+          addedToOracle={addedToOracle}
+          onAddedToOracleChange={setAddedToOracle}
+          keywords={keywords}
+          onKeywordsChange={setKeywords}
         />
 
         {/* Filters Section */}
