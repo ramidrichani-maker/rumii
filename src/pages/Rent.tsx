@@ -54,6 +54,8 @@ const Rent = () => {
   const [barMinPrice, setBarMinPrice] = useState('');
   const [barMaxPrice, setBarMaxPrice] = useState('');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedMustHaves, setSelectedMustHaves] = useState<string[]>([]);
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [unfurnishedOnly, setUnfurnishedOnly] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -213,6 +215,10 @@ const Rent = () => {
           onBarMaxPriceChange={setBarMaxPrice}
           selectedPropertyTypes={selectedPropertyTypes}
           onPropertyTypesChange={setSelectedPropertyTypes}
+          selectedMustHaves={selectedMustHaves}
+          onMustHavesChange={setSelectedMustHaves}
+          selectedFeatures={selectedFeatures}
+          onFeaturesChange={setSelectedFeatures}
         />
 
         {/* Filters Section */}

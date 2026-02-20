@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { MapPin, ChevronDown, BedDouble, DollarSign, Home } from 'lucide-react';
+import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
@@ -34,6 +34,13 @@ const propertyTypeOptions = [
   'Apartment', 'Villa', 'Beach House', 'Chalet', 'Duplex', 'Triplex',
   'Penthouse', 'Commercial Rental', 'Farm House', 'Building', 'Venue',
   'Studio', 'Rooftop', 'Land',
+];
+
+const mustHaveOptions = ['Garden', 'Parking/Garage', 'Balcony/Terrace'];
+
+const propertyFeatureOptions = [
+  'Swimming Pool', 'Gym', 'Elevator', 'Storage Room',
+  'Security', 'Concierge', 'EV Charging', 'Patio', 'Basement',
 ];
 
 const generatePriceOptions = (): number[] => {
@@ -70,6 +77,10 @@ interface LocationSearchBarProps {
   onBarMaxPriceChange: (value: string) => void;
   selectedPropertyTypes: string[];
   onPropertyTypesChange: (types: string[]) => void;
+  selectedMustHaves: string[];
+  onMustHavesChange: (items: string[]) => void;
+  selectedFeatures: string[];
+  onFeaturesChange: (items: string[]) => void;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -88,9 +99,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onBarMaxPriceChange,
     selectedPropertyTypes,
     onPropertyTypesChange,
+    selectedMustHaves,
+    onMustHavesChange,
+    selectedFeatures,
+    onFeaturesChange,
   } = props;
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
+  const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
+  const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
   const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
 
   return (
@@ -329,6 +346,244 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   </button>
                 );
               })}
+            </div>
+          </PopoverContent>
+        </Popover>
+        {/* Filter Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[110px]">
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="text-sm font-medium">Filter</span>
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-[400px] bg-popover z-50 p-4 max-h-[80vh] overflow-y-auto">
+            <div className="space-y-5">
+              {/* Bedrooms section */}
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Bedrooms</h4>
+                <div className="flex gap-2 mb-2">
+                  <button
+                    onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'min' ? null : 'min')}
+                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                      activeFilterBedroomTab === 'min'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    Min: {minBedrooms || 'No min'}
+                  </button>
+                  <button
+                    onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'max' ? null : 'max')}
+                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                      activeFilterBedroomTab === 'max'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    Max: {maxBedrooms || 'No max'}
+                  </button>
+                </div>
+                {activeFilterBedroomTab && (
+                  <div className="flex flex-col gap-1 max-h-40 overflow-y-auto">
+                    <button
+                      onClick={() => {
+                        if (activeFilterBedroomTab === 'min') onMinBedroomsChange('');
+                        else onMaxBedroomsChange('');
+                      }}
+                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                        (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-background hover:border-primary/50'
+                      }`}
+                    >
+                      {activeFilterBedroomTab === 'min' ? 'No min' : 'No max'}
+                    </button>
+                    {bedroomOptions.map((opt) => {
+                      const currentVal = activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms;
+                      const onChange = activeFilterBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                      return (
+                        <button
+                          key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
+                          onClick={() => onChange(currentVal === opt ? '' : opt)}
+                          className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                            currentVal === opt
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-border bg-background hover:border-primary/50'
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Price section */}
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Price</h4>
+                <div className="flex gap-2 mb-2">
+                  <button
+                    onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'min' ? null : 'min')}
+                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                      activeFilterPriceTab === 'min'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
+                  </button>
+                  <button
+                    onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'max' ? null : 'max')}
+                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                      activeFilterPriceTab === 'max'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
+                  </button>
+                </div>
+                {activeFilterPriceTab && (
+                  <div className="flex flex-col gap-1 max-h-40 overflow-y-auto">
+                    <button
+                      onClick={() => {
+                        if (activeFilterPriceTab === 'min') onBarMinPriceChange('');
+                        else onBarMaxPriceChange('');
+                      }}
+                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                        (activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-background hover:border-primary/50'
+                      }`}
+                    >
+                      {activeFilterPriceTab === 'min' ? 'No min' : 'No max'}
+                    </button>
+                    {priceOptions.map((price) => {
+                      const val = String(price);
+                      const currentVal = activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice;
+                      const onChange = activeFilterPriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                      return (
+                        <button
+                          key={`filter-price-${activeFilterPriceTab}-${price}`}
+                          onClick={() => onChange(currentVal === val ? '' : val)}
+                          className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                            currentVal === val
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-border bg-background hover:border-primary/50'
+                          }`}
+                        >
+                          {formatPrice(price)}{price === 10000000 ? '+' : ''}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Property Type section */}
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Property Type</h4>
+                <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
+                  <button
+                    onClick={() => onPropertyTypesChange([])}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                      selectedPropertyTypes.length === 0
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
+                    Show All
+                  </button>
+                  {propertyTypeOptions.map((type) => {
+                    const typeId = type.toLowerCase();
+                    const isSelected = selectedPropertyTypes.includes(typeId);
+                    return (
+                      <button
+                        key={`filter-type-${type}`}
+                        onClick={() => {
+                          if (isSelected) {
+                            onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
+                          } else {
+                            onPropertyTypesChange([...selectedPropertyTypes, typeId]);
+                          }
+                        }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                          isSelected
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background hover:border-primary/50'
+                        }`}
+                      >
+                        <Checkbox checked={isSelected} className="pointer-events-none" />
+                        {type}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Must-Haves section */}
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Must-Haves</h4>
+                <div className="flex flex-col gap-2">
+                  {mustHaveOptions.map((item) => {
+                    const isSelected = selectedMustHaves.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => {
+                          if (isSelected) {
+                            onMustHavesChange(selectedMustHaves.filter(m => m !== item));
+                          } else {
+                            onMustHavesChange([...selectedMustHaves, item]);
+                          }
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <Checkbox checked={isSelected} className="pointer-events-none" />
+                        <span className="text-sm font-medium">{item}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Property Features section */}
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Property Features</h4>
+                <div className="grid grid-cols-2 gap-1">
+                  {propertyFeatureOptions.map((item) => {
+                    const isSelected = selectedFeatures.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => {
+                          if (isSelected) {
+                            onFeaturesChange(selectedFeatures.filter(f => f !== item));
+                          } else {
+                            onFeaturesChange([...selectedFeatures, item]);
+                          }
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <Checkbox checked={isSelected} className="pointer-events-none" />
+                        <span className="text-sm font-medium">{item}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
