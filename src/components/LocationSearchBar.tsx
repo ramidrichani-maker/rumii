@@ -180,14 +180,14 @@ const LocationSearchBar = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 bg-popover z-50 p-4">
-            <div className="space-y-4">
+            <div className="flex gap-4">
               {/* Min Price */}
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground mb-2">Min</p>
-                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                <div className="flex flex-col gap-1 max-h-52 overflow-y-auto">
                   <button
-                    onClick={() => onBarMinPriceChange(barMinPrice === '' ? '' : '')}
-                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                    onClick={() => onBarMinPriceChange('')}
+                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
                       barMinPrice === ''
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-border bg-background hover:border-primary/50'
@@ -201,7 +201,7 @@ const LocationSearchBar = ({
                       <button
                         key={`min-${price}`}
                         onClick={() => onBarMinPriceChange(barMinPrice === val ? '' : val)}
-                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
                           barMinPrice === val
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-border bg-background hover:border-primary/50'
@@ -214,15 +214,13 @@ const LocationSearchBar = ({
                 </div>
               </div>
 
-              <div className="border-t border-border" />
-
               {/* Max Price */}
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground mb-2">Max</p>
-                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                <div className="flex flex-col gap-1 max-h-52 overflow-y-auto">
                   <button
-                    onClick={() => onBarMaxPriceChange(barMaxPrice === '' ? '' : '')}
-                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                    onClick={() => onBarMaxPriceChange('')}
+                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
                       barMaxPrice === ''
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-border bg-background hover:border-primary/50'
@@ -236,14 +234,13 @@ const LocationSearchBar = ({
                       <button
                         key={`max-${price}`}
                         onClick={() => onBarMaxPriceChange(barMaxPrice === val ? '' : val)}
-                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
                           barMaxPrice === val
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-border bg-background hover:border-primary/50'
                         }`}
                       >
-                        {formatPrice(price)}
-                        {price === 10000000 ? '+' : ''}
+                        {formatPrice(price)}{price === 10000000 ? '+' : ''}
                       </button>
                     );
                   })}
