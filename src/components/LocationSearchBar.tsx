@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { MapPin, ChevronDown, BedDouble, DollarSign } from 'lucide-react';
+import { MapPin, ChevronDown, BedDouble, DollarSign, Home } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,12 @@ const radiusOptions = [
 ];
 
 const bedroomOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
+
+const propertyTypeOptions = [
+  'Apartment', 'Villa', 'Beach House', 'Chalet', 'Duplex', 'Triplex',
+  'Penthouse', 'Commercial Rental', 'Farm House', 'Building', 'Venue',
+  'Studio', 'Rooftop', 'Land',
+];
 
 const generatePriceOptions = (): number[] => {
   const prices: number[] = [];
@@ -61,6 +68,8 @@ interface LocationSearchBarProps {
   barMaxPrice: string;
   onBarMinPriceChange: (value: string) => void;
   onBarMaxPriceChange: (value: string) => void;
+  selectedPropertyTypes: string[];
+  onPropertyTypesChange: (types: string[]) => void;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -77,6 +86,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     barMaxPrice,
     onBarMinPriceChange,
     onBarMaxPriceChange,
+    selectedPropertyTypes,
+    onPropertyTypesChange,
   } = props;
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
@@ -262,6 +273,62 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   })}
                 </div>
               )}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Property Type Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[150px]">
+              <Home className="w-4 h-4" />
+              <span className="text-sm font-medium">Property Type</span>
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
+            <div className="flex flex-col gap-1 max-h-64 overflow-y-auto">
+              <button
+                onClick={() => onPropertyTypesChange([])}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                  selectedPropertyTypes.length === 0
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background hover:border-primary/50'
+                }`}
+              >
+                <Checkbox
+                  checked={selectedPropertyTypes.length === 0}
+                  className="pointer-events-none"
+                />
+                Show All
+              </button>
+              {propertyTypeOptions.map((type) => {
+                const typeId = type.toLowerCase();
+                const isSelected = selectedPropertyTypes.includes(typeId);
+                return (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      if (isSelected) {
+                        onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
+                      } else {
+                        onPropertyTypesChange([...selectedPropertyTypes, typeId]);
+                      }
+                    }}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                      isSelected
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    <Checkbox
+                      checked={isSelected}
+                      className="pointer-events-none"
+                    />
+                    {type}
+                  </button>
+                );
+              })}
             </div>
           </PopoverContent>
         </Popover>
