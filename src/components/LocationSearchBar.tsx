@@ -43,6 +43,15 @@ const propertyFeatureOptions = [
   'Security', 'Concierge', 'EV Charging', 'Patio', 'Basement',
 ];
 
+const addedToOracleOptions = [
+  { label: 'Anytime', value: '' },
+  { label: 'Last 24 hours', value: '1' },
+  { label: 'Last 3 days', value: '3' },
+  { label: 'Last 7 days', value: '7' },
+  { label: 'Last 14 days', value: '14' },
+  { label: 'Last 30 days', value: '30' },
+];
+
 const generatePriceOptions = (): number[] => {
   const prices: number[] = [];
   for (let p = 10000; p < 250000; p += 10000) prices.push(p);
@@ -81,6 +90,10 @@ interface LocationSearchBarProps {
   onMustHavesChange: (items: string[]) => void;
   selectedFeatures: string[];
   onFeaturesChange: (items: string[]) => void;
+  addedToOracle: string;
+  onAddedToOracleChange: (value: string) => void;
+  keywords: string;
+  onKeywordsChange: (value: string) => void;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -103,6 +116,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onMustHavesChange,
     selectedFeatures,
     onFeaturesChange,
+    addedToOracle,
+    onAddedToOracleChange,
+    keywords,
+    onKeywordsChange,
   } = props;
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
@@ -583,6 +600,48 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     );
                   })}
                 </div>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Added to Oracle section */}
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Added to Oracle</h4>
+                <div className="flex flex-col gap-1">
+                  {addedToOracleOptions.map((option) => (
+                    <button
+                      key={option.label}
+                      onClick={() => onAddedToOracleChange(option.value)}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-left ${
+                        addedToOracle === option.value
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        addedToOracle === option.value ? 'border-primary-foreground' : 'border-muted-foreground'
+                      }`}>
+                        {addedToOracle === option.value && (
+                          <div className="w-2 h-2 rounded-full bg-primary-foreground" />
+                        )}
+                      </div>
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* Keywords section */}
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Keywords</h4>
+                <Input
+                  value={keywords}
+                  onChange={(e) => onKeywordsChange(e.target.value)}
+                  placeholder="e.g. sea view, modern, quiet..."
+                  className="h-10 text-sm"
+                />
               </div>
             </div>
           </PopoverContent>
