@@ -274,18 +274,8 @@ const Purchase = () => {
           onKeywordsChange={setKeywords}
         />
 
-        {/* Unfurnished & Map View Toggle */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="unfurnished-filter"
-              checked={unfurnishedOnly}
-              onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
-            />
-            <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
-              Show only unfurnished properties
-            </label>
-          </div>
+        {/* Map View Toggle - directly under search bar */}
+        <div className="mb-4 flex items-center">
           <button
             onClick={() => setShowMap(prev => !prev)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-200 ${
@@ -297,6 +287,18 @@ const Purchase = () => {
             <Map className="w-4 h-4" />
             Map View
           </button>
+        </div>
+
+        {/* Unfurnished Filter */}
+        <div className="mb-6 flex items-center space-x-2">
+          <Checkbox
+            id="unfurnished-filter"
+            checked={unfurnishedOnly}
+            onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
+          />
+          <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
+            Show only unfurnished properties
+          </label>
         </div>
 
         {/* Results Summary */}
@@ -316,9 +318,9 @@ const Purchase = () => {
         </div>
 
         {/* Split Layout: Results + Map */}
-        <div className={`flex gap-6 ${showMap ? '' : ''}`}>
+        <div className={`flex flex-col ${showMap ? 'md:flex-row' : ''} gap-6`}>
           {/* Property Grid */}
-          <div className={`${showMap ? 'w-1/2' : 'w-full'} transition-all duration-300`}>
+          <div className={`${showMap ? 'w-full md:w-1/2' : 'w-full'} transition-all duration-300`}>
             {!isLoading && filteredProperties.length > 0 && (
               <div className="mb-8">
                 <ScrollReveal animation="fade-up">
@@ -340,7 +342,7 @@ const Purchase = () => {
 
           {/* Map Panel */}
           {showMap && (
-            <div className="w-1/2 sticky top-4 self-start">
+            <div className="w-full md:w-1/2 md:sticky md:top-4 md:self-start">
               <CompactPropertyMap
                 properties={filteredProperties}
                 height="calc(100vh - 200px)"
