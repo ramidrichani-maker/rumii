@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House, Map } from "lucide-react";
+import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House, Map, Maximize2, Minimize2, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -64,6 +64,7 @@ const Purchase = () => {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [mapFullscreen, setMapFullscreen] = useState(false);
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
 
@@ -341,8 +342,24 @@ const Purchase = () => {
           </div>
 
           {/* Map Panel */}
-          {showMap && (
-            <div className="w-full md:w-1/2 md:sticky md:top-4 md:self-start">
+          {showMap && !mapFullscreen && (
+            <div className="w-full md:w-1/2 md:sticky md:top-4 md:self-start relative">
+              <div className="absolute top-2 right-2 z-[1000] flex gap-1">
+                <button
+                  onClick={() => setMapFullscreen(true)}
+                  className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                  title="Fullscreen"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowMap(false)}
+                  className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                  title="Close map"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
               <CompactPropertyMap
                 properties={filteredProperties}
                 height="calc(100vh - 200px)"
@@ -354,6 +371,36 @@ const Purchase = () => {
             </div>
           )}
         </div>
+
+        {/* Fullscreen Map Overlay */}
+        {showMap && mapFullscreen && (
+          <div className="fixed inset-0 z-50 bg-background">
+            <div className="absolute top-4 right-4 z-[1000] flex gap-1">
+              <button
+                onClick={() => setMapFullscreen(false)}
+                className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                title="Exit fullscreen"
+              >
+                <Minimize2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => { setMapFullscreen(false); setShowMap(false); }}
+                className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                title="Close map"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <CompactPropertyMap
+              properties={filteredProperties}
+              height="100vh"
+              defaultExpanded={true}
+              onPropertySelect={handlePropertySelect}
+              onDrawnAreaChange={handleDrawnAreaChange}
+              enableDrawing={true}
+            />
+          </div>
+        )}
 
         {/* Property Detail Modal */}
         <PropertyDetailModal
