@@ -79,6 +79,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onBarMaxPriceChange,
   } = props;
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
+  const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
   const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
 
   return (
@@ -126,48 +127,66 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
-            <div className="space-y-4">
-              {/* Min Bedrooms */}
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-2">Min</p>
-                <div className="flex flex-wrap gap-2">
-                  {bedroomOptions.map((opt) => (
-                    <button
-                      key={`min-${opt}`}
-                      onClick={() => onMinBedroomsChange(minBedrooms === opt ? '' : opt)}
-                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
-                        minBedrooms === opt
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-background hover:border-primary/50'
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
+            <div className="space-y-3">
+              {/* Min / Max toggle buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
+                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    activeBedroomTab === 'min'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background hover:border-primary/50'
+                  }`}
+                >
+                  Min: {minBedrooms || 'No min'}
+                </button>
+                <button
+                  onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
+                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    activeBedroomTab === 'max'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background hover:border-primary/50'
+                  }`}
+                >
+                  Max: {maxBedrooms || 'No max'}
+                </button>
               </div>
 
-              <div className="border-t border-border" />
-
-              {/* Max Bedrooms */}
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-2">Max</p>
-                <div className="flex flex-wrap gap-2">
-                  {bedroomOptions.map((opt) => (
-                    <button
-                      key={`max-${opt}`}
-                      onClick={() => onMaxBedroomsChange(maxBedrooms === opt ? '' : opt)}
-                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
-                        maxBedrooms === opt
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-background hover:border-primary/50'
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
+              {/* Options list */}
+              {activeBedroomTab && (
+                <div className="flex flex-col gap-1 max-h-52 overflow-y-auto">
+                  <button
+                    onClick={() => {
+                      if (activeBedroomTab === 'min') onMinBedroomsChange('');
+                      else onMaxBedroomsChange('');
+                    }}
+                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                      (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    {activeBedroomTab === 'min' ? 'No min' : 'No max'}
+                  </button>
+                  {bedroomOptions.map((opt) => {
+                    const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
+                    const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                    return (
+                      <button
+                        key={`${activeBedroomTab}-${opt}`}
+                        onClick={() => onChange(currentVal === opt ? '' : opt)}
+                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                          currentVal === opt
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background hover:border-primary/50'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
+              )}
             </div>
           </PopoverContent>
         </Popover>
