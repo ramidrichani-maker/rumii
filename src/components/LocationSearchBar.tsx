@@ -63,20 +63,22 @@ interface LocationSearchBarProps {
   onBarMaxPriceChange: (value: string) => void;
 }
 
-const LocationSearchBar = ({
-  location,
-  onLocationChange,
-  radius,
-  onRadiusChange,
-  minBedrooms,
-  maxBedrooms,
-  onMinBedroomsChange,
-  onMaxBedroomsChange,
-  barMinPrice,
-  barMaxPrice,
-  onBarMinPriceChange,
-  onBarMaxPriceChange,
-}: LocationSearchBarProps) => {
+const LocationSearchBar = (props: LocationSearchBarProps) => {
+  const {
+    location,
+    onLocationChange,
+    radius,
+    onRadiusChange,
+    minBedrooms,
+    maxBedrooms,
+    onMinBedroomsChange,
+    onMaxBedroomsChange,
+    barMinPrice,
+    barMaxPrice,
+    onBarMinPriceChange,
+    onBarMaxPriceChange,
+  } = props;
+  const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
   const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
 
   return (
@@ -179,63 +181,58 @@ const LocationSearchBar = ({
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 bg-popover z-50 p-4">
-            <div className="flex gap-4">
-              {/* Min Price */}
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground mb-2">Min</p>
-                <div className="flex flex-col gap-1 max-h-52 overflow-y-auto">
-                  <button
-                    onClick={() => onBarMinPriceChange('')}
-                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
-                      barMinPrice === ''
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
-                    }`}
-                  >
-                    No min
-                  </button>
-                  {priceOptions.map((price) => {
-                    const val = String(price);
-                    return (
-                      <button
-                        key={`min-${price}`}
-                        onClick={() => onBarMinPriceChange(barMinPrice === val ? '' : val)}
-                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
-                          barMinPrice === val
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background hover:border-primary/50'
-                        }`}
-                      >
-                        {formatPrice(price)}
-                      </button>
-                    );
-                  })}
-                </div>
+           <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
+            <div className="space-y-3">
+              {/* Min / Max toggle buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
+                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    activePriceTab === 'min'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background hover:border-primary/50'
+                  }`}
+                >
+                  Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
+                </button>
+                <button
+                  onClick={() => setActivePriceTab(activePriceTab === 'max' ? null : 'max')}
+                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    activePriceTab === 'max'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background hover:border-primary/50'
+                  }`}
+                >
+                  Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
+                </button>
               </div>
 
-              {/* Max Price */}
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground mb-2">Max</p>
+              {/* Options list */}
+              {activePriceTab && (
                 <div className="flex flex-col gap-1 max-h-52 overflow-y-auto">
                   <button
-                    onClick={() => onBarMaxPriceChange('')}
+                    onClick={() => {
+                      if (activePriceTab === 'min') onBarMinPriceChange('');
+                      else onBarMaxPriceChange('');
+                    }}
                     className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
-                      barMaxPrice === ''
+                      (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-border bg-background hover:border-primary/50'
                     }`}
                   >
-                    No max
+                    {activePriceTab === 'min' ? 'No min' : 'No max'}
                   </button>
                   {priceOptions.map((price) => {
                     const val = String(price);
+                    const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
+                    const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
                     return (
                       <button
-                        key={`max-${price}`}
-                        onClick={() => onBarMaxPriceChange(barMaxPrice === val ? '' : val)}
+                        key={`${activePriceTab}-${price}`}
+                        onClick={() => onChange(currentVal === val ? '' : val)}
                         className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
-                          barMaxPrice === val
+                          currentVal === val
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-border bg-background hover:border-primary/50'
                         }`}
@@ -245,7 +242,7 @@ const LocationSearchBar = ({
                     );
                   })}
                 </div>
-              </div>
+              )}
             </div>
           </PopoverContent>
         </Popover>
