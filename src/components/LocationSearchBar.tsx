@@ -29,7 +29,7 @@ const radiusOptions = [
 
 const bedroomOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10+'];
 
-const generatePriceOptions = (): number[] => {
+const generateSalePriceOptions = (): number[] => {
   const prices: number[] = [];
   for (let p = 10000; p < 250000; p += 10000) prices.push(p);
   for (let p = 250000; p < 500000; p += 25000) prices.push(p);
@@ -40,7 +40,19 @@ const generatePriceOptions = (): number[] => {
   return prices;
 };
 
-const priceOptions = generatePriceOptions();
+const generateRentPriceOptions = (): number[] => {
+  const prices: number[] = [];
+  for (let p = 100; p < 500; p += 50) prices.push(p);
+  for (let p = 500; p < 1000; p += 100) prices.push(p);
+  for (let p = 1000; p < 2500; p += 250) prices.push(p);
+  for (let p = 2500; p < 5000; p += 500) prices.push(p);
+  for (let p = 5000; p <= 10000; p += 1000) prices.push(p);
+  for (let p = 15000; p <= 50000; p += 5000) prices.push(p);
+  return prices;
+};
+
+const salePriceOptions = generateSalePriceOptions();
+const rentPriceOptions = generateRentPriceOptions();
 
 const formatPrice = (value: number): string => {
   if (value >= 1000000) return `$${(value / 1000000).toFixed(value % 1000000 === 0 ? 0 : 1)}M`;
@@ -61,6 +73,7 @@ interface LocationSearchBarProps {
   barMaxPrice: string;
   onBarMinPriceChange: (value: string) => void;
   onBarMaxPriceChange: (value: string) => void;
+  listingType?: 'rent' | 'sale';
 }
 
 const LocationSearchBar = ({
@@ -76,8 +89,11 @@ const LocationSearchBar = ({
   barMaxPrice,
   onBarMinPriceChange,
   onBarMaxPriceChange,
+  listingType = 'sale',
 }: LocationSearchBarProps) => {
   const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
+  const priceOptions = listingType === 'rent' ? rentPriceOptions : salePriceOptions;
+  const maxPriceValue = listingType === 'rent' ? 50000 : 10000000;
 
   return (
     <div className="mb-6">
@@ -240,7 +256,7 @@ const LocationSearchBar = ({
                             : 'border-border bg-background hover:border-primary/50'
                         }`}
                       >
-                        {formatPrice(price)}{price === 10000000 ? '+' : ''}
+                        {formatPrice(price)}{price === maxPriceValue ? '+' : ''}
                       </button>
                     );
                   })}
