@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House } from "lucide-react";
+import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House, Map } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -63,6 +63,7 @@ const Rent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
 
@@ -268,28 +269,29 @@ const Rent = () => {
           onKeywordsChange={setKeywords}
         />
 
-        {/* Unfurnished Filter */}
-        <div className="mb-8 flex items-center space-x-2">
-          <Checkbox
-            id="unfurnished-filter"
-            checked={unfurnishedOnly}
-            onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
-          />
-          <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
-            Show only unfurnished properties
-          </label>
-        </div>
-
-        {/* Property Map */}
-        <div className="mb-8">
-          <CompactPropertyMap 
-            properties={filteredProperties} 
-            height="300px"
-            defaultExpanded={false}
-            onPropertySelect={handlePropertySelect}
-            onDrawnAreaChange={handleDrawnAreaChange}
-            enableDrawing={true}
-          />
+        {/* Unfurnished & Map View Toggle */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="unfurnished-filter"
+              checked={unfurnishedOnly}
+              onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
+            />
+            <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
+              Show only unfurnished properties
+            </label>
+          </div>
+          <button
+            onClick={() => setShowMap(prev => !prev)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-200 ${
+              showMap
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-background hover:border-primary/50 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Map className="w-4 h-4" />
+            Map View
+          </button>
         </div>
 
         {/* Results Summary */}
@@ -308,24 +310,43 @@ const Rent = () => {
           )}
         </div>
 
-        {/* Property Grid */}
-        {!isLoading && filteredProperties.length > 0 && (
-          <div className="mb-8">
-            <ScrollReveal animation="fade-up">
-              <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
-            </ScrollReveal>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProperties.map((property, index) => (
-                <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
-                  <PropertyCard
-                    property={property}
-                    onClick={handlePropertySelect}
-                  />
+        {/* Split Layout: Results + Map */}
+        <div className={`flex gap-6`}>
+          {/* Property Grid */}
+          <div className={`${showMap ? 'w-1/2' : 'w-full'} transition-all duration-300`}>
+            {!isLoading && filteredProperties.length > 0 && (
+              <div className="mb-8">
+                <ScrollReveal animation="fade-up">
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
                 </ScrollReveal>
-              ))}
-            </div>
+                <div className={`grid ${showMap ? 'grid-cols-1 lg:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'} gap-6`}>
+                  {filteredProperties.map((property, index) => (
+                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
+                      <PropertyCard
+                        property={property}
+                        onClick={handlePropertySelect}
+                      />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Map Panel */}
+          {showMap && (
+            <div className="w-1/2 sticky top-4 self-start">
+              <CompactPropertyMap
+                properties={filteredProperties}
+                height="calc(100vh - 200px)"
+                defaultExpanded={true}
+                onPropertySelect={handlePropertySelect}
+                onDrawnAreaChange={handleDrawnAreaChange}
+                enableDrawing={true}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Property Detail Modal */}
         <PropertyDetailModal
