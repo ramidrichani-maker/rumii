@@ -287,7 +287,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
-            <div className="flex flex-col gap-1 max-h-64 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-1 max-h-64 overflow-y-auto">
               <button
                 onClick={() => onPropertyTypesChange([])}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
