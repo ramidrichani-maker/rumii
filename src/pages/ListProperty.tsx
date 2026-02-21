@@ -42,7 +42,8 @@ interface UploadedImage {
   roomType: string;
 }
 const formSchema = z.object({
-  municipality: z.string().min(1, "District is required"),
+  municipality: z.string().min(1, "Governorate is required"),
+  description: z.string().optional(),
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Full address is required"),
   propertyType: z.string().min(1, "Property type is required"),
@@ -229,6 +230,7 @@ const ListProperty = () => {
         images: imageUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
+        description: data.description || null,
         status: 'pending'
       }).select('id').single();
 
@@ -311,21 +313,23 @@ const ListProperty = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FormField control={form.control} name="municipality" render={({
-                  field
+                   field
                 }) => <FormItem>
-                        <FormLabel>District</FormLabel>
+                        <FormLabel>Governorate</FormLabel>
                         <FormControl>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select district" />
+                              <SelectValue placeholder="Select governorate" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="Beirut">Beirut</SelectItem>
-                              <SelectItem value="Jbeil">Jbeil</SelectItem>
-                              <SelectItem value="Batroun">Batroun</SelectItem>
-                              <SelectItem value="Faqra">Faqra</SelectItem>
-                              <SelectItem value="Faraya">Faraya</SelectItem>
-                              <SelectItem value="Broumana">Broumana</SelectItem>
+                              <SelectItem value="Mount Lebanon">Mount Lebanon</SelectItem>
+                              <SelectItem value="North Lebanon">North Lebanon</SelectItem>
+                              <SelectItem value="South Lebanon">South Lebanon</SelectItem>
+                              <SelectItem value="Bekaa">Bekaa</SelectItem>
+                              <SelectItem value="Nabatiyeh">Nabatiyeh</SelectItem>
+                              <SelectItem value="Baalbek-Hermel">Baalbek-Hermel</SelectItem>
+                              <SelectItem value="Akkar">Akkar</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -342,12 +346,22 @@ const ListProperty = () => {
                         <FormMessage />
                       </FormItem>} />
 
-                  <FormField control={form.control} name="address" render={({
-                  field
+                   <FormField control={form.control} name="address" render={({
+                   field
                 }) => <FormItem>
                         <FormLabel>Full Address</FormLabel>
                         <FormControl>
                           <Textarea placeholder="Enter complete address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>} />
+
+                  <FormField control={form.control} name="description" render={({
+                   field
+                }) => <FormItem>
+                        <FormLabel>Description (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Describe the property and its ambience..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>} />

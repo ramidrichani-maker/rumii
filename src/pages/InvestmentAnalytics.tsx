@@ -80,14 +80,16 @@ const InvestmentAnalytics = () => {
       // Base rental calculation (this would typically use real market data)
       let baseRentalPerSqm = 15; // Base $15 per sqm
       
-      // District multipliers
+      // Governorate multipliers
       const locationMultipliers: { [key: string]: number } = {
         'beirut': 1.5,
-        'jbeil': 1.2,
-        'batroun': 1.1,
-        'faqra': 1.3,
-        'faraya': 1.3,
-        'broumana': 1.2
+        'mount lebanon': 1.3,
+        'north lebanon': 1.0,
+        'south lebanon': 0.9,
+        'bekaa': 0.85,
+        'nabatiyeh': 0.8,
+        'baalbek-hermel': 0.75,
+        'akkar': 0.7
       };
       
       // Property type multipliers
@@ -179,18 +181,20 @@ const InvestmentAnalytics = () => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">District</Label>
+                  <Label htmlFor="location">Governorate</Label>
                   <Select onValueChange={(value) => handleSelectChange('location', value)} value={formData.location}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select district" />
+                      <SelectValue placeholder="Select governorate" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="beirut">Beirut</SelectItem>
-                      <SelectItem value="jbeil">Jbeil</SelectItem>
-                      <SelectItem value="batroun">Batroun</SelectItem>
-                      <SelectItem value="faqra">Faqra</SelectItem>
-                      <SelectItem value="faraya">Faraya</SelectItem>
-                      <SelectItem value="broumana">Broumana</SelectItem>
+                      <SelectItem value="mount lebanon">Mount Lebanon</SelectItem>
+                      <SelectItem value="north lebanon">North Lebanon</SelectItem>
+                      <SelectItem value="south lebanon">South Lebanon</SelectItem>
+                      <SelectItem value="bekaa">Bekaa</SelectItem>
+                      <SelectItem value="nabatiyeh">Nabatiyeh</SelectItem>
+                      <SelectItem value="baalbek-hermel">Baalbek-Hermel</SelectItem>
+                      <SelectItem value="akkar">Akkar</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
