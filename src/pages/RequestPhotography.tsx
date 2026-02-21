@@ -259,20 +259,22 @@ export default function RequestPhotography() {
                     name="municipality"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>District (Optional)</FormLabel>
+                        <FormLabel>Governorate (Optional)</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select district" />
+                              <SelectValue placeholder="Select governorate" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="Beirut">Beirut</SelectItem>
-                            <SelectItem value="Jbeil">Jbeil</SelectItem>
-                            <SelectItem value="Batroun">Batroun</SelectItem>
-                            <SelectItem value="Faqra">Faqra</SelectItem>
-                            <SelectItem value="Faraya">Faraya</SelectItem>
-                            <SelectItem value="Broumana">Broumana</SelectItem>
+                            <SelectItem value="Mount Lebanon">Mount Lebanon</SelectItem>
+                            <SelectItem value="North Lebanon">North Lebanon</SelectItem>
+                            <SelectItem value="South Lebanon">South Lebanon</SelectItem>
+                            <SelectItem value="Bekaa">Bekaa</SelectItem>
+                            <SelectItem value="Nabatiyeh">Nabatiyeh</SelectItem>
+                            <SelectItem value="Baalbek-Hermel">Baalbek-Hermel</SelectItem>
+                            <SelectItem value="Akkar">Akkar</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

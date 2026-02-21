@@ -423,6 +423,7 @@ export type Database = {
           bedrooms: number
           city: string
           created_at: string
+          description: string | null
           featured_section: string | null
           floors: number | null
           id: string
@@ -452,6 +453,7 @@ export type Database = {
           bedrooms: number
           city: string
           created_at?: string
+          description?: string | null
           featured_section?: string | null
           floors?: number | null
           id?: string
@@ -481,6 +483,7 @@ export type Database = {
           bedrooms?: number
           city?: string
           created_at?: string
+          description?: string | null
           featured_section?: string | null
           floors?: number | null
           id?: string
