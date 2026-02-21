@@ -273,7 +273,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Options list */}
               {activePriceTab && (
-                <div className="flex flex-col gap-1 max-h-52 overflow-y-auto">
+                <div className="grid grid-cols-2 gap-1 max-h-52 overflow-y-auto">
                   <button
                     onClick={() => {
                       if (activePriceTab === 'min') onBarMinPriceChange('');
@@ -466,7 +466,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   </button>
                 </div>
                 {activeFilterPriceTab && (
-                  <div className="flex flex-col gap-1 max-h-40 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-1 max-h-40 overflow-y-auto">
                     <button
                       onClick={() => {
                         if (activeFilterPriceTab === 'min') onBarMinPriceChange('');
