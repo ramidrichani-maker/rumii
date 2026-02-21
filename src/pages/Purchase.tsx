@@ -89,12 +89,10 @@ const Purchase = () => {
         .eq('listing_type', 'sale')
         .eq('status', 'approved');
 
-      // Apply filters
       if (selectedPropertyTypes.length > 0) {
         query = query.in('property_type', selectedPropertyTypes as any);
       }
 
-      // Square meters filter (handle 1000+ case)
       if (squareMetersRange[1] >= 1000) {
         query = query.gte('square_meters', squareMetersRange[0]);
       } else {
@@ -109,13 +107,10 @@ const Purchase = () => {
         query = query.gte('bathrooms', minBathrooms);
       }
 
-      // Note: amenities filter is handled below together with must-haves and features
-
       if (unfurnishedOnly) {
         query = query.eq('unfurnished', true);
       }
 
-      // Price filter
       if (priceRange[0] > 0) {
         query = query.gte('price', priceRange[0]);
       }
@@ -123,12 +118,10 @@ const Purchase = () => {
         query = query.lte('price', priceRange[1]);
       }
 
-      // Location search filter
       if (searchQuery) {
         query = query.or(`city.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,municipality.ilike.%${searchQuery}%`);
       }
 
-      // Search bar bedrooms filter
       const parsedBarMinBed = barMinBedrooms ? parseInt(barMinBedrooms) : null;
       const parsedBarMaxBed = barMaxBedrooms ? parseInt(barMaxBedrooms) : null;
       if (parsedBarMinBed && parsedBarMinBed > 0) {
@@ -138,7 +131,6 @@ const Purchase = () => {
         query = query.lte('bedrooms', parsedBarMaxBed);
       }
 
-      // Search bar price filter
       const parsedBarMinPrice = barMinPrice ? parseInt(barMinPrice.replace(/[^0-9]/g, '')) : null;
       const parsedBarMaxPrice = barMaxPrice ? parseInt(barMaxPrice.replace(/[^0-9]/g, '')) : null;
       if (parsedBarMinPrice && parsedBarMinPrice > 0) {
@@ -148,15 +140,12 @@ const Purchase = () => {
         query = query.lte('price', parsedBarMaxPrice);
       }
 
-      // Must-haves & features filter (stored in amenities array)
       const allAmenityFilters = [...selectedAmenities, ...selectedMustHaves, ...selectedFeatures];
       if (allAmenityFilters.length > 0) {
-        // Override the earlier amenities filter - remove duplicates
         const unique = [...new Set(allAmenityFilters)];
         query = query.contains('amenities', unique);
       }
 
-      // Added to Oracle (date filter)
       if (addedToOracle && addedToOracle !== 'anytime') {
         const daysMap: Record<string, number> = { '24h': 1, '3d': 3, '7d': 7, '14d': 14, '30d': 30 };
         const days = daysMap[addedToOracle];
@@ -167,7 +156,6 @@ const Purchase = () => {
         }
       }
 
-      // Keywords filter
       if (keywords.trim()) {
         query = query.or(`address.ilike.%${keywords.trim()}%,city.ilike.%${keywords.trim()}%,municipality.ilike.%${keywords.trim()}%`);
       }
@@ -192,11 +180,10 @@ const Purchase = () => {
     fetchProperties();
   }, []);
 
-  // Auto-fetch when filters change with debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchProperties();
-    }, 500); // 500ms debounce delay
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords]);
@@ -232,12 +219,12 @@ const Purchase = () => {
     setDrawnPolygon(polygon);
   }, [setDrawnPolygon]);
 
-  // Filter properties by drawn polygon
   const filteredProperties = filterPropertiesByPolygon(properties);
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="container mx-auto px-4 py-8">
+      {/* Header & Filters - always in container */}
+      <div className="container mx-auto px-4 py-8 pb-0">
         <ScrollReveal animation="fade-up">
           <div className="mb-8">
             <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
@@ -249,7 +236,6 @@ const Purchase = () => {
           </div>
         </ScrollReveal>
 
-        {/* Location Search Bar */}
         <LocationSearchBar
           location={locationInput}
           onLocationChange={handleLocationChange}
@@ -275,7 +261,6 @@ const Purchase = () => {
           onKeywordsChange={setKeywords}
         />
 
-        {/* Map View Toggle - directly under search bar */}
         <div className="mb-4 flex items-center">
           <button
             onClick={() => setShowMap(prev => !prev)}
@@ -290,7 +275,6 @@ const Purchase = () => {
           </button>
         </div>
 
-        {/* Unfurnished Filter */}
         <div className="mb-6 flex items-center space-x-2">
           <Checkbox
             id="unfurnished-filter"
@@ -302,7 +286,6 @@ const Purchase = () => {
           </label>
         </div>
 
-        {/* Results Summary */}
         <div className="text-center mb-6">
           {isLoading ? (
             <p className="text-muted-foreground">Loading properties...</p>
@@ -317,11 +300,16 @@ const Purchase = () => {
             </p>
           )}
         </div>
+      </div>
 
-        {/* Split Layout: Results + Map */}
+      {/* Split Layout: full-width when map is shown */}
+      <div className={`${showMap ? 'px-4' : 'container mx-auto px-4'}`}>
         <div className={`flex flex-col ${showMap ? 'md:flex-row' : ''} gap-6`}>
           {/* Property Grid */}
-          <div className={`${showMap ? 'w-full md:w-1/2' : 'w-full'} transition-all duration-300`}>
+          <div
+            className={`${showMap ? 'w-full md:w-1/2 overflow-y-auto' : 'w-full'} transition-all duration-300`}
+            style={showMap ? { maxHeight: 'calc(100vh - 120px)' } : undefined}
+          >
             {!isLoading && filteredProperties.length > 0 && (
               <div className="mb-8">
                 <ScrollReveal animation="fade-up">
@@ -341,9 +329,9 @@ const Purchase = () => {
             )}
           </div>
 
-          {/* Map Panel */}
+          {/* Map Panel - right half of viewport */}
           {showMap && !mapFullscreen && (
-            <div className="w-full md:w-1/2 md:sticky md:top-4 md:self-start relative">
+            <div className="w-full md:w-1/2 md:sticky md:top-0 md:self-start relative" style={{ height: 'calc(100vh - 120px)' }}>
               <div className="absolute top-2 right-2 z-[1000] flex gap-1">
                 <button
                   onClick={() => setMapFullscreen(true)}
@@ -362,7 +350,7 @@ const Purchase = () => {
               </div>
               <CompactPropertyMap
                 properties={filteredProperties}
-                height="calc(100vh - 200px)"
+                height="100%"
                 defaultExpanded={true}
                 onPropertySelect={handlePropertySelect}
                 onDrawnAreaChange={handleDrawnAreaChange}
@@ -373,54 +361,54 @@ const Purchase = () => {
             </div>
           )}
         </div>
-
-        {/* Fullscreen Map Overlay */}
-        <div
-          className={`fixed inset-0 z-50 bg-background transition-all duration-500 ease-in-out ${
-            showMap && mapFullscreen
-              ? "opacity-100 scale-100 pointer-events-auto"
-              : "opacity-0 scale-95 pointer-events-none"
-          }`}
-          style={{ transformOrigin: "right center" }}
-        >
-          <div className="absolute top-4 right-4 z-[1000] flex gap-1">
-            <button
-              onClick={() => setMapFullscreen(false)}
-              className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
-              title="Exit fullscreen"
-            >
-              <Minimize2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => { setMapFullscreen(false); setShowMap(false); }}
-              className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
-              title="Close map"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          {showMap && (
-            <CompactPropertyMap
-              properties={filteredProperties}
-              height="100vh"
-              defaultExpanded={true}
-              onPropertySelect={handlePropertySelect}
-              onDrawnAreaChange={handleDrawnAreaChange}
-              enableDrawing={true}
-              initialSearchLocation={locationInput}
-              searchRadius={radius}
-            />
-          )}
-        </div>
-
-        {/* Property Detail Modal */}
-        <PropertyDetailModal
-          property={selectedProperty}
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          allowDelete={false}
-        />
       </div>
+
+      {/* Fullscreen Map Overlay */}
+      <div
+        className={`fixed inset-0 z-50 bg-background transition-all duration-500 ease-in-out ${
+          showMap && mapFullscreen
+            ? "opacity-100 scale-100 pointer-events-auto"
+            : "opacity-0 scale-95 pointer-events-none"
+        }`}
+        style={{ transformOrigin: "right center" }}
+      >
+        <div className="absolute top-4 right-4 z-[1000] flex gap-1">
+          <button
+            onClick={() => setMapFullscreen(false)}
+            className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+            title="Exit fullscreen"
+          >
+            <Minimize2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => { setMapFullscreen(false); setShowMap(false); }}
+            className="p-2 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+            title="Close map"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        {showMap && (
+          <CompactPropertyMap
+            properties={filteredProperties}
+            height="100vh"
+            defaultExpanded={true}
+            onPropertySelect={handlePropertySelect}
+            onDrawnAreaChange={handleDrawnAreaChange}
+            enableDrawing={true}
+            initialSearchLocation={locationInput}
+            searchRadius={radius}
+          />
+        )}
+      </div>
+
+      {/* Property Detail Modal */}
+      <PropertyDetailModal
+        property={selectedProperty}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        allowDelete={false}
+      />
     </div>
   );
 };
