@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -64,6 +65,11 @@ export const AdminPropertyListingsManager = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
 
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
   useEffect(() => {
     loadProperties();
   }, []);
@@ -71,6 +77,11 @@ export const AdminPropertyListingsManager = () => {
   useEffect(() => {
     filterProperties();
   }, [properties, searchQuery, statusFilter, typeFilter]);
+
+  // Clear selection when filters change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [searchQuery, statusFilter, typeFilter]);
 
   const loadProperties = async () => {
     setIsLoading(true);
@@ -82,7 +93,6 @@ export const AdminPropertyListingsManager = () => {
 
       if (error) throw error;
 
-      // Fetch related data
       const propertiesWithDetails = await Promise.all(
         (data || []).map(async (property) => {
           const { data: profile } = await supabase
@@ -148,6 +158,28 @@ export const AdminPropertyListingsManager = () => {
     setFilteredProperties(filtered);
   };
 
+  // --- Selection helpers ---
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProperties.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProperties.map((p) => p.id)));
+    }
+  };
+
+  const allSelected = filteredProperties.length > 0 && selectedIds.size === filteredProperties.length;
+  const someSelected = selectedIds.size > 0 && selectedIds.size < filteredProperties.length;
+
+  // --- Handlers ---
   const handleViewProperty = (property: Property) => {
     setSelectedProperty(property);
     setIsDetailModalOpen(true);
@@ -189,6 +221,39 @@ export const AdminPropertyListingsManager = () => {
         description: "Failed to delete property",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleBulkDelete = async (reason: string) => {
+    if (selectedIds.size === 0) return;
+    setIsBulkDeleting(true);
+
+    try {
+      const ids = Array.from(selectedIds);
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .in('id', ids);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `${ids.length} ${ids.length === 1 ? 'property' : 'properties'} deleted. Reason: ${reason}`,
+      });
+
+      setSelectedIds(new Set());
+      loadProperties();
+      setBulkDeleteDialogOpen(false);
+    } catch (error) {
+      console.error('Error bulk deleting properties:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete selected properties",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBulkDeleting(false);
     }
   };
 
@@ -255,6 +320,31 @@ export const AdminPropertyListingsManager = () => {
           </Button>
         </div>
 
+        {/* Bulk actions bar */}
+        {selectedIds.size > 0 && (
+          <div className="flex items-center gap-3 mb-4 p-3 rounded-lg border border-destructive/30 bg-destructive/5">
+            <span className="text-sm font-medium">
+              {selectedIds.size} {selectedIds.size === 1 ? 'property' : 'properties'} selected
+            </span>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              disabled={isBulkDeleting}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete Selected
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        )}
+
         {/* Properties Table */}
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground">Loading properties...</div>
@@ -265,6 +355,18 @@ export const AdminPropertyListingsManager = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={allSelected}
+                      ref={(el) => {
+                        if (el) {
+                          (el as any).indeterminate = someSelected;
+                        }
+                      }}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="Select all"
+                    />
+                  </TableHead>
                   <TableHead>Code</TableHead>
                   <TableHead>Address</TableHead>
                   <TableHead>Type</TableHead>
@@ -276,7 +378,14 @@ export const AdminPropertyListingsManager = () => {
               </TableHeader>
               <TableBody>
                 {filteredProperties.map((property) => (
-                  <TableRow key={property.id}>
+                  <TableRow key={property.id} data-state={selectedIds.has(property.id) ? "selected" : undefined}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedIds.has(property.id)}
+                        onCheckedChange={() => toggleSelect(property.id)}
+                        aria-label={`Select property ${property.property_code}`}
+                      />
+                    </TableCell>
                     <TableCell className="font-mono text-sm">{property.property_code}</TableCell>
                     <TableCell>
                       <div>
@@ -370,12 +479,20 @@ export const AdminPropertyListingsManager = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Single Delete Confirmation Dialog */}
       <PropertyDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteProperty}
         propertyAddress={propertyToDelete?.address || ""}
+      />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <PropertyDeleteDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={handleBulkDelete}
+        propertyAddress={`${selectedIds.size} selected ${selectedIds.size === 1 ? 'property' : 'properties'}`}
       />
     </Card>
   );
