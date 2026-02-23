@@ -42,6 +42,9 @@ const amenities = [
 const Purchase = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
+  const urlMinBeds = searchParams.get('minBeds') || '';
+  const urlMaxPrice = searchParams.get('maxPrice') || '';
+  const urlMinYearBuilt = searchParams.get('minYearBuilt') || '';
   const [locationInput, setLocationInput] = useState(searchQuery);
   const [radius, setRadius] = useState(1);
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
@@ -49,10 +52,10 @@ const Purchase = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
   const [minBedrooms, setMinBedrooms] = useState(1);
   const [minBathrooms, setMinBathrooms] = useState(1);
-  const [barMinBedrooms, setBarMinBedrooms] = useState('');
+  const [barMinBedrooms, setBarMinBedrooms] = useState(urlMinBeds);
   const [barMaxBedrooms, setBarMaxBedrooms] = useState('');
   const [barMinPrice, setBarMinPrice] = useState('');
-  const [barMaxPrice, setBarMaxPrice] = useState('');
+  const [barMaxPrice, setBarMaxPrice] = useState(urlMaxPrice);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedMustHaves, setSelectedMustHaves] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
@@ -160,6 +163,13 @@ const Purchase = () => {
         query = query.or(`address.ilike.%${keywords.trim()}%,city.ilike.%${keywords.trim()}%,municipality.ilike.%${keywords.trim()}%`);
       }
 
+      if (urlMinYearBuilt) {
+        const minYear = parseInt(urlMinYearBuilt);
+        if (minYear > 0) {
+          query = query.gte('year_built', minYear);
+        }
+      }
+
       const { data, error } = await query;
 
       if (error) throw error;
@@ -186,7 +196,7 @@ const Purchase = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords]);
+  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords, urlMinYearBuilt]);
 
   const handleLocationChange = (value: string) => {
     setLocationInput(value);
