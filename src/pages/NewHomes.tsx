@@ -38,10 +38,7 @@ const generatePriceOptions = (): { label: string; value: string }[] => {
   for (let p = 3000000; p < 5000000; p += 250000) prices.push(p);
   for (let p = 5000000; p <= 10000000; p += 500000) prices.push(p);
   prices.forEach((v) => {
-    let label: string;
-    if (v >= 1000000) label = `$${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M`;
-    else if (v >= 1000) label = `$${(v / 1000).toFixed(0)}K`;
-    else label = `$${v}`;
+    const label = `$${v.toLocaleString()}`;
     options.push({ label, value: String(v) });
   });
   return options;

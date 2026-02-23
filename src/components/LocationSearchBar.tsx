@@ -67,9 +67,7 @@ const generatePriceOptions = (): number[] => {
 const priceOptions = generatePriceOptions();
 
 const formatPrice = (value: number): string => {
-  if (value >= 1000000) return `$${(value / 1000000).toFixed(value % 1000000 === 0 ? 0 : 1)}M`;
-  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
-  return `$${value}`;
+  return `$${value.toLocaleString()}`;
 };
 
 interface LocationSearchBarProps {
