@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -50,12 +50,35 @@ export const Navbar = () => {
   return <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <Home className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">Oracle Estates</span>
-          </Link>
+          <div className="flex items-center space-x-6">
+            <Link to="/" className="flex items-center space-x-2">
+              <Home className="w-6 h-6 text-primary" />
+              <span className="text-xl font-bold">Oracle Estates</span>
+            </Link>
+            <nav className="hidden md:flex items-center space-x-1">
+              <Link to="/purchase">
+                <Button variant="ghost" size="sm">Buy</Button>
+              </Link>
+              <Link to="/rent">
+                <Button variant="ghost" size="sm">Rent</Button>
+              </Link>
+              <Link to="/find-agents">
+                <Button variant="ghost" size="sm">Find agents</Button>
+              </Link>
+              <Link to="/new-homes">
+                <Button variant="ghost" size="sm">New homes</Button>
+              </Link>
+              <Link to="/agent-valuation">
+                <Button variant="ghost" size="sm">Agent valuation</Button>
+              </Link>
+            </nav>
+          </div>
 
           <div className="flex items-center space-x-4">
+            <Link to="/favorites" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <Bookmark className="w-4 h-4" />
+              <span>Saved</span>
+            </Link>
             {user ? <>
                 <NotificationBell />
                 
@@ -102,12 +125,6 @@ export const Navbar = () => {
                       <Link to="/investment-analytics" className="flex items-center">
                         <BarChart3 className="mr-2 h-4 w-4" />
                         <span>Investment Analytics</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/favorites" className="flex items-center">
-                        <Heart className="mr-2 h-4 w-4" />
-                        <span>Favorites</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
