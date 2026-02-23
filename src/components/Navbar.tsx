@@ -56,19 +56,6 @@ export const Navbar = () => {
           </Link>
 
           <div className="flex items-center space-x-4">
-            <Link to="/request-photography">
-              <Button variant="ghost" size="sm" className="hidden md:flex">
-                <Camera className="w-4 h-4 mr-2" />
-                Photography Service
-              </Button>
-            </Link>
-            <Link to="/investment-analytics">
-              <Button variant="ghost" size="sm" className="hidden md:flex">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Investment Analytics
-              </Button>
-            </Link>
-
             {user ? <>
                 <NotificationBell />
                 
@@ -103,6 +90,12 @@ export const Navbar = () => {
                       <Link to="/profile" className="flex items-center">
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/request-photography" className="flex items-center">
+                        <Camera className="mr-2 h-4 w-4" />
+                        <span>Photography Service</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
