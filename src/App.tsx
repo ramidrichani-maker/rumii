@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import ChatAssistant from "./pages/ChatAssistant";
 import RequestPhotography from "./pages/RequestPhotography";
 import TermsOfService from "./pages/TermsOfService";
+import NewHomes from "./pages/NewHomes";
 import { FloatingChatWidget } from "./components/FloatingChatWidget";
 
 const queryClient = new QueryClient();
@@ -73,6 +74,7 @@ const AppRoutes = () => {
           <Route path="/chat" element={<ChatAssistant />} />
           <Route path="/request-photography" element={<RequestPhotography />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/new-homes" element={<NewHomes />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
