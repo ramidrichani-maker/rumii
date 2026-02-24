@@ -603,6 +603,63 @@ export type Database = {
           },
         ]
       }
+      property_enquiries: {
+        Row: {
+          agency_id: string | null
+          agent_id: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone_number: string
+          property_id: string
+          sender_user_id: string | null
+          wants_viewing: boolean
+        }
+        Insert: {
+          agency_id?: string | null
+          agent_id?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone_number: string
+          property_id: string
+          sender_user_id?: string | null
+          wants_viewing?: boolean
+        }
+        Update: {
+          agency_id?: string | null
+          agent_id?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone_number?: string
+          property_id?: string
+          sender_user_id?: string | null
+          wants_viewing?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_enquiries_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_enquiries_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_generated_images: {
         Row: {
           approved: boolean
