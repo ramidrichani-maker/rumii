@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AgentContactBox from "@/components/AgentContactBox";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -11,6 +12,7 @@ interface Property {
   address: string;
   city: string;
   municipality?: string;
+  agency_id?: string;
   price: number;
   property_type: string;
   bedrooms: number;
@@ -269,7 +271,10 @@ const PropertyDetail = () => {
 
   return (
     <div className="min-h-screen bg-background pt-4 pb-16">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="flex flex-col lg:flex-row gap-8">
+        {/* Left column - main content */}
+        <div className="flex-1 min-w-0">
         {/* Back button */}
         <Button
           variant="ghost"
@@ -476,6 +481,18 @@ const PropertyDetail = () => {
             </div>
           </div>
         )}
+        </div>
+
+        {/* Right column - agent contact box */}
+        <div className="lg:w-[300px] shrink-0">
+          <div className="lg:sticky lg:top-20">
+            <AgentContactBox
+              propertyId={property.id}
+              agencyId={property.agency_id}
+            />
+          </div>
+        </div>
+        </div>
       </div>
     </div>
   );
