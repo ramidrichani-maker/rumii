@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
+  const navigate = useNavigate();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
@@ -162,10 +164,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     <Card 
       className="animate-fade-in hover-scale hover:shadow-xl transition-all duration-300 cursor-pointer"
       onClick={(e) => {
-        // Only trigger property details if not clicking on buttons or interactive elements
         const target = e.target as HTMLElement;
         if (!target.closest('button') && !target.closest('[role="button"]')) {
-          onClick(property);
+          navigate(`/property/${property.id}`);
         }
       }}
     >
