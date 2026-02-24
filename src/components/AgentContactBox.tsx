@@ -69,12 +69,13 @@ const AgentContactBox = ({ propertyId, agencyId }: AgentContactBoxProps) => {
     );
   }
 
-  if (!agent && !agencyName) return null;
+  const displayAgencyName = agencyName || "Oracle";
+  const displayPhone = agent?.phone_number || "+96170612686";
+  const displayAgentName = agent?.full_name || "Oracle Agent";
 
   const handleCallClick = () => {
-    if (!agent) return;
     if (showPhone) {
-      window.location.href = `tel:${agent.phone_number}`;
+      window.location.href = `tel:${displayPhone}`;
     } else {
       setShowPhone(true);
     }
@@ -82,29 +83,23 @@ const AgentContactBox = ({ propertyId, agencyId }: AgentContactBoxProps) => {
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-      {agencyName && (
-        <div className="flex items-center gap-2 text-foreground">
-          <Building2 className="w-5 h-5 text-muted-foreground" />
-          <span className="font-semibold">{agencyName}</span>
-        </div>
-      )}
+      <div className="flex items-center gap-2 text-foreground">
+        <Building2 className="w-5 h-5 text-muted-foreground" />
+        <span className="font-semibold">{displayAgencyName}</span>
+      </div>
 
-      {agent && (
-        <p className="text-sm text-muted-foreground">
-          Agent: {agent.full_name}
-        </p>
-      )}
+      <p className="text-sm text-muted-foreground">
+        Agent: {displayAgentName}
+      </p>
 
-      {agent && (
-        <Button
-          variant="outline"
-          className="w-full gap-2"
-          onClick={handleCallClick}
-        >
-          <Phone className="w-4 h-4" />
-          {showPhone ? agent.phone_number : "Call agent"}
-        </Button>
-      )}
+      <Button
+        variant="outline"
+        className="w-full gap-2"
+        onClick={handleCallClick}
+      >
+        <Phone className="w-4 h-4" />
+        {showPhone ? displayPhone : "Call agent"}
+      </Button>
 
       <Button
         className="w-full gap-2"
