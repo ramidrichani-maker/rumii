@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN floor_plan_url text;

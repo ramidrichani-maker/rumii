@@ -51,6 +51,7 @@ interface Agency {
 export const AdminPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -136,6 +137,21 @@ export const AdminPropertyForm = () => {
     
     try {
       let imageUrls: string[] = [];
+      let floorPlanUrl: string | null = null;
+
+      // Upload floor plan
+      if (floorPlanFile) {
+        const fileExt = floorPlanFile.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
+        const { error: fpError } = await supabase.storage
+          .from('property-images')
+          .upload(fileName, floorPlanFile);
+        if (fpError) throw fpError;
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(fileName);
+        floorPlanUrl = publicUrl;
+      }
 
       if (uploadedFiles.length > 0) {
         const uploadPromises = uploadedFiles.map(async (file, index) => {
@@ -176,6 +192,7 @@ export const AdminPropertyForm = () => {
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
         images: imageUrls,
+        floor_plan_url: floorPlanUrl,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
@@ -193,6 +210,8 @@ export const AdminPropertyForm = () => {
       form.reset();
       setSelectedAmenities([]);
       setUploadedFiles([]);
+      setFloorPlanFile(null);
+      setSelectedAgency(null);
       setSelectedAgency(null);
     } catch (error) {
       console.error('Error listing property:', error);
@@ -507,6 +526,39 @@ export const AdminPropertyForm = () => {
                       </Button>
                     </div>
                   ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Floor Plan Upload */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Floor Plan (Optional)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center">
+                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <Label htmlFor="admin-floor-plan-upload" className="cursor-pointer">
+                  <span className="text-primary hover:text-primary/80">Click to upload floor plan</span>
+                </Label>
+                <Input
+                  id="admin-floor-plan-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setFloorPlanFile(file);
+                  }}
+                  className="hidden"
+                />
+              </div>
+              {floorPlanFile && (
+                <div className="mt-3 flex items-center justify-between p-2 bg-muted rounded">
+                  <span className="text-sm truncate">{floorPlanFile.name}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFile(null)}>
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               )}
             </CardContent>
