@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AgentContactBox from "@/components/AgentContactBox";
 import L from "leaflet";
@@ -28,6 +28,7 @@ interface Property {
   description?: string;
   latitude?: number;
   longitude?: number;
+  floor_plan_url?: string;
 }
 
 interface NearbySchool {
@@ -47,11 +48,16 @@ const PropertyDetail = () => {
   const [satelliteView, setSatelliteView] = useState(false);
   const [nearbySchools, setNearbySchools] = useState<NearbySchool[]>([]);
   const [schoolsLoading, setSchoolsLoading] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+  const [showFloorPlan, setShowFloorPlan] = useState(false);
+  const [showMapOverlay, setShowMapOverlay] = useState(false);
 
   const miniMapRef = useRef<HTMLDivElement>(null);
   const miniMapInstance = useRef<L.Map | null>(null);
   const expandedMapRef = useRef<HTMLDivElement>(null);
   const expandedMapInstance = useRef<L.Map | null>(null);
+  const overlayMapRef = useRef<HTMLDivElement>(null);
+  const overlayMapInstance = useRef<L.Map | null>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [descriptionClamped, setDescriptionClamped] = useState(false);
 
@@ -72,7 +78,6 @@ const PropertyDetail = () => {
     fetchProperty();
   }, [id]);
 
-  // Check if description is clamped
   useEffect(() => {
     if (descriptionRef.current) {
       setDescriptionClamped(
@@ -81,13 +86,12 @@ const PropertyDetail = () => {
     }
   }, [property?.description]);
 
-  // Fetch nearby schools using Overpass API
   useEffect(() => {
     if (!property?.latitude || !property?.longitude) return;
     const fetchSchools = async () => {
       setSchoolsLoading(true);
       try {
-        const radius = 5000; // 5km
+        const radius = 5000;
         const query = `[out:json];node["amenity"="school"](around:${radius},${property.latitude},${property.longitude});out body 4;`;
         const res = await fetch(
           `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
@@ -116,7 +120,6 @@ const PropertyDetail = () => {
     fetchSchools();
   }, [property?.latitude, property?.longitude]);
 
-  // Mini map
   useEffect(() => {
     if (!miniMapRef.current || !property?.latitude || !property?.longitude) return;
     if (miniMapInstance.current) {
@@ -139,12 +142,9 @@ const PropertyDetail = () => {
     ).addTo(map);
 
     const icon = L.icon({
-      iconUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-      iconRetinaUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-      shadowUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+      iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+      iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+      shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
       iconSize: [25, 41],
       iconAnchor: [12, 41],
     });
@@ -160,11 +160,9 @@ const PropertyDetail = () => {
     };
   }, [property?.latitude, property?.longitude]);
 
-  // Expanded map
   useEffect(() => {
     if (!mapExpanded || !expandedMapRef.current || !property?.latitude || !property?.longitude) return;
 
-    // Small delay so the DOM is ready
     const timer = setTimeout(() => {
       if (expandedMapInstance.current) {
         expandedMapInstance.current.remove();
@@ -192,12 +190,9 @@ const PropertyDetail = () => {
       }
 
       const icon = L.icon({
-        iconUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-        iconRetinaUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-        shadowUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
       });
@@ -205,7 +200,6 @@ const PropertyDetail = () => {
       L.marker([property.latitude!, property.longitude!], { icon }).addTo(map);
       expandedMapInstance.current = map;
 
-      // Store layers for toggle
       (map as any)._streetLayer = streetLayer;
       (map as any)._satelliteLayer = satelliteLayer;
     }, 50);
@@ -218,6 +212,46 @@ const PropertyDetail = () => {
       }
     };
   }, [mapExpanded, property?.latitude, property?.longitude, satelliteView]);
+
+  useEffect(() => {
+    if (!showMapOverlay || !overlayMapRef.current || !property?.latitude || !property?.longitude) return;
+
+    const timer = setTimeout(() => {
+      if (overlayMapInstance.current) {
+        overlayMapInstance.current.remove();
+        overlayMapInstance.current = null;
+      }
+
+      const map = L.map(overlayMapRef.current!, { attributionControl: false }).setView(
+        [property.latitude!, property.longitude!],
+        15
+      );
+
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        { maxZoom: 20 }
+      ).addTo(map);
+
+      const icon = L.icon({
+        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+      });
+
+      L.marker([property.latitude!, property.longitude!], { icon }).addTo(map);
+      overlayMapInstance.current = map;
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      if (overlayMapInstance.current) {
+        overlayMapInstance.current.remove();
+        overlayMapInstance.current = null;
+      }
+    };
+  }, [showMapOverlay, property?.latitude, property?.longitude]);
 
   const goToImage = useCallback(
     (direction: "left" | "right") => {
@@ -263,6 +297,7 @@ const PropertyDetail = () => {
     property.images && property.images.length > 0
       ? property.images[currentImageIndex]
       : null;
+  const photoCount = property.images?.length || 0;
 
   const formatPrice = (price: number, listingType: string) => {
     const formatted = `$${price.toLocaleString()}`;
@@ -322,7 +357,7 @@ const PropertyDetail = () => {
                 <ChevronRight className="w-6 h-6" />
               </button>
 
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
+              <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
                 {property.images.map((_, i) => (
                   <span
                     key={i}
@@ -336,6 +371,42 @@ const PropertyDetail = () => {
               </div>
             </>
           )}
+
+          {/* Bottom overlay bar */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center gap-2 px-3 py-2 bg-black/60 backdrop-blur-sm">
+            {/* Photos button */}
+            {photoCount > 0 && (
+              <button
+                onClick={() => setShowGallery(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
+              >
+                <Image className="w-4 h-4" />
+                {photoCount} photo{photoCount !== 1 ? "s" : ""}
+              </button>
+            )}
+
+            {/* Floor plan button */}
+            {property.floor_plan_url && (
+              <button
+                onClick={() => setShowFloorPlan(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
+              >
+                <Layers className="w-4 h-4" />
+                Floor plan
+              </button>
+            )}
+
+            {/* Map button */}
+            {property.latitude && property.longitude && (
+              <button
+                onClick={() => setShowMapOverlay(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
+              >
+                <MapPin className="w-4 h-4" />
+                Map
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Property info */}
@@ -372,7 +443,6 @@ const PropertyDetail = () => {
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-foreground mb-4">About this property</h2>
 
-          {/* Amenities 2-column dash list */}
           {property.amenities && property.amenities.length > 0 && (
             <ul className="grid grid-cols-2 gap-x-6 gap-y-1.5 mb-5">
               {property.amenities.map((amenity, i) => (
@@ -384,7 +454,6 @@ const PropertyDetail = () => {
             </ul>
           )}
 
-          {/* Description */}
           {property.description && (
             <div className="mt-4">
               <p
@@ -414,7 +483,6 @@ const PropertyDetail = () => {
               Local area information
             </h2>
 
-            {/* Mini map */}
             <div className="relative rounded-xl overflow-hidden border border-border">
               <div ref={miniMapRef} className="w-full h-[200px]" />
               <Button
@@ -428,7 +496,6 @@ const PropertyDetail = () => {
               </Button>
             </div>
 
-            {/* Expanded map modal */}
             {mapExpanded && (
               <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col">
                 <div className="flex items-center justify-between p-4">
@@ -454,7 +521,6 @@ const PropertyDetail = () => {
               </div>
             )}
 
-            {/* Nearby schools */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-foreground mb-3">Nearby schools</h3>
               {schoolsLoading ? (
@@ -494,6 +560,95 @@ const PropertyDetail = () => {
         </div>
         </div>
       </div>
+
+      {/* Gallery overlay */}
+      {showGallery && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto">
+          <div className="max-w-5xl mx-auto px-4 py-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-foreground">
+                All Photos ({photoCount})
+              </h3>
+              <button
+                onClick={() => setShowGallery(false)}
+                className="p-2 rounded-full hover:bg-muted transition-colors"
+                aria-label="Close gallery"
+              >
+                <X className="w-5 h-5 text-foreground" />
+              </button>
+            </div>
+            <div className="flex flex-col lg:flex-row gap-8">
+              <div className="flex-1 min-w-0">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {property.images.map((img, i) => (
+                    <div key={i} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                      <img
+                        src={img}
+                        alt={`Photo ${i + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/placeholder.svg";
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="lg:w-[300px] shrink-0">
+                <AgentContactBox
+                  propertyId={property.id}
+                  agencyId={property.agency_id}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floor plan overlay */}
+      {showFloorPlan && property.floor_plan_url && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center">
+          <div className="w-full max-w-4xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-foreground">Floor Plan</h3>
+              <button
+                onClick={() => setShowFloorPlan(false)}
+                className="p-2 rounded-full hover:bg-muted transition-colors"
+                aria-label="Close floor plan"
+              >
+                <X className="w-5 h-5 text-foreground" />
+              </button>
+            </div>
+            <div className="rounded-xl overflow-hidden bg-muted">
+              <img
+                src={property.floor_plan_url}
+                alt="Floor plan"
+                className="w-full h-auto object-contain max-h-[80vh]"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Map overlay (from image bar) */}
+      {showMapOverlay && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col">
+          <div className="flex items-center justify-between p-4">
+            <h3 className="text-lg font-semibold text-foreground">Property Location</h3>
+            <button
+              onClick={() => setShowMapOverlay(false)}
+              className="p-2 rounded-full hover:bg-muted transition-colors"
+              aria-label="Close map"
+            >
+              <X className="w-5 h-5 text-foreground" />
+            </button>
+          </div>
+          <div ref={overlayMapRef} className="flex-1" />
+        </div>
+      )}
     </div>
   );
 };

@@ -74,6 +74,7 @@ interface Agency {
 const AgentPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -171,6 +172,21 @@ const AgentPropertyForm = () => {
       }
 
       let imageUrls: string[] = [];
+      let floorPlanUrl: string | null = null;
+
+      // Upload floor plan
+      if (floorPlanFile) {
+        const fileExt = floorPlanFile.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
+        const { error: fpError } = await supabase.storage
+          .from('property-images')
+          .upload(fileName, floorPlanFile);
+        if (fpError) throw fpError;
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(fileName);
+        floorPlanUrl = publicUrl;
+      }
 
       if (uploadedImages.length > 0) {
         const uploadPromises = uploadedImages.map(async (uploadedImage, index) => {
@@ -216,6 +232,7 @@ const AgentPropertyForm = () => {
         apartments_count: data.apartmentsCount ? parseInt(data.apartmentsCount) : null,
         amenities: selectedAmenities,
         images: imageUrls,
+        floor_plan_url: floorPlanUrl,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
@@ -241,6 +258,7 @@ const AgentPropertyForm = () => {
       form.reset();
       setSelectedAmenities([]);
       setUploadedImages([]);
+      setFloorPlanFile(null);
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
@@ -568,6 +586,39 @@ const AgentPropertyForm = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Floor Plan Upload */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Floor Plan (Optional)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center">
+                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <Label htmlFor="agent-floor-plan-upload" className="cursor-pointer">
+                  <span className="text-primary hover:text-primary/80">Click to upload floor plan</span>
+                </Label>
+                <Input
+                  id="agent-floor-plan-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setFloorPlanFile(file);
+                  }}
+                  className="hidden"
+                />
+              </div>
+              {floorPlanFile && (
+                <div className="mt-3 flex items-center justify-between p-3 bg-muted rounded">
+                  <span className="text-sm truncate">{floorPlanFile.name}</span>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFile(null)}>
+                    Remove
+                  </Button>
                 </div>
               )}
             </CardContent>

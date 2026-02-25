@@ -425,6 +425,7 @@ export type Database = {
           created_at: string
           description: string | null
           featured_section: string | null
+          floor_plan_url: string | null
           floors: number | null
           id: string
           images: string[] | null
@@ -455,6 +456,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           featured_section?: string | null
+          floor_plan_url?: string | null
           floors?: number | null
           id?: string
           images?: string[] | null
@@ -485,6 +487,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           featured_section?: string | null
+          floor_plan_url?: string | null
           floors?: number | null
           id?: string
           images?: string[] | null

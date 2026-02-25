@@ -41,6 +41,7 @@ interface UploadedImage {
   file: File;
   roomType: string;
 }
+
 const formSchema = z.object({
   municipality: z.string().min(1, "Governorate is required"),
   description: z.string().optional(),
@@ -70,6 +71,7 @@ const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -179,6 +181,21 @@ const ListProperty = () => {
       }
 
       let imageUrls: string[] = [];
+      let floorPlanUrl: string | null = null;
+
+      // Upload floor plan if provided
+      if (floorPlanFile) {
+        const fileExt = floorPlanFile.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
+        const { error: fpError } = await supabase.storage
+          .from('property-images')
+          .upload(fileName, floorPlanFile);
+        if (fpError) throw fpError;
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(fileName);
+        floorPlanUrl = publicUrl;
+      }
 
       // Upload images to Supabase storage if there are any
       if (uploadedImages.length > 0) {
@@ -197,7 +214,6 @@ const ListProperty = () => {
             throw uploadError;
           }
 
-          // Get public URL for the uploaded image
           const { data: { publicUrl } } = supabase.storage
             .from('property-images')
             .getPublicUrl(fileName);
@@ -228,6 +244,7 @@ const ListProperty = () => {
         apartments_count: data.apartmentsCount ? parseInt(data.apartmentsCount) : null,
         amenities: selectedAmenities,
         images: imageUrls,
+        floor_plan_url: floorPlanUrl,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
@@ -264,6 +281,7 @@ const ListProperty = () => {
       form.reset();
       setSelectedAmenities([]);
       setUploadedImages([]);
+      setFloorPlanFile(null);
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
@@ -663,6 +681,45 @@ const ListProperty = () => {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Floor Plan Upload */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Floor Plan (Optional)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                  <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                  <Label htmlFor="floor-plan-upload" className="cursor-pointer">
+                    <span className="text-primary hover:text-primary/80">Click to upload floor plan</span>
+                  </Label>
+                  <Input
+                    id="floor-plan-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setFloorPlanFile(file);
+                    }}
+                    className="hidden"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
+                </div>
+                {floorPlanFile && (
+                  <div className="mt-3 flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-16 bg-background rounded overflow-hidden">
+                        <img src={URL.createObjectURL(floorPlanFile)} alt="Floor plan preview" className="w-full h-full object-cover" />
+                      </div>
+                      <span className="text-sm font-medium truncate">{floorPlanFile.name}</span>
+                    </div>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFile(null)} className="text-destructive">
+                      Remove
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
