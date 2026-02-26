@@ -156,7 +156,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
       onClick={() => navigate(`/property/${property.id}`)}
     >
       {/* Left: Image */}
-      <div className="relative w-48 min-w-[12rem] md:w-64 md:min-w-[16rem] h-auto min-h-[10rem] flex-shrink-0 group bg-muted">
+      <div className="relative w-64 min-w-[16rem] md:w-96 md:min-w-[24rem] h-auto min-h-[14rem] flex-shrink-0 group bg-muted">
         {hasMultipleImages && (
           <>
             <Button
