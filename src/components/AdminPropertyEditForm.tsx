@@ -70,8 +70,9 @@ const PROPERTY_TYPES = [
 ];
 
 const AMENITIES = [
-  "Parking", "Pool", "Gym", "Garden", "Balcony", "Terrace",
-  "AC", "Heating", "Elevator", "Security", "Storage", "Laundry"
+  "Garden", "Parking/Garage", "Balcony/Terrace", "Swimming Pool", "Gym", "Elevator",
+  "Storage Room", "Security", "Concierge", "EV Charging", "Patio", "Basement",
+  "Sea View", "Mountain View", "Fireplace", "Smart-home"
 ];
 
 export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPropertyEditFormProps) => {
