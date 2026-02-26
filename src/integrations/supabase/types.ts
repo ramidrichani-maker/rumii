@@ -903,6 +903,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_my_agency_id: { Args: never; Returns: string }
       get_new_users_analytics: {
         Args: { days_back?: number; period_type?: string }
         Returns: {
@@ -931,6 +932,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_agency_manager: { Args: { _user_id: string }; Returns: boolean }
       start_user_session: {
         Args: { _ip_address?: string; _user_agent?: string; _user_id: string }
         Returns: string
