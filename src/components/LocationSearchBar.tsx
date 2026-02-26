@@ -41,7 +41,7 @@ const mustHaveOptions = ['Garden', 'Parking/Garage', 'Balcony/Terrace'];
 const propertyFeatureOptions = [
   'Swimming Pool', 'Gym', 'Elevator', 'Storage Room',
   'Security', 'Concierge', 'EV Charging', 'Patio', 'Basement',
-  'Sea View', 'Mountain View',
+  'Sea View', 'Mountain View', 'Fireplace', 'Smart-home',
 ];
 
 const addedToOracleOptions = [
