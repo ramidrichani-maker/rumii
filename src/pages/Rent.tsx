@@ -311,7 +311,7 @@ const Rent = () => {
                 <ScrollReveal animation="fade-up">
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
                 </ScrollReveal>
-                <div className={`grid ${showMap ? 'grid-cols-1 lg:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'} gap-6`}>
+                <div className={`grid grid-cols-1 gap-6`}>
                   {filteredProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
