@@ -933,6 +933,10 @@ export type Database = {
         Returns: boolean
       }
       is_agency_manager: { Args: { _user_id: string }; Returns: boolean }
+      is_assigned_agent: {
+        Args: { _property_id: string; _user_id: string }
+        Returns: boolean
+      }
       start_user_session: {
         Args: { _ip_address?: string; _user_agent?: string; _user_id: string }
         Returns: string
