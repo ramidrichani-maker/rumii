@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, MapPin, Calendar, Heart, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import ViewingBookingModal from "./ViewingBookingModal";
+import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +24,8 @@ interface Property {
   created_at: string;
   user_id: string;
   unfurnished?: boolean;
+  description?: string;
+  agency_id?: string | null;
 }
 
 interface PropertyCardProps {
@@ -35,277 +35,240 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const navigate = useNavigate();
-  const [showBookingModal, setShowBookingModal] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [hasAIDesigns, setHasAIDesigns] = useState(false);
+  const [showPhone, setShowPhone] = useState(false);
+  const [agentPhone, setAgentPhone] = useState<string | null>(null);
+  const [agentId, setAgentId] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Check if unfurnished property has AI designs
   useEffect(() => {
-    if (property.unfurnished) {
-      const checkAIDesigns = async () => {
-        const { count } = await supabase
-          .from('property_generated_images')
-          .select('id', { count: 'exact', head: true })
-          .eq('property_id', property.id)
-          .eq('approved', true);
-        
-        setHasAIDesigns((count || 0) > 0);
-      };
-      checkAIDesigns();
-    }
-  }, [property.id, property.unfurnished]);
+    if (user) checkFavoriteStatus();
+  }, [user, property.id]);
 
   useEffect(() => {
-    if (user) {
-      checkFavoriteStatus();
-    }
-  }, [user, property.id]);
+    const fetchAgent = async () => {
+      const { data: assignment } = await supabase
+        .from('property_agents')
+        .select('agent_id')
+        .eq('property_id', property.id)
+        .limit(1)
+        .single();
+      if (assignment) {
+        setAgentId(assignment.agent_id);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('phone_number')
+          .eq('user_id', assignment.agent_id)
+          .single();
+        if (profile) setAgentPhone(profile.phone_number);
+      }
+    };
+    fetchAgent();
+  }, [property.id]);
 
   const checkFavoriteStatus = async () => {
     if (!user) return;
-    
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('favorites')
       .select('id')
       .eq('user_id', user.id)
       .eq('property_id', property.id)
       .maybeSingle();
-    
-    if (!error && data) {
-      setIsFavorited(true);
-    }
+    if (data) setIsFavorited(true);
   };
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
     if (!user) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to favorite properties",
-        variant: "destructive"
-      });
+      toast({ title: "Sign in required", description: "Please sign in to favorite properties", variant: "destructive" });
       return;
     }
-
     setIsTogglingFavorite(true);
-
     try {
       if (isFavorited) {
-        const { error } = await supabase
-          .from('favorites')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('property_id', property.id);
-        
-        if (error) throw error;
-        
+        await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', property.id);
         setIsFavorited(false);
-        toast({
-          title: "Removed from favorites",
-          description: "Property removed from your favorites"
-        });
+        toast({ title: "Removed from favorites" });
       } else {
-        const { error } = await supabase
-          .from('favorites')
-          .insert({
-            user_id: user.id,
-            property_id: property.id
-          });
-        
-        if (error) throw error;
-        
+        await supabase.from('favorites').insert({ user_id: user.id, property_id: property.id });
         setIsFavorited(true);
-        toast({
-          title: "Added to favorites",
-          description: "Property added to your favorites"
-        });
+        toast({ title: "Added to favorites" });
       }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update favorite status",
-        variant: "destructive"
-      });
+    } catch {
+      toast({ title: "Error", description: "Failed to update favorite", variant: "destructive" });
     } finally {
       setIsTogglingFavorite(false);
     }
   };
+
   const formatPrice = (price: number, listingType: string) => {
-    const formattedPrice = `$${price.toLocaleString()}`;
-    return listingType === 'rent' ? `${formattedPrice}/mo` : formattedPrice;
+    const formatted = `$${price.toLocaleString()}`;
+    return listingType === 'rent' ? `${formatted}/mo` : formatted;
   };
 
-  const handlePreviousImage = (e: React.MouseEvent) => {
+  const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? property.images.length - 1 : prev - 1
-    );
+    setCurrentImageIndex(prev => prev === 0 ? property.images.length - 1 : prev - 1);
   };
 
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => 
-      prev === property.images.length - 1 ? 0 : prev + 1
-    );
+    setCurrentImageIndex(prev => prev === property.images.length - 1 ? 0 : prev + 1);
+  };
+
+  const handleCall = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const phone = agentPhone || '+96170612686';
+    if (showPhone) {
+      window.location.href = `tel:${phone}`;
+    } else {
+      setShowPhone(true);
+    }
+  };
+
+  const handleEmail = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/property/${property.id}/enquiry`, {
+      state: { agentId, agencyId: property.agency_id },
+    });
+  };
+
+  const truncateDescription = (desc?: string | null) => {
+    if (!desc) return '';
+    const sentences = desc.match(/[^.!?]+[.!?]+/g);
+    if (sentences && sentences.length > 2) {
+      return sentences.slice(0, 2).join('').trim() + '...';
+    }
+    // If no sentence boundaries, just clamp by character length
+    if (desc.length > 150) return desc.slice(0, 150).trim() + '...';
+    return desc;
   };
 
   const hasMultipleImages = property.images && property.images.length > 1;
-  const currentImage = property.images && property.images.length > 0 
-    ? property.images[currentImageIndex] 
-    : null;
+  const currentImage = property.images?.[currentImageIndex] || null;
 
   return (
-    <Card 
-      className="animate-fade-in hover-scale hover:shadow-xl transition-all duration-300 cursor-pointer"
-      onClick={(e) => {
-        const target = e.target as HTMLElement;
-        if (!target.closest('button') && !target.closest('[role="button"]')) {
-          navigate(`/property/${property.id}`);
-        }
-      }}
+    <Card
+      className="animate-fade-in hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-row overflow-hidden"
+      onClick={() => navigate(`/property/${property.id}`)}
     >
-      <div className="h-48 bg-muted rounded-t-lg overflow-hidden relative group">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
-          onClick={toggleFavorite}
-          disabled={isTogglingFavorite}
-        >
-          <Heart 
-            className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
-          />
-        </Button>
-
-        {/* AI Staging badge for unfurnished properties */}
-        {property.unfurnished && hasAIDesigns && (
-          <Badge className="absolute top-2 left-2 z-10 bg-primary/90 text-primary-foreground flex items-center gap-1">
-            <Sparkles className="w-3 h-3" />
-            AI Staging
-          </Badge>
-        )}
-        
-        {/* Image navigation arrows */}
+      {/* Left: Image */}
+      <div className="relative w-48 min-w-[12rem] md:w-64 md:min-w-[16rem] h-auto min-h-[10rem] flex-shrink-0 group bg-muted">
         {hasMultipleImages && (
           <>
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={handlePreviousImage}
+              className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7"
+              onClick={handlePrevImage}
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7"
               onClick={handleNextImage}
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4" />
             </Button>
-            
-            {/* Image indicator dots */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
-              {property.images.map((_, index) => (
+              {property.images.map((_, i) => (
                 <div
-                  key={index}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    index === currentImageIndex 
-                      ? 'bg-white w-4' 
-                      : 'bg-white/50'
-                  }`}
+                  key={i}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentImageIndex ? 'bg-white w-4' : 'bg-white/50'}`}
                 />
               ))}
             </div>
           </>
         )}
-        
         {currentImage ? (
-          <img 
-            src={currentImage} 
+          <img
+            src={currentImage}
             alt={`${property.property_type} in ${property.city}`}
             className="w-full h-full object-cover"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTEwSDE4NVYxMjBIMTc1VjExMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTE2NSAxMzBIMjM1VjIwMEgxNjVWMTMwWiIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHA+PHRleHQgeD0iMjAwIiB5PSIxNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Q0EzQUYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij5Qcm9wZXJ0eSBJbWFnZTwvdGV4dD48L3A+Cjwvc3ZnPgo=';
+              (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjwvc3ZnPgo=';
             }}
           />
         ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <div className="text-center text-muted-foreground">
-              <Square className="w-8 h-8 mx-auto mb-2" />
-              <span className="text-sm">No Image</span>
-            </div>
+          <div className="w-full h-full flex items-center justify-center">
+            <Square className="w-8 h-8 text-muted-foreground" />
           </div>
         )}
       </div>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start mb-2">
-          <Badge variant={property.listing_type === 'rent' ? 'secondary' : 'default'}>
-            For {property.listing_type === 'rent' ? 'Rent' : 'Sale'}
-          </Badge>
-          <span className="text-2xl font-bold text-primary">
-            {formatPrice(property.price, property.listing_type)}
-          </span>
-        </div>
-        <CardTitle className="text-lg capitalize">
-          {property.property_type}
-        </CardTitle>
-        <CardDescription className="flex items-start gap-1">
-          <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-          <span>
-            {property.address}, {property.city}
-            {property.municipality && `, ${property.municipality}`}
-          </span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-4">
-          <div className="flex items-center">
-            <Bed className="w-4 h-4 mr-1" />
-            <span>{property.bedrooms} bed{property.bedrooms !== 1 ? 's' : ''}</span>
-          </div>
-          <div className="flex items-center">
-            <Bath className="w-4 h-4 mr-1" />
-            <span>{property.bathrooms} bath{property.bathrooms !== 1 ? 's' : ''}</span>
-          </div>
-          <div className="flex items-center">
-            <Square className="w-4 h-4 mr-1" />
-            <span>{property.square_meters}m²</span>
-          </div>
-        </div>
-        
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="w-full flex items-center gap-2"
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowBookingModal(true);
-          }}
+
+      {/* Right: Details */}
+      <div className="flex flex-col flex-1 p-4 relative min-w-0">
+        {/* Top-right: Favorite */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 h-8 w-8"
+          onClick={toggleFavorite}
+          disabled={isTogglingFavorite}
         >
-          <Calendar className="w-4 h-4" />
-          Request Viewing
+          <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
         </Button>
-      </CardContent>
-      
-      <ViewingBookingModal
-        isOpen={showBookingModal}
-        onClose={() => setShowBookingModal(false)}
-        property={{
-          id: property.id,
-          address: property.address,
-          property_type: property.property_type,
-          price: property.price,
-          listing_type: property.listing_type
-        }}
-      />
+
+        {/* Price */}
+        <h3 className="text-xl md:text-2xl font-bold text-primary pr-10">
+          {formatPrice(property.price, property.listing_type)}
+        </h3>
+
+        {/* Beds, Baths, Size */}
+        <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+          <span className="flex items-center gap-1">
+            <Bed className="w-4 h-4" />
+            {property.bedrooms} bed{property.bedrooms !== 1 ? 's' : ''}
+          </span>
+          <span className="flex items-center gap-1">
+            <Bath className="w-4 h-4" />
+            {property.bathrooms} bath{property.bathrooms !== 1 ? 's' : ''}
+          </span>
+          <span className="flex items-center gap-1">
+            <Square className="w-4 h-4" />
+            {property.square_meters}m²
+          </span>
+        </div>
+
+        {/* Location */}
+        <p className="text-sm text-foreground mt-2 truncate">
+          {property.city}, {property.address}
+        </p>
+
+        {/* Description (max 2 lines) */}
+        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+          {truncateDescription((property as any).description)}
+        </p>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Bottom-right: Call & Email */}
+        <div className="flex items-center gap-2 justify-end mt-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={handleCall}
+          >
+            <Phone className="w-4 h-4" />
+            {showPhone ? (agentPhone || '+96170612686') : 'Call'}
+          </Button>
+          <Button
+            size="sm"
+            className="gap-1.5"
+            onClick={handleEmail}
+          >
+            <Mail className="w-4 h-4" />
+            Email
+          </Button>
+        </div>
+      </div>
     </Card>
   );
 };
