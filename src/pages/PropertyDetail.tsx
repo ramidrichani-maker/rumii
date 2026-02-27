@@ -555,6 +555,10 @@ const PropertyDetail = () => {
             <AgentContactBox
               propertyId={property.id}
               agencyId={property.agency_id}
+              propertyAddress={property.address}
+              propertyType={property.property_type}
+              propertyPrice={property.price}
+              listingType={property.listing_type}
             />
           </div>
         </div>
@@ -598,6 +602,10 @@ const PropertyDetail = () => {
                 <AgentContactBox
                   propertyId={property.id}
                   agencyId={property.agency_id}
+                  propertyAddress={property.address}
+                  propertyType={property.property_type}
+                  propertyPrice={property.price}
+                  listingType={property.listing_type}
                 />
               </div>
             </div>
