@@ -255,6 +255,8 @@ const Rent = () => {
           onAddedToOracleChange={setAddedToOracle}
           keywords={keywords}
           onKeywordsChange={setKeywords}
+          unfurnishedOnly={unfurnishedOnly}
+          onUnfurnishedChange={setUnfurnishedOnly}
         />
 
         <div className="mb-4 flex items-center">
@@ -269,17 +271,6 @@ const Rent = () => {
             <Map className="w-4 h-4" />
             Map View
           </button>
-        </div>
-
-        <div className="mb-6 flex items-center space-x-2">
-          <Checkbox
-            id="unfurnished-filter"
-            checked={unfurnishedOnly}
-            onCheckedChange={(checked) => setUnfurnishedOnly(checked === true)}
-          />
-          <label htmlFor="unfurnished-filter" className="text-sm cursor-pointer">
-            Show only unfurnished properties
-          </label>
         </div>
 
         <div className="text-center mb-6">
