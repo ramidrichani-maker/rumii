@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Clock, Calendar as CalendarIcon } from "lucide-react";
-import { format, addDays, isSameDay, isBefore, startOfToday } from "date-fns";
+import { format, addDays, isBefore, startOfToday } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -27,8 +27,9 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [confirmByEmail, setConfirmByEmail] = useState(false);
+  const [confirmByPhone, setConfirmByPhone] = useState(false);
 
-  // Generate time slots from 10 AM to 4 PM (1-hour intervals)
   const timeSlots = [
     "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
   ];
@@ -51,10 +52,18 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
       return;
     }
 
+    if (!confirmByEmail && !confirmByPhone) {
+      toast({
+        title: "Missing Confirmation Method",
+        description: "Please select at least one confirmation method",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Check if the time slot is already booked
       const { data: existingBooking, error: checkError } = await supabase
         .from('property_viewings')
         .select('id')
@@ -75,7 +84,10 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
         return;
       }
 
-      // Create the viewing request
+      const confirmMethods = [];
+      if (confirmByEmail) confirmMethods.push('email');
+      if (confirmByPhone) confirmMethods.push('phone');
+
       const { error: insertError } = await supabase
         .from('property_viewings')
         .insert({
@@ -83,7 +95,8 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
           user_id: user.id,
           viewing_date: format(selectedDate, 'yyyy-MM-dd'),
           viewing_time: selectedTime,
-          status: 'pending'
+          status: 'pending',
+          notes: `Confirmation preference: ${confirmMethods.join(', ')}`
         });
 
       if (insertError) throw insertError;
@@ -96,6 +109,8 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
       onClose();
       setSelectedDate(undefined);
       setSelectedTime("");
+      setConfirmByEmail(false);
+      setConfirmByPhone(false);
 
     } catch (error) {
       console.error('Error booking viewing:', error);
@@ -116,20 +131,20 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
-    
     return `${formatter.format(price)}${listingType === 'rent' ? '/mo' : ''}`;
   };
 
-  // Disable past dates and dates more than 30 days in the future
   const isDateDisabled = (date: Date) => {
     const today = startOfToday();
     const maxDate = addDays(today, 30);
     return isBefore(date, today) || isBefore(maxDate, date);
   };
 
+  const hasConfirmation = confirmByEmail || confirmByPhone;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Book a Property Viewing</DialogTitle>
           <DialogDescription>
@@ -162,12 +177,13 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
             {selectedDate ? (
               <div className="grid grid-cols-2 gap-2">
                 {timeSlots.map((time) => (
-                  <Card 
-                    key={time} 
-                    className={`cursor-pointer transition-colors ${
-                      selectedTime === time 
-                        ? 'border-primary bg-primary/10' 
-                        : 'hover:border-primary/50'
+                  <button
+                    key={time}
+                    type="button"
+                    className={`p-3 text-center font-medium rounded-lg border transition-colors ${
+                      selectedTime === time
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border hover:border-primary/50'
                     }`}
                     onClick={(e) => {
                       e.preventDefault();
@@ -175,10 +191,8 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
                       setSelectedTime(time);
                     }}
                   >
-                    <CardContent className="p-3 text-center">
-                      <span className="font-medium">{formatTimeSlot(time)}</span>
-                    </CardContent>
-                  </Card>
+                    {formatTimeSlot(time)}
+                  </button>
                 ))}
               </div>
             ) : (
@@ -189,14 +203,34 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
           </div>
         </div>
 
-        {/* Summary and Action */}
+        {/* Summary, Confirmation Options & Action */}
         {selectedDate && selectedTime && (
-          <div className="border-t pt-4">
-            <div className="bg-muted p-4 rounded-lg mb-4">
+          <div className="border-t pt-4 space-y-4">
+            <div className="bg-muted p-4 rounded-lg">
               <h4 className="font-semibold mb-2">Viewing Summary</h4>
               <p><strong>Property:</strong> {property.address}</p>
               <p><strong>Date:</strong> {format(selectedDate, 'EEEE, MMMM do, yyyy')}</p>
               <p><strong>Time:</strong> {formatTimeSlot(selectedTime)}</p>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-foreground">How would you like to receive confirmation? <span className="text-destructive">*</span></p>
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-muted/50 transition-colors">
+                  <Checkbox
+                    checked={confirmByEmail}
+                    onCheckedChange={(checked) => setConfirmByEmail(checked === true)}
+                  />
+                  <span className="text-sm">Receive confirmation by email</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-muted/50 transition-colors">
+                  <Checkbox
+                    checked={confirmByPhone}
+                    onCheckedChange={(checked) => setConfirmByPhone(checked === true)}
+                  />
+                  <span className="text-sm">Receive confirmation by phone call</span>
+                </label>
+              </div>
             </div>
           </div>
         )}
@@ -205,12 +239,12 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleBookViewing}
-            disabled={!selectedDate || !selectedTime || loading}
+            disabled={!selectedDate || !selectedTime || !hasConfirmation || loading}
             className="min-w-[120px]"
           >
-            {loading ? "Booking..." : "Request Viewing"}
+            {loading ? "Booking..." : "Confirm Viewing"}
           </Button>
         </div>
       </DialogContent>

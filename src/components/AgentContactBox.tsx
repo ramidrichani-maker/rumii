@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Phone, Mail, Building2 } from "lucide-react";
+import { Phone, Mail, Building2, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import ViewingBookingModal from "@/components/ViewingBookingModal";
 
 interface AgentInfo {
   user_id: string;
@@ -13,14 +14,19 @@ interface AgentInfo {
 interface AgentContactBoxProps {
   propertyId: string;
   agencyId?: string | null;
+  propertyAddress?: string;
+  propertyType?: string;
+  propertyPrice?: number;
+  listingType?: string;
 }
 
-const AgentContactBox = ({ propertyId, agencyId }: AgentContactBoxProps) => {
+const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, propertyPrice, listingType }: AgentContactBoxProps) => {
   const navigate = useNavigate();
   const [agencyName, setAgencyName] = useState<string | null>(null);
   const [agent, setAgent] = useState<AgentInfo | null>(null);
   const [showPhone, setShowPhone] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showViewingModal, setShowViewingModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,6 +101,15 @@ const AgentContactBox = ({ propertyId, agencyId }: AgentContactBoxProps) => {
       <Button
         variant="outline"
         className="w-full gap-2"
+        onClick={() => setShowViewingModal(true)}
+      >
+        <CalendarCheck className="w-4 h-4" />
+        Request Viewing
+      </Button>
+
+      <Button
+        variant="outline"
+        className="w-full gap-2"
         onClick={handleCallClick}
       >
         <Phone className="w-4 h-4" />
@@ -112,6 +127,20 @@ const AgentContactBox = ({ propertyId, agencyId }: AgentContactBoxProps) => {
         <Mail className="w-4 h-4" />
         Email agent
       </Button>
+
+      {showViewingModal && propertyAddress && propertyType && propertyPrice !== undefined && listingType && (
+        <ViewingBookingModal
+          isOpen={showViewingModal}
+          onClose={() => setShowViewingModal(false)}
+          property={{
+            id: propertyId,
+            address: propertyAddress,
+            property_type: propertyType,
+            price: propertyPrice,
+            listing_type: listingType,
+          }}
+        />
+      )}
     </div>
   );
 };
