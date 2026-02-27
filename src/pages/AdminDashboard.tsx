@@ -397,9 +397,8 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Column 1: Properties, Featured, Photography, Media */}
+        {/* Row 1: Property Management */}
+        <div className="mb-8">
           <div>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Home className="w-5 h-5" />
@@ -571,10 +570,12 @@ const AdminDashboard = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
+          </Tabs>
           </div>
+        </div>
 
-          {/* Column 2: Users, Accounts, Viewings */}
+        {/* Row 2: User & Viewings Management */}
+        <div className="mb-8">
           <div>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Users className="w-5 h-5" />
@@ -707,12 +708,12 @@ const AdminDashboard = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
-            </Tabs>
+          </Tabs>
           </div>
         </div>
 
-        {/* Bottom Section: Agent Stats and Analytics */}
-        <div className="space-y-6">
+        {/* Row 3: Analytics & Agent Performance */}
+        <div className="mb-8 space-y-6">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
             Analytics & Agent Performance
