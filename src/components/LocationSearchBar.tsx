@@ -93,6 +93,8 @@ interface LocationSearchBarProps {
   onAddedToOracleChange: (value: string) => void;
   keywords: string;
   onKeywordsChange: (value: string) => void;
+  unfurnishedOnly?: boolean;
+  onUnfurnishedChange?: (value: boolean) => void;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -119,6 +121,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onAddedToOracleChange,
     keywords,
     onKeywordsChange,
+    unfurnishedOnly,
+    onUnfurnishedChange,
   } = props;
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
@@ -544,6 +548,19 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   })}
                 </div>
               </div>
+
+              {/* Unfurnished toggle */}
+              {onUnfurnishedChange !== undefined && (
+                <div className="mt-2">
+                  <button
+                    onClick={() => onUnfurnishedChange(!unfurnishedOnly)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                  >
+                    <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
+                    <span className="text-sm font-medium">Show only unfurnished properties</span>
+                  </button>
+                </div>
+              )}
 
               <div className="border-t border-border" />
 
