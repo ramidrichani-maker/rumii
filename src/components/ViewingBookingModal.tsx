@@ -30,14 +30,15 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
 
   // Generate time slots from 10 AM to 4 PM (1-hour intervals)
   const timeSlots = [
-    "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"
+    "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
   ];
 
   const formatTimeSlot = (time: string) => {
-    const [hours] = time.split(':');
+    const [hours, mins] = time.split(':');
     const hour = parseInt(hours);
-    if (hour === 12) return `${hour}:00 PM`;
-    return hour > 12 ? `${hour - 12}:00 PM` : `${hour}:00 AM`;
+    const suffix = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${displayHour}:${mins} ${suffix}`;
   };
 
   const handleBookViewing = async () => {

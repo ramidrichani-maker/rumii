@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck } from "lucide-react";
+import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +42,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [showPhone, setShowPhone] = useState(false);
   const [agentPhone, setAgentPhone] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
+  const [showViewingModal, setShowViewingModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -248,8 +250,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Bottom-right: Call & Email */}
+        {/* Bottom-right: Request Viewing, Call & Email */}
         <div className="flex items-center gap-2 justify-end mt-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowViewingModal(true);
+            }}
+          >
+            <CalendarCheck className="w-4 h-4" />
+            Request Viewing
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -269,6 +283,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           </Button>
         </div>
       </div>
+
+      {showViewingModal && (
+        <ViewingBookingModal
+          isOpen={showViewingModal}
+          onClose={() => setShowViewingModal(false)}
+          property={{
+            id: property.id,
+            address: property.address,
+            property_type: property.property_type,
+            price: property.price,
+            listing_type: property.listing_type,
+          }}
+        />
+      )}
     </Card>
   );
 };
