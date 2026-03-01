@@ -344,6 +344,7 @@ const Rent = () => {
                 enableDrawing={true}
                 initialSearchLocation={locationInput}
                 searchRadius={radius}
+                embedded={true}
               />
             </div>
           )}
@@ -379,12 +380,13 @@ const Rent = () => {
           <CompactPropertyMap
             properties={filteredProperties}
             height="100vh"
-            defaultExpanded={true}
+            defaultExpanded={false}
             onPropertySelect={handlePropertySelect}
             onDrawnAreaChange={handleDrawnAreaChange}
             enableDrawing={true}
             initialSearchLocation={locationInput}
             searchRadius={radius}
+            embedded={true}
           />
         )}
       </div>

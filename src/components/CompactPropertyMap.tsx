@@ -47,6 +47,8 @@ interface CompactPropertyMapProps {
   initialSearchLocation?: string;
   /** Radius in km to draw around the searched location */
   searchRadius?: number;
+  /** When true, hides the internal header/controls (parent manages chrome) */
+  embedded?: boolean;
 }
 
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
@@ -59,6 +61,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   enableDrawing = true,
   initialSearchLocation = '',
   searchRadius = 1,
+  embedded = false,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
@@ -372,8 +375,55 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     }
   }, []);
 
-  const mapHeight = isExpanded ? "60vh" : height;
-  const mapClass = isExpanded ? "fixed inset-0 z-40 bg-background p-4" : className;
+  const mapHeight = embedded ? height : (isExpanded ? "60vh" : height);
+  const mapClass = embedded ? (className || "h-full") : (isExpanded ? "fixed inset-0 z-40 bg-background p-4" : className);
+
+  if (embedded) {
+    return (
+      <div className={`${mapClass} flex flex-col relative`} style={{ height }}>
+        {/* Draw controls overlay */}
+        {enableDrawing && (
+          <div className="absolute bottom-3 left-3 z-[1000] flex gap-1">
+            {isDrawingMode ? (
+              <button
+                onClick={cancelDrawing}
+                className="px-3 py-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors text-xs font-medium"
+              >
+                Cancel Drawing
+              </button>
+            ) : hasDrawnArea ? (
+              <button
+                onClick={clearDrawnArea}
+                className="px-3 py-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-destructive/10 text-destructive transition-colors text-xs font-medium flex items-center gap-1"
+              >
+                <Trash2 className="w-3 h-3" />
+                Clear Area
+              </button>
+            ) : (
+              <button
+                onClick={startDrawing}
+                className="px-3 py-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors text-xs font-medium flex items-center gap-1"
+              >
+                <PenTool className="w-3 h-3" />
+                Draw Area
+              </button>
+            )}
+          </div>
+        )}
+        {isDrawingMode && (
+          <div className="absolute top-3 left-3 right-3 z-[1000]">
+            <p className="text-xs text-foreground bg-background/90 border border-border rounded-md px-3 py-1.5 shadow-sm">
+              Click on the map to draw a polygon. Click the first point to close the shape.
+            </p>
+          </div>
+        )}
+        <div 
+          ref={mapRef}
+          className="flex-1 rounded-lg overflow-hidden"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={mapClass}>
