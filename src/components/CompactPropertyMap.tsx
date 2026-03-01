@@ -276,7 +276,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         searchCircleRef.current = circle;
 
         // Fit map to circle bounds
-        leafletMapRef.current!.fitBounds(circle.getBounds(), { padding: [20, 20] });
+        leafletMapRef.current!.fitBounds(circle.getBounds(), { padding: [5, 5], maxZoom: 16 });
       } catch (err) {
         console.error('Error drawing location circle:', err);
       }
@@ -313,7 +313,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
-        leafletMapRef.current.setView([parseFloat(lat), parseFloat(lon)], 13);
+        leafletMapRef.current.setView([parseFloat(lat), parseFloat(lon)], 15);
       } else {
         alert('Location not found. Please try a different search term.');
       }
