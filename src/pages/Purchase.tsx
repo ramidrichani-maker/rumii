@@ -352,7 +352,7 @@ const Purchase = () => {
               <CompactPropertyMap
                 properties={filteredProperties}
                 height="100%"
-                defaultExpanded={true}
+                defaultExpanded={false}
                 onPropertySelect={handlePropertySelect}
                 onDrawnAreaChange={handleDrawnAreaChange}
                 enableDrawing={true}
