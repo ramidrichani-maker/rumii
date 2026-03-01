@@ -497,7 +497,7 @@ const PropertyDetail = () => {
             </div>
 
             {mapExpanded && (
-              <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col">
+              <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
                     <h3 className="text-lg font-semibold text-foreground">Map View</h3>
