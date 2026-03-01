@@ -308,7 +308,7 @@ const Purchase = () => {
         <div className={`flex flex-col ${showMap ? 'md:flex-row' : ''} gap-6`}>
           {/* Property Grid */}
           <div
-            className={`${showMap ? 'w-full md:w-1/2 overflow-y-auto' : 'w-full'} transition-all duration-300`}
+            className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto' : 'w-full'} transition-all duration-300`}
             style={showMap ? { maxHeight: 'calc(100vh - 120px)' } : undefined}
           >
             {!isLoading && filteredProperties.length > 0 && (
@@ -332,7 +332,7 @@ const Purchase = () => {
 
           {/* Map Panel - right half of viewport */}
           {showMap && !mapFullscreen && (
-            <div className="w-full md:w-1/2 md:sticky md:top-0 md:self-start relative" style={{ height: 'calc(100vh - 120px)' }}>
+            <div className="w-full md:w-[55%] md:sticky md:top-0 md:self-start relative" style={{ height: 'calc(100vh - 120px)' }}>
               <div className="absolute top-2 right-2 z-[1000] flex gap-1">
                 <button
                   onClick={() => setMapFullscreen(true)}
