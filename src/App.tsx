@@ -28,6 +28,7 @@ import NewHomes from "./pages/NewHomes";
 import PropertyDetail from "./pages/PropertyDetail";
 import AgentEnquiry from "./pages/AgentEnquiry";
 import FindAgents from "./pages/FindAgents";
+import Messages from "./pages/Messages";
 import { FloatingChatWidget } from "./components/FloatingChatWidget";
 
 const queryClient = new QueryClient();
@@ -81,6 +82,7 @@ const AppRoutes = () => {
           <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/property/:id/enquiry" element={<AgentEnquiry />} />
           <Route path="/find-agents" element={<FindAgents />} />
+          <Route path="/messages" element={<Messages />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

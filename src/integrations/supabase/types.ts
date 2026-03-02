@@ -270,6 +270,57 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read: boolean
+          recipient_user_id: string
+          related_property_id: string | null
+          related_viewing_id: string | null
+          sender_user_id: string
+          subject: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_user_id: string
+          related_property_id?: string | null
+          related_viewing_id?: string | null
+          sender_user_id: string
+          subject: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_user_id?: string
+          related_property_id?: string | null
+          related_viewing_id?: string | null
+          sender_user_id?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_related_property_id_fkey"
+            columns: ["related_property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_related_viewing_id_fkey"
+            columns: ["related_viewing_id"]
+            isOneToOne: false
+            referencedRelation: "property_viewings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
