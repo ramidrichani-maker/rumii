@@ -244,48 +244,102 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     }
   }, [isExpanded]);
 
-  // Draw a circle for the searched location when map is ready
+  // Draw the actual boundary polygon for the searched location
+  const searchBoundaryRef = useRef<L.GeoJSON | null>(null);
+
   useEffect(() => {
     if (!mapInitialized || !leafletMapRef.current || !initialSearchLocation?.trim()) return;
 
-    const drawLocationCircle = async () => {
+    const drawLocationBoundary = async () => {
       try {
+        // Request polygon geometry from Nominatim
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(initialSearchLocation + ', Lebanon')}&limit=1`
+          `https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=${encodeURIComponent(initialSearchLocation + ', Lebanon')}&limit=1`
         );
         const data = await response.json();
         if (!data || data.length === 0) return;
 
-        const lat = parseFloat(data[0].lat);
-        const lon = parseFloat(data[0].lon);
-        const radiusMeters = searchRadius * 1000;
+        const result = data[0];
 
-        // Remove any previous circle
+        // Remove previous boundary & circle
+        if (searchBoundaryRef.current) {
+          searchBoundaryRef.current.remove();
+          searchBoundaryRef.current = null;
+        }
         if (searchCircleRef.current) {
           searchCircleRef.current.remove();
           searchCircleRef.current = null;
         }
 
-        // Draw circle
-        const circle = L.circle([lat, lon], {
-          radius: radiusMeters,
-          color: 'hsl(30, 20%, 55%)',
-          fillColor: 'hsl(30, 20%, 65%)',
-          fillOpacity: 0.15,
-          weight: 2,
-          dashArray: '6 4',
-        }).addTo(leafletMapRef.current!);
+        // Clear previous drawn items so auto-boundary takes effect
+        if (drawnItemsRef.current) {
+          drawnItemsRef.current.clearLayers();
+        }
 
-        searchCircleRef.current = circle;
+        const geojson = result.geojson;
 
-        // Fit map to circle bounds
-        leafletMapRef.current!.fitBounds(circle.getBounds(), { padding: [5, 5], maxZoom: 16 });
+        if (geojson && (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon')) {
+          // Draw the actual boundary
+          const boundaryLayer = L.geoJSON(geojson, {
+            style: {
+              color: 'hsl(30, 20%, 55%)',
+              fillColor: 'hsl(30, 20%, 65%)',
+              fillOpacity: 0.15,
+              weight: 2,
+              dashArray: '6 4',
+            }
+          }).addTo(leafletMapRef.current!);
+
+          searchBoundaryRef.current = boundaryLayer;
+
+          // Extract polygon coordinates for filtering
+          const coords: DrawnPolygonCoordinate[] = [];
+          if (geojson.type === 'Polygon') {
+            geojson.coordinates[0].forEach((c: number[]) => {
+              coords.push({ latitude: c[1], longitude: c[0] });
+            });
+          } else if (geojson.type === 'MultiPolygon') {
+            // Use the largest polygon ring
+            let largest = geojson.coordinates[0][0];
+            for (const poly of geojson.coordinates) {
+              if (poly[0].length > largest.length) largest = poly[0];
+            }
+            largest.forEach((c: number[]) => {
+              coords.push({ latitude: c[1], longitude: c[0] });
+            });
+          }
+
+          if (coords.length >= 3) {
+            setHasDrawnArea(true);
+            onDrawnAreaChange?.(coords);
+          }
+
+          // Fit map to boundary
+          leafletMapRef.current!.fitBounds(boundaryLayer.getBounds(), { padding: [10, 10], maxZoom: 16 });
+        } else {
+          // Fallback: draw a circle if no polygon geometry available
+          const lat = parseFloat(result.lat);
+          const lon = parseFloat(result.lon);
+          const radiusMeters = searchRadius * 1000;
+
+          const circle = L.circle([lat, lon], {
+            radius: radiusMeters,
+            color: 'hsl(30, 20%, 55%)',
+            fillColor: 'hsl(30, 20%, 65%)',
+            fillOpacity: 0.15,
+            weight: 2,
+            dashArray: '6 4',
+          }).addTo(leafletMapRef.current!);
+
+          searchCircleRef.current = circle;
+          leafletMapRef.current!.fitBounds(circle.getBounds(), { padding: [5, 5], maxZoom: 16 });
+        }
       } catch (err) {
-        console.error('Error drawing location circle:', err);
+        console.error('Error drawing location boundary:', err);
       }
     };
 
-    drawLocationCircle();
+    drawLocationBoundary();
   }, [mapInitialized, initialSearchLocation, searchRadius]);
 
   const getCurrentLocation = () => {
