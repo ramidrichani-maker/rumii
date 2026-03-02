@@ -3,14 +3,46 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 export const Navbar = () => {
   const auth = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  const user = auth?.user;
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchUnread = async () => {
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_user_id', user.id)
+        .eq('read', false);
+      setUnreadMessages(count || 0);
+    };
+
+    fetchUnread();
+
+    const channel = supabase
+      .channel('messages-unread-count')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'messages',
+        filter: `recipient_user_id=eq.${user.id}`,
+      }, () => fetchUnread())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   // Guard against auth context not being ready
   if (!auth || auth.loading) {
@@ -25,7 +57,7 @@ export const Navbar = () => {
       </nav>;
   }
 
-  const { user, profile, signOut } = auth;
+  const { profile, signOut } = auth;
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -80,6 +112,15 @@ export const Navbar = () => {
               <span>Saved</span>
             </Link>
             {user ? <>
+                <Link to="/messages" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative">
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Messages</span>
+                  {unreadMessages > 0 && (
+                    <Badge variant="destructive" className="absolute -top-2 -right-3 h-4 w-4 flex items-center justify-center p-0 text-[10px]">
+                      {unreadMessages > 9 ? '9+' : unreadMessages}
+                    </Badge>
+                  )}
+                </Link>
                 <NotificationBell />
                 
                 <DropdownMenu>
