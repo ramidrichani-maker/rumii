@@ -19,7 +19,8 @@ const Auth = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    full_name: ''
+    full_name: '',
+    phone_number: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   
@@ -150,7 +151,7 @@ const Auth = () => {
 
         const { error } = await signUp(formData.email, formData.password, {
           full_name: formData.full_name,
-          phone_number: '',
+          phone_number: formData.phone_number || '',
           role: 'user'
         });
 
@@ -278,6 +279,20 @@ const Auth = () => {
                         value={formData.full_name}
                         onChange={handleInputChange}
                         required
+                      />
+                    </div>
+                  )}
+
+                  {isSignUp && (
+                    <div className="space-y-2">
+                      <Label htmlFor="phone_number">Phone Number <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                      <Input
+                        id="phone_number"
+                        name="phone_number"
+                        type="tel"
+                        placeholder="+961 XX XXX XXX"
+                        value={formData.phone_number}
+                        onChange={handleInputChange}
                       />
                     </div>
                   )}
