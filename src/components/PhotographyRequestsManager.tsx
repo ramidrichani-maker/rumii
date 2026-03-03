@@ -94,6 +94,17 @@ export default function PhotographyRequestsManager() {
 
       if (error) throw error;
 
+      // Send confirmation email when photography request is scheduled or completed
+      if (status === 'scheduled' || status === 'completed') {
+        try {
+          await supabase.functions.invoke('send-confirmation-email', {
+            body: { type: 'photography', record_id: requestId },
+          });
+        } catch (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+        }
+      }
+
       toast({
         title: "Success",
         description: `Request marked as ${status}`,
