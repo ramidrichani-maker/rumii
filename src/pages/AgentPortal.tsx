@@ -175,6 +175,17 @@ const AgentPortal = () => {
 
       if (error) throw error;
 
+      // Send confirmation email when viewing is confirmed
+      if (newStatus === 'confirmed') {
+        try {
+          await supabase.functions.invoke('send-confirmation-email', {
+            body: { type: 'viewing', record_id: viewingId },
+          });
+        } catch (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+        }
+      }
+
       toast({
         title: "Success",
         description: `Viewing ${newStatus} successfully`,
