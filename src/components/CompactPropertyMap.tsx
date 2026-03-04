@@ -198,26 +198,85 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           const marker = L.marker([property.latitude, property.longitude], { icon: propertyIcon })
             .addTo(leafletMapRef.current!);
 
-          // Create popup content
-          const popupContent = `
-            <div class="p-2 min-w-[180px]">
-              <h3 class="font-semibold text-sm mb-1">${property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1)} in ${property.city}</h3>
-              <p class="text-xs text-gray-600 mb-2">${property.address}</p>
-              <div class="text-xs space-y-1">
-                <div><strong>Price:</strong> $${property.price.toLocaleString()}</div>
-                <div><strong>Size:</strong> ${property.square_meters}m²</div>
-                <div><strong>Beds:</strong> ${property.bedrooms} | <strong>Baths:</strong> ${property.bathrooms}</div>
+          // Create rich popup content
+          const imageUrl = property.images?.[0] || '/placeholder.svg';
+          const priceFormatted = property.listing_type === 'rent' 
+            ? `$${property.price.toLocaleString()}/mo` 
+            : `$${property.price.toLocaleString()}`;
+          const propType = property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1);
+          const listingLabel = property.listing_type === 'rent' ? 'For Rent' : 'For Sale';
+
+          const popupContent = document.createElement('div');
+          popupContent.innerHTML = `
+            <div style="width:260px;font-family:system-ui,sans-serif;">
+              <div style="position:relative;width:100%;height:140px;overflow:hidden;border-radius:8px 8px 0 0;">
+                <img src="${imageUrl}" alt="${propType}" style="width:100%;height:100%;object-fit:cover;" />
+                <span style="position:absolute;top:6px;left:6px;background:hsl(30,20%,45%);color:white;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;">${listingLabel}</span>
+              </div>
+              <div style="padding:10px;">
+                <div style="font-weight:700;font-size:16px;color:#1a1a1a;margin-bottom:2px;">${priceFormatted}</div>
+                <div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px;">${propType} in ${property.city}</div>
+                <div style="font-size:11px;color:#666;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${property.address}</div>
+                <div style="display:flex;gap:12px;font-size:11px;color:#555;margin-bottom:10px;">
+                  <span>🛏 ${property.bedrooms}</span>
+                  <span>🛁 ${property.bathrooms}</span>
+                  <span>📐 ${property.square_meters}m²</span>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <button data-action="call" style="flex:1;padding:6px 0;font-size:11px;font-weight:600;border:1px solid #d1d5db;border-radius:6px;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">📞 Call</button>
+                  <button data-action="email" style="flex:1;padding:6px 0;font-size:11px;font-weight:600;border:1px solid #d1d5db;border-radius:6px;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">✉️ Email</button>
+                  <button data-action="view" style="flex:1;padding:6px 0;font-size:11px;font-weight:600;border:none;border-radius:6px;background:hsl(30,20%,45%);color:white;cursor:pointer;">View</button>
+                </div>
               </div>
             </div>
           `;
 
-          marker.bindPopup(popupContent);
-          
-          // Add click handler
-          marker.on('click', () => {
+          // Wire up button actions
+          popupContent.querySelector('[data-action="call"]')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Fetch agent phone and call
+            import('@/integrations/supabase/client').then(({ supabase }) => {
+              supabase
+                .from('property_agents')
+                .select('agent_id')
+                .eq('property_id', property.id)
+                .limit(1)
+                .single()
+                .then(({ data: assignment }) => {
+                  if (assignment) {
+                    supabase
+                      .from('profiles')
+                      .select('phone_number')
+                      .eq('user_id', assignment.agent_id)
+                      .single()
+                      .then(({ data: profile }) => {
+                        const phone = profile?.phone_number || '+96170612686';
+                        window.location.href = `tel:${phone}`;
+                      });
+                  } else {
+                    window.location.href = 'tel:+96170612686';
+                  }
+                });
+            });
+          });
+
+          popupContent.querySelector('[data-action="email"]')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.location.href = `/property/${property.id}/enquiry`;
+          });
+
+          popupContent.querySelector('[data-action="view"]')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             if (onPropertySelect) {
               onPropertySelect(property);
             }
+          });
+
+          marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 260, className: 'property-rich-popup' });
+          
+          // Open popup on click (no immediate navigation)
+          marker.on('click', () => {
+            marker.openPopup();
           });
 
           markersRef.current.push(marker);
