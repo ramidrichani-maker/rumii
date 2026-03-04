@@ -321,6 +321,47 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         )}
 
+        {/* Contact & Viewing Actions - Prominent placement */}
+        {!isAdmin && property.status === 'approved' && (
+          <div className="flex flex-wrap gap-2 pb-2">
+            {user && (
+              <Button 
+                onClick={() => setIsViewingModalOpen(true)}
+                className="flex-1"
+                size="default"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Request Viewing
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => {
+                const phone = agentPhone || '+96170612686';
+                if (showPhone) {
+                  window.location.href = `tel:${phone}`;
+                } else {
+                  setShowPhone(true);
+                }
+              }}
+            >
+              <Phone className="w-4 h-4 mr-2" />
+              {showPhone ? (agentPhone || '+96170612686') : 'Call Agent'}
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => navigate(`/property/${property.id}/enquiry`, {
+                state: { agentId, agencyId: undefined }
+              })}
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Email Agent
+            </Button>
+          </div>
+        )}
+
         {/* Property Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Basic Info */}
@@ -543,48 +584,8 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         )}
 
-        {/* Contact & Viewing Actions */}
-        {!isAdmin && property.status === 'approved' && (
-          <div className="pt-4 border-t space-y-2">
-            {user && (
-              <Button 
-                onClick={() => setIsViewingModalOpen(true)}
-                className="w-full"
-                size="lg"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Request Viewing
-              </Button>
-            )}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => {
-                  const phone = agentPhone || '+96170612686';
-                  if (showPhone) {
-                    window.location.href = `tel:${phone}`;
-                  } else {
-                    setShowPhone(true);
-                  }
-                }}
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                {showPhone ? (agentPhone || '+96170612686') : 'Call Agent'}
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => navigate(`/property/${property.id}/enquiry`, {
-                  state: { agentId, agencyId: undefined }
-                })}
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                Email Agent
-              </Button>
-            </div>
-          </div>
-        )}
+
+
 
         {/* Admin Actions */}
         {isAdmin && property.status === 'pending' && (
