@@ -219,3 +219,18 @@ All colors MUST be HSL.
 .scroll-reveal-zoom-out {
   transform: scale(1.1);
 }
+
+/* Rich property popup on map */
+.property-rich-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.property-rich-popup .leaflet-popup-content {
+  margin: 0;
+  line-height: 1.4;
+}
+.property-rich-popup .leaflet-popup-tip {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
