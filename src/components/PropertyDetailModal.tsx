@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -22,7 +23,9 @@ import {
   Eye,
   Trash2,
   Sparkles,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Phone,
+  Mail
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -97,13 +100,44 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   allowDelete = true
 }) => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [agentPhone, setAgentPhone] = useState<string | null>(null);
+  const [showPhone, setShowPhone] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
   const [approvedDesigns, setApprovedDesigns] = useState<ApprovedDesign[]>([]);
   const [selectedStyle, setSelectedStyle] = useState<string>("modern");
   const [selectedPalette, setSelectedPalette] = useState<string>("neutral");
   const [matchingDesign, setMatchingDesign] = useState<ApprovedDesign | null>(null);
   const [showDesignViewer, setShowDesignViewer] = useState(false);
+
+  // Fetch assigned agent info
+  useEffect(() => {
+    if (!property?.id || !isOpen) return;
+    setShowPhone(false);
+    const fetchAgent = async () => {
+      const { data: assignment } = await supabase
+        .from('property_agents')
+        .select('agent_id')
+        .eq('property_id', property.id)
+        .limit(1)
+        .single();
+      if (assignment) {
+        setAgentId(assignment.agent_id);
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('phone_number')
+          .eq('user_id', assignment.agent_id)
+          .single();
+        setAgentPhone(prof?.phone_number || null);
+      } else {
+        setAgentId(null);
+        setAgentPhone(null);
+      }
+    };
+    fetchAgent();
+  }, [property?.id, isOpen]);
 
   // Load approved AI designs for this property
   useEffect(() => {
@@ -509,17 +543,46 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           </div>
         )}
 
-        {/* Request Viewing Button */}
-        {!isAdmin && user && property.status === 'approved' && (
-          <div className="pt-4 border-t">
-            <Button 
-              onClick={() => setIsViewingModalOpen(true)}
-              className="w-full"
-              size="lg"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              Request Viewing
-            </Button>
+        {/* Contact & Viewing Actions */}
+        {!isAdmin && property.status === 'approved' && (
+          <div className="pt-4 border-t space-y-2">
+            {user && (
+              <Button 
+                onClick={() => setIsViewingModalOpen(true)}
+                className="w-full"
+                size="lg"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Request Viewing
+              </Button>
+            )}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  const phone = agentPhone || '+96170612686';
+                  if (showPhone) {
+                    window.location.href = `tel:${phone}`;
+                  } else {
+                    setShowPhone(true);
+                  }
+                }}
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                {showPhone ? (agentPhone || '+96170612686') : 'Call Agent'}
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => navigate(`/property/${property.id}/enquiry`, {
+                  state: { agentId, agencyId: undefined }
+                })}
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Email Agent
+              </Button>
+            </div>
           </div>
         )}
 
