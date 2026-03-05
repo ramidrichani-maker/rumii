@@ -13,7 +13,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const FALLBACK_PHONE = "+96176942480";
 
 interface EmailPayload {
-  type: "viewing" | "photography";
+  type: "viewing" | "photography" | "valuation";
   record_id: string;
 }
 
@@ -59,13 +59,11 @@ function buildViewingEmailHtml(
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-          <!-- Header -->
           <tr>
             <td style="background-color:#1a1a2e;padding:32px 40px;text-align:center;">
               <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;">Viewing Confirmed ✓</h1>
             </td>
           </tr>
-          <!-- Body -->
           <tr>
             <td style="padding:40px;">
               <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 20px;">
@@ -74,8 +72,6 @@ function buildViewingEmailHtml(
               <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 24px;">
                 Your property viewing has been confirmed! Here are the details:
               </p>
-              
-              <!-- Details Card -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;border-radius:8px;border:1px solid #e9ecef;margin-bottom:24px;">
                 <tr>
                   <td style="padding:24px;">
@@ -96,8 +92,6 @@ function buildViewingEmailHtml(
                   </td>
                 </tr>
               </table>
-
-              <!-- Agent Contact Card -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a2e;border-radius:8px;overflow:hidden;margin-bottom:24px;">
                 <tr>
                   <td style="padding:24px;">
@@ -108,13 +102,11 @@ function buildViewingEmailHtml(
                   </td>
                 </tr>
               </table>
-
               <p style="color:#6c757d;font-size:14px;line-height:1.6;margin:0;">
                 If you need to reschedule or cancel, please contact us as soon as possible.
               </p>
             </td>
           </tr>
-          <!-- Footer -->
           <tr>
             <td style="background-color:#f8f9fa;padding:20px 40px;text-align:center;border-top:1px solid #e9ecef;">
               <p style="color:#adb5bd;font-size:12px;margin:0;">This is an automated email. Please do not reply directly.</p>
@@ -148,13 +140,11 @@ function buildPhotographyEmailHtml(
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-          <!-- Header -->
           <tr>
             <td style="background-color:#1a1a2e;padding:32px 40px;text-align:center;">
               <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;">📸 Photography Service Confirmed</h1>
             </td>
           </tr>
-          <!-- Body -->
           <tr>
             <td style="padding:40px;">
               <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 20px;">
@@ -163,8 +153,6 @@ function buildPhotographyEmailHtml(
               <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 24px;">
                 Your photography service request has been confirmed! Here are the details:
               </p>
-
-              <!-- Details Card -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;border-radius:8px;border:1px solid #e9ecef;margin-bottom:24px;">
                 <tr>
                   <td style="padding:24px;">
@@ -185,8 +173,6 @@ function buildPhotographyEmailHtml(
                   </td>
                 </tr>
               </table>
-
-              <!-- Agent Contact Card -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a2e;border-radius:8px;overflow:hidden;margin-bottom:24px;">
                 <tr>
                   <td style="padding:24px;">
@@ -197,13 +183,92 @@ function buildPhotographyEmailHtml(
                   </td>
                 </tr>
               </table>
-
               <p style="color:#6c757d;font-size:14px;line-height:1.6;margin:0;">
                 Our photographer will arrive at the scheduled time. Please ensure the property is ready for the shoot.
               </p>
             </td>
           </tr>
-          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f8f9fa;padding:20px 40px;text-align:center;border-top:1px solid #e9ecef;">
+              <p style="color:#adb5bd;font-size:12px;margin:0;">This is an automated email. Please do not reply directly.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+function buildValuationEmailHtml(
+  recipientName: string,
+  propertyAddress: string,
+  city: string,
+  valuationDate: string,
+  valuationTime: string,
+  agent: { name: string; phone: string; email: string }
+): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background-color:#1a1a2e;padding:32px 40px;text-align:center;">
+              <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;">📋 Valuation Confirmed ✓</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 20px;">
+                Hi <strong>${recipientName}</strong>,
+              </p>
+              <p style="color:#333;font-size:16px;line-height:1.6;margin:0 0 24px;">
+                Your property valuation request has been confirmed! An agent will visit your property at the scheduled time.
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;border-radius:8px;border:1px solid #e9ecef;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:8px 0;color:#6c757d;font-size:14px;width:120px;">📍 Property</td>
+                        <td style="padding:8px 0;color:#333;font-size:14px;font-weight:600;">${propertyAddress}, ${city}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;color:#6c757d;font-size:14px;">📅 Date</td>
+                        <td style="padding:8px 0;color:#333;font-size:14px;font-weight:600;">${valuationDate}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;color:#6c757d;font-size:14px;">🕐 Time</td>
+                        <td style="padding:8px 0;color:#333;font-size:14px;font-weight:600;">${valuationTime}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a2e;border-radius:8px;overflow:hidden;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:24px;">
+                    <p style="color:#a0a0b8;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px;">Your Contact</p>
+                    <p style="color:#ffffff;font-size:18px;font-weight:700;margin:0 0 8px;">🧑‍💼 ${agent.name}</p>
+                    <p style="color:#d0d0e0;font-size:14px;margin:0 0 4px;">📞 <a href="tel:${agent.phone}" style="color:#7c8aff;text-decoration:none;">${agent.phone}</a></p>
+                    ${agent.email ? `<p style="color:#d0d0e0;font-size:14px;margin:0;">✉️ <a href="mailto:${agent.email}" style="color:#7c8aff;text-decoration:none;">${agent.email}</a></p>` : ""}
+                  </td>
+                </tr>
+              </table>
+              <p style="color:#6c757d;font-size:14px;line-height:1.6;margin:0;">
+                Please ensure access to the property at the scheduled time. If you need to reschedule, contact us as soon as possible.
+              </p>
+            </td>
+          </tr>
           <tr>
             <td style="background-color:#f8f9fa;padding:20px 40px;text-align:center;border-top:1px solid #e9ecef;">
               <p style="color:#adb5bd;font-size:12px;margin:0;">This is an automated email. Please do not reply directly.</p>
@@ -231,7 +296,6 @@ serve(async (req) => {
     let html: string;
 
     if (type === "viewing") {
-      // Fetch viewing with property info
       const { data: viewing, error: viewingError } = await supabase
         .from("property_viewings")
         .select("*")
@@ -246,7 +310,6 @@ serve(async (req) => {
         .eq("id", viewing.property_id)
         .single();
 
-      // Get viewer's email and name
       const { data: viewerAuth } = await supabase.auth.admin.getUserById(viewing.user_id);
       const { data: viewerProfile } = await supabase
         .from("profiles")
@@ -254,11 +317,9 @@ serve(async (req) => {
         .eq("user_id", viewing.user_id)
         .single();
 
-      // Get agent contact - use assigned agent, or property lister agent, or fallback
       const agentId = viewing.agent_id || null;
       const agent = await getAgentContactCard(supabase, agentId);
 
-      // If no agent assigned, try property owner
       if (!agentId && property?.user_id) {
         const ownerAgent = await getAgentContactCard(supabase, property.user_id);
         if (ownerAgent.phone !== FALLBACK_PHONE) {
@@ -272,13 +333,9 @@ serve(async (req) => {
       if (!toEmail) throw new Error("Viewer email not found");
 
       const formattedDate = new Date(viewing.viewing_date).toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        weekday: "long", year: "numeric", month: "long", day: "numeric",
       });
 
-      // Format time
       const timeParts = viewing.viewing_time.split(":");
       const hour = parseInt(timeParts[0]);
       const mins = timeParts[1];
@@ -290,12 +347,9 @@ serve(async (req) => {
       html = buildViewingEmailHtml(
         viewerProfile?.full_name || "Valued Customer",
         `${property?.address || "Property"}, ${property?.city || ""}`,
-        formattedDate,
-        formattedTime,
-        agent
+        formattedDate, formattedTime, agent
       );
     } else if (type === "photography") {
-      // Fetch photography request
       const { data: photoReq, error: photoError } = await supabase
         .from("photography_requests")
         .select("*")
@@ -304,7 +358,6 @@ serve(async (req) => {
 
       if (photoError || !photoReq) throw new Error("Photography request not found");
 
-      // Get agent contact
       const agent = await getAgentContactCard(supabase, photoReq.assigned_agent_id);
 
       toEmail = photoReq.email;
@@ -312,27 +365,47 @@ serve(async (req) => {
 
       const formattedDate = photoReq.preferred_date
         ? new Date(photoReq.preferred_date).toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
+            weekday: "long", year: "numeric", month: "long", day: "numeric",
           })
         : null;
 
       subject = `Photography Service Confirmed - ${photoReq.property_address}`;
       html = buildPhotographyEmailHtml(
-        photoReq.full_name,
-        photoReq.property_address,
-        photoReq.city,
-        formattedDate,
-        photoReq.preferred_time,
-        agent
+        photoReq.full_name, photoReq.property_address, photoReq.city,
+        formattedDate, photoReq.preferred_time, agent
+      );
+    } else if (type === "valuation") {
+      const { data: valReq, error: valError } = await supabase
+        .from("valuation_requests")
+        .select("*")
+        .eq("id", record_id)
+        .single();
+
+      if (valError || !valReq) throw new Error("Valuation request not found");
+
+      const agent = await getAgentContactCard(supabase, valReq.assigned_agent_id);
+
+      toEmail = valReq.email;
+      if (!toEmail) throw new Error("Requester email not found");
+
+      const formattedDate = new Date(valReq.preferred_date).toLocaleDateString("en-US", {
+        weekday: "long", year: "numeric", month: "long", day: "numeric",
+      });
+
+      const hour = parseInt(valReq.preferred_time.split(":")[0]);
+      const suffix = hour >= 12 ? "PM" : "AM";
+      const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+      const formattedTime = `${displayHour}:00 ${suffix}`;
+
+      subject = `Valuation Confirmed - ${valReq.property_address}`;
+      html = buildValuationEmailHtml(
+        valReq.full_name, valReq.property_address, valReq.city,
+        formattedDate, formattedTime, agent
       );
     } else {
       throw new Error("Invalid type");
     }
 
-    // Send email via Resend
     const resendRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {

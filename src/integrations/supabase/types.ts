@@ -936,6 +936,75 @@ export type Database = {
         }
         Relationships: []
       }
+      valuation_requests: {
+        Row: {
+          additional_notes: string | null
+          admin_notes: string | null
+          assigned_agent_id: string | null
+          bathrooms: number | null
+          bedrooms: number | null
+          city: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          municipality: string | null
+          phone_number: string
+          preferred_date: string
+          preferred_time: string
+          property_address: string
+          property_type: string
+          square_meters: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          admin_notes?: string | null
+          assigned_agent_id?: string | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          city: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          municipality?: string | null
+          phone_number: string
+          preferred_date: string
+          preferred_time: string
+          property_address: string
+          property_type: string
+          square_meters?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_notes?: string | null
+          admin_notes?: string | null
+          assigned_agent_id?: string | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          city?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          municipality?: string | null
+          phone_number?: string
+          preferred_date?: string
+          preferred_time?: string
+          property_address?: string
+          property_type?: string
+          square_meters?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
