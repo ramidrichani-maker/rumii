@@ -82,29 +82,27 @@ export const Navbar = () => {
   return <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <Link to="/" className="flex items-center space-x-2">
-              <Home className="w-6 h-6 text-primary" />
-              <span className="text-xl font-bold">Oracle Estates</span>
+          <Link to="/" className="flex items-center space-x-2 shrink-0">
+            <Home className="w-6 h-6 text-primary" />
+            <span className="text-xl font-bold">Oracle Estates</span>
+          </Link>
+          <nav className="hidden md:flex items-center justify-center flex-1 space-x-1">
+            <Link to="/purchase">
+              <Button variant="ghost" size="sm">Buy</Button>
             </Link>
-            <nav className="hidden md:flex items-center space-x-1">
-              <Link to="/purchase">
-                <Button variant="ghost" size="sm">Buy</Button>
-              </Link>
-              <Link to="/rent">
-                <Button variant="ghost" size="sm">Rent</Button>
-              </Link>
-              <Link to="/find-agents">
-                <Button variant="ghost" size="sm">Find agents</Button>
-              </Link>
-              <Link to="/new-homes">
-                <Button variant="ghost" size="sm">New homes</Button>
-              </Link>
-              <Link to="/agent-valuation">
-                <Button variant="ghost" size="sm">Agent valuation</Button>
-              </Link>
-            </nav>
-          </div>
+            <Link to="/rent">
+              <Button variant="ghost" size="sm">Rent</Button>
+            </Link>
+            <Link to="/find-agents">
+              <Button variant="ghost" size="sm">Find agents</Button>
+            </Link>
+            <Link to="/new-homes">
+              <Button variant="ghost" size="sm">New homes</Button>
+            </Link>
+            <Link to="/agent-valuation">
+              <Button variant="ghost" size="sm">Agent valuation</Button>
+            </Link>
+          </nav>
 
           <div className="flex items-center space-x-4">
             <Link to="/favorites" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
