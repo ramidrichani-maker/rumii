@@ -88,19 +88,19 @@ export const Navbar = () => {
           </Link>
           <nav className="hidden md:flex items-center justify-center flex-1 space-x-1">
             <Link to="/purchase">
-              <Button variant="ghost" size="sm">Buy</Button>
+              <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
             </Link>
             <Link to="/rent">
-              <Button variant="ghost" size="sm">Rent</Button>
+              <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
             </Link>
             <Link to="/find-agents">
-              <Button variant="ghost" size="sm">Find agents</Button>
+              <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
             </Link>
             <Link to="/new-homes">
-              <Button variant="ghost" size="sm">New homes</Button>
+              <Button variant="ghost" size="sm" className="text-[1.05rem]">New homes</Button>
             </Link>
             <Link to="/agent-valuation">
-              <Button variant="ghost" size="sm">Agent valuation</Button>
+              <Button variant="ghost" size="sm" className="text-[1.05rem]">Agent valuation</Button>
             </Link>
           </nav>
 
