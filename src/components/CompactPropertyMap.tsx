@@ -692,7 +692,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           <div 
             ref={mapRef}
             style={{ height: mapHeight }} 
-            className="rounded-lg overflow-hidden border"
+            className="rounded-lg border overflow-visible"
           />
         </CardContent>
       </Card>
