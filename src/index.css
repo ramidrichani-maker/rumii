@@ -221,6 +221,9 @@ All colors MUST be HSL.
 }
 
 /* Rich property popup on map */
+.property-rich-popup {
+  z-index: 10000 !important;
+}
 .property-rich-popup .leaflet-popup-content-wrapper {
   padding: 0;
   border-radius: 10px;
@@ -233,4 +236,8 @@ All colors MUST be HSL.
 }
 .property-rich-popup .leaflet-popup-tip {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.leaflet-popup-pane {
+  z-index: 10000 !important;
+  overflow: visible !important;
 }
