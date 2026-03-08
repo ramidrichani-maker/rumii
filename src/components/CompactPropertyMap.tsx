@@ -574,11 +574,12 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             </p>
           </div>
         )}
-        <div className="flex-1 relative rounded-lg overflow-hidden">
+        <div className="flex-1 relative">
           <div 
             ref={mapRef}
-            className="absolute inset-0"
+            className="absolute inset-0 rounded-lg"
           />
+          <div className="absolute inset-0 rounded-lg ring-[3px] ring-background pointer-events-none z-[500]" />
         </div>
       </div>
     );
