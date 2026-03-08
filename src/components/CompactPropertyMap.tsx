@@ -574,10 +574,13 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             </p>
           </div>
         )}
-        <div 
-          ref={mapRef}
-          className="flex-1 rounded-lg overflow-visible"
-        />
+        <div className="flex-1 relative">
+          <div 
+            ref={mapRef}
+            className="absolute inset-0 rounded-lg"
+          />
+          <div className="absolute inset-0 rounded-lg ring-[3px] ring-background pointer-events-none z-[500]" />
+        </div>
       </div>
     );
   }
@@ -689,11 +692,13 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           </div>
           
           {/* Map Container */}
-          <div 
-            ref={mapRef}
-            style={{ height: mapHeight }} 
-            className="rounded-lg border overflow-visible"
-          />
+          <div className="relative" style={{ height: mapHeight }}>
+            <div 
+              ref={mapRef}
+              className="absolute inset-0 rounded-lg"
+            />
+            <div className="absolute inset-0 rounded-lg ring-[3px] ring-background border border-border pointer-events-none z-[500]" />
+          </div>
         </CardContent>
       </Card>
     </div>
