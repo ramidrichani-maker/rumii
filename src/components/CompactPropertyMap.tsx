@@ -576,7 +576,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         )}
         <div 
           ref={mapRef}
-          className="flex-1 rounded-lg overflow-hidden"
+          className="flex-1 rounded-lg overflow-visible"
         />
       </div>
     );

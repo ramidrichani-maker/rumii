@@ -241,3 +241,14 @@ All colors MUST be HSL.
   z-index: 10000 !important;
   overflow: visible !important;
 }
+/* Allow popups to overflow the map container */
+.leaflet-container {
+  overflow: visible !important;
+}
+.leaflet-map-pane {
+  overflow: visible !important;
+}
+.leaflet-map-pane svg,
+.leaflet-map-pane canvas {
+  overflow: visible !important;
+}
