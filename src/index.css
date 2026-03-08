@@ -241,10 +241,12 @@ All colors MUST be HSL.
   z-index: 10000 !important;
   overflow: visible !important;
 }
-/* Allow popups to overflow map while keeping rounded corners via overlay ring */
+/* Clip map tiles to container bounds but let popups escape */
 .leaflet-container {
-  overflow: visible !important;
+  overflow: hidden !important;
 }
-.leaflet-map-pane {
+.leaflet-pane.leaflet-popup-pane {
   overflow: visible !important;
+  z-index: 10000 !important;
+  position: fixed !important;
 }
