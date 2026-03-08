@@ -279,6 +279,20 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             marker.openPopup();
           });
 
+          // Show preview on hover after 1 second
+          let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+          marker.on('mouseover', () => {
+            hoverTimeout = setTimeout(() => {
+              marker.openPopup();
+            }, 1000);
+          });
+          marker.on('mouseout', () => {
+            if (hoverTimeout) {
+              clearTimeout(hoverTimeout);
+              hoverTimeout = null;
+            }
+          });
+
           markersRef.current.push(marker);
           bounds.extend([property.latitude, property.longitude]);
         }
