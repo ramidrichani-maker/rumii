@@ -223,8 +223,6 @@ All colors MUST be HSL.
 /* Rich property popup on map */
 .property-rich-popup {
   z-index: 10000 !important;
-  /* Allow popup to escape clipped parent */
-  position: absolute;
 }
 .property-rich-popup .leaflet-popup-content-wrapper {
   padding: 0;
@@ -241,5 +239,12 @@ All colors MUST be HSL.
 }
 .leaflet-popup-pane {
   z-index: 10000 !important;
+  overflow: visible !important;
+}
+/* Allow popups to overflow map while keeping rounded corners via overlay ring */
+.leaflet-container {
+  overflow: visible !important;
+}
+.leaflet-map-pane {
   overflow: visible !important;
 }
