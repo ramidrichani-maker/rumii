@@ -692,11 +692,12 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           </div>
           
           {/* Map Container */}
-          <div className="relative rounded-lg border overflow-hidden" style={{ height: mapHeight }}>
+          <div className="relative" style={{ height: mapHeight }}>
             <div 
               ref={mapRef}
-              className="absolute inset-0"
+              className="absolute inset-0 rounded-lg"
             />
+            <div className="absolute inset-0 rounded-lg ring-[3px] ring-background border border-border pointer-events-none z-[500]" />
           </div>
         </CardContent>
       </Card>
