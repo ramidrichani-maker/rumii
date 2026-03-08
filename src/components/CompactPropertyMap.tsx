@@ -272,25 +272,55 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             }
           });
 
-          marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 260, className: 'property-rich-popup' });
+          marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 260, className: 'property-rich-popup', autoPan: false });
           
-          // Open popup on click (no immediate navigation)
+          // Open popup on click
           marker.on('click', () => {
             marker.openPopup();
           });
 
-          // Show preview on hover after 1 second
+          // Hover logic: show after 1s, close when mouse leaves both pin and popup
           let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+          let closeTimeout: ReturnType<typeof setTimeout> | null = null;
+          let isOverPopup = false;
+
+          const clearCloseTimeout = () => {
+            if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+          };
+
+          const scheduleClose = () => {
+            clearCloseTimeout();
+            closeTimeout = setTimeout(() => {
+              if (!isOverPopup) {
+                marker.closePopup();
+              }
+            }, 100);
+          };
+
           marker.on('mouseover', () => {
+            clearCloseTimeout();
             hoverTimeout = setTimeout(() => {
               marker.openPopup();
+              // Attach popup hover listeners after opening
+              setTimeout(() => {
+                const popupEl = marker.getPopup()?.getElement();
+                if (popupEl) {
+                  popupEl.addEventListener('mouseenter', () => {
+                    isOverPopup = true;
+                    clearCloseTimeout();
+                  });
+                  popupEl.addEventListener('mouseleave', () => {
+                    isOverPopup = false;
+                    scheduleClose();
+                  });
+                }
+              }, 50);
             }, 1000);
           });
+
           marker.on('mouseout', () => {
-            if (hoverTimeout) {
-              clearTimeout(hoverTimeout);
-              hoverTimeout = null;
-            }
+            if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
+            scheduleClose();
           });
 
           markersRef.current.push(marker);
