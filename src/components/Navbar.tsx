@@ -86,7 +86,7 @@ export const Navbar = () => {
             <Home className="w-6 h-6 text-primary" />
             <span className="text-xl font-bold">Oracle Estates</span>
           </Link>
-          <nav className="hidden md:flex items-center justify-center flex-1 space-x-2">
+          <nav className="hidden md:flex items-center justify-center flex-1 space-x-4">
             <Link to="/purchase">
               <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
             </Link>
