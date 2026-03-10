@@ -25,6 +25,7 @@ import { BulkPropertyImport } from "@/components/BulkPropertyImport";
 import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
 import { AdminPropertyListingsManager } from "@/components/AdminPropertyListingsManager";
 import ValuationRequestsManager from "@/components/ValuationRequestsManager";
+import FindAgentRequestsManager from "@/components/FindAgentRequestsManager";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
