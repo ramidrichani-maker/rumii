@@ -407,7 +407,7 @@ const AdminDashboard = () => {
               Property Management
             </h2>
             <Tabs defaultValue="properties" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-10">
+              <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Home className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Pending</span>
@@ -435,14 +435,6 @@ const AdminDashboard = () => {
                 <TabsTrigger value="feature-requests" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Requests</span>
-                </TabsTrigger>
-                <TabsTrigger value="photography" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Photos</span>
-                </TabsTrigger>
-                <TabsTrigger value="valuations" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <ClipboardCheck className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Valuations</span>
                 </TabsTrigger>
                 <TabsTrigger value="media" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
