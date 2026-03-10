@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, MapPin, User, Briefcase } from 'lucide-react';
+import { Send, MapPin, User, Briefcase, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const radiusOptions = [
   { value: '0.2', label: '+0.2 km' },
@@ -27,15 +31,93 @@ const radiusOptions = [
   { value: '10', label: '+10 km' },
 ];
 
+const ORACLE_ESTATES_NAME = 'Oracle Estates';
+
 const FindAgents = () => {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [location, setLocation] = useState('');
   const [radius, setRadius] = useState('1');
   const [agentName, setAgentName] = useState('');
   const [agentType, setAgentType] = useState('');
+  const [sending, setSending] = useState(false);
 
-  const handleSearch = () => {
-    // Search logic placeholder
-    console.log({ location, radius, agentName, agentType });
+  const handleConnect = async () => {
+    if (!user) {
+      toast({ title: 'Please sign in', description: 'You need to be signed in to connect with an agent.', variant: 'destructive' });
+      navigate('/auth');
+      return;
+    }
+
+    if (!location) {
+      toast({ title: 'Location required', description: 'Please enter a location to connect with an agent.', variant: 'destructive' });
+      return;
+    }
+
+    setSending(true);
+    try {
+      // Find the Oracle Estates agency
+      const { data: agency, error: agencyError } = await supabase
+        .from('agencies')
+        .select('id')
+        .eq('name', ORACLE_ESTATES_NAME)
+        .maybeSingle();
+
+      if (agencyError || !agency) {
+        toast({ title: 'Error', description: 'Could not find Oracle Estates agency. Please try again later.', variant: 'destructive' });
+        setSending(false);
+        return;
+      }
+
+      // Find all agents belonging to Oracle Estates
+      const { data: agents, error: agentsError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .eq('agency_id', agency.id)
+        .in('role', ['agent', 'agency_manager', 'admin']);
+
+      if (agentsError || !agents || agents.length === 0) {
+        toast({ title: 'No agents available', description: 'No Oracle Estates agents are currently available. Please try again later.', variant: 'destructive' });
+        setSending(false);
+        return;
+      }
+
+      const agentTypeLabel = agentType === 'sales' ? 'Sales' : agentType === 'rent_out' ? 'Rent out' : agentType === 'commercial' ? 'Commercial' : 'Not specified';
+      const radiusLabel = radiusOptions.find(r => r.value === radius)?.label || radius + ' km';
+      const clientName = profile?.full_name || 'A client';
+      const clientPhone = profile?.phone_number || 'Not provided';
+
+      const messageBody = `New client enquiry from the Find Agents page:\n\nClient: ${clientName}\nPhone: ${clientPhone}\nEmail: ${user.email || 'Not provided'}\n\nSearch Criteria:\n- Location: ${location}\n- Search Radius: ${radiusLabel}\n- Agent Type: ${agentTypeLabel}${agentName ? `\n- Preferred Agent: ${agentName}` : ''}`;
+
+      // Send a message to each Oracle Estates agent
+      const messageInserts = agents.map(agent => ({
+        sender_user_id: user.id,
+        recipient_user_id: agent.user_id,
+        subject: `New Agent Enquiry - ${location}`,
+        body: messageBody,
+      }));
+
+      const { error: msgError } = await supabase
+        .from('messages')
+        .insert(messageInserts);
+
+      if (msgError) {
+        console.error('Message send error:', msgError);
+        toast({ title: 'Error', description: 'Failed to send your request. Please try again.', variant: 'destructive' });
+      } else {
+        toast({ title: 'Request sent!', description: `Your details have been sent to ${agents.length} Oracle Estates agent${agents.length > 1 ? 's' : ''}. They will be in touch soon.` });
+        // Reset form
+        setLocation('');
+        setAgentName('');
+        setAgentType('');
+        setRadius('1');
+      }
+    } catch (err) {
+      console.error('Connect error:', err);
+      toast({ title: 'Error', description: 'Something went wrong. Please try again.', variant: 'destructive' });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -121,10 +203,14 @@ const FindAgents = () => {
               </Select>
             </div>
 
-            {/* Search Button */}
-            <Button onClick={handleSearch} className="w-full mt-2" size="lg">
-              <Search className="h-4 w-4 mr-2" />
-              Search Agents
+            {/* Connect Button */}
+            <Button onClick={handleConnect} className="w-full mt-2" size="lg" disabled={sending}>
+              {sending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4 mr-2" />
+              )}
+              {sending ? 'Sending...' : 'Connect with Agent'}
             </Button>
           </div>
         </div>
