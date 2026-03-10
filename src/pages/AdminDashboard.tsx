@@ -551,18 +551,6 @@ const AdminDashboard = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="photography">
-                <div className="max-h-[500px] overflow-y-auto">
-                  <PhotographyRequestsManager />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="valuations">
-                <div className="max-h-[500px] overflow-y-auto">
-                  <ValuationRequestsManager />
-                </div>
-              </TabsContent>
-
               <TabsContent value="media">
                 <Card>
                   <CardHeader>
@@ -575,6 +563,50 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
           </Tabs>
+          </div>
+        </div>
+
+        {/* Row 1.5: Service Requests */}
+        <div className="mb-8">
+          <div>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" />
+              Service Requests
+            </h2>
+            <Tabs defaultValue="valuations" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="valuations" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <ClipboardCheck className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Valuations</span>
+                </TabsTrigger>
+                <TabsTrigger value="photography" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Photography</span>
+                </TabsTrigger>
+                <TabsTrigger value="find-agent" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Search className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Find Agent</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="valuations">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <ValuationRequestsManager />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="photography">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <PhotographyRequestsManager />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="find-agent">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <FindAgentRequestsManager />
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
 
