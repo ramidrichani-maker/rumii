@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2, ListChecks, ClipboardCheck } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2, ListChecks, ClipboardCheck, Search, MessageSquare } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
@@ -25,6 +25,7 @@ import { BulkPropertyImport } from "@/components/BulkPropertyImport";
 import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
 import { AdminPropertyListingsManager } from "@/components/AdminPropertyListingsManager";
 import ValuationRequestsManager from "@/components/ValuationRequestsManager";
+import FindAgentRequestsManager from "@/components/FindAgentRequestsManager";
 import { format } from "date-fns";
 
 const AdminDashboard = () => {
@@ -406,7 +407,7 @@ const AdminDashboard = () => {
               Property Management
             </h2>
             <Tabs defaultValue="properties" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-10">
+              <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Home className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Pending</span>
@@ -434,14 +435,6 @@ const AdminDashboard = () => {
                 <TabsTrigger value="feature-requests" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Requests</span>
-                </TabsTrigger>
-                <TabsTrigger value="photography" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Photos</span>
-                </TabsTrigger>
-                <TabsTrigger value="valuations" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <ClipboardCheck className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Valuations</span>
                 </TabsTrigger>
                 <TabsTrigger value="media" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -558,18 +551,6 @@ const AdminDashboard = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="photography">
-                <div className="max-h-[500px] overflow-y-auto">
-                  <PhotographyRequestsManager />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="valuations">
-                <div className="max-h-[500px] overflow-y-auto">
-                  <ValuationRequestsManager />
-                </div>
-              </TabsContent>
-
               <TabsContent value="media">
                 <Card>
                   <CardHeader>
@@ -582,6 +563,50 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
           </Tabs>
+          </div>
+        </div>
+
+        {/* Row 1.5: Service Requests */}
+        <div className="mb-8">
+          <div>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" />
+              Service Requests
+            </h2>
+            <Tabs defaultValue="valuations" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="valuations" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <ClipboardCheck className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Valuations</span>
+                </TabsTrigger>
+                <TabsTrigger value="photography" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Photography</span>
+                </TabsTrigger>
+                <TabsTrigger value="find-agent" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Search className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Find Agent</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="valuations">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <ValuationRequestsManager />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="photography">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <PhotographyRequestsManager />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="find-agent">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <FindAgentRequestsManager />
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
 
