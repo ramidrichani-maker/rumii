@@ -66,7 +66,7 @@ const Purchase = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(!!searchQuery);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
@@ -203,6 +203,8 @@ const Purchase = () => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
       newParams.set('search', value);
+      // Auto-open map to show boundary polygon for the searched area
+      setShowMap(true);
     } else {
       newParams.delete('search');
     }
