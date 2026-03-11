@@ -46,7 +46,7 @@ const Purchase = () => {
   const urlMaxPrice = searchParams.get('maxPrice') || '';
   const urlMinYearBuilt = searchParams.get('minYearBuilt') || '';
   const [locationInput, setLocationInput] = useState(searchQuery);
-  const [radius, setRadius] = useState(1);
+  const [radius, setRadius] = useState(0);
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 1000]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
@@ -231,7 +231,7 @@ const Purchase = () => {
     setDrawnPolygon(polygon);
   }, [setDrawnPolygon]);
 
-  const filteredProperties = filterPropertiesByPolygon(properties);
+  const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
   return (
     <div className="min-h-screen bg-transparent">

@@ -420,13 +420,34 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
               onDrawnAreaChange?.(coords);
             }
 
-            // Fit map to boundary
-            leafletMapRef.current!.fitBounds(boundaryLayer.getBounds(), { padding: [10, 10], maxZoom: 16 });
+            // If radius is set, also draw a dashed circle around the centroid to visualize the extra radius
+            if (searchRadius > 0) {
+              const bounds = boundaryLayer.getBounds();
+              const center = bounds.getCenter();
+              // Approximate the polygon's max extent from center + add user radius
+              const cornerDist = center.distanceTo(bounds.getNorthEast());
+              const totalRadius = cornerDist + searchRadius * 1000;
+
+              const radiusCircle = L.circle([center.lat, center.lng], {
+                radius: totalRadius,
+                color: 'hsl(30, 20%, 55%)',
+                fillColor: 'hsl(30, 20%, 65%)',
+                fillOpacity: 0.05,
+                weight: 1,
+                dashArray: '4 6',
+              }).addTo(leafletMapRef.current!);
+
+              searchCircleRef.current = radiusCircle;
+              leafletMapRef.current!.fitBounds(radiusCircle.getBounds(), { padding: [10, 10], maxZoom: 16 });
+            } else {
+              // Fit map to boundary only
+              leafletMapRef.current!.fitBounds(boundaryLayer.getBounds(), { padding: [10, 10], maxZoom: 16 });
+            }
           } else {
             // Fallback: draw a circle if no polygon geometry available
             const lat = parseFloat(result.lat);
             const lon = parseFloat(result.lon);
-            const radiusMeters = searchRadius * 1000;
+            const radiusMeters = searchRadius > 0 ? searchRadius * 1000 : 2000;
 
             const circle = L.circle([lat, lon], {
               radius: radiusMeters,

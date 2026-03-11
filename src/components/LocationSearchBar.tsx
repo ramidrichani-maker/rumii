@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/popover';
 
 const radiusOptions = [
+  { label: 'None', value: 0 },
   { label: '+0.2 km', value: 0.2 },
   { label: '+0.5 km', value: 0.5 },
   { label: '+1 km', value: 1 },
@@ -128,7 +129,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
-  const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
+  const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
   return (
     <div className="mb-6">

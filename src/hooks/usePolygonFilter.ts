@@ -28,11 +28,34 @@ function isPointInPolygon(point: Coordinate, polygon: Coordinate[]): boolean {
   return inside;
 }
 
+// Haversine distance in km between two coordinates
+function haversineDistance(a: Coordinate, b: Coordinate): number {
+  const R = 6371; // Earth radius in km
+  const dLat = (b.latitude - a.latitude) * Math.PI / 180;
+  const dLon = (b.longitude - a.longitude) * Math.PI / 180;
+  const lat1 = a.latitude * Math.PI / 180;
+  const lat2 = b.latitude * Math.PI / 180;
+
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+// Minimum distance from a point to any edge of the polygon
+function minDistanceToPolygon(point: Coordinate, polygon: Coordinate[]): number {
+  let minDist = Infinity;
+  for (let i = 0; i < polygon.length; i++) {
+    const dist = haversineDistance(point, polygon[i]);
+    if (dist < minDist) minDist = dist;
+  }
+  return minDist;
+}
+
 export function usePolygonFilter() {
   const [drawnPolygon, setDrawnPolygon] = useState<Coordinate[] | null>(null);
 
   const filterPropertiesByPolygon = useCallback(<T extends { latitude: number | null; longitude: number | null }>(
-    properties: T[]
+    properties: T[],
+    radiusKm: number = 0
   ): T[] => {
     if (!drawnPolygon || drawnPolygon.length < 3) {
       return properties;
@@ -42,10 +65,19 @@ export function usePolygonFilter() {
       if (property.latitude === null || property.longitude === null) {
         return false;
       }
-      return isPointInPolygon(
-        { latitude: property.latitude, longitude: property.longitude },
-        drawnPolygon
-      );
+      const point = { latitude: property.latitude, longitude: property.longitude };
+      
+      // Check if inside polygon
+      if (isPointInPolygon(point, drawnPolygon)) {
+        return true;
+      }
+      
+      // If radius is set, also include properties within radiusKm of the polygon boundary
+      if (radiusKm > 0) {
+        return minDistanceToPolygon(point, drawnPolygon) <= radiusKm;
+      }
+      
+      return false;
     });
   }, [drawnPolygon]);
 
