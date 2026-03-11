@@ -175,8 +175,8 @@ const PropertyDetail = () => {
       );
 
       const streetLayer = L.tileLayer(
-        "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en",
-        { maxZoom: 20 }
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        { subdomains: 'abcd', maxZoom: 20 }
       );
       const satelliteLayer = L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
