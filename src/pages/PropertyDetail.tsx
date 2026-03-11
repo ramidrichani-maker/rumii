@@ -137,8 +137,8 @@ const PropertyDetail = () => {
     }).setView([property.latitude, property.longitude], 15);
 
     L.tileLayer(
-      "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en",
-      { maxZoom: 20 }
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      { subdomains: 'abcd', maxZoom: 20 }
     ).addTo(map);
 
     const icon = L.icon({
