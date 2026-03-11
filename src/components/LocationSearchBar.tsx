@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/popover';
 
 const radiusOptions = [
+  { label: 'None', value: 0 },
   { label: '+0.2 km', value: 0.2 },
   { label: '+0.5 km', value: 0.5 },
   { label: '+1 km', value: 1 },
