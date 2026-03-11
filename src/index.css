@@ -207,7 +207,7 @@ All colors MUST be HSL.
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .leaflet-popup-pane {
-  z-index: 10000 !important;
+  z-index: 700 !important;
   overflow: visible !important;
 }
 /* Clip map tiles to container bounds but let popups escape */
@@ -216,6 +216,9 @@ All colors MUST be HSL.
 }
 .leaflet-pane.leaflet-popup-pane {
   overflow: visible !important;
-  z-index: 10000 !important;
-  position: fixed !important;
+  z-index: 700 !important;
+  pointer-events: none;
+}
+.leaflet-pane.leaflet-popup-pane .leaflet-popup {
+  pointer-events: auto;
 }
