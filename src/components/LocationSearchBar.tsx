@@ -129,7 +129,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
-  const selectedLabel = radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`;
+  const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
   return (
     <div className="mb-6">
