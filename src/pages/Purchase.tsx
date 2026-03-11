@@ -231,7 +231,7 @@ const Purchase = () => {
     setDrawnPolygon(polygon);
   }, [setDrawnPolygon]);
 
-  const filteredProperties = filterPropertiesByPolygon(properties);
+  const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
   return (
     <div className="min-h-screen bg-transparent">
