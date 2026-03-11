@@ -359,7 +359,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         try {
           // Request polygon geometry from Nominatim
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=${encodeURIComponent(initialSearchLocation + ', Lebanon')}&limit=1`
+            `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&polygon_geojson=1&q=${encodeURIComponent(initialSearchLocation + ', Lebanon')}&limit=1`,
+            { headers: { 'Accept': 'application/json' } }
           );
           const data = await response.json();
           if (!data || data.length === 0) return;
