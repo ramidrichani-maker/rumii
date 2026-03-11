@@ -175,7 +175,7 @@ const PropertyDetail = () => {
       );
 
       const streetLayer = L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         { maxZoom: 20 }
       );
       const satelliteLayer = L.tileLayer(
