@@ -137,7 +137,7 @@ const PropertyDetail = () => {
     }).setView([property.latitude, property.longitude], 15);
 
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en",
       { maxZoom: 20 }
     ).addTo(map);
 
