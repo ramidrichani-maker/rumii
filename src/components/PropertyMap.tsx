@@ -168,7 +168,8 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     setIsSearching(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1`
+        `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&q=${encodeURIComponent(searchAddress)}&limit=1`,
+        { headers: { 'Accept': 'application/json' } }
       );
       const data = await response.json();
       
