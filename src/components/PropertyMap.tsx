@@ -53,9 +53,8 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       const map = L.map(mapRef.current).setView(position, 13);
       
       // Add tile layer with English labels
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
+      L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en', {
+        attribution: '&copy; Google Maps',
         maxZoom: 20
       }).addTo(map);
 
