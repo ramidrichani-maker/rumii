@@ -378,7 +378,7 @@ const Rent = () => {
             <X className="w-4 h-4" />
           </button>
         </div>
-        {showMap && (
+        {showMap && mapFullscreen && (
           <CompactPropertyMap
             properties={filteredProperties}
             height="100vh"
