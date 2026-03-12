@@ -219,26 +219,36 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
               Select Time
             </h3>
             {selectedDate ? (
-              <div className="grid grid-cols-2 gap-2">
-                {timeSlots.map((time) => (
-                  <button
-                    key={time}
-                    type="button"
-                    className={`p-3 text-center font-medium rounded-lg border transition-colors ${
-                      selectedTime === time
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelectedTime(time);
-                    }}
-                  >
-                    {formatTimeSlot(time)}
-                  </button>
-                ))}
-              </div>
+              loadingSlots ? (
+                <p className="text-muted-foreground text-center py-8">Loading available slots...</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {timeSlots.map((time) => {
+                    const isBusy = busySlots.includes(time);
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        disabled={isBusy}
+                        className={`p-3 text-center font-medium rounded-lg border transition-colors ${
+                          isBusy
+                            ? 'border-border bg-muted text-muted-foreground opacity-50 cursor-not-allowed line-through'
+                            : selectedTime === time
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border hover:border-primary/50'
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedTime(time);
+                        }}
+                      >
+                        {formatTimeSlot(time)}
+                      </button>
+                    );
+                  })}
+                </div>
+              )
             ) : (
               <p className="text-muted-foreground text-center py-8">
                 Please select a date first to see available time slots
