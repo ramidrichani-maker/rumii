@@ -351,7 +351,25 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const searchBoundaryRef = useRef<L.GeoJSON | null>(null);
 
   useEffect(() => {
-    if (!mapInitialized || !leafletMapRef.current || !initialSearchLocation?.trim()) return;
+    if (!mapInitialized || !leafletMapRef.current) return;
+
+    // If location is cleared, remove boundary/circle and clear polygon filter
+    if (!initialSearchLocation?.trim()) {
+      if (searchBoundaryRef.current) {
+        searchBoundaryRef.current.remove();
+        searchBoundaryRef.current = null;
+      }
+      if (searchCircleRef.current) {
+        searchCircleRef.current.remove();
+        searchCircleRef.current = null;
+      }
+      if (drawnItemsRef.current) {
+        drawnItemsRef.current.clearLayers();
+      }
+      setHasDrawnArea(false);
+      onDrawnAreaChange?.(null);
+      return;
+    }
 
     // Debounce Nominatim requests to avoid rate-limiting
     const timeoutId = setTimeout(() => {
