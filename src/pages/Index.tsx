@@ -145,7 +145,7 @@ const Index = () => {
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredSales.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
-                      <Link to={`/purchase`}>
+                      <Link to={`/property/${property.id}`}>
                         <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer">
                           <div 
                             className="h-48 bg-muted rounded-t-lg bg-cover bg-center"
