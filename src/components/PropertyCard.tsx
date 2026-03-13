@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
