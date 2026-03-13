@@ -114,22 +114,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isImageTransitioning) return;
-    setIsImageTransitioning(true);
-    setTimeout(() => {
-      setCurrentImageIndex(prev => prev === 0 ? property.images.length - 1 : prev - 1);
-      setIsImageTransitioning(false);
-    }, 250);
+    imageCarousel.goTo("left");
   };
 
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isImageTransitioning) return;
-    setIsImageTransitioning(true);
-    setTimeout(() => {
-      setCurrentImageIndex(prev => prev === property.images.length - 1 ? 0 : prev + 1);
-      setIsImageTransitioning(false);
-    }, 250);
+    imageCarousel.goTo("right");
   };
 
   const handleCall = (e: React.MouseEvent) => {
