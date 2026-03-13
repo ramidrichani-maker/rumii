@@ -253,25 +253,13 @@ const PropertyDetail = () => {
     };
   }, [showMapOverlay, property?.latitude, property?.longitude]);
 
-  const goToImage = useCallback(
-    (direction: "left" | "right") => {
-      if (!property || isTransitioning) return;
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentImageIndex((prev) =>
-          direction === "right"
-            ? prev === property.images.length - 1
-              ? 0
-              : prev + 1
-            : prev === 0
-            ? property.images.length - 1
-            : prev - 1
-        );
-        setIsTransitioning(false);
-      }, 300);
-    },
-    [property, isTransitioning]
-  );
+  const imageCount = property?.images?.length || 0;
+  const carousel = useSwipeCarousel(imageCount);
+
+  // Sync carousel index to local state for other usages
+  useEffect(() => {
+    setCurrentImageIndex(carousel.currentIndex);
+  }, [carousel.currentIndex]);
 
   if (loading) {
     return (
