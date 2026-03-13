@@ -39,6 +39,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageTransitioning, setIsImageTransitioning] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
   const [agentPhone, setAgentPhone] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -113,12 +114,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex(prev => prev === 0 ? property.images.length - 1 : prev - 1);
+    if (isImageTransitioning) return;
+    setIsImageTransitioning(true);
+    setTimeout(() => {
+      setCurrentImageIndex(prev => prev === 0 ? property.images.length - 1 : prev - 1);
+      setIsImageTransitioning(false);
+    }, 250);
   };
 
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex(prev => prev === property.images.length - 1 ? 0 : prev + 1);
+    if (isImageTransitioning) return;
+    setIsImageTransitioning(true);
+    setTimeout(() => {
+      setCurrentImageIndex(prev => prev === property.images.length - 1 ? 0 : prev + 1);
+      setIsImageTransitioning(false);
+    }, 250);
   };
 
   const handleCall = (e: React.MouseEvent) => {
@@ -191,7 +202,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           <img
             src={currentImage}
             alt={`${property.property_type} in ${property.city}`}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-opacity duration-250 ${isImageTransitioning ? 'opacity-0' : 'opacity-100'}`}
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjwvc3ZnPgo=';
             }}
