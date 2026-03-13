@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -29,10 +29,55 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
   const [loading, setLoading] = useState(false);
   const [confirmByEmail, setConfirmByEmail] = useState(false);
   const [confirmByPhone, setConfirmByPhone] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
+  const [busySlots, setBusySlots] = useState<string[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   const timeSlots = [
     "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
   ];
+
+  // Fetch assigned agent for property
+  useEffect(() => {
+    if (!isOpen || !property.id) return;
+    const fetchAgent = async () => {
+      const { data } = await supabase
+        .from('property_agents')
+        .select('agent_id')
+        .eq('property_id', property.id)
+        .limit(1)
+        .maybeSingle();
+      setAgentId(data?.agent_id || null);
+    };
+    fetchAgent();
+  }, [isOpen, property.id]);
+
+  // Fetch agent's busy slots for selected date
+  useEffect(() => {
+    if (!selectedDate || !agentId) {
+      setBusySlots([]);
+      return;
+    }
+    setSelectedTime(""); // Reset time when date changes
+    const fetchBusySlots = async () => {
+      setLoadingSlots(true);
+      try {
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        const { data } = await supabase
+          .from('property_viewings')
+          .select('viewing_time')
+          .eq('agent_id', agentId)
+          .eq('viewing_date', dateStr)
+          .in('status', ['confirmed', 'pending']);
+        setBusySlots((data || []).map(v => v.viewing_time?.substring(0, 5)));
+      } catch {
+        setBusySlots([]);
+      } finally {
+        setLoadingSlots(false);
+      }
+    };
+    fetchBusySlots();
+  }, [selectedDate, agentId]);
 
   const formatTimeSlot = (time: string) => {
     const [hours, mins] = time.split(':');
@@ -175,26 +220,36 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
               Select Time
             </h3>
             {selectedDate ? (
-              <div className="grid grid-cols-2 gap-2">
-                {timeSlots.map((time) => (
-                  <button
-                    key={time}
-                    type="button"
-                    className={`p-3 text-center font-medium rounded-lg border transition-colors ${
-                      selectedTime === time
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelectedTime(time);
-                    }}
-                  >
-                    {formatTimeSlot(time)}
-                  </button>
-                ))}
-              </div>
+              loadingSlots ? (
+                <p className="text-muted-foreground text-center py-8">Loading available slots...</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {timeSlots.map((time) => {
+                    const isBusy = busySlots.includes(time);
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        disabled={isBusy}
+                        className={`p-3 text-center font-medium rounded-lg border transition-colors ${
+                          isBusy
+                            ? 'border-border bg-muted text-muted-foreground opacity-50 cursor-not-allowed line-through'
+                            : selectedTime === time
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border hover:border-primary/50'
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedTime(time);
+                        }}
+                      >
+                        {formatTimeSlot(time)}
+                      </button>
+                    );
+                  })}
+                </div>
+              )
             ) : (
               <p className="text-muted-foreground text-center py-8">
                 Please select a date first to see available time slots
