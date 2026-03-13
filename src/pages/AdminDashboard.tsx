@@ -125,14 +125,31 @@ const AdminDashboard = () => {
 
   const loadAgents = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: agentProfiles, error } = await supabase
         .from('profiles')
         .select('*')
         .in('role', ['agent', 'admin'])
         .order('full_name', { ascending: true });
 
       if (error) throw error;
-      setAgents(data || []);
+
+      // Fetch agency names for agents
+      const agentsWithAgency = await Promise.all(
+        (agentProfiles || []).map(async (agent) => {
+          let agency_name = null;
+          if (agent.agency_id) {
+            const { data: agency } = await supabase
+              .from('agencies')
+              .select('name')
+              .eq('id', agent.agency_id)
+              .single();
+            agency_name = agency?.name || null;
+          }
+          return { ...agent, agency_name };
+        })
+      );
+
+      setAgents(agentsWithAgency);
     } catch (error) {
       console.error('Error loading agents:', error);
     }
