@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,8 +39,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isImageTransitioning, setIsImageTransitioning] = useState(false);
+  const imageCarousel = useSwipeCarousel(property.images?.length || 0);
   const [showPhone, setShowPhone] = useState(false);
   const [agentPhone, setAgentPhone] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -114,22 +114,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isImageTransitioning) return;
-    setIsImageTransitioning(true);
-    setTimeout(() => {
-      setCurrentImageIndex(prev => prev === 0 ? property.images.length - 1 : prev - 1);
-      setIsImageTransitioning(false);
-    }, 250);
+    imageCarousel.goTo("left");
   };
 
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isImageTransitioning) return;
-    setIsImageTransitioning(true);
-    setTimeout(() => {
-      setCurrentImageIndex(prev => prev === property.images.length - 1 ? 0 : prev + 1);
-      setIsImageTransitioning(false);
-    }, 250);
+    imageCarousel.goTo("right");
   };
 
   const handleCall = (e: React.MouseEvent) => {
@@ -161,7 +151,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   };
 
   const hasMultipleImages = property.images && property.images.length > 1;
-  const currentImage = property.images?.[currentImageIndex] || null;
 
   return (
     <Card
@@ -169,7 +158,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
       onClick={() => navigate(`/property/${property.id}`)}
     >
       {/* Left: Image */}
-      <div className="relative w-64 min-w-[16rem] md:w-96 md:min-w-[24rem] h-auto min-h-[14rem] flex-shrink-0 group bg-muted">
+      <div
+        className="relative w-64 min-w-[16rem] md:w-96 md:min-w-[24rem] h-auto min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden"
+        onTouchStart={imageCarousel.onTouchStart}
+        onTouchMove={imageCarousel.onTouchMove}
+        onTouchEnd={imageCarousel.onTouchEnd}
+      >
         {hasMultipleImages && (
           <>
             <Button
@@ -192,26 +186,39 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
               {property.images.map((_, i) => (
                 <div
                   key={i}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentImageIndex ? 'bg-white w-4' : 'bg-white/50'}`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === imageCarousel.currentIndex ? 'bg-white w-4' : 'bg-white/50'}`}
                 />
               ))}
             </div>
           </>
         )}
-        {currentImage ? (
-          <img
-            src={currentImage}
-            alt={`${property.property_type} in ${property.city}`}
-            className={`w-full h-full object-cover transition-opacity duration-250 ${isImageTransitioning ? 'opacity-0' : 'opacity-100'}`}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjwvc3ZnPgo=';
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Square className="w-8 h-8 text-muted-foreground" />
-          </div>
-        )}
+        <div
+          className="flex h-full"
+          style={{
+            width: `${(property.images?.length || 1) * 100}%`,
+            transform: `translateX(calc(-${imageCarousel.currentIndex * (100 / (property.images?.length || 1))}% + ${imageCarousel.swipeOffset}px))`,
+            transition: imageCarousel.swipeOffset ? 'none' : 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        >
+          {(property.images?.length ? property.images : [null]).map((img, i) => (
+            <div key={i} className="h-full flex-shrink-0" style={{ width: `${100 / (property.images?.length || 1)}%` }}>
+              {img ? (
+                <img
+                  src={img}
+                  alt={`${property.property_type} in ${property.city}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjwvc3ZnPgo=';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Square className="w-8 h-8 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Right: Details */}
