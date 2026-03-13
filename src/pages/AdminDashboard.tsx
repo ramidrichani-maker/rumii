@@ -723,11 +723,45 @@ const AdminDashboard = () => {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="none">No agent assigned</SelectItem>
-                                    {agents.map((agent) => (
-                                      <SelectItem key={agent.user_id} value={agent.user_id}>
-                                        {agent.full_name}
-                                      </SelectItem>
-                                    ))}
+                                    {(() => {
+                                      const oracleAgents = agents.filter(a => a.agency_name?.toLowerCase() === 'oracle estates');
+                                      const otherAgents = agents.filter(a => a.agency_name && a.agency_name.toLowerCase() !== 'oracle estates');
+                                      const unaffiliatedAgents = agents.filter(a => !a.agency_name);
+                                      return (
+                                        <>
+                                          {oracleAgents.length > 0 && (
+                                            <>
+                                              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Oracle Estates</div>
+                                              {oracleAgents.map((agent) => (
+                                                <SelectItem key={agent.user_id} value={agent.user_id}>
+                                                  {agent.full_name}
+                                                </SelectItem>
+                                              ))}
+                                            </>
+                                          )}
+                                          {otherAgents.length > 0 && (
+                                            <>
+                                              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Other Agencies</div>
+                                              {otherAgents.map((agent) => (
+                                                <SelectItem key={agent.user_id} value={agent.user_id}>
+                                                  {agent.full_name} ({agent.agency_name})
+                                                </SelectItem>
+                                              ))}
+                                            </>
+                                          )}
+                                          {unaffiliatedAgents.length > 0 && (
+                                            <>
+                                              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Unaffiliated</div>
+                                              {unaffiliatedAgents.map((agent) => (
+                                                <SelectItem key={agent.user_id} value={agent.user_id}>
+                                                  {agent.full_name}
+                                                </SelectItem>
+                                              ))}
+                                            </>
+                                          )}
+                                        </>
+                                      );
+                                    })()}
                                   </SelectContent>
                                 </Select>
                               </div>
