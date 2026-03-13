@@ -39,8 +39,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isImageTransitioning, setIsImageTransitioning] = useState(false);
+  const imageCarousel = useSwipeCarousel(property.images?.length || 0);
   const [showPhone, setShowPhone] = useState(false);
   const [agentPhone, setAgentPhone] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
