@@ -58,6 +58,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
       setBusySlots([]);
       return;
     }
+    setSelectedTime(""); // Reset time when date changes
     const fetchBusySlots = async () => {
       setLoadingSlots(true);
       try {
