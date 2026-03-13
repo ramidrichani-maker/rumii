@@ -310,35 +310,51 @@ const PropertyDetail = () => {
         </Button>
 
         {/* Image carousel */}
-        <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-muted group">
-          {currentImage ? (
-            <img
-              src={currentImage}
-              alt={`${property.property_type} in ${property.city}`}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                isTransitioning ? "opacity-0" : "opacity-100"
-              }`}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/placeholder.svg";
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-              No Image
-            </div>
-          )}
+        <div
+          className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-muted group"
+          onTouchStart={carousel.onTouchStart}
+          onTouchMove={carousel.onTouchMove}
+          onTouchEnd={carousel.onTouchEnd}
+        >
+          <div
+            className="flex h-full"
+            style={{
+              width: `${(property.images?.length || 1) * 100}%`,
+              transform: `translateX(calc(-${carousel.currentIndex * (100 / (property.images?.length || 1))}% + ${carousel.swipeOffset}px))`,
+              transition: carousel.swipeOffset ? 'none' : 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            {(property.images?.length ? property.images : [null]).map((img, i) => (
+              <div key={i} className="h-full flex-shrink-0" style={{ width: `${100 / (property.images?.length || 1)}%` }}>
+                {img ? (
+                  <img
+                    src={img}
+                    alt={`${property.property_type} in ${property.city}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/placeholder.svg";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    No Image
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
 
           {hasMultipleImages && (
             <>
               <button
-                onClick={() => goToImage("left")}
+                onClick={() => carousel.goTo("left")}
                 className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-foreground/10 text-foreground/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-foreground/20"
                 aria-label="Previous image"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
-                onClick={() => goToImage("right")}
+                onClick={() => carousel.goTo("right")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-foreground/10 text-foreground/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-foreground/20"
                 aria-label="Next image"
               >
