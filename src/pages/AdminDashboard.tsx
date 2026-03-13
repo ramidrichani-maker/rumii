@@ -125,14 +125,31 @@ const AdminDashboard = () => {
 
   const loadAgents = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: agentProfiles, error } = await supabase
         .from('profiles')
         .select('*')
         .in('role', ['agent', 'admin'])
         .order('full_name', { ascending: true });
 
       if (error) throw error;
-      setAgents(data || []);
+
+      // Fetch agency names for agents
+      const agentsWithAgency = await Promise.all(
+        (agentProfiles || []).map(async (agent) => {
+          let agency_name = null;
+          if (agent.agency_id) {
+            const { data: agency } = await supabase
+              .from('agencies')
+              .select('name')
+              .eq('id', agent.agency_id)
+              .single();
+            agency_name = agency?.name || null;
+          }
+          return { ...agent, agency_name };
+        })
+      );
+
+      setAgents(agentsWithAgency);
     } catch (error) {
       console.error('Error loading agents:', error);
     }
@@ -706,11 +723,45 @@ const AdminDashboard = () => {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="none">No agent assigned</SelectItem>
-                                    {agents.map((agent) => (
-                                      <SelectItem key={agent.user_id} value={agent.user_id}>
-                                        {agent.full_name}
-                                      </SelectItem>
-                                    ))}
+                                    {(() => {
+                                      const oracleAgents = agents.filter(a => a.agency_name?.toLowerCase() === 'oracle estates');
+                                      const otherAgents = agents.filter(a => a.agency_name && a.agency_name.toLowerCase() !== 'oracle estates');
+                                      const unaffiliatedAgents = agents.filter(a => !a.agency_name);
+                                      return (
+                                        <>
+                                          {oracleAgents.length > 0 && (
+                                            <>
+                                              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Oracle Estates</div>
+                                              {oracleAgents.map((agent) => (
+                                                <SelectItem key={agent.user_id} value={agent.user_id}>
+                                                  {agent.full_name}
+                                                </SelectItem>
+                                              ))}
+                                            </>
+                                          )}
+                                          {otherAgents.length > 0 && (
+                                            <>
+                                              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Other Agencies</div>
+                                              {otherAgents.map((agent) => (
+                                                <SelectItem key={agent.user_id} value={agent.user_id}>
+                                                  {agent.full_name} ({agent.agency_name})
+                                                </SelectItem>
+                                              ))}
+                                            </>
+                                          )}
+                                          {unaffiliatedAgents.length > 0 && (
+                                            <>
+                                              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Unaffiliated</div>
+                                              {unaffiliatedAgents.map((agent) => (
+                                                <SelectItem key={agent.user_id} value={agent.user_id}>
+                                                  {agent.full_name}
+                                                </SelectItem>
+                                              ))}
+                                            </>
+                                          )}
+                                        </>
+                                      );
+                                    })()}
                                   </SelectContent>
                                 </Select>
                               </div>
