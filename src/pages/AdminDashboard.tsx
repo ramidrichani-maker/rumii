@@ -26,7 +26,9 @@ import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
 import { AdminPropertyListingsManager } from "@/components/AdminPropertyListingsManager";
 import ValuationRequestsManager from "@/components/ValuationRequestsManager";
 import FindAgentRequestsManager from "@/components/FindAgentRequestsManager";
+import EmailBroadcastManager from "@/components/EmailBroadcastManager";
 import { format } from "date-fns";
+import { Mail } from "lucide-react";
 
 const AdminDashboard = () => {
   const [pendingProperties, setPendingProperties] = useState<any[]>([]);
@@ -625,6 +627,15 @@ const AdminDashboard = () => {
               </TabsContent>
             </Tabs>
           </div>
+        </div>
+
+        {/* Email Broadcast */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            Email Broadcast
+          </h2>
+          <EmailBroadcastManager />
         </div>
 
         {/* Row 2: User & Viewings Management */}
