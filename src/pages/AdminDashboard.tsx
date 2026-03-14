@@ -629,6 +629,15 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Email Broadcast */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            Email Broadcast
+          </h2>
+          <EmailBroadcastManager />
+        </div>
+
         {/* Row 2: User & Viewings Management */}
         <div className="mb-8">
           <div>
