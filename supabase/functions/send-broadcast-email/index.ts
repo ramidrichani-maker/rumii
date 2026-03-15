@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     }
 
     // Get emails from auth.users
-    const userIds = profiles.map((p: any) => p.user_id);
+    const profileUserIds = profiles.map((p: any) => p.user_id);
     const { data: authUsers, error: authUsersError } = await supabase.auth.admin.listUsers({
       perPage: 1000,
     });
