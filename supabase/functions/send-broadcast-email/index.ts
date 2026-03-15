@@ -48,24 +48,36 @@ Deno.serve(async (req) => {
       throw new Error("Only admins can send broadcast emails");
     }
 
-    const { subject, message, recipientGroup } = await req.json();
+    const { subject, message, recipientGroup, userIds } = await req.json();
 
     if (!subject || !message || !recipientGroup) {
       throw new Error("Missing required fields: subject, message, recipientGroup");
     }
 
     // Get recipient emails based on group
-    let profileFilter: any;
-    if (recipientGroup === "users") {
-      profileFilter = supabase.from("profiles").select("user_id").eq("role", "user");
-    } else if (recipientGroup === "agents") {
-      profileFilter = supabase.from("profiles").select("user_id").in("role", ["agent", "agency_manager"]);
-    } else {
-      // everyone
-      profileFilter = supabase.from("profiles").select("user_id");
-    }
+    let profiles: any[] | null = null;
+    let profilesError: any = null;
 
-    const { data: profiles, error: profilesError } = await profileFilter;
+    if (recipientGroup === "specific") {
+      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        throw new Error("No user IDs provided for specific recipient group");
+      }
+      const res = await supabase.from("profiles").select("user_id").in("user_id", userIds);
+      profiles = res.data;
+      profilesError = res.error;
+    } else if (recipientGroup === "users") {
+      const res = await supabase.from("profiles").select("user_id").eq("role", "user");
+      profiles = res.data;
+      profilesError = res.error;
+    } else if (recipientGroup === "agents") {
+      const res = await supabase.from("profiles").select("user_id").in("role", ["agent", "agency_manager"]);
+      profiles = res.data;
+      profilesError = res.error;
+    } else {
+      const res = await supabase.from("profiles").select("user_id");
+      profiles = res.data;
+      profilesError = res.error;
+    }
     if (profilesError) throw profilesError;
 
     if (!profiles || profiles.length === 0) {
