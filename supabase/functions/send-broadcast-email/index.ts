@@ -88,16 +88,31 @@ Deno.serve(async (req) => {
     }
 
     // Get emails from auth.users
-    const profileUserIds = profiles.map((p: any) => p.user_id);
-    const { data: authUsers, error: authUsersError } = await supabase.auth.admin.listUsers({
-      perPage: 1000,
-    });
+    const profileUserIds = new Set(profiles.map((p: any) => p.user_id));
+    console.log("Profile user IDs:", [...profileUserIds]);
 
-    if (authUsersError) throw authUsersError;
+    // Paginate through all auth users
+    let allAuthUsers: any[] = [];
+    let page = 1;
+    const perPage = 1000;
+    while (true) {
+      const { data, error: authUsersError } = await supabase.auth.admin.listUsers({
+        page,
+        perPage,
+      });
+      if (authUsersError) throw authUsersError;
+      allAuthUsers = allAuthUsers.concat(data.users);
+      if (data.users.length < perPage) break;
+      page++;
+    }
 
-    const recipientEmails = authUsers.users
-      .filter((u: any) => profileUserIds.includes(u.id) && u.email)
+    console.log("Total auth users fetched:", allAuthUsers.length);
+
+    const recipientEmails = allAuthUsers
+      .filter((u: any) => profileUserIds.has(u.id) && u.email)
       .map((u: any) => u.email);
+
+    console.log("Recipient emails found:", recipientEmails.length, recipientEmails);
 
     if (recipientEmails.length === 0) {
       return new Response(
