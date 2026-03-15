@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
     if (authUsersError) throw authUsersError;
 
     const recipientEmails = authUsers.users
-      .filter((u: any) => userIds.includes(u.id) && u.email)
+      .filter((u: any) => profileUserIds.includes(u.id) && u.email)
       .map((u: any) => u.email);
 
     if (recipientEmails.length === 0) {
