@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     }
 
     // Get emails from auth.users
-    const userIds = profiles.map((p: any) => p.user_id);
+    const profileUserIds = profiles.map((p: any) => p.user_id);
     const { data: authUsers, error: authUsersError } = await supabase.auth.admin.listUsers({
       perPage: 1000,
     });
@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
     if (authUsersError) throw authUsersError;
 
     const recipientEmails = authUsers.users
-      .filter((u: any) => userIds.includes(u.id) && u.email)
+      .filter((u: any) => profileUserIds.includes(u.id) && u.email)
       .map((u: any) => u.email);
 
     if (recipientEmails.length === 0) {
