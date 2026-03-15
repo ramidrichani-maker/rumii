@@ -151,25 +151,30 @@ Deno.serve(async (req) => {
       const batch = recipientEmails.slice(i, i + batchSize);
 
       // Send individual emails using BCC for privacy
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Oracle Estates <noreply@oracleestates.com>",
-          to: batch,
-          subject: subject,
-          html: htmlBody,
-        }),
-      });
+      // Send individual emails for reliability
+      for (const email of batch) {
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "Oracle Estates <onboarding@resend.dev>",
+            to: [email],
+            subject: subject,
+            html: htmlBody,
+          }),
+        });
 
-      if (res.ok) {
-        sentCount += batch.length;
-      } else {
-        const errText = await res.text();
-        errors.push(`Batch ${i / batchSize + 1}: ${errText}`);
+        if (res.ok) {
+          sentCount += 1;
+          console.log("Email sent to:", email);
+        } else {
+          const errText = await res.text();
+          console.error("Failed to send to:", email, errText);
+          errors.push(`${email}: ${errText}`);
+        }
       }
     }
 
