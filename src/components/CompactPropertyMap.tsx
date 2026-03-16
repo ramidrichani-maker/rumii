@@ -97,17 +97,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       map.addLayer(drawnItems);
       drawnItemsRef.current = drawnItems;
 
-      // Stream partial polygon coords in real time as user draws vertices
-      map.on(L.Draw.Event.DRAWVERTEX, (event: any) => {
-        const layers = event.layers?.getLayers?.() ?? [];
-        if (layers.length >= 3) {
-          const coords: DrawnPolygonCoordinate[] = layers.map((layer: any) => ({
-            latitude: layer.getLatLng().lat,
-            longitude: layer.getLatLng().lng,
-          }));
-          onDrawnAreaChange?.(coords);
-        }
-      });
+      // Don't stream partial polygon coords — only filter once the polygon is closed
 
       // Clear partial filter if drawing is stopped/cancelled
       map.on(L.Draw.Event.DRAWSTOP, () => {
