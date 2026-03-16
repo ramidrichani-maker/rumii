@@ -594,7 +594,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       <div className={`${mapClass} flex flex-col relative`} style={{ height }}>
         {/* Draw controls overlay */}
         {enableDrawing && (
-          <div className="absolute bottom-3 left-3 z-[1000] flex gap-1">
+          <div className="absolute top-2 right-20 z-[1000] flex gap-1">
             {isDrawingMode ? (
               <button
                 onClick={cancelDrawing}
