@@ -234,8 +234,8 @@ All colors MUST be HSL.
   margin-top: -6px !important;
 }
 
-/* First vertex of polygon draw — purple */
-.leaflet-marker-pane .leaflet-draw-vertex-icon:first-child {
-  background: #9333ea !important;
-  border-color: #7e22ce !important;
+/* First vertex of polygon draw — light purple */
+.leaflet-draw-vertex-first {
+  background: #c084fc !important;
+  border-color: #a855f7 !important;
 }
