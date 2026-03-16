@@ -328,15 +328,15 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         }
       });
 
-      // Fit map to show all properties
-      if (bounds.isValid()) {
+      // Fit map to show all properties — but NOT while user is actively drawing
+      if (bounds.isValid() && !isDrawingMode && !hasDrawnArea) {
         leafletMapRef.current.fitBounds(bounds, { padding: [10, 10] });
       }
 
     } catch (error) {
       console.error('Error updating property markers:', error);
     }
-  }, [properties, mapInitialized, onPropertySelect]);
+  }, [properties, mapInitialized, onPropertySelect, isDrawingMode, hasDrawnArea]);
 
   // Handle map resize when expanded
   useEffect(() => {
