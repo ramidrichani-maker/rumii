@@ -97,7 +97,16 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       map.addLayer(drawnItems);
       drawnItemsRef.current = drawnItems;
 
-      // Don't stream partial polygon coords — only filter once the polygon is closed
+      // Style the first vertex purple when drawing polygon
+      map.on(L.Draw.Event.DRAWVERTEX, (event: any) => {
+        const layers = event.layers?.getLayers?.() ?? [];
+        if (layers.length >= 1) {
+          const firstEl = layers[0]?.getElement?.();
+          if (firstEl) {
+            firstEl.classList.add('leaflet-draw-vertex-first');
+          }
+        }
+      });
 
       // Clear partial filter if drawing is stopped/cancelled
       map.on(L.Draw.Event.DRAWSTOP, () => {
