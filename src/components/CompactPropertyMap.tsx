@@ -529,6 +529,13 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     
     setIsDrawingMode(true);
     
+    // Custom vertex icon — small greenish-yellow circle
+    const vertexIcon = new L.DivIcon({
+      className: 'leaflet-draw-vertex-icon',
+      iconSize: [12, 12],
+      iconAnchor: [6, 6],
+    });
+
     // Create polygon draw handler
     const drawHandler = new (L.Draw as any).Polygon(leafletMapRef.current, {
       shapeOptions: {
@@ -537,6 +544,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         fillOpacity: 0.2,
         weight: 2
       },
+      icon: vertexIcon,
+      touchIcon: vertexIcon,
       showArea: true,
       metric: true
     });
