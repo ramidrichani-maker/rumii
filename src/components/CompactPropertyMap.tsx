@@ -336,7 +336,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     } catch (error) {
       console.error('Error updating property markers:', error);
     }
-  }, [properties, mapInitialized, onPropertySelect]);
+  }, [properties, mapInitialized, onPropertySelect, isDrawingMode, hasDrawnArea]);
 
   // Handle map resize when expanded
   useEffect(() => {
