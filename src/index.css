@@ -222,3 +222,20 @@ All colors MUST be HSL.
 .leaflet-pane.leaflet-popup-pane .leaflet-popup {
   pointer-events: auto;
 }
+
+/* Custom polygon draw vertex styling */
+.leaflet-draw-vertex-icon {
+  background: #b8cc2a !important;
+  border: 2px solid #8fa000 !important;
+  border-radius: 50% !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin-left: -6px !important;
+  margin-top: -6px !important;
+}
+
+/* First vertex of polygon draw — purple */
+.leaflet-marker-pane .leaflet-draw-vertex-icon:first-child {
+  background: #9333ea !important;
+  border-color: #7e22ce !important;
+}
