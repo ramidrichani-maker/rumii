@@ -112,6 +112,8 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   const [selectedPalette, setSelectedPalette] = useState<string>("neutral");
   const [matchingDesign, setMatchingDesign] = useState<ApprovedDesign | null>(null);
   const [showDesignViewer, setShowDesignViewer] = useState(false);
+  const [agencyName, setAgencyName] = useState<string | null>(null);
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
 
   // Fetch assigned agent info
   useEffect(() => {
