@@ -3,7 +3,7 @@ import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck } from "lucide-react";
+import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2 } from "lucide-react";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -44,6 +44,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [agentPhone, setAgentPhone] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [showViewingModal, setShowViewingModal] = useState(false);
+  const [agencyName, setAgencyName] = useState<string | null>(null);
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -71,6 +73,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     };
     fetchAgent();
   }, [property.id]);
+
+  useEffect(() => {
+    const fetchAgency = async () => {
+      if (property.agency_id) {
+        const { data: agency } = await supabase
+          .from('agencies')
+          .select('name, logo_url')
+          .eq('id', property.agency_id)
+          .single();
+        if (agency) {
+          setAgencyName(agency.name);
+          setAgencyLogo(agency.logo_url);
+        }
+      }
+    };
+    fetchAgency();
+  }, [property.agency_id]);
 
   const checkFavoriteStatus = async () => {
     if (!user) return;
@@ -223,16 +242,28 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
       {/* Right: Details */}
       <div className="flex flex-col flex-1 p-4 relative min-w-0">
-        {/* Top-right: Favorite */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 h-8 w-8"
-          onClick={toggleFavorite}
-          disabled={isTogglingFavorite}
-        >
-          <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
-        </Button>
+        {/* Top-right: Agency + Favorite */}
+        <div className="absolute top-2 right-2 flex items-center gap-1.5">
+          {agencyName && (
+            <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+              {agencyLogo ? (
+                <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
+              ) : (
+                <Building2 className="w-4 h-4 text-muted-foreground" />
+              )}
+              <span className="text-xs font-medium text-muted-foreground">{agencyName}</span>
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={toggleFavorite}
+            disabled={isTogglingFavorite}
+          >
+            <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+          </Button>
+        </div>
 
         {/* Price */}
         <h3 className="text-xl md:text-2xl font-bold text-primary pr-10">

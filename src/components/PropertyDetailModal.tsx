@@ -76,6 +76,7 @@ interface Property {
   created_at: string;
   user_id: string;
   unfurnished?: boolean;
+  agency_id?: string | null;
 }
 
 interface PropertyDetailModalProps {
@@ -111,6 +112,8 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   const [selectedPalette, setSelectedPalette] = useState<string>("neutral");
   const [matchingDesign, setMatchingDesign] = useState<ApprovedDesign | null>(null);
   const [showDesignViewer, setShowDesignViewer] = useState(false);
+  const [agencyName, setAgencyName] = useState<string | null>(null);
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
 
   // Fetch assigned agent info
   useEffect(() => {
@@ -138,6 +141,23 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
     };
     fetchAgent();
   }, [property?.id, isOpen]);
+
+  // Fetch agency info
+  useEffect(() => {
+    if (!property?.agency_id || !isOpen) return;
+    const fetchAgency = async () => {
+      const { data: agency } = await supabase
+        .from('agencies')
+        .select('name, logo_url')
+        .eq('id', property.agency_id!)
+        .single();
+      if (agency) {
+        setAgencyName(agency.name);
+        setAgencyLogo(agency.logo_url);
+      }
+    };
+    fetchAgency();
+  }, [property?.agency_id, isOpen]);
 
   // Load approved AI designs for this property
   useEffect(() => {
@@ -323,7 +343,20 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
         {/* Contact & Viewing Actions - Prominent placement */}
         {!isAdmin && property.status === 'approved' && (
-          <div className="flex flex-wrap gap-2 pb-2">
+          <div className="space-y-3 pb-2">
+            {agencyName && (
+              <div className="flex items-center gap-2">
+                {agencyLogo ? (
+                  <img src={agencyLogo} alt={agencyName} className="w-8 h-8 rounded-full object-cover border border-border" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                    <Home className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                )}
+                <span className="text-sm font-semibold text-foreground">{agencyName}</span>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2">
             {user && (
               <Button 
                 onClick={() => setIsViewingModalOpen(true)}
@@ -359,6 +392,7 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               <Mail className="w-4 h-4 mr-2" />
               Email Agent
             </Button>
+            </div>
           </div>
         )}
 
