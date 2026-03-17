@@ -392,6 +392,7 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               <Mail className="w-4 h-4 mr-2" />
               Email Agent
             </Button>
+            </div>
           </div>
         )}
 
