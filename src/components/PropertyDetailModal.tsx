@@ -142,6 +142,23 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
     fetchAgent();
   }, [property?.id, isOpen]);
 
+  // Fetch agency info
+  useEffect(() => {
+    if (!property?.agency_id || !isOpen) return;
+    const fetchAgency = async () => {
+      const { data: agency } = await supabase
+        .from('agencies')
+        .select('name, logo_url')
+        .eq('id', property.agency_id!)
+        .single();
+      if (agency) {
+        setAgencyName(agency.name);
+        setAgencyLogo(agency.logo_url);
+      }
+    };
+    fetchAgency();
+  }, [property?.agency_id, isOpen]);
+
   // Load approved AI designs for this property
   useEffect(() => {
     if (!property?.id || !isOpen) return;
