@@ -343,7 +343,20 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
         {/* Contact & Viewing Actions - Prominent placement */}
         {!isAdmin && property.status === 'approved' && (
-          <div className="flex flex-wrap gap-2 pb-2">
+          <div className="space-y-3 pb-2">
+            {agencyName && (
+              <div className="flex items-center gap-2">
+                {agencyLogo ? (
+                  <img src={agencyLogo} alt={agencyName} className="w-8 h-8 rounded-full object-cover border border-border" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                    <Home className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                )}
+                <span className="text-sm font-semibold text-foreground">{agencyName}</span>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2">
             {user && (
               <Button 
                 onClick={() => setIsViewingModalOpen(true)}
