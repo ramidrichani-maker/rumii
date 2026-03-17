@@ -1,0 +1,1 @@
+ALTER TABLE public.agencies ADD COLUMN logo_url text;
