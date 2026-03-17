@@ -74,6 +74,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     fetchAgent();
   }, [property.id]);
 
+  useEffect(() => {
+    const fetchAgency = async () => {
+      if (property.agency_id) {
+        const { data: agency } = await supabase
+          .from('agencies')
+          .select('name, logo_url')
+          .eq('id', property.agency_id)
+          .single();
+        if (agency) {
+          setAgencyName(agency.name);
+          setAgencyLogo(agency.logo_url);
+        }
+      }
+    };
+    fetchAgency();
+  }, [property.agency_id]);
+
   const checkFavoriteStatus = async () => {
     if (!user) return;
     const { data } = await supabase
