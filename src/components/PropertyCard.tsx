@@ -44,6 +44,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [agentPhone, setAgentPhone] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [showViewingModal, setShowViewingModal] = useState(false);
+  const [agencyName, setAgencyName] = useState<string | null>(null);
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
