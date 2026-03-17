@@ -76,6 +76,7 @@ interface Property {
   created_at: string;
   user_id: string;
   unfurnished?: boolean;
+  agency_id?: string | null;
 }
 
 interface PropertyDetailModalProps {
