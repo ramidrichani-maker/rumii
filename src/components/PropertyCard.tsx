@@ -242,16 +242,28 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
       {/* Right: Details */}
       <div className="flex flex-col flex-1 p-4 relative min-w-0">
-        {/* Top-right: Favorite */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 h-8 w-8"
-          onClick={toggleFavorite}
-          disabled={isTogglingFavorite}
-        >
-          <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
-        </Button>
+        {/* Top-right: Agency + Favorite */}
+        <div className="absolute top-2 right-2 flex items-center gap-1.5">
+          {agencyName && (
+            <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+              {agencyLogo ? (
+                <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
+              ) : (
+                <Building2 className="w-4 h-4 text-muted-foreground" />
+              )}
+              <span className="text-xs font-medium text-muted-foreground">{agencyName}</span>
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={toggleFavorite}
+            disabled={isTogglingFavorite}
+          >
+            <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+          </Button>
+        </div>
 
         {/* Price */}
         <h3 className="text-xl md:text-2xl font-bold text-primary pr-10">
