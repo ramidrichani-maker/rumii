@@ -244,7 +244,7 @@ const AccountPropertiesView: React.FC = () => {
                                         {property.listing_type === 'rent' && '/mo'}
                                       </span>
                                       <Badge variant="outline" className="text-xs">
-                                        {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
+                                        {property.listing_type === 'rent' ? 'For Rent' : property.listing_type === 'both' ? 'Rent & Sale' : 'For Sale'}
                                       </Badge>
                                     </div>
 

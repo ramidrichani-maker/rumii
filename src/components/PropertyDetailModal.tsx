@@ -664,7 +664,7 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         {/* Listing Info */}
         <div className="pt-4 border-t text-xs text-muted-foreground">
           Listed on {new Date(property.created_at).toLocaleDateString()} • 
-          For {property.listing_type === 'rent' ? 'Rent' : 'Sale'}
+          For {property.listing_type === 'rent' ? 'Rent' : property.listing_type === 'both' ? 'Rent & Sale' : 'Sale'}
         </div>
       </DialogContent>
 

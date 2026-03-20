@@ -203,7 +203,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             ? `$${property.price.toLocaleString()}/mo` 
             : `$${property.price.toLocaleString()}`;
           const propType = property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1);
-          const listingLabel = property.listing_type === 'rent' ? 'For Rent' : 'For Sale';
+          const listingLabel = property.listing_type === 'rent' ? 'For Rent' : property.listing_type === 'both' ? 'Rent & Sale' : 'For Sale';
 
           const popupContent = document.createElement('div');
           popupContent.innerHTML = `
