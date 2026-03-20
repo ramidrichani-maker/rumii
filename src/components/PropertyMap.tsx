@@ -73,7 +73,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       
       // Add click handler
       map.on('click', (e: L.LeafletMouseEvent) => {
-        if (isPinPointMode) {
+        {
           const { lat, lng } = e.latlng;
           setPosition([lat, lng]);
           onLocationSelect(lat, lng);
