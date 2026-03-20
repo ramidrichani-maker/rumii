@@ -169,11 +169,12 @@ export const AdminPropertyForm = () => {
 
       // Upload floor plan
       if (floorPlanFile) {
-        const fileExt = floorPlanFile.name.split('.').pop();
+        const convertedFp = await convertToJpeg(floorPlanFile);
+        const fileExt = convertedFp.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
           .from('property-images')
-          .upload(fileName, floorPlanFile);
+          .upload(fileName, convertedFp);
         if (fpError) throw fpError;
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
