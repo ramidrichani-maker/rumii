@@ -49,11 +49,24 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
       <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer group">
         <div className="relative h-48 bg-muted rounded-t-lg overflow-hidden">
           {images.length > 0 ? (
-            <img
-              src={images[imgIndex]}
-              alt={`${property.address} - image ${imgIndex + 1}`}
-              className="w-full h-full object-cover transition-opacity duration-300"
-            />
+            <div
+              className="flex h-full"
+              style={{
+                width: `${images.length * 100}%`,
+                transform: `translateX(-${imgIndex * (100 / images.length)}%)`,
+                transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            >
+              {images.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt={`${property.address} - image ${i + 1}`}
+                  className="h-full object-cover flex-shrink-0"
+                  style={{ width: `${100 / images.length}%` }}
+                />
+              ))}
+            </div>
           ) : (
             <div className="w-full h-full bg-muted" />
           )}
