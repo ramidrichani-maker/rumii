@@ -87,6 +87,7 @@ const AppRoutes = () => {
           <Route path="/find-agents" element={<FindAgents />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/agent-valuation" element={<AgentValuation />} />
+          <Route path="/support-portal" element={<SupportPortal />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
