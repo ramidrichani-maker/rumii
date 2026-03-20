@@ -15,11 +15,12 @@ interface Property {
   city: string;
   municipality?: string;
   price: number;
+  rental_price?: number | null;
   property_type: string;
   bedrooms: number;
   bathrooms: number;
   square_meters: number;
-  listing_type: 'rent' | 'sale';
+  listing_type: 'rent' | 'sale' | 'both';
   images: string[];
   amenities: string[];
   status: 'pending' | 'approved' | 'rejected';
@@ -126,9 +127,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     }
   };
 
-  const formatPrice = (price: number, listingType: string) => {
-    const formatted = `$${price.toLocaleString()}`;
-    return listingType === 'rent' ? `${formatted}/mo` : formatted;
+  const formatPrice = (price: number, listingType: string, rentalPrice?: number | null) => {
+    if (listingType === 'both' && rentalPrice) {
+      return `$${price.toLocaleString()} / $${rentalPrice.toLocaleString()}/mo`;
+    }
+    if (listingType === 'rent') {
+      const rp = rentalPrice || price;
+      return `$${rp.toLocaleString()}/mo`;
+    }
+    return `$${price.toLocaleString()}`;
   };
 
   const handlePrevImage = (e: React.MouseEvent) => {
@@ -267,7 +274,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
         {/* Price */}
         <h3 className="text-xl md:text-2xl font-bold text-primary pr-10">
-          {formatPrice(property.price, property.listing_type)}
+          {formatPrice(property.price, property.listing_type, property.rental_price)}
         </h3>
 
         {/* Beds, Baths, Size */}

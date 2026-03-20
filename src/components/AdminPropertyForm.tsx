@@ -31,15 +31,24 @@ const formSchema = z.object({
   metersSquared: z.string().min(1, "Meters squared is required"),
   bedrooms: z.string().min(1, "Number of bedrooms is required"),
   bathrooms: z.string().min(1, "Number of bathrooms is required"),
-  listingType: z.enum(["rent", "sale"], {
-    required_error: "Please select if this is for rent or sale"
+  listingType: z.enum(["rent", "sale", "both"], {
+    required_error: "Please select a listing type"
   }),
-  price: z.string().min(1, "Price is required"),
+  price: z.string().optional(),
+  rentalPrice: z.string().optional(),
   priceNegotiable: z.boolean().default(false),
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
   amenities: z.array(z.string()).default([])
-});
+}).refine((data) => {
+  if (data.listingType === 'sale' && (!data.price || data.price === '')) return false;
+  if (data.listingType === 'rent' && (!data.rentalPrice || data.rentalPrice === '')) return false;
+  if (data.listingType === 'both') {
+    if (!data.price || data.price === '') return false;
+    if (!data.rentalPrice || data.rentalPrice === '') return false;
+  }
+  return true;
+}, { message: "Please fill in the required price fields", path: ["price"] });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -97,6 +106,8 @@ export const AdminPropertyForm = () => {
       agencyId: ""
     }
   });
+
+  const listingType = form.watch('listingType');
 
   useEffect(() => {
     const fetchAgencies = async () => {
@@ -216,7 +227,8 @@ export const AdminPropertyForm = () => {
         bedrooms: parseInt(data.bedrooms),
         bathrooms: parseFloat(data.bathrooms),
         listing_type: data.listingType as any,
-        price: parseFloat(data.price),
+        price: data.price ? parseFloat(data.price) : null,
+        rental_price: data.rentalPrice ? parseFloat(data.rentalPrice) : null,
         price_negotiable: data.priceNegotiable,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
@@ -406,6 +418,36 @@ export const AdminPropertyForm = () => {
             </CardContent>
           </Card>
 
+          {/* Listing Type - shown before property details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Listing Type</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField control={form.control} name="listingType" render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormControl>
+                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-8">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="rent" id="admin-rent" />
+                        <Label htmlFor="admin-rent">For Rent</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="sale" id="admin-sale" />
+                        <Label htmlFor="admin-sale">For Sale</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="both" id="admin-both" />
+                        <Label htmlFor="admin-both">Both (Rent & Sale)</Label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </CardContent>
+          </Card>
+
           {/* Property Details */}
           <Card>
             <CardHeader>
@@ -413,15 +455,29 @@ export const AdminPropertyForm = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField control={form.control} name="price" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price ($)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Enter price" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+                {(listingType === 'sale' || listingType === 'both') && (
+                  <FormField control={form.control} name="price" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Property Price ($)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter sale price" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                )}
+
+                {(listingType === 'rent' || listingType === 'both') && (
+                  <FormField control={form.control} name="rentalPrice" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Monthly Rental Price ($)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter monthly rent" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                )}
 
                 <FormField control={form.control} name="metersSquared" render={({ field }) => (
                   <FormItem>
@@ -489,32 +545,6 @@ export const AdminPropertyForm = () => {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <FormLabel className="cursor-pointer">Price is negotiable</FormLabel>
-                </FormItem>
-              )} />
-            </CardContent>
-          </Card>
-
-          {/* Listing Type */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Listing Type</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField control={form.control} name="listingType" render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-8">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="rent" id="admin-rent" />
-                        <Label htmlFor="admin-rent">For Rent</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="sale" id="admin-sale" />
-                        <Label htmlFor="admin-sale">For Sale</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
                 </FormItem>
               )} />
             </CardContent>

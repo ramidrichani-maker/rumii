@@ -18,7 +18,7 @@ interface Property {
   bedrooms: number;
   bathrooms: number;
   square_meters: number;
-  listing_type: 'rent' | 'sale';
+  listing_type: 'rent' | 'sale' | 'both';
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   images: string[];
@@ -244,7 +244,7 @@ const AccountPropertiesView: React.FC = () => {
                                         {property.listing_type === 'rent' && '/mo'}
                                       </span>
                                       <Badge variant="outline" className="text-xs">
-                                        {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
+                                        {property.listing_type === 'rent' ? 'For Rent' : property.listing_type === 'both' ? 'Rent & Sale' : 'For Sale'}
                                       </Badge>
                                     </div>
 

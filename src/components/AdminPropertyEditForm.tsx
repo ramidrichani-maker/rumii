@@ -18,8 +18,9 @@ const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   municipality: z.string().optional(),
   property_type: z.string().min(1, "Property type is required"),
-  listing_type: z.enum(["rent", "sale"]),
+  listing_type: z.enum(["rent", "sale", "both"]),
   price: z.coerce.number().min(0).optional(),
+  rental_price: z.coerce.number().min(0).optional(),
   square_meters: z.coerce.number().min(1, "Size is required"),
   bedrooms: z.coerce.number().min(0),
   bathrooms: z.coerce.number().min(0),
@@ -44,7 +45,7 @@ interface Property {
   city: string;
   municipality: string | null;
   property_type: string;
-  listing_type: "rent" | "sale";
+  listing_type: "rent" | "sale" | "both";
   price: number | null;
   square_meters: number;
   bedrooms: number;
@@ -88,8 +89,9 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
       city: property.city,
       municipality: property.municipality || "",
       property_type: property.property_type,
-      listing_type: property.listing_type as "rent" | "sale",
+      listing_type: property.listing_type as "rent" | "sale" | "both",
       price: property.price || undefined,
+      rental_price: (property as any).rental_price || undefined,
       square_meters: property.square_meters,
       bedrooms: property.bedrooms,
       bathrooms: property.bathrooms,
@@ -101,6 +103,8 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
       amenities: property.amenities || [],
     },
   });
+
+  const editListingType = form.watch('listing_type');
 
   useEffect(() => {
     const fetchAgencies = async () => {
@@ -133,6 +137,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         property_type: data.property_type,
         listing_type: data.listing_type,
         price: data.price || null,
+        rental_price: data.rental_price || null,
         square_meters: data.square_meters,
         bedrooms: data.bedrooms,
         bathrooms: data.bathrooms,
@@ -288,7 +293,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         </div>
 
         {/* Listing Type and Price */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="listing_type"
@@ -304,6 +309,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
                   <SelectContent>
                     <SelectItem value="rent">For Rent</SelectItem>
                     <SelectItem value="sale">For Sale</SelectItem>
+                    <SelectItem value="both">Both (Rent & Sale)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -311,19 +317,37 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price ($)</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {(editListingType === 'sale' || editListingType === 'both') && (
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Property Price ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          {(editListingType === 'rent' || editListingType === 'both') && (
+            <FormField
+              control={form.control}
+              name="rental_price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Monthly Rental Price ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}

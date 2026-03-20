@@ -67,7 +67,7 @@ interface Property {
   bedrooms: number;
   bathrooms: number;
   square_meters: number;
-  listing_type: 'rent' | 'sale';
+  listing_type: 'rent' | 'sale' | 'both';
   year_built?: number;
   last_renovated?: number;
   amenities: string[];
@@ -664,7 +664,7 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         {/* Listing Info */}
         <div className="pt-4 border-t text-xs text-muted-foreground">
           Listed on {new Date(property.created_at).toLocaleDateString()} • 
-          For {property.listing_type === 'rent' ? 'Rent' : 'Sale'}
+          For {property.listing_type === 'rent' ? 'Rent' : property.listing_type === 'both' ? 'Rent & Sale' : 'Sale'}
         </div>
       </DialogContent>
 

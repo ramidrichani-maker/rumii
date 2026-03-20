@@ -51,10 +51,11 @@ const formSchema = z.object({
   metersSquared: z.string().min(1, "Meters squared is required"),
   bedrooms: z.string().min(1, "Number of bedrooms is required"),
   bathrooms: z.string().min(1, "Number of bathrooms is required"),
-  listingType: z.enum(["rent", "sale"], {
-    required_error: "Please select if this is for rent or sale"
+  listingType: z.enum(["rent", "sale", "both"], {
+    required_error: "Please select a listing type"
   }),
-  price: z.string().min(1, "Price is required"),
+  price: z.string().optional(),
+  rentalPrice: z.string().optional(),
   priceNegotiable: z.boolean().default(false),
   unfurnished: z.boolean().default(false),
   yearBuilt: z.string().optional(),
@@ -65,7 +66,15 @@ const formSchema = z.object({
   brokerAgreement: z.boolean().refine((val) => val === true, {
     message: "You must agree to the broker terms to list your property"
   })
-});
+}).refine((data) => {
+  if (data.listingType === 'sale' && (!data.price || data.price === '')) return false;
+  if (data.listingType === 'rent' && (!data.rentalPrice || data.rentalPrice === '')) return false;
+  if (data.listingType === 'both') {
+    if (!data.price || data.price === '') return false;
+    if (!data.rentalPrice || data.rentalPrice === '') return false;
+  }
+  return true;
+}, { message: "Please fill in the required price fields", path: ["price"] });
 type FormData = z.infer<typeof formSchema>;
 const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
@@ -88,6 +97,8 @@ const ListProperty = () => {
       brokerAgreement: false
     }
   });
+
+  const listingType = form.watch('listingType');
 
   // Guard against auth context not being ready - AFTER all hooks
   if (!auth || auth.loading) {
@@ -235,7 +246,8 @@ const ListProperty = () => {
         bedrooms: parseInt(data.bedrooms),
         bathrooms: parseFloat(data.bathrooms),
         listing_type: data.listingType as any,
-        price: parseFloat(data.price),
+        price: data.price ? parseFloat(data.price) : null,
+        rental_price: data.rentalPrice ? parseFloat(data.rentalPrice) : null,
         price_negotiable: data.priceNegotiable,
         unfurnished: data.unfurnished,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
@@ -417,6 +429,36 @@ const ListProperty = () => {
               </Card>
             </div>
 
+            {/* Listing Type - shown before property details */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Listing Type</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField control={form.control} name="listingType" render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormControl>
+                      <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-8">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="rent" id="rent" />
+                          <Label htmlFor="rent">For Rent</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="sale" id="sale" />
+                          <Label htmlFor="sale">For Sale</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="both" id="both" />
+                          <Label htmlFor="both">Both (Rent & Sale)</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </CardContent>
+            </Card>
+
             <div className="space-y-8">
               {/* Property Details */}
               <Card>
@@ -424,171 +466,145 @@ const ListProperty = () => {
                   <CardTitle>Property Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <FormField control={form.control} name="price" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Price ($)</FormLabel>
+                  {(listingType === 'sale' || listingType === 'both') && (
+                    <FormField control={form.control} name="price" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Property Price ($)</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="Enter price" {...field} />
+                          <Input type="number" placeholder="Enter sale price" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>} />
+                      </FormItem>
+                    )} />
+                  )}
 
-                  <FormField control={form.control} name="priceNegotiable" render={({
-                  field
-                }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  {(listingType === 'rent' || listingType === 'both') && (
+                    <FormField control={form.control} name="rentalPrice" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Monthly Rental Price ($)</FormLabel>
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="cursor-pointer">
-                            Price is negotiable
-                          </FormLabel>
-                        </div>
-                      </FormItem>} />
-
-                  <FormField control={form.control} name="unfurnished" render={({
-                  field
-                }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="cursor-pointer">
-                            Property is unfurnished
-                          </FormLabel>
-                          <p className="text-xs text-muted-foreground">
-                            Check this if the property does not include furniture
-                          </p>
-                        </div>
-                      </FormItem>} />
-
-                  <FormField control={form.control} name="metersSquared" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Meters Squared (m²)</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="Enter size in m²" {...field} />
+                          <Input type="number" placeholder="Enter monthly rent" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>} />
+                      </FormItem>
+                    )} />
+                  )}
 
-                  <FormField control={form.control} name="bedrooms" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Bedrooms</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select bedrooms" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(num => <SelectItem key={num} value={num.toString()}>
-                                {num} {num === 1 ? 'Bedroom' : 'Bedrooms'}
-                              </SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>} />
+                  <FormField control={form.control} name="priceNegotiable" render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="cursor-pointer">Price is negotiable</FormLabel>
+                      </div>
+                    </FormItem>
+                  )} />
 
-                  <FormField control={form.control} name="bathrooms" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Bathrooms</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            step="0.5" 
-                            min="0.5"
-                            placeholder="e.g. 2 or 1.5" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Use .5 for half baths (toilet only, no shower)
+                  <FormField control={form.control} name="unfurnished" render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="cursor-pointer">Property is unfurnished</FormLabel>
+                        <p className="text-xs text-muted-foreground">
+                          Check this if the property does not include furniture
                         </p>
-                        <FormMessage />
-                      </FormItem>} />
+                      </div>
+                    </FormItem>
+                  )} />
 
-                  <FormField control={form.control} name="yearBuilt" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Year of Construction (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="e.g. 2010" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
+                  <FormField control={form.control} name="metersSquared" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Meters Squared (m²)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter size in m²" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
 
-                  <FormField control={form.control} name="lastRenovated" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel>Last Renovation (Optional)</FormLabel>
+                  <FormField control={form.control} name="bedrooms" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bedrooms</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <Input type="number" placeholder="e.g. 2020" {...field} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select bedrooms" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                            <SelectItem key={num} value={num.toString()}>
+                              {num} {num === 1 ? 'Bedroom' : 'Bedrooms'}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="bathrooms" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bathrooms</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.5" min="0.5" placeholder="e.g. 2 or 1.5" {...field} />
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Use .5 for half baths (toilet only, no shower)
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="yearBuilt" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Year of Construction (Optional)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="e.g. 2010" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="lastRenovated" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Renovation (Optional)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="e.g. 2020" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
 
                   {['building', 'villa'].includes(form.watch('propertyType')) && (
-                    <FormField control={form.control} name="floors" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel>Number of Floors</FormLabel>
-                            <FormControl>
-                              <Input type="number" min="1" placeholder="e.g. 5" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                    <FormField control={form.control} name="floors" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Number of Floors</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="1" placeholder="e.g. 5" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                   )}
 
                   {form.watch('propertyType') === 'building' && (
-                    <FormField control={form.control} name="apartmentsCount" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel>Number of Apartments</FormLabel>
-                            <FormControl>
-                              <Input type="number" min="1" placeholder="e.g. 20" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                    <FormField control={form.control} name="apartmentsCount" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Number of Apartments</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="1" placeholder="e.g. 20" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                   )}
                 </CardContent>
               </Card>
             </div>
-
-            {/* Listing Type */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Listing Type</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FormField control={form.control} name="listingType" render={({
-                field
-              }) => <FormItem className="space-y-3">
-                      <FormControl>
-                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-8">
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="rent" id="rent" />
-                            <Label htmlFor="rent">For Rent</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="sale" id="sale" />
-                            <Label htmlFor="sale">For Sale</Label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>} />
-              </CardContent>
-            </Card>
 
             {/* Media Upload */}
             <Card>
