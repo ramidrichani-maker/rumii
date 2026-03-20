@@ -29,7 +29,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [position, setPosition] = useState<[number, number]>([latitude, longitude]);
   const [searchAddress, setSearchAddress] = useState('');
-  const [isPinPointMode, setIsPinPointMode] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [mapInitialized, setMapInitialized] = useState(false);
 
