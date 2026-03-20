@@ -192,7 +192,7 @@ export const BulkPropertyImport = () => {
       square_meters: Number(squareMeters) || 0,
       bedrooms: Number(bedrooms) || 0,
       bathrooms: Number(bathrooms) || 0,
-      listing_type: (listingType?.toLowerCase() === 'rent' ? 'rent' : 'sale') as "rent" | "sale",
+      listing_type: (['rent', 'sale', 'both'].includes(listingType?.toLowerCase() || '') ? listingType?.toLowerCase() : 'sale') as "rent" | "sale" | "both",
       price: Number(price) || 0,
       price_negotiable: ['true', 'yes', '1'].includes(getValue('pricenegotiable')?.toLowerCase() || getValue('price_negotiable')?.toLowerCase() || ''),
       year_built: getValue('yearbuilt') || getValue('year_built') ? Number(getValue('yearbuilt') || getValue('year_built')) : undefined,
