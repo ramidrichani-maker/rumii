@@ -811,6 +811,15 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Customer Support Management */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <HeadphonesIcon className="w-5 h-5" />
+            Customer Support
+          </h2>
+          <SupportDashboard />
+        </div>
+
         {/* Row 3: Analytics & Agent Performance */}
         <div className="mb-8 space-y-6">
           <h2 className="text-lg font-semibold flex items-center gap-2">
