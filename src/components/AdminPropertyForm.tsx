@@ -20,6 +20,16 @@ import PropertyMap from "@/components/PropertyMap";
 
 const propertyTypes = ["Apartment", "Villa", "Beach House", "Chalet", "Duplex", "Triplex", "Penthouse", "Commercial Rental", "Farm House", "Building", "Venue", "Studio", "Rooftop", "Land"];
 const amenities = ["Garden", "Parking/Garage", "Balcony/Terrace", "Swimming Pool", "Gym", "Elevator", "Storage Room", "Security", "Concierge", "EV Charging", "Patio", "Basement", "Sea View", "Mountain View", "Fireplace", "Smart-home"];
+const roomTypes = [
+  "Entrance", "Bedroom", "Salon", "Living Room", "Dining Room", "Kitchen",
+  "Bathroom", "Toilet", "Terrace", "Balcony", "Roof", "Maid's Room",
+  "Maid's Bathroom", "Storage Room", "Corridor"
+];
+
+interface UploadedImage {
+  file: File;
+  roomType: string;
+}
 
 const formSchema = z.object({
   agencyId: z.string().optional(),
