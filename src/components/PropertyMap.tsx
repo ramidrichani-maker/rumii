@@ -249,11 +249,9 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
             className="rounded-lg overflow-hidden border"
           />
           
-          {isPinPointMode && (
-            <p className="text-sm text-muted-foreground mt-2 text-center">
-              Click anywhere on the map to set the property location, then drag the pin to fine-tune
-            </p>
-          )}
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            Click anywhere on the map to set the property location, then drag the pin to fine-tune
+          </p>
         </CardContent>
       </Card>
     </div>
