@@ -18,7 +18,7 @@ const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   municipality: z.string().optional(),
   property_type: z.string().min(1, "Property type is required"),
-  listing_type: z.enum(["rent", "sale"]),
+  listing_type: z.enum(["rent", "sale", "both"]),
   price: z.coerce.number().min(0).optional(),
   square_meters: z.coerce.number().min(1, "Size is required"),
   bedrooms: z.coerce.number().min(0),
