@@ -492,6 +492,7 @@ export type Database = {
           price_negotiable: boolean | null
           property_code: number
           property_type: Database["public"]["Enums"]["property_type"]
+          rental_price: number | null
           square_meters: number
           status: Database["public"]["Enums"]["property_status"]
           unfurnished: boolean
@@ -523,6 +524,7 @@ export type Database = {
           price_negotiable?: boolean | null
           property_code?: number
           property_type: Database["public"]["Enums"]["property_type"]
+          rental_price?: number | null
           square_meters: number
           status?: Database["public"]["Enums"]["property_status"]
           unfurnished?: boolean
@@ -554,6 +556,7 @@ export type Database = {
           price_negotiable?: boolean | null
           property_code?: number
           property_type?: Database["public"]["Enums"]["property_type"]
+          rental_price?: number | null
           square_meters?: number
           status?: Database["public"]["Enums"]["property_status"]
           unfurnished?: boolean
@@ -1074,7 +1077,7 @@ export type Database = {
       }
     }
     Enums: {
-      listing_type: "rent" | "sale"
+      listing_type: "rent" | "sale" | "both"
       property_status: "pending" | "approved" | "rejected"
       property_type:
         | "apartment"
@@ -1222,7 +1225,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      listing_type: ["rent", "sale"],
+      listing_type: ["rent", "sale", "both"],
       property_status: ["pending", "approved", "rejected"],
       property_type: [
         "apartment",
