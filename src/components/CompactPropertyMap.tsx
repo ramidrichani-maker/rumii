@@ -332,14 +332,28 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     }
   }, [properties, mapInitialized, onPropertySelect, isDrawingMode, hasDrawnArea]);
 
-  // Handle map resize when expanded
+  // Handle map resize when expanded or container size changes
   useEffect(() => {
-    if (leafletMapRef.current && isExpanded) {
+    if (leafletMapRef.current) {
       setTimeout(() => {
         leafletMapRef.current?.invalidateSize();
       }, 100);
+      setTimeout(() => {
+        leafletMapRef.current?.invalidateSize();
+      }, 300);
     }
   }, [isExpanded]);
+
+  // ResizeObserver to catch any container size changes (e.g. toggling map view)
+  useEffect(() => {
+    if (!mapRef.current || !leafletMapRef.current) return;
+    const map = leafletMapRef.current;
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    observer.observe(mapRef.current);
+    return () => observer.disconnect();
+  }, [mapInitialized]);
 
   // Draw the actual boundary polygon for the searched location
   const searchBoundaryRef = useRef<L.GeoJSON | null>(null);
