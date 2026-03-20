@@ -189,24 +189,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   };
 
   const toggleFullscreen = (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    setIsFullscreen(!isFullscreen);
-    // Re-initialize map size after fullscreen toggle
-    setTimeout(() => {
-      if (leafletMapRef.current) {
-        leafletMapRef.current.invalidateSize();
-      }
-    }, 100);
-  };
-
-  const togglePinPointMode = (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    setIsPinPointMode(!isPinPointMode);
-    // Remove focus from any input elements to prevent keyboard
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-  };
 
   const mapHeight = isFullscreen ? "70vh" : height;
   const mapClass = isFullscreen ? "fixed inset-0 z-50 bg-background p-4" : className;
