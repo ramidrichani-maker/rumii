@@ -189,7 +189,14 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   };
 
   const toggleFullscreen = (e?: React.MouseEvent) => {
-
+    e?.preventDefault();
+    setIsFullscreen(!isFullscreen);
+    setTimeout(() => {
+      if (leafletMapRef.current) {
+        leafletMapRef.current.invalidateSize();
+      }
+    }, 100);
+  };
   const mapHeight = isFullscreen ? "70vh" : height;
   const mapClass = isFullscreen ? "fixed inset-0 z-50 bg-background p-4" : className;
 
