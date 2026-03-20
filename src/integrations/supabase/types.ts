@@ -1088,7 +1088,12 @@ export type Database = {
         | "townhouse"
         | "duplex"
         | "loft"
-      user_role: "user" | "agent" | "admin" | "agency_manager"
+      user_role:
+        | "user"
+        | "agent"
+        | "admin"
+        | "agency_manager"
+        | "customer_support"
       viewing_status:
         | "pending"
         | "confirmed"
@@ -1237,7 +1242,13 @@ export const Constants = {
         "duplex",
         "loft",
       ],
-      user_role: ["user", "agent", "admin", "agency_manager"],
+      user_role: [
+        "user",
+        "agent",
+        "admin",
+        "agency_manager",
+        "customer_support",
+      ],
       viewing_status: [
         "pending",
         "confirmed",
