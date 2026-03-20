@@ -98,6 +98,8 @@ const ListProperty = () => {
     }
   });
 
+  const listingType = form.watch('listingType');
+
   // Guard against auth context not being ready - AFTER all hooks
   if (!auth || auth.loading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
