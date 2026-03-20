@@ -266,7 +266,7 @@ export const AdminPropertyForm = () => {
       // Reset form
       form.reset();
       setSelectedAmenities([]);
-      setUploadedFiles([]);
+      setUploadedImages([]);
       setFloorPlanFile(null);
       setSelectedAgency(null);
       setSelectedAgency(null);
