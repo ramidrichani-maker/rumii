@@ -97,7 +97,7 @@ const convertToJpeg = (file: File): Promise<File> => {
 
 export const AdminPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
