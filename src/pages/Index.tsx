@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square } from "lucide-react";
-import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import HeroSearch from "@/components/HeroSearch";
+import FeaturedPropertyCard from "@/components/FeaturedPropertyCard";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Property {
@@ -48,13 +45,6 @@ const Index = () => {
     }
   };
 
-  const formatPrice = (price: number, listingType: string) => {
-    if (listingType === 'rent') {
-      return `$${price?.toLocaleString()}/mo`;
-    }
-    return `$${price?.toLocaleString()}`;
-  };
-
   return (
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-16">
@@ -71,7 +61,6 @@ const Index = () => {
           <HeroSearch />
         </ScrollReveal>
         
-        {/* Popular Listings Section - Only show if there are featured properties */}
         {!isLoading && (featuredRentals.length > 0 || featuredSales.length > 0) && (
           <div className="mt-24">
             <ScrollReveal animation="fade-up">
@@ -83,7 +72,6 @@ const Index = () => {
               </div>
             </ScrollReveal>
             
-            {/* Rental Properties Row */}
             {featuredRentals.length > 0 && (
               <div className="mb-16">
                 <ScrollReveal animation="fade-right">
@@ -92,51 +80,13 @@ const Index = () => {
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredRentals.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
-                      <Link to={`/property/${property.id}`}>
-                        <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer">
-                          <div 
-                            className="h-48 bg-muted rounded-t-lg bg-cover bg-center"
-                            style={{
-                              backgroundImage: property.images?.[0] 
-                                ? `url(${property.images[0]})` 
-                                : undefined
-                            }}
-                          />
-                          <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start mb-2">
-                              <Badge variant="secondary">For Rent</Badge>
-                              <span className="text-2xl font-bold text-primary">
-                                {formatPrice(property.price, property.listing_type)}
-                              </span>
-                            </div>
-                            <CardTitle className="text-lg">{property.address}</CardTitle>
-                            <CardDescription>{property.city}</CardDescription>
-                          </CardHeader>
-                          <CardContent className="pt-0">
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <div className="flex items-center">
-                                <Bed className="w-4 h-4 mr-1" />
-                                <span>{property.bedrooms} bed</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Bath className="w-4 h-4 mr-1" />
-                                <span>{property.bathrooms} bath</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Square className="w-4 h-4 mr-1" />
-                                <span>{property.square_meters}m²</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
+                      <FeaturedPropertyCard property={property} badgeLabel="For Rent" badgeVariant="secondary" />
                     </ScrollReveal>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Properties for Sale Row */}
             {featuredSales.length > 0 && (
               <div>
                 <ScrollReveal animation="fade-left">
@@ -145,44 +95,7 @@ const Index = () => {
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredSales.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
-                      <Link to={`/property/${property.id}`}>
-                        <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer">
-                          <div 
-                            className="h-48 bg-muted rounded-t-lg bg-cover bg-center"
-                            style={{
-                              backgroundImage: property.images?.[0] 
-                                ? `url(${property.images[0]})` 
-                                : undefined
-                            }}
-                          />
-                          <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start mb-2">
-                              <Badge>For Sale</Badge>
-                              <span className="text-2xl font-bold text-primary">
-                                {formatPrice(property.price, property.listing_type)}
-                              </span>
-                            </div>
-                            <CardTitle className="text-lg">{property.address}</CardTitle>
-                            <CardDescription>{property.city}</CardDescription>
-                          </CardHeader>
-                          <CardContent className="pt-0">
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <div className="flex items-center">
-                                <Bed className="w-4 h-4 mr-1" />
-                                <span>{property.bedrooms} bed</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Bath className="w-4 h-4 mr-1" />
-                                <span>{property.bathrooms} bath</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Square className="w-4 h-4 mr-1" />
-                                <span>{property.square_meters}m²</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
+                      <FeaturedPropertyCard property={property} badgeLabel="For Sale" />
                     </ScrollReveal>
                   ))}
                 </div>
