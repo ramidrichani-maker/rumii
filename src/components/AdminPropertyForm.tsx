@@ -208,9 +208,9 @@ export const AdminPropertyForm = () => {
         floorPlanUrl = publicUrl;
       }
 
-      if (uploadedFiles.length > 0) {
-        const uploadPromises = uploadedFiles.map(async (file, index) => {
-          const convertedFile = await convertToJpeg(file);
+      if (uploadedImages.length > 0) {
+        const uploadPromises = uploadedImages.map(async (img, index) => {
+          const convertedFile = await convertToJpeg(img.file);
           const fileExt = convertedFile.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
           
