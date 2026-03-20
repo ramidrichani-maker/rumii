@@ -135,6 +135,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         property_type: data.property_type,
         listing_type: data.listing_type,
         price: data.price || null,
+        rental_price: data.rental_price || null,
         square_meters: data.square_meters,
         bedrooms: data.bedrooms,
         bathrooms: data.bathrooms,
