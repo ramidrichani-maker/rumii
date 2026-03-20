@@ -48,6 +48,34 @@ interface Agency {
   name: string;
 }
 
+const convertToJpeg = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (supportedTypes.includes(file.type) || file.type.startsWith('video/')) {
+      resolve(file);
+      return;
+    }
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('Canvas not supported')); return; }
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob((blob) => {
+        URL.revokeObjectURL(url);
+        if (!blob) { reject(new Error('Conversion failed')); return; }
+        const newName = file.name.replace(/\.[^.]+$/, '.jpg');
+        resolve(new File([blob], newName, { type: 'image/jpeg' }));
+      }, 'image/jpeg', 0.9);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Failed to load image')); };
+    img.src = url;
+  });
+};
+
 export const AdminPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -141,11 +169,12 @@ export const AdminPropertyForm = () => {
 
       // Upload floor plan
       if (floorPlanFile) {
-        const fileExt = floorPlanFile.name.split('.').pop();
+        const convertedFp = await convertToJpeg(floorPlanFile);
+        const fileExt = convertedFp.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
           .from('property-images')
-          .upload(fileName, floorPlanFile);
+          .upload(fileName, convertedFp);
         if (fpError) throw fpError;
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
@@ -155,12 +184,13 @@ export const AdminPropertyForm = () => {
 
       if (uploadedFiles.length > 0) {
         const uploadPromises = uploadedFiles.map(async (file, index) => {
-          const fileExt = file.name.split('.').pop();
+          const convertedFile = await convertToJpeg(file);
+          const fileExt = convertedFile.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
           
           const { error: uploadError } = await supabase.storage
             .from('property-images')
-            .upload(fileName, file);
+            .upload(fileName, convertedFile);
 
           if (uploadError) throw uploadError;
 
