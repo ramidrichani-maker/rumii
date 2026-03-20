@@ -104,6 +104,8 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
     },
   });
 
+  const editListingType = form.watch('listing_type');
+
   useEffect(() => {
     const fetchAgencies = async () => {
       const { data } = await supabase
