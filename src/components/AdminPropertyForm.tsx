@@ -415,6 +415,36 @@ export const AdminPropertyForm = () => {
             </CardContent>
           </Card>
 
+          {/* Listing Type - shown before property details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Listing Type</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField control={form.control} name="listingType" render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormControl>
+                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-8">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="rent" id="admin-rent" />
+                        <Label htmlFor="admin-rent">For Rent</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="sale" id="admin-sale" />
+                        <Label htmlFor="admin-sale">For Sale</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="both" id="admin-both" />
+                        <Label htmlFor="admin-both">Both (Rent & Sale)</Label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </CardContent>
+          </Card>
+
           {/* Property Details */}
           <Card>
             <CardHeader>
@@ -422,15 +452,29 @@ export const AdminPropertyForm = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField control={form.control} name="price" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price ($)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Enter price" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+                {(listingType === 'sale' || listingType === 'both') && (
+                  <FormField control={form.control} name="price" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Property Price ($)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter sale price" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                )}
+
+                {(listingType === 'rent' || listingType === 'both') && (
+                  <FormField control={form.control} name="rentalPrice" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Monthly Rental Price ($)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter monthly rent" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                )}
 
                 <FormField control={form.control} name="metersSquared" render={({ field }) => (
                   <FormItem>
@@ -498,32 +542,6 @@ export const AdminPropertyForm = () => {
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <FormLabel className="cursor-pointer">Price is negotiable</FormLabel>
-                </FormItem>
-              )} />
-            </CardContent>
-          </Card>
-
-          {/* Listing Type */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Listing Type</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FormField control={form.control} name="listingType" render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-8">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="rent" id="admin-rent" />
-                        <Label htmlFor="admin-rent">For Rent</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="sale" id="admin-sale" />
-                        <Label htmlFor="admin-sale">For Sale</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
                 </FormItem>
               )} />
             </CardContent>
