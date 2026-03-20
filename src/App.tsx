@@ -30,7 +30,9 @@ import AgentEnquiry from "./pages/AgentEnquiry";
 import FindAgents from "./pages/FindAgents";
 import Messages from "./pages/Messages";
 import AgentValuation from "./pages/AgentValuation";
+import SupportPortal from "./pages/SupportPortal";
 import { FloatingChatWidget } from "./components/FloatingChatWidget";
+import { SupportReviewWidget } from "./components/SupportReviewWidget";
 
 const queryClient = new QueryClient();
 
