@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2, ListChecks, ClipboardCheck, Search, MessageSquare } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2, ListChecks, ClipboardCheck, Search, MessageSquare, HeadphonesIcon } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
@@ -29,6 +29,7 @@ import FindAgentRequestsManager from "@/components/FindAgentRequestsManager";
 import EmailBroadcastManager from "@/components/EmailBroadcastManager";
 import { format } from "date-fns";
 import { Mail } from "lucide-react";
+import { SupportDashboard } from "@/components/SupportDashboard";
 
 const AdminDashboard = () => {
   const [pendingProperties, setPendingProperties] = useState<any[]>([]);
@@ -808,6 +809,15 @@ const AdminDashboard = () => {
               </TabsContent>
           </Tabs>
           </div>
+        </div>
+
+        {/* Customer Support Management */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <HeadphonesIcon className="w-5 h-5" />
+            Customer Support
+          </h2>
+          <SupportDashboard />
         </div>
 
         {/* Row 3: Analytics & Agent Performance */}

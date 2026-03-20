@@ -426,6 +426,30 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          review_text: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          review_text?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           agency_id: string | null
@@ -915,6 +939,106 @@ export type Database = {
         }
         Relationships: []
       }
+      support_conversations: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          ended_at: string | null
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "support_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_ratings: {
+        Row: {
+          agent_id: string
+          conversation_id: string
+          created_at: string
+          id: string
+          rating: number
+          rating_reasons: string[] | null
+          review_text: string | null
+          user_id: string
+        }
+        Insert: {
+          agent_id: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          rating_reasons?: string[] | null
+          review_text?: string | null
+          user_id: string
+        }
+        Update: {
+          agent_id?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          rating_reasons?: string[] | null
+          review_text?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ratings_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: true
+            referencedRelation: "support_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_sessions: {
         Row: {
           id: string
@@ -1017,6 +1141,7 @@ export type Database = {
     }
     Functions: {
       approve_property_media: { Args: { media_id: string }; Returns: boolean }
+      cleanup_old_support_conversations: { Args: never; Returns: number }
       delete_user_account: {
         Args: { _admin_id: string; _user_id: string }
         Returns: boolean
@@ -1088,7 +1213,12 @@ export type Database = {
         | "townhouse"
         | "duplex"
         | "loft"
-      user_role: "user" | "agent" | "admin" | "agency_manager"
+      user_role:
+        | "user"
+        | "agent"
+        | "admin"
+        | "agency_manager"
+        | "customer_support"
       viewing_status:
         | "pending"
         | "confirmed"
@@ -1237,7 +1367,13 @@ export const Constants = {
         "duplex",
         "loft",
       ],
-      user_role: ["user", "agent", "admin", "agency_manager"],
+      user_role: [
+        "user",
+        "agent",
+        "admin",
+        "agency_manager",
+        "customer_support",
+      ],
       viewing_status: [
         "pending",
         "confirmed",

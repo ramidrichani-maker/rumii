@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -194,6 +194,12 @@ export const Navbar = () => {
                         <Link to="/agent-portal" className="flex items-center">
                           <User className="mr-2 h-4 w-4" />
                           <span>Agent Portal</span>
+                        </Link>
+                      </DropdownMenuItem>}
+                    {profile?.role === 'customer_support' && <DropdownMenuItem asChild>
+                        <Link to="/support-portal" className="flex items-center">
+                          <HeadphonesIcon className="mr-2 h-4 w-4" />
+                          <span>Support Portal</span>
                         </Link>
                       </DropdownMenuItem>}
                     <DropdownMenuSeparator />
