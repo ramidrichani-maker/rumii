@@ -231,18 +231,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
               </Button>
               
               <Button 
-                onClick={togglePinPointMode}
-                onMouseDown={(e) => e.preventDefault()}
-                size="sm"
-                variant={isPinPointMode ? "default" : "outline"}
-                className="flex items-center gap-2"
-                type="button"
-              >
-                <MapPin className="h-4 w-4" />
-                {isPinPointMode ? 'Click Map to Pin' : 'Enable Pinpoint'}
-              </Button>
-              
-              <Button 
                 onClick={toggleFullscreen}
                 size="sm"
                 variant="outline"
