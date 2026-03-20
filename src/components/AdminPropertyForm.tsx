@@ -139,11 +139,16 @@ export const AdminPropertyForm = () => {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files]);
+    const newImages = files.map(file => ({ file, roomType: "" }));
+    setUploadedImages(prev => [...prev, ...newImages]);
   };
 
   const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateImageRoomType = (index: number, roomType: string) => {
+    setUploadedImages(prev => prev.map((img, i) => i === index ? { ...img, roomType } : img));
   };
 
   const handleAmenityToggle = (amenity: string) => {
