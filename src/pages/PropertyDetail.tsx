@@ -422,7 +422,7 @@ const PropertyDetail = () => {
           <div className="flex items-baseline gap-3 flex-wrap">
             <p className="text-lg text-foreground">
               {property.bedrooms} bed {property.property_type} for{" "}
-              {property.listing_type === "rent" ? "rent" : "sale"}
+              {property.listing_type === "rent" ? "rent" : property.listing_type === "both" ? "rent & sale" : "sale"}
             </p>
             <p className="text-muted-foreground">
               {property.address}, {property.city}
