@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Locate, Search, Maximize2, Minimize2 } from 'lucide-react';
+import { Locate, Search, Maximize2, Minimize2 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -29,7 +29,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [position, setPosition] = useState<[number, number]>([latitude, longitude]);
   const [searchAddress, setSearchAddress] = useState('');
-  const [isPinPointMode, setIsPinPointMode] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [mapInitialized, setMapInitialized] = useState(false);
 
@@ -74,7 +73,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       
       // Add click handler
       map.on('click', (e: L.LeafletMouseEvent) => {
-        if (isPinPointMode) {
+        {
           const { lat, lng } = e.latlng;
           setPosition([lat, lng]);
           onLocationSelect(lat, lng);
@@ -192,23 +191,12 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const toggleFullscreen = (e?: React.MouseEvent) => {
     e?.preventDefault();
     setIsFullscreen(!isFullscreen);
-    // Re-initialize map size after fullscreen toggle
     setTimeout(() => {
       if (leafletMapRef.current) {
         leafletMapRef.current.invalidateSize();
       }
     }, 100);
   };
-
-  const togglePinPointMode = (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    setIsPinPointMode(!isPinPointMode);
-    // Remove focus from any input elements to prevent keyboard
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-  };
-
   const mapHeight = isFullscreen ? "70vh" : height;
   const mapClass = isFullscreen ? "fixed inset-0 z-50 bg-background p-4" : className;
 
@@ -250,18 +238,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
               </Button>
               
               <Button 
-                onClick={togglePinPointMode}
-                onMouseDown={(e) => e.preventDefault()}
-                size="sm"
-                variant={isPinPointMode ? "default" : "outline"}
-                className="flex items-center gap-2"
-                type="button"
-              >
-                <MapPin className="h-4 w-4" />
-                {isPinPointMode ? 'Click Map to Pin' : 'Enable Pinpoint'}
-              </Button>
-              
-              <Button 
                 onClick={toggleFullscreen}
                 size="sm"
                 variant="outline"
@@ -280,11 +256,9 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
             className="rounded-lg overflow-hidden border"
           />
           
-          {isPinPointMode && (
-            <p className="text-sm text-muted-foreground mt-2 text-center">
-              Click anywhere on the map to set the property location, then drag the pin to fine-tune
-            </p>
-          )}
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            Click anywhere on the map to set the property location, then drag the pin to fine-tune
+          </p>
         </CardContent>
       </Card>
     </div>
