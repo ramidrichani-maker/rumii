@@ -18,7 +18,7 @@ interface Property {
   bedrooms: number;
   bathrooms: number;
   square_meters: number;
-  listing_type: 'rent' | 'sale';
+  listing_type: 'rent' | 'sale' | 'both';
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   images: string[];

@@ -88,7 +88,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
       city: property.city,
       municipality: property.municipality || "",
       property_type: property.property_type,
-      listing_type: property.listing_type as "rent" | "sale",
+      listing_type: property.listing_type as "rent" | "sale" | "both",
       price: property.price || undefined,
       square_meters: property.square_meters,
       bedrooms: property.bedrooms,

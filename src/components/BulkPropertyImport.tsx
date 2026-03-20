@@ -23,7 +23,7 @@ interface ParsedProperty {
   square_meters: number;
   bedrooms: number;
   bathrooms: number;
-  listing_type: "rent" | "sale";
+  listing_type: "rent" | "sale" | "both";
   price: number;
   price_negotiable?: boolean;
   year_built?: number;

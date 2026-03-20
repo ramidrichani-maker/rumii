@@ -67,7 +67,7 @@ interface Property {
   bedrooms: number;
   bathrooms: number;
   square_meters: number;
-  listing_type: 'rent' | 'sale';
+  listing_type: 'rent' | 'sale' | 'both';
   year_built?: number;
   last_renovated?: number;
   amenities: string[];
