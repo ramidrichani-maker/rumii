@@ -15,6 +15,7 @@ interface Property {
   city: string;
   municipality?: string;
   price: number;
+  rental_price?: number | null;
   property_type: string;
   bedrooms: number;
   bathrooms: number;
