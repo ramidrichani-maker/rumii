@@ -127,9 +127,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     }
   };
 
-  const formatPrice = (price: number, listingType: string) => {
-    const formatted = `$${price.toLocaleString()}`;
-    return listingType === 'rent' ? `${formatted}/mo` : formatted;
+  const formatPrice = (price: number, listingType: string, rentalPrice?: number | null) => {
+    if (listingType === 'both' && rentalPrice) {
+      return `$${price.toLocaleString()} / $${rentalPrice.toLocaleString()}/mo`;
+    }
+    if (listingType === 'rent') {
+      const rp = rentalPrice || price;
+      return `$${rp.toLocaleString()}/mo`;
+    }
+    return `$${price.toLocaleString()}`;
   };
 
   const handlePrevImage = (e: React.MouseEvent) => {
