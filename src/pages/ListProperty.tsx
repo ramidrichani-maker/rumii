@@ -51,10 +51,11 @@ const formSchema = z.object({
   metersSquared: z.string().min(1, "Meters squared is required"),
   bedrooms: z.string().min(1, "Number of bedrooms is required"),
   bathrooms: z.string().min(1, "Number of bathrooms is required"),
-  listingType: z.enum(["rent", "sale"], {
-    required_error: "Please select if this is for rent or sale"
+  listingType: z.enum(["rent", "sale", "both"], {
+    required_error: "Please select a listing type"
   }),
-  price: z.string().min(1, "Price is required"),
+  price: z.string().optional(),
+  rentalPrice: z.string().optional(),
   priceNegotiable: z.boolean().default(false),
   unfurnished: z.boolean().default(false),
   yearBuilt: z.string().optional(),
@@ -65,7 +66,15 @@ const formSchema = z.object({
   brokerAgreement: z.boolean().refine((val) => val === true, {
     message: "You must agree to the broker terms to list your property"
   })
-});
+}).refine((data) => {
+  if (data.listingType === 'sale' && (!data.price || data.price === '')) return false;
+  if (data.listingType === 'rent' && (!data.rentalPrice || data.rentalPrice === '')) return false;
+  if (data.listingType === 'both') {
+    if (!data.price || data.price === '') return false;
+    if (!data.rentalPrice || data.rentalPrice === '') return false;
+  }
+  return true;
+}, { message: "Please fill in the required price fields", path: ["price"] });
 type FormData = z.infer<typeof formSchema>;
 const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
