@@ -1,0 +1,118 @@
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Bed, Bath, Square, ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+
+interface Property {
+  id: string;
+  address: string;
+  city: string;
+  price: number;
+  listing_type: string;
+  property_type: string;
+  bedrooms: number;
+  bathrooms: number;
+  square_meters: number;
+  images: string[];
+}
+
+interface FeaturedPropertyCardProps {
+  property: Property;
+  badgeLabel: string;
+  badgeVariant?: "default" | "secondary";
+}
+
+const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }: FeaturedPropertyCardProps) => {
+  const [imgIndex, setImgIndex] = useState(0);
+  const images = property.images?.length ? property.images : [];
+  const hasMultiple = images.length > 1;
+
+  const formatPrice = (price: number, listingType: string) => {
+    return listingType === 'rent' ? `$${price?.toLocaleString()}/mo` : `$${price?.toLocaleString()}`;
+  };
+
+  const goLeft = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setImgIndex(imgIndex === 0 ? images.length - 1 : imgIndex - 1);
+  };
+
+  const goRight = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setImgIndex(imgIndex === images.length - 1 ? 0 : imgIndex + 1);
+  };
+
+  return (
+    <Link to={`/property/${property.id}`}>
+      <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer group">
+        <div className="relative h-48 bg-muted rounded-t-lg overflow-hidden">
+          {images.length > 0 ? (
+            <img
+              src={images[imgIndex]}
+              alt={`${property.address} - image ${imgIndex + 1}`}
+              className="w-full h-full object-cover transition-opacity duration-300"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted" />
+          )}
+          {hasMultiple && (
+            <>
+              <button
+                onClick={goLeft}
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={goRight}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm"
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                {images.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`w-1.5 h-1.5 rounded-full transition-colors ${i === imgIndex ? 'bg-background' : 'bg-background/50'}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-start mb-2">
+            <Badge variant={badgeVariant}>{badgeLabel}</Badge>
+            <span className="text-2xl font-bold text-primary">
+              {formatPrice(property.price, property.listing_type)}
+            </span>
+          </div>
+          <CardTitle className="text-lg">{property.address}</CardTitle>
+          <CardDescription>{property.city}</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+            <div className="flex items-center">
+              <Bed className="w-4 h-4 mr-1" />
+              <span>{property.bedrooms} bed</span>
+            </div>
+            <div className="flex items-center">
+              <Bath className="w-4 h-4 mr-1" />
+              <span>{property.bathrooms} bath</span>
+            </div>
+            <div className="flex items-center">
+              <Square className="w-4 h-4 mr-1" />
+              <span>{property.square_meters}m²</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+};
+
+export default FeaturedPropertyCard;
