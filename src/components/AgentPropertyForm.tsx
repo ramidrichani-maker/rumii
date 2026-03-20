@@ -101,6 +101,8 @@ const AgentPropertyForm = () => {
     }
   });
 
+  const listingType = form.watch('listingType');
+
   useEffect(() => {
     const fetchAgentAgency = async () => {
       if (!profile?.agency_id) return;
