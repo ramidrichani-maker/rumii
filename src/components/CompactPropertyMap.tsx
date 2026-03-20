@@ -198,7 +198,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             .addTo(leafletMapRef.current!);
 
           // Create rich popup content
-          const imageUrl = property.images?.[0] || '/placeholder.svg';
+          const images = property.images?.length ? property.images : ['/placeholder.svg'];
           const priceFormatted = property.listing_type === 'rent' 
             ? `$${property.price.toLocaleString()}/mo` 
             : `$${property.price.toLocaleString()}`;
@@ -206,69 +206,64 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           const listingLabel = property.listing_type === 'rent' ? 'For Rent' : property.listing_type === 'both' ? 'Rent & Sale' : 'For Sale';
 
           const popupContent = document.createElement('div');
+          let currentImgIndex = 0;
+          const hasMultiple = images.length > 1;
+
+          const arrowStyle = `position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.85);border:none;border-radius:50%;width:24px;height:24px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;`;
+
           popupContent.innerHTML = `
-            <div style="width:260px;font-family:system-ui,sans-serif;">
+            <div data-action="navigate" style="width:260px;font-family:system-ui,sans-serif;cursor:pointer;">
               <div style="position:relative;width:100%;height:140px;overflow:hidden;border-radius:8px 8px 0 0;">
-                <img src="${imageUrl}" alt="${propType}" style="width:100%;height:100%;object-fit:cover;" />
+                <img data-popup-img style="width:100%;height:100%;object-fit:cover;" src="${images[0]}" alt="${propType}" />
+                ${hasMultiple ? `<button data-action="prev-img" style="${arrowStyle}left:4px;">‹</button><button data-action="next-img" style="${arrowStyle}right:4px;">›</button>` : ''}
                 <span style="position:absolute;top:6px;left:6px;background:hsl(30,20%,45%);color:white;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;">${listingLabel}</span>
+                ${hasMultiple ? `<div data-dots style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;"></div>` : ''}
               </div>
               <div style="padding:10px;">
                 <div style="font-weight:700;font-size:16px;color:#1a1a1a;margin-bottom:2px;">${priceFormatted}</div>
                 <div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px;">${propType} in ${property.city}</div>
                 <div style="font-size:11px;color:#666;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${property.address}</div>
-                <div style="display:flex;gap:12px;font-size:11px;color:#555;margin-bottom:10px;">
+                <div style="display:flex;gap:12px;font-size:11px;color:#555;">
                   <span>🛏 ${property.bedrooms}</span>
                   <span>🛁 ${property.bathrooms}</span>
                   <span>📐 ${property.square_meters}m²</span>
-                </div>
-                <div style="display:flex;gap:6px;">
-                  <button data-action="call" style="flex:1;padding:6px 0;font-size:11px;font-weight:600;border:1px solid #d1d5db;border-radius:6px;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">📞 Call</button>
-                  <button data-action="email" style="flex:1;padding:6px 0;font-size:11px;font-weight:600;border:1px solid #d1d5db;border-radius:6px;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">✉️ Email</button>
-                  <button data-action="view" style="flex:1;padding:6px 0;font-size:11px;font-weight:600;border:none;border-radius:6px;background:hsl(30,20%,45%);color:white;cursor:pointer;">View</button>
                 </div>
               </div>
             </div>
           `;
 
-          // Wire up button actions
-          popupContent.querySelector('[data-action="call"]')?.addEventListener('click', (e) => {
+          // Image carousel dots
+          const updateDots = () => {
+            const dotsEl = popupContent.querySelector('[data-dots]') as HTMLElement;
+            if (!dotsEl) return;
+            dotsEl.innerHTML = images.map((_, i) =>
+              `<div style="width:${i === currentImgIndex ? '12px' : '5px'};height:5px;border-radius:3px;background:${i === currentImgIndex ? 'white' : 'rgba(255,255,255,0.5)'};transition:width 0.2s;"></div>`
+            ).join('');
+          };
+          updateDots();
+
+          const setImg = (idx: number) => {
+            currentImgIndex = idx;
+            const img = popupContent.querySelector('[data-popup-img]') as HTMLImageElement;
+            if (img) img.src = images[idx];
+            updateDots();
+          };
+
+          popupContent.querySelector('[data-action="prev-img"]')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Fetch agent phone and call
-            import('@/integrations/supabase/client').then(({ supabase }) => {
-              supabase
-                .from('property_agents')
-                .select('agent_id')
-                .eq('property_id', property.id)
-                .limit(1)
-                .single()
-                .then(({ data: assignment }) => {
-                  if (assignment) {
-                    supabase
-                      .from('profiles')
-                      .select('phone_number')
-                      .eq('user_id', assignment.agent_id)
-                      .single()
-                      .then(({ data: profile }) => {
-                        const phone = profile?.phone_number || '+96170612686';
-                        window.location.href = `tel:${phone}`;
-                      });
-                  } else {
-                    window.location.href = 'tel:+96170612686';
-                  }
-                });
-            });
+            e.preventDefault();
+            setImg(currentImgIndex === 0 ? images.length - 1 : currentImgIndex - 1);
           });
 
-          popupContent.querySelector('[data-action="email"]')?.addEventListener('click', (e) => {
+          popupContent.querySelector('[data-action="next-img"]')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = `/property/${property.id}/enquiry`;
+            e.preventDefault();
+            setImg(currentImgIndex === images.length - 1 ? 0 : currentImgIndex + 1);
           });
 
-          popupContent.querySelector('[data-action="view"]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (onPropertySelect) {
-              onPropertySelect(property);
-            }
+          // Clicking the popup navigates to property detail
+          popupContent.querySelector('[data-action="navigate"]')?.addEventListener('click', () => {
+            window.location.href = `/property/${property.id}`;
           });
 
           marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 260, className: 'property-rich-popup', autoPan: false });
