@@ -183,12 +183,13 @@ export const AdminPropertyForm = () => {
 
       if (uploadedFiles.length > 0) {
         const uploadPromises = uploadedFiles.map(async (file, index) => {
-          const fileExt = file.name.split('.').pop();
+          const convertedFile = await convertToJpeg(file);
+          const fileExt = convertedFile.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${index}.${fileExt}`;
           
           const { error: uploadError } = await supabase.storage
             .from('property-images')
-            .upload(fileName, file);
+            .upload(fileName, convertedFile);
 
           if (uploadError) throw uploadError;
 
