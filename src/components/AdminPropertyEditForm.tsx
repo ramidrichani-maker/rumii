@@ -293,7 +293,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         </div>
 
         {/* Listing Type and Price */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="listing_type"
@@ -309,6 +309,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
                   <SelectContent>
                     <SelectItem value="rent">For Rent</SelectItem>
                     <SelectItem value="sale">For Sale</SelectItem>
+                    <SelectItem value="both">Both (Rent & Sale)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -316,19 +317,37 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price ($)</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {(editListingType === 'sale' || editListingType === 'both') && (
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Property Price ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          {(editListingType === 'rent' || editListingType === 'both') && (
+            <FormField
+              control={form.control}
+              name="rental_price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Monthly Rental Price ($)</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
