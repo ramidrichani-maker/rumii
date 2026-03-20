@@ -97,6 +97,7 @@ export const AdminPropertyForm = () => {
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
   const { user } = useAuth();
+  const listingType = form.watch('listingType');
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
