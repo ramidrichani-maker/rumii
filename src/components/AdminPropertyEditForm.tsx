@@ -44,7 +44,7 @@ interface Property {
   city: string;
   municipality: string | null;
   property_type: string;
-  listing_type: "rent" | "sale";
+  listing_type: "rent" | "sale" | "both";
   price: number | null;
   square_meters: number;
   bedrooms: number;
