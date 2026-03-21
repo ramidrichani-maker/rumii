@@ -134,7 +134,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
-      <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row gap-3">
         <div className="relative flex-1">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
