@@ -309,35 +309,36 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         <div className="flex-1" />
 
         {/* Bottom-right: Request Viewing, Call & Email */}
-        <div className="flex items-center gap-2 justify-end mt-3">
+        <div className="flex items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap">
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5"
+            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
             onClick={(e) => {
               e.stopPropagation();
               setShowViewingModal(true);
             }}
           >
-            <CalendarCheck className="w-4 h-4" />
-            Request Viewing
+            <CalendarCheck className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden md:inline">Request Viewing</span>
+            <span className="md:hidden">View</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5"
+            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
             onClick={handleCall}
           >
-            <Phone className="w-4 h-4" />
-            {showPhone ? (agentPhone || '+96170612686') : 'Call'}
+            <Phone className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden md:inline">{showPhone ? (agentPhone || '+96170612686') : 'Call'}</span>
           </Button>
           <Button
             size="sm"
-            className="gap-1.5"
+            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
             onClick={handleEmail}
           >
-            <Mail className="w-4 h-4" />
-            Email
+            <Mail className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden md:inline">Email</span>
           </Button>
         </div>
       </div>
