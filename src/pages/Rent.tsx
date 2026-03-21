@@ -329,7 +329,7 @@ const Rent = () => {
 
           {/* Map Panel - right half of viewport */}
           {showMap && !mapFullscreen && (
-            <div className="w-full md:w-[55%] md:sticky md:top-0 md:self-start relative overflow-hidden animate-slide-fade-in-right" style={{ height: 'calc(100vh - 120px)' }}>
+            <div className={`w-full md:w-[55%] md:sticky md:top-0 md:self-start relative overflow-hidden ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`} style={{ height: 'calc(100vh - 120px)' }}>
               <div className="absolute top-2 right-2 z-[1000] flex gap-1">
                 <button
                   onClick={() => setMapFullscreen(true)}
