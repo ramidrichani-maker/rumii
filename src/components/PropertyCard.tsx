@@ -185,7 +185,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     >
       {/* Left: Image */}
       <div
-        className="relative w-64 min-w-[16rem] md:w-96 md:min-w-[24rem] h-auto min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden"
+        className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden"
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
         onTouchEnd={imageCarousel.onTouchEnd}
@@ -250,11 +250,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
       </div>
 
       {/* Right: Details */}
-      <div className="flex flex-col flex-1 p-4 relative min-w-0">
+      <div className="flex flex-col flex-1 p-2 md:p-4 relative min-w-0">
         {/* Top-right: Agency + Favorite */}
-        <div className="absolute top-2 right-2 flex items-center gap-1.5">
+        <div className="absolute top-1 right-1 md:top-2 md:right-2 flex items-center gap-1">
           {agencyName && (
-            <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+            <div className="hidden md:flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
               {agencyLogo ? (
                 <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
               ) : (
@@ -266,42 +266,42 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-6 w-6 md:h-8 md:w-8"
             onClick={toggleFavorite}
             disabled={isTogglingFavorite}
           >
-            <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+            <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
           </Button>
         </div>
 
         {/* Price */}
-        <h3 className="text-xl md:text-2xl font-bold text-primary pr-10">
+        <h3 className="text-sm md:text-2xl font-bold text-primary pr-8 md:pr-10">
           {formatPrice(property.price, property.listing_type, property.rental_price)}
         </h3>
 
         {/* Beds, Baths, Size */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+        <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap">
           <span className="flex items-center gap-1">
-            <Bed className="w-4 h-4" />
-            {property.bedrooms} bed{property.bedrooms !== 1 ? 's' : ''}
+            <Bed className="w-3 h-3 md:w-4 md:h-4" />
+            {property.bedrooms}
           </span>
           <span className="flex items-center gap-1">
-            <Bath className="w-4 h-4" />
-            {property.bathrooms} bath{property.bathrooms !== 1 ? 's' : ''}
+            <Bath className="w-3 h-3 md:w-4 md:h-4" />
+            {property.bathrooms}
           </span>
           <span className="flex items-center gap-1">
-            <Square className="w-4 h-4" />
+            <Square className="w-3 h-3 md:w-4 md:h-4" />
             {property.square_meters}m²
           </span>
         </div>
 
         {/* Location */}
-        <p className="text-sm text-foreground mt-2 truncate">
+        <p className="text-xs md:text-sm text-foreground mt-1 md:mt-2 truncate">
           {property.city}, {property.address}
         </p>
 
         {/* Description (max 2 lines) */}
-        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+        <p className="hidden md:block text-sm text-muted-foreground mt-1 line-clamp-2">
           {truncateDescription((property as any).description)}
         </p>
 
@@ -309,35 +309,36 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         <div className="flex-1" />
 
         {/* Bottom-right: Request Viewing, Call & Email */}
-        <div className="flex items-center gap-2 justify-end mt-3">
+        <div className="flex items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap">
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5"
+            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
             onClick={(e) => {
               e.stopPropagation();
               setShowViewingModal(true);
             }}
           >
-            <CalendarCheck className="w-4 h-4" />
-            Request Viewing
+            <CalendarCheck className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden md:inline">Request Viewing</span>
+            <span className="md:hidden">View</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5"
+            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
             onClick={handleCall}
           >
-            <Phone className="w-4 h-4" />
-            {showPhone ? (agentPhone || '+96170612686') : 'Call'}
+            <Phone className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden md:inline">{showPhone ? (agentPhone || '+96170612686') : 'Call'}</span>
           </Button>
           <Button
             size="sm"
-            className="gap-1.5"
+            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
             onClick={handleEmail}
           >
-            <Mail className="w-4 h-4" />
-            Email
+            <Mail className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden md:inline">Email</span>
           </Button>
         </div>
       </div>
