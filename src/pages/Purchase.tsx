@@ -67,7 +67,16 @@ const Purchase = () => {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showMap, setShowMap] = useState(!!searchQuery);
+  const [mapClosing, setMapClosing] = useState(false);
   const [mapFullscreen, setMapFullscreen] = useState(false);
+
+  const closeMap = useCallback(() => {
+    setMapClosing(true);
+    setTimeout(() => {
+      setShowMap(false);
+      setMapClosing(false);
+    }, 300);
+  }, []);
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
 
@@ -277,7 +286,7 @@ const Purchase = () => {
 
         <div className="mb-4 flex items-center">
           <button
-            onClick={() => setShowMap(prev => !prev)}
+            onClick={() => showMap ? closeMap() : setShowMap(true)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-200 ${
               showMap
                 ? "border-primary bg-primary/10 text-primary"
@@ -334,7 +343,7 @@ const Purchase = () => {
 
           {/* Map Panel - right half of viewport */}
           {showMap && !mapFullscreen && (
-            <div className="w-full md:w-[55%] md:sticky md:top-0 md:self-start relative overflow-hidden animate-slide-fade-in-right" style={{ height: 'calc(100vh - 120px)' }}>
+            <div className={`w-full md:w-[55%] md:sticky md:top-0 md:self-start relative overflow-hidden ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`} style={{ height: 'calc(100vh - 120px)' }}>
               <div className="absolute top-2 right-2 z-[1000] flex gap-1">
                 <button
                   onClick={() => setMapFullscreen(true)}
@@ -344,7 +353,7 @@ const Purchase = () => {
                   <Maximize2 className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => setShowMap(false)}
+                  onClick={closeMap}
                   className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
                   title="Close map"
                 >
