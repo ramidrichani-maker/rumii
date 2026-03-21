@@ -76,6 +76,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [hasDrawnArea, setHasDrawnArea] = useState(false);
+  const [tilesLoading, setTilesLoading] = useState(true);
   const drawHandlerRef = useRef<L.Draw.Polygon | null>(null);
 
   // Initialize map
