@@ -301,7 +301,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         </p>
 
         {/* Description (max 2 lines) */}
-        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+        <p className="hidden md:block text-sm text-muted-foreground mt-1 line-clamp-2">
           {truncateDescription((property as any).description)}
         </p>
 
