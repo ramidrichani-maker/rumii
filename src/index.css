@@ -130,6 +130,7 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
