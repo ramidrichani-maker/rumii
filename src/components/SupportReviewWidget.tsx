@@ -17,6 +17,7 @@ export const SupportReviewWidget = () => {
   const [reviewText, setReviewText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [defaultTab, setDefaultTab] = useState("review");
 
   const handleSubmitReview = async () => {
     if (!user) {
