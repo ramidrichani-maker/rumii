@@ -321,35 +321,35 @@ const AgentPortal = () => {
   return (
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">Agent Portal</h1>
-            <p className="text-xl text-muted-foreground mt-2">
-              Manage property viewings and client requests
+        <div className="flex justify-between items-start mb-6 md:mb-8 gap-2">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-4xl font-bold text-foreground">Agent Portal</h1>
+            <p className="text-sm md:text-xl text-muted-foreground mt-1 md:mt-2">
+              Manage viewings and client requests
             </p>
           </div>
           <NotificationBell />
         </div>
 
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="add" className="flex items-center gap-1">
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">List Property</span>
+          <TabsList className="flex w-full overflow-x-auto md:grid md:grid-cols-6 gap-1 h-auto p-1">
+            <TabsTrigger value="add" className="flex items-center gap-1 text-xs md:text-sm whitespace-nowrap px-2 md:px-3">
+              <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span>List</span>
             </TabsTrigger>
-            <TabsTrigger value="pending">
+            <TabsTrigger value="pending" className="text-xs md:text-sm whitespace-nowrap px-2 md:px-3">
               Pending ({pendingViewings.length})
             </TabsTrigger>
-            <TabsTrigger value="confirmed">
+            <TabsTrigger value="confirmed" className="text-xs md:text-sm whitespace-nowrap px-2 md:px-3">
               Confirmed ({confirmedViewings.length})
             </TabsTrigger>
-            <TabsTrigger value="calendar">
+            <TabsTrigger value="calendar" className="text-xs md:text-sm whitespace-nowrap px-2 md:px-3">
               Calendar
             </TabsTrigger>
-            <TabsTrigger value="properties">
-              My Properties ({assignedProperties.length})
+            <TabsTrigger value="properties" className="text-xs md:text-sm whitespace-nowrap px-2 md:px-3">
+              Properties ({assignedProperties.length})
             </TabsTrigger>
-            <TabsTrigger value="past">
+            <TabsTrigger value="past" className="text-xs md:text-sm whitespace-nowrap px-2 md:px-3">
               Past ({pastViewings.length})
             </TabsTrigger>
           </TabsList>
@@ -413,7 +413,7 @@ const AgentPortal = () => {
                         </div>
                       </div>
                       
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <Button
                           onClick={() => updateViewingStatus(viewing.id, 'confirmed')}
                           className="flex items-center gap-2"
