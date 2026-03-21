@@ -64,6 +64,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
                   alt={`${property.address} - image ${i + 1}`}
                   className="h-full object-cover flex-shrink-0"
                   style={{ width: `${100 / images.length}%` }}
+                  loading="lazy"
+                  decoding="async"
                 />
               ))}
             </div>
