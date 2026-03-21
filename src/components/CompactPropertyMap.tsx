@@ -601,7 +601,11 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   }, []);
 
   const mapHeight = embedded ? height : (isExpanded ? "60vh" : height);
-  const mapClass = embedded ? (className || "h-full") : (isExpanded ? "fixed inset-0 z-40 bg-background p-4" : className);
+  const mapClass = embedded
+    ? (className || "h-full")
+    : isExpanded
+      ? "fixed inset-0 z-40 bg-background/95 backdrop-blur-sm p-4 animate-fade-in"
+      : `${className} animate-fade-in`;
 
   if (embedded) {
     return (
