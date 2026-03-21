@@ -275,7 +275,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         </div>
 
         {/* Price */}
-        <h3 className="text-xl md:text-2xl font-bold text-primary pr-10">
+        <h3 className="text-sm md:text-2xl font-bold text-primary pr-8 md:pr-10">
           {formatPrice(property.price, property.listing_type, property.rental_price)}
         </h3>
 
