@@ -67,7 +67,16 @@ const Purchase = () => {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showMap, setShowMap] = useState(!!searchQuery);
+  const [mapClosing, setMapClosing] = useState(false);
   const [mapFullscreen, setMapFullscreen] = useState(false);
+
+  const closeMap = useCallback(() => {
+    setMapClosing(true);
+    setTimeout(() => {
+      setShowMap(false);
+      setMapClosing(false);
+    }, 300);
+  }, []);
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
 
