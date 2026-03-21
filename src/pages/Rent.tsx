@@ -272,7 +272,7 @@ const Rent = () => {
 
         <div className="mb-4 flex items-center">
           <button
-            onClick={() => setShowMap(prev => !prev)}
+            onClick={() => showMap ? closeMap() : setShowMap(true)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-200 ${
               showMap
                 ? "border-primary bg-primary/10 text-primary"
