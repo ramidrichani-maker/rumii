@@ -132,7 +132,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 sticky top-0 z-30 bg-background pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
       <div className="flex gap-3">
         <div className="relative flex-1">
