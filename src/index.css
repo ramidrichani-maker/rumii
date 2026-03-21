@@ -130,6 +130,7 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
@@ -157,36 +158,38 @@ All colors MUST be HSL.
 .scroll-reveal {
   opacity: 0;
   transition-property: opacity, transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+  backface-visibility: hidden;
 }
 
 .scroll-reveal-visible {
   opacity: 1;
-  transform: translateY(0) translateX(0) scale(1) !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
 }
 
 .scroll-reveal-fade-up {
-  transform: translateY(40px);
+  transform: translate3d(0, 24px, 0);
 }
 
 .scroll-reveal-fade-down {
-  transform: translateY(-40px);
+  transform: translate3d(0, -24px, 0);
 }
 
 .scroll-reveal-fade-left {
-  transform: translateX(40px);
+  transform: translate3d(24px, 0, 0);
 }
 
 .scroll-reveal-fade-right {
-  transform: translateX(-40px);
+  transform: translate3d(-24px, 0, 0);
 }
 
 .scroll-reveal-zoom-in {
-  transform: scale(0.9);
+  transform: scale(0.95);
 }
 
 .scroll-reveal-zoom-out {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 /* Rich property popup on map */
