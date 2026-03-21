@@ -353,7 +353,7 @@ const Purchase = () => {
                   <Maximize2 className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => setShowMap(false)}
+                  onClick={closeMap}
                   className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
                   title="Close map"
                 >
