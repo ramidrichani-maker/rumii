@@ -321,11 +321,11 @@ const AgentPortal = () => {
   return (
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">Agent Portal</h1>
-            <p className="text-xl text-muted-foreground mt-2">
-              Manage property viewings and client requests
+        <div className="flex justify-between items-start mb-6 md:mb-8 gap-2">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-4xl font-bold text-foreground">Agent Portal</h1>
+            <p className="text-sm md:text-xl text-muted-foreground mt-1 md:mt-2">
+              Manage viewings and client requests
             </p>
           </div>
           <NotificationBell />
