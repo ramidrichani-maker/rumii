@@ -35,6 +35,7 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [tilesLoading, setTilesLoading] = useState(true);
 
   // Initialize map
   useEffect(() => {

@@ -31,6 +31,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const [searchAddress, setSearchAddress] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [tilesLoading, setTilesLoading] = useState(true);
 
   // Initialize map
   useEffect(() => {
