@@ -316,7 +316,7 @@ const Purchase = () => {
 
       {/* Split Layout: full-width when map is shown */}
       <div className={`${showMap ? 'px-4' : 'container mx-auto px-4'}`}>
-        <div className={`flex flex-col ${showMap ? 'md:flex-row' : ''} gap-6`}>
+        <div className={`flex ${showMap ? 'flex-col-reverse md:flex-row' : 'flex-col'} gap-6`}>
           {/* Property Grid */}
           <div
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto' : 'w-full'} transition-all duration-300`}
