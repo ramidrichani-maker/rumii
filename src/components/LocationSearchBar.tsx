@@ -135,7 +135,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     <div className="mb-6 sticky top-0 z-30 bg-background pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
       <div className="flex flex-col md:flex-row gap-3">
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={location}
@@ -145,6 +145,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           />
         </div>
 
+        <div className="flex gap-3 overflow-x-auto md:overflow-x-visible w-full md:w-auto shrink-0">
         {/* Radius Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
