@@ -250,7 +250,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
       </div>
 
       {/* Right: Details */}
-      <div className="flex flex-col flex-1 p-4 relative min-w-0">
+      <div className="flex flex-col flex-1 p-2 md:p-4 relative min-w-0">
         {/* Top-right: Agency + Favorite */}
         <div className="absolute top-2 right-2 flex items-center gap-1.5">
           {agencyName && (
