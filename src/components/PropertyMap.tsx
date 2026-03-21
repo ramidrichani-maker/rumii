@@ -254,11 +254,17 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           </div>
 
           {/* Map Container */}
-          <div 
-            ref={mapRef}
-            style={{ height: mapHeight }} 
-            className="rounded-lg overflow-hidden border"
-          />
+          <div className="relative" style={{ height: mapHeight }}>
+            <div 
+              ref={mapRef}
+              className="rounded-lg overflow-hidden border absolute inset-0"
+            />
+            {tilesLoading && (
+              <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
           
           <p className="text-sm text-muted-foreground mt-2 text-center">
             Click anywhere on the map to set the property location, then drag the pin to fine-tune
