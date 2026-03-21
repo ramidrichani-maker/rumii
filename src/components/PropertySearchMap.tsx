@@ -162,11 +162,17 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div 
-          ref={mapRef}
-          style={{ height }} 
-          className="rounded-lg overflow-hidden border"
-        />
+        <div className="relative" style={{ height }}>
+          <div 
+            ref={mapRef}
+            className="rounded-lg overflow-hidden border absolute inset-0"
+          />
+          {tilesLoading && (
+            <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
