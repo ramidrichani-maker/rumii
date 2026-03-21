@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin } from 'lucide-react';
+import { MapPin, Loader2 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -35,6 +35,7 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [tilesLoading, setTilesLoading] = useState(true);
 
   // Initialize map
   useEffect(() => {
@@ -58,11 +59,14 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
       const map = L.map(mapRef.current).setView([33.8938, 35.5018], 12);
       
       // Add tile layer with English labels
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20
       }).addTo(map);
+
+      tileLayer.on('loading', () => setTilesLoading(true));
+      tileLayer.on('load', () => setTilesLoading(false));
 
       leafletMapRef.current = map;
       setMapInitialized(true);
@@ -158,11 +162,17 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div 
-          ref={mapRef}
-          style={{ height }} 
-          className="rounded-lg overflow-hidden border"
-        />
+        <div className="relative" style={{ height }}>
+          <div 
+            ref={mapRef}
+            className="rounded-lg overflow-hidden border absolute inset-0"
+          />
+          {tilesLoading && (
+            <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

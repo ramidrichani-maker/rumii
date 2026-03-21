@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Locate, Search, Maximize2, PenTool, Trash2 } from 'lucide-react';
@@ -75,6 +76,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [hasDrawnArea, setHasDrawnArea] = useState(false);
+  const [tilesLoading, setTilesLoading] = useState(true);
   const drawHandlerRef = useRef<L.Draw.Polygon | null>(null);
 
   // Initialize map
@@ -86,11 +88,14 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       const map = L.map(mapRef.current).setView([33.8938, 35.5018], 12);
       
       // Add tile layer with English labels
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20
       }).addTo(map);
+
+      tileLayer.on('loading', () => setTilesLoading(true));
+      tileLayer.on('load', () => setTilesLoading(false));
 
       // Initialize feature group for drawn items
       const drawnItems = new L.FeatureGroup();
@@ -642,6 +647,11 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             ref={mapRef}
             className="absolute inset-0 rounded-lg"
           />
+          {tilesLoading && (
+            <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
           <div className="absolute inset-0 rounded-lg ring-[3px] ring-background pointer-events-none z-[500]" />
         </div>
       </div>
@@ -760,6 +770,11 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
               ref={mapRef}
               className="absolute inset-0 rounded-lg"
             />
+            {tilesLoading && (
+              <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
             <div className="absolute inset-0 rounded-lg ring-[3px] ring-background border border-border pointer-events-none z-[500]" />
           </div>
         </CardContent>
