@@ -280,17 +280,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         </h3>
 
         {/* Beds, Baths, Size */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+        <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap">
           <span className="flex items-center gap-1">
-            <Bed className="w-4 h-4" />
-            {property.bedrooms} bed{property.bedrooms !== 1 ? 's' : ''}
+            <Bed className="w-3 h-3 md:w-4 md:h-4" />
+            {property.bedrooms}
           </span>
           <span className="flex items-center gap-1">
-            <Bath className="w-4 h-4" />
-            {property.bathrooms} bath{property.bathrooms !== 1 ? 's' : ''}
+            <Bath className="w-3 h-3 md:w-4 md:h-4" />
+            {property.bathrooms}
           </span>
           <span className="flex items-center gap-1">
-            <Square className="w-4 h-4" />
+            <Square className="w-3 h-3 md:w-4 md:h-4" />
             {property.square_meters}m²
           </span>
         </div>
