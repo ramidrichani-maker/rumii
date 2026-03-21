@@ -296,7 +296,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         </div>
 
         {/* Location */}
-        <p className="text-sm text-foreground mt-2 truncate">
+        <p className="text-xs md:text-sm text-foreground mt-1 md:mt-2 truncate">
           {property.city}, {property.address}
         </p>
 
