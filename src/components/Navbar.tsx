@@ -86,23 +86,37 @@ export const Navbar = () => {
             <Home className="w-6 h-6 text-primary" />
             <span className="text-xl font-bold">Oracle Estates</span>
           </Link>
-          <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
-            <Link to="/purchase">
-              <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
-            </Link>
-            <Link to="/rent">
-              <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
-            </Link>
-            <Link to="/find-agents">
-              <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
-            </Link>
-            <Link to="/new-homes">
-              <Button variant="ghost" size="sm" className="text-[1.05rem]">New homes</Button>
-            </Link>
-            <Link to="/agent-valuation">
-              <Button variant="ghost" size="sm" className="text-[1.05rem]">Agent valuation</Button>
-            </Link>
-          </nav>
+          {profile?.role !== 'customer_support' ? (
+            <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
+              <Link to="/purchase">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+              </Link>
+              <Link to="/rent">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
+              </Link>
+              <Link to="/find-agents">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
+              </Link>
+              <Link to="/new-homes">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">New homes</Button>
+              </Link>
+              <Link to="/agent-valuation">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Agent valuation</Button>
+              </Link>
+            </nav>
+          ) : (
+            <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
+              <Link to="/purchase">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+              </Link>
+              <Link to="/rent">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
+              </Link>
+              <Link to="/support-portal">
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Support Portal</Button>
+              </Link>
+            </nav>
+          )}
 
           <div className="flex items-center space-x-4">
             <Link to="/favorites" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
