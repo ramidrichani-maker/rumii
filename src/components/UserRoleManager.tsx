@@ -134,6 +134,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
 
   const getRoleDisplayName = (role: string) => {
     if (role === 'agency_manager') return 'Agency Manager';
+    if (role === 'customer_support') return 'Customer Support';
     return role.charAt(0).toUpperCase() + role.slice(1);
   };
 
