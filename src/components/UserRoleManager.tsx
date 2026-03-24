@@ -241,6 +241,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                         <SelectItem value="agent">Agent</SelectItem>
                         <SelectItem value="agency_manager">Agency Manager</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="customer_support">Customer Support</SelectItem>
                       </SelectContent>
                     </Select>
                     {(user.role === 'agent' || user.role === 'agency_manager') && (
