@@ -118,7 +118,21 @@ export const CustomerSupportChat = () => {
     }
 
     setConversationId(data.id);
-    setStatus("waiting");
+
+    // If agent was auto-assigned by the trigger, set active state immediately
+    if (data.agent_id && data.status === "active") {
+      setAgentId(data.agent_id);
+      setStatus("active");
+      // Fetch agent name
+      const { data: agentProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("user_id", data.agent_id)
+        .single();
+      if (agentProfile) setAgentName(agentProfile.full_name);
+    } else {
+      setStatus("waiting");
+    }
   };
 
   const sendMessage = async () => {
