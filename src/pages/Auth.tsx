@@ -236,12 +236,10 @@ const Auth = () => {
           setFormData(prev => ({ ...prev, password: '', confirmPassword: '', full_name: '', phone_number: '' }));
         } else {
           toast({
-            title: "Check your email!",
-            description: "We've sent a confirmation link to " + formData.email + ". Please verify your email before signing in.",
+            title: "Account created!",
+            description: "Welcome! You are now signed in.",
           });
-          setIsSignUp(false);
-          setShowEmailForm(true);
-          setFormData(prev => ({ ...prev, password: '', confirmPassword: '', full_name: '', phone_number: '' }));
+          navigate('/');
         }
       } else {
         const { error } = await signIn(formData.email, formData.password);
