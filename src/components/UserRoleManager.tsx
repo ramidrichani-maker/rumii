@@ -154,12 +154,12 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     setDeletingUser(userToDelete.id);
     
     try {
-      const { data, error } = await supabase.rpc('delete_user_account', {
-        _user_id: userToDelete.id,
-        _admin_id: (await supabase.auth.getUser()).data.user?.id
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { user_id: userToDelete.id }
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       toast({
         title: "Success",
