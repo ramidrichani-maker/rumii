@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { UserCog, Shield, User, Trash2, Search, Building2 } from "lucide-react";
+import { UserCog, Shield, User, Trash2, Search, Building2, Headphones } from "lucide-react";
 
 interface Agency {
   id: string;
