@@ -230,7 +230,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                   <div className="flex items-center gap-2">
                     <Select
                       value={user.role}
-                      onValueChange={(newRole) => handleRoleChange(user.user_id, newRole as 'user' | 'agent' | 'admin' | 'agency_manager')}
+                      onValueChange={(newRole) => handleRoleChange(user.user_id, newRole as 'user' | 'agent' | 'admin' | 'agency_manager' | 'customer_support')}
                       disabled={changingRoles.has(user.user_id)}
                     >
                       <SelectTrigger className="w-40">
