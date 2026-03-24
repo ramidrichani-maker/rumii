@@ -137,6 +137,49 @@ const Auth = () => {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!formData.email.trim()) {
+      toast({
+        title: "Email required",
+        description: "Enter your email first, then resend verification.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: formData.email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Could not resend",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Verification email sent",
+          description: `A new confirmation link was sent to ${formData.email}.`
+        });
+      }
+    } catch {
+      toast({
+        title: "Error",
+        description: "Could not resend verification right now. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -163,7 +206,7 @@ const Auth = () => {
           return;
         }
 
-        const { error } = await signUp(formData.email, formData.password, {
+        const { error, isExistingUser } = await signUp(formData.email, formData.password, {
           full_name: formData.full_name,
           phone_number: formData.phone_number || '',
           role: 'user'
@@ -183,6 +226,14 @@ const Auth = () => {
               variant: "destructive"
             });
           }
+        } else if (isExistingUser) {
+          toast({
+            title: "Account already exists",
+            description: "This email is already registered. Please sign in or resend verification.",
+          });
+          setIsSignUp(false);
+          setShowEmailForm(true);
+          setFormData(prev => ({ ...prev, password: '', confirmPassword: '', full_name: '', phone_number: '' }));
         } else {
           toast({
             title: "Check your email!",
@@ -371,14 +422,25 @@ const Auth = () => {
 
                   {!isSignUp && (
                     <div className="mt-2 text-center">
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="text-sm p-0 h-auto font-normal"
-                        onClick={() => setShowForgotPassword(true)}
-                      >
-                        Forgot password?
-                      </Button>
+                      <div className="flex flex-col items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-sm p-0 h-auto font-normal"
+                          onClick={() => setShowForgotPassword(true)}
+                        >
+                          Forgot password?
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-sm p-0 h-auto font-normal"
+                          onClick={handleResendVerification}
+                          disabled={isLoading}
+                        >
+                          Resend verification email
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </form>
