@@ -123,6 +123,8 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
         return 'destructive';
       case 'agency_manager':
         return 'default';
+      case 'customer_support':
+        return 'default';
       case 'agent':
         return 'secondary';
       default:
