@@ -35,7 +35,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     fetchAgencies();
   }, []);
 
-  const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin' | 'agency_manager') => {
+  const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin' | 'agency_manager' | 'customer_support') => {
     setChangingRoles(prev => new Set([...prev, userId]));
     
     try {
