@@ -110,6 +110,8 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
         return <Building2 className="w-4 h-4" />;
       case 'agent':
         return <UserCog className="w-4 h-4" />;
+      case 'customer_support':
+        return <Headphones className="w-4 h-4" />;
       default:
         return <User className="w-4 h-4" />;
     }
