@@ -168,36 +168,40 @@ export const Navbar = () => {
                         <span>Profile</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/request-photography" className="flex items-center">
-                        <Camera className="mr-2 h-4 w-4" />
-                        <span>Photography Service</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/investment-analytics" className="flex items-center">
-                        <BarChart3 className="mr-2 h-4 w-4" />
-                        <span>Investment Analytics</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/my-listings" className="flex items-center">
-                        <Home className="mr-2 h-4 w-4" />
-                        <span>My Listings</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/list-property" className="flex items-center">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        <span>List Property</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    {profile?.role === 'user' && <DropdownMenuItem asChild>
-                        <Link to="/my-viewings" className="flex items-center">
-                          <Settings className="mr-2 h-4 w-4" />
-                          <span>My Viewings</span>
-                        </Link>
-                      </DropdownMenuItem>}
+                    {profile?.role !== 'customer_support' && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/request-photography" className="flex items-center">
+                            <Camera className="mr-2 h-4 w-4" />
+                            <span>Photography Service</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/investment-analytics" className="flex items-center">
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            <span>Investment Analytics</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/my-listings" className="flex items-center">
+                            <Home className="mr-2 h-4 w-4" />
+                            <span>My Listings</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/list-property" className="flex items-center">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            <span>List Property</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        {profile?.role === 'user' && <DropdownMenuItem asChild>
+                            <Link to="/my-viewings" className="flex items-center">
+                              <Settings className="mr-2 h-4 w-4" />
+                              <span>My Viewings</span>
+                            </Link>
+                          </DropdownMenuItem>}
+                      </>
+                    )}
                     {profile?.role === 'admin' && <DropdownMenuItem asChild>
                         <Link to="/admin" className="flex items-center">
                           <Shield className="mr-2 h-4 w-4" />
