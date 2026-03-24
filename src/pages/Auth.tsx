@@ -185,10 +185,12 @@ const Auth = () => {
           }
         } else {
           toast({
-            title: "Success!",
-            description: "Account created successfully. Please check your email for verification.",
+            title: "Check your email!",
+            description: "We've sent a confirmation link to " + formData.email + ". Please verify your email before signing in.",
           });
-          navigate('/');
+          setIsSignUp(false);
+          setShowEmailForm(true);
+          setFormData(prev => ({ ...prev, password: '', confirmPassword: '', full_name: '', phone_number: '' }));
         }
       } else {
         const { error } = await signIn(formData.email, formData.password);
