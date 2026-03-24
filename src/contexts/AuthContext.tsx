@@ -18,7 +18,7 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData: { full_name: string; phone_number: string; role: string }) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: { full_name: string; phone_number: string; role: string }) => Promise<{ error: any; isExistingUser: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
@@ -113,7 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, userData: { full_name: string; phone_number: string; role: string }) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -121,7 +121,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: userData
       }
     });
-    return { error };
+
+    const isExistingUser =
+      !error &&
+      !!data.user &&
+      Array.isArray(data.user.identities) &&
+      data.user.identities.length === 0;
+
+    return { error, isExistingUser };
   };
 
   const signIn = async (email: string, password: string) => {
