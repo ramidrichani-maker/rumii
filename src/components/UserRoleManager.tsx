@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { UserCog, Shield, User, Trash2, Search, Building2 } from "lucide-react";
+import { UserCog, Shield, User, Trash2, Search, Building2, Headphones } from "lucide-react";
 
 interface Agency {
   id: string;
@@ -35,7 +35,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
     fetchAgencies();
   }, []);
 
-  const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin' | 'agency_manager') => {
+  const handleRoleChange = async (userId: string, newRole: 'user' | 'agent' | 'admin' | 'agency_manager' | 'customer_support') => {
     setChangingRoles(prev => new Set([...prev, userId]));
     
     try {
@@ -110,6 +110,8 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
         return <Building2 className="w-4 h-4" />;
       case 'agent':
         return <UserCog className="w-4 h-4" />;
+      case 'customer_support':
+        return <Headphones className="w-4 h-4" />;
       default:
         return <User className="w-4 h-4" />;
     }
@@ -121,6 +123,8 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
         return 'destructive';
       case 'agency_manager':
         return 'default';
+      case 'customer_support':
+        return 'default';
       case 'agent':
         return 'secondary';
       default:
@@ -130,6 +134,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
 
   const getRoleDisplayName = (role: string) => {
     if (role === 'agency_manager') return 'Agency Manager';
+    if (role === 'customer_support') return 'Customer Support';
     return role.charAt(0).toUpperCase() + role.slice(1);
   };
 
@@ -230,7 +235,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                   <div className="flex items-center gap-2">
                     <Select
                       value={user.role}
-                      onValueChange={(newRole) => handleRoleChange(user.user_id, newRole as 'user' | 'agent' | 'admin' | 'agency_manager')}
+                      onValueChange={(newRole) => handleRoleChange(user.user_id, newRole as 'user' | 'agent' | 'admin' | 'agency_manager' | 'customer_support')}
                       disabled={changingRoles.has(user.user_id)}
                     >
                       <SelectTrigger className="w-40">
@@ -241,6 +246,7 @@ const UserRoleManager = ({ users, onUserUpdated }: UserRoleManagerProps) => {
                         <SelectItem value="agent">Agent</SelectItem>
                         <SelectItem value="agency_manager">Agency Manager</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="customer_support">Customer Support</SelectItem>
                       </SelectContent>
                     </Select>
                     {(user.role === 'agent' || user.role === 'agency_manager') && (
