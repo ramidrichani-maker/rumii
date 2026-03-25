@@ -169,6 +169,16 @@ const Auth = () => {
           title: "Verification email sent",
           description: `A new confirmation link was sent to ${formData.email}.`
         });
+        setResendCooldown(30);
+        const interval = setInterval(() => {
+          setResendCooldown(prev => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
       }
     } catch {
       toast({
