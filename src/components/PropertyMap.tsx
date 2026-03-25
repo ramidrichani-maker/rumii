@@ -269,6 +269,9 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           <p className="text-sm text-muted-foreground mt-2 text-center">
             Click anywhere on the map to set the property location, then drag the pin to fine-tune
           </p>
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 text-center font-medium">
+            🔒 For privacy, the exact location will not be shown to users. Only the general city area will be displayed on public maps.
+          </p>
         </CardContent>
       </Card>
     </div>

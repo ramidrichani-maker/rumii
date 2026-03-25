@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import AgentContactBox from "@/components/AgentContactBox";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { getCityCenter } from "@/utils/cityCenter";
 
 interface Property {
   id: string;
@@ -51,6 +52,7 @@ const PropertyDetail = () => {
   const [showGallery, setShowGallery] = useState(false);
   const [showFloorPlan, setShowFloorPlan] = useState(false);
   const [showMapOverlay, setShowMapOverlay] = useState(false);
+  const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const miniMapRef = useRef<HTMLDivElement>(null);
   const miniMapInstance = useRef<L.Map | null>(null);
@@ -85,6 +87,14 @@ const PropertyDetail = () => {
       );
     }
   }, [property?.description]);
+
+  // Fetch city center coordinates for public map display (privacy: no exact location)
+  useEffect(() => {
+    if (!property?.city) return;
+    getCityCenter(property.city).then((coords) => {
+      if (coords) setCityCoords(coords);
+    });
+  }, [property?.city]);
 
   useEffect(() => {
     if (!property?.latitude || !property?.longitude) return;
@@ -121,7 +131,7 @@ const PropertyDetail = () => {
   }, [property?.latitude, property?.longitude]);
 
   useEffect(() => {
-    if (!miniMapRef.current || !property?.latitude || !property?.longitude) return;
+    if (!miniMapRef.current || !cityCoords) return;
     if (miniMapInstance.current) {
       miniMapInstance.current.remove();
       miniMapInstance.current = null;
@@ -134,7 +144,7 @@ const PropertyDetail = () => {
       doubleClickZoom: false,
       touchZoom: false,
       attributionControl: false,
-    }).setView([property.latitude, property.longitude], 15);
+    }).setView([cityCoords.lat, cityCoords.lng], 13);
 
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
@@ -149,7 +159,7 @@ const PropertyDetail = () => {
       iconAnchor: [12, 41],
     });
 
-    L.marker([property.latitude, property.longitude], { icon }).addTo(map);
+    L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
     miniMapInstance.current = map;
 
     return () => {
@@ -158,10 +168,10 @@ const PropertyDetail = () => {
         miniMapInstance.current = null;
       }
     };
-  }, [property?.latitude, property?.longitude]);
+  }, [cityCoords]);
 
   useEffect(() => {
-    if (!mapExpanded || !expandedMapRef.current || !property?.latitude || !property?.longitude) return;
+    if (!mapExpanded || !expandedMapRef.current || !cityCoords) return;
 
     const timer = setTimeout(() => {
       if (expandedMapInstance.current) {
@@ -170,8 +180,8 @@ const PropertyDetail = () => {
       }
 
       const map = L.map(expandedMapRef.current!, { attributionControl: false }).setView(
-        [property.latitude!, property.longitude!],
-        15
+        [cityCoords.lat, cityCoords.lng],
+        13
       );
 
       const streetLayer = L.tileLayer(
@@ -197,7 +207,7 @@ const PropertyDetail = () => {
         iconAnchor: [12, 41],
       });
 
-      L.marker([property.latitude!, property.longitude!], { icon }).addTo(map);
+      L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
       expandedMapInstance.current = map;
 
       (map as any)._streetLayer = streetLayer;
@@ -211,10 +221,10 @@ const PropertyDetail = () => {
         expandedMapInstance.current = null;
       }
     };
-  }, [mapExpanded, property?.latitude, property?.longitude, satelliteView]);
+  }, [mapExpanded, cityCoords, satelliteView]);
 
   useEffect(() => {
-    if (!showMapOverlay || !overlayMapRef.current || !property?.latitude || !property?.longitude) return;
+    if (!showMapOverlay || !overlayMapRef.current || !cityCoords) return;
 
     const timer = setTimeout(() => {
       if (overlayMapInstance.current) {
@@ -223,8 +233,8 @@ const PropertyDetail = () => {
       }
 
       const map = L.map(overlayMapRef.current!, { attributionControl: false }).setView(
-        [property.latitude!, property.longitude!],
-        15
+        [cityCoords.lat, cityCoords.lng],
+        13
       );
 
       L.tileLayer(
@@ -240,7 +250,7 @@ const PropertyDetail = () => {
         iconAnchor: [12, 41],
       });
 
-      L.marker([property.latitude!, property.longitude!], { icon }).addTo(map);
+      L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
       overlayMapInstance.current = map;
     }, 50);
 
@@ -251,7 +261,7 @@ const PropertyDetail = () => {
         overlayMapInstance.current = null;
       }
     };
-  }, [showMapOverlay, property?.latitude, property?.longitude]);
+  }, [showMapOverlay, cityCoords]);
 
   const imageCount = property?.images?.length || 0;
   const carousel = useSwipeCarousel(imageCount);
@@ -401,7 +411,7 @@ const PropertyDetail = () => {
             )}
 
             {/* Map button */}
-            {property.latitude && property.longitude && (
+            {cityCoords && (
               <button
                 onClick={() => setShowMapOverlay(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
@@ -481,7 +491,7 @@ const PropertyDetail = () => {
         </div>
 
         {/* Local area information */}
-        {property.latitude && property.longitude && (
+        {cityCoords && (
           <div className="mt-10">
             <h2 className="text-xl font-semibold text-foreground mb-4">
               Local area information

@@ -8,6 +8,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import { getCityCenter } from '@/utils/cityCenter';
 
 interface Property {
   id: string;
@@ -172,7 +173,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     };
   }, []);
 
-  // Update markers when properties change
+  // Update markers when properties change — use city center for privacy
   useEffect(() => {
     if (!leafletMapRef.current || !mapInitialized) return;
 
@@ -182,24 +183,41 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
 
     if (properties.length === 0) return;
 
-    try {
-      const propertyIcon = L.icon({
-        iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        `),
-        iconSize: [20, 20],
-        iconAnchor: [10, 20],
-        popupAnchor: [0, -20],
-      });
+    const addMarkers = async () => {
+      try {
+        const propertyIcon = L.icon({
+          iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          `),
+          iconSize: [20, 20],
+          iconAnchor: [10, 20],
+          popupAnchor: [0, -20],
+        });
 
-      const bounds = L.latLngBounds([]);
+        const bounds = L.latLngBounds([]);
 
-      properties.forEach(property => {
-        if (property.latitude && property.longitude) {
-          const marker = L.marker([property.latitude, property.longitude], { icon: propertyIcon })
+        // Batch geocode unique cities
+        const uniqueCities = [...new Set(properties.map(p => p.city).filter(Boolean))];
+        const cityCenters: Record<string, { lat: number; lng: number }> = {};
+        await Promise.all(uniqueCities.map(async (city) => {
+          const center = await getCityCenter(city);
+          if (center) cityCenters[city] = center;
+        }));
+
+        properties.forEach(property => {
+          const center = cityCenters[property.city];
+          if (!center) return;
+
+          // Add small random offset so markers for same city don't stack exactly
+          const jitterLat = (Math.random() - 0.5) * 0.008;
+          const jitterLng = (Math.random() - 0.5) * 0.008;
+          const markerLat = center.lat + jitterLat;
+          const markerLng = center.lng + jitterLng;
+
+          const marker = L.marker([markerLat, markerLng], { icon: propertyIcon })
             .addTo(leafletMapRef.current!);
 
           // Create rich popup content
@@ -323,18 +341,20 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           });
 
           markersRef.current.push(marker);
-          bounds.extend([property.latitude, property.longitude]);
+          bounds.extend([markerLat, markerLng]);
+        });
+
+        // Fit map to show all properties — but NOT while user is actively drawing
+        if (bounds.isValid() && !isDrawingMode && !hasDrawnArea) {
+          leafletMapRef.current!.fitBounds(bounds, { padding: [10, 10] });
         }
-      });
 
-      // Fit map to show all properties — but NOT while user is actively drawing
-      if (bounds.isValid() && !isDrawingMode && !hasDrawnArea) {
-        leafletMapRef.current.fitBounds(bounds, { padding: [10, 10] });
+      } catch (error) {
+        console.error('Error updating property markers:', error);
       }
+    };
 
-    } catch (error) {
-      console.error('Error updating property markers:', error);
-    }
+    addMarkers();
   }, [properties, mapInitialized, onPropertySelect, isDrawingMode, hasDrawnArea]);
 
   // Handle map resize when expanded or container size changes
