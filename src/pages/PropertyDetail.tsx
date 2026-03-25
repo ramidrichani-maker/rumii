@@ -171,7 +171,7 @@ const PropertyDetail = () => {
   }, [cityCoords]);
 
   useEffect(() => {
-    if (!mapExpanded || !expandedMapRef.current || !property?.latitude || !property?.longitude) return;
+    if (!mapExpanded || !expandedMapRef.current || !cityCoords) return;
 
     const timer = setTimeout(() => {
       if (expandedMapInstance.current) {
@@ -180,8 +180,8 @@ const PropertyDetail = () => {
       }
 
       const map = L.map(expandedMapRef.current!, { attributionControl: false }).setView(
-        [property.latitude!, property.longitude!],
-        15
+        [cityCoords.lat, cityCoords.lng],
+        13
       );
 
       const streetLayer = L.tileLayer(
@@ -207,7 +207,7 @@ const PropertyDetail = () => {
         iconAnchor: [12, 41],
       });
 
-      L.marker([property.latitude!, property.longitude!], { icon }).addTo(map);
+      L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
       expandedMapInstance.current = map;
 
       (map as any)._streetLayer = streetLayer;
@@ -221,7 +221,7 @@ const PropertyDetail = () => {
         expandedMapInstance.current = null;
       }
     };
-  }, [mapExpanded, property?.latitude, property?.longitude, satelliteView]);
+  }, [mapExpanded, cityCoords, satelliteView]);
 
   useEffect(() => {
     if (!showMapOverlay || !overlayMapRef.current || !property?.latitude || !property?.longitude) return;
