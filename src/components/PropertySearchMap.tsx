@@ -86,7 +86,7 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
     };
   }, []);
 
-  // Update markers when properties change
+  // Update markers when properties change — use city center for privacy
   useEffect(() => {
     if (!leafletMapRef.current || !mapInitialized) return;
 
@@ -96,24 +96,41 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
 
     if (properties.length === 0) return;
 
-    try {
-      const propertyIcon = L.icon({
-        iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        `),
-        iconSize: [24, 24],
-        iconAnchor: [12, 24],
-        popupAnchor: [0, -24],
-      });
+    const addMarkers = async () => {
+      try {
+        const propertyIcon = L.icon({
+          iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          `),
+          iconSize: [24, 24],
+          iconAnchor: [12, 24],
+          popupAnchor: [0, -24],
+        });
 
-      const bounds = L.latLngBounds([]);
+        // Batch geocode unique cities
+        const uniqueCities = [...new Set(properties.map(p => p.city).filter(Boolean))];
+        const cityCenters: Record<string, { lat: number; lng: number }> = {};
+        await Promise.all(uniqueCities.map(async (city) => {
+          const center = await getCityCenter(city);
+          if (center) cityCenters[city] = center;
+        }));
 
-      properties.forEach(property => {
-        if (property.latitude && property.longitude) {
-          const marker = L.marker([property.latitude, property.longitude], { icon: propertyIcon })
+        const bounds = L.latLngBounds([]);
+
+        properties.forEach(property => {
+          const center = cityCenters[property.city];
+          if (!center) return;
+
+          // Add small random offset so markers for same city don't stack exactly
+          const jitterLat = (Math.random() - 0.5) * 0.008;
+          const jitterLng = (Math.random() - 0.5) * 0.008;
+          const markerLat = center.lat + jitterLat;
+          const markerLng = center.lng + jitterLng;
+
+          const marker = L.marker([markerLat, markerLng], { icon: propertyIcon })
             .addTo(leafletMapRef.current!);
 
           // Create popup content
@@ -140,18 +157,20 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
           });
 
           markersRef.current.push(marker);
-          bounds.extend([property.latitude, property.longitude]);
+          bounds.extend([markerLat, markerLng]);
+        });
+
+        // Fit map to show all properties
+        if (bounds.isValid()) {
+          leafletMapRef.current!.fitBounds(bounds, { padding: [20, 20] });
         }
-      });
 
-      // Fit map to show all properties
-      if (bounds.isValid()) {
-        leafletMapRef.current.fitBounds(bounds, { padding: [20, 20] });
+      } catch (error) {
+        console.error('Error updating property markers:', error);
       }
+    };
 
-    } catch (error) {
-      console.error('Error updating property markers:', error);
-    }
+    addMarkers();
   }, [properties, mapInitialized, onPropertySelect]);
 
   return (
