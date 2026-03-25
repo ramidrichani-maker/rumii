@@ -179,6 +179,7 @@ const Auth = () => {
           title: "Verification email sent",
           description: `A new confirmation link was sent to ${formData.email}.`
         });
+        setResendAttempts(prev => prev + 1);
         setResendCooldown(30);
         const interval = setInterval(() => {
           setResendCooldown(prev => {
