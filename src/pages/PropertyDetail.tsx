@@ -241,7 +241,7 @@ const PropertyDetail = () => {
 
       const map = L.map(overlayMapRef.current!, { attributionControl: false }).setView(
         [cityCoords.lat, cityCoords.lng],
-        13
+        isAdmin ? 15 : 13
       );
 
       L.tileLayer(
