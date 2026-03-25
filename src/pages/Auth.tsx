@@ -465,9 +465,11 @@ const Auth = () => {
                         onClick={handleResendVerification}
                         disabled={isLoading || resendCooldown > 0 || resendAttempts >= 3}
                       >
-                        {resendCooldown > 0
-                          ? `Resend available in ${resendCooldown}s`
-                          : 'Resend verification email'}
+                        {resendAttempts >= 3
+                          ? 'Max attempts reached'
+                          : resendCooldown > 0
+                            ? `Resend available in ${resendCooldown}s`
+                            : `Resend verification email (${3 - resendAttempts} left)`}
                       </Button>
                     </div>
                   )}
