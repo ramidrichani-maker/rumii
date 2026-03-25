@@ -491,7 +491,7 @@ const PropertyDetail = () => {
         </div>
 
         {/* Local area information */}
-        {property.latitude && property.longitude && (
+        {cityCoords && (
           <div className="mt-10">
             <h2 className="text-xl font-semibold text-foreground mb-4">
               Local area information
