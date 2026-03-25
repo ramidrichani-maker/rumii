@@ -680,6 +680,7 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             price: property.price,
             listing_type: property.listing_type
           }}
+          agencyId={property.agency_id}
         />
       )}
 

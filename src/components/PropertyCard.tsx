@@ -354,6 +354,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
             price: property.price,
             listing_type: property.listing_type,
           }}
+          agencyId={property.agency_id}
         />
       )}
     </Card>

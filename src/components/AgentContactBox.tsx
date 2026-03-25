@@ -139,6 +139,7 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
             price: propertyPrice,
             listing_type: listingType,
           }}
+          agencyId={agencyId}
         />
       )}
     </div>
