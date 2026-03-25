@@ -411,7 +411,7 @@ const PropertyDetail = () => {
             )}
 
             {/* Map button */}
-            {property.latitude && property.longitude && (
+            {cityCoords && (
               <button
                 onClick={() => setShowMapOverlay(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
