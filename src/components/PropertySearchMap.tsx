@@ -4,6 +4,7 @@ import { MapPin, Loader2 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { getCityCenter } from '@/utils/cityCenter';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Property {
   id: string;
