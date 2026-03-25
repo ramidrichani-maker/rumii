@@ -188,7 +188,7 @@ const PropertyDetail = () => {
 
       const map = L.map(expandedMapRef.current!, { attributionControl: false }).setView(
         [cityCoords.lat, cityCoords.lng],
-        13
+        isAdmin ? 15 : 13
       );
 
       const streetLayer = L.tileLayer(
