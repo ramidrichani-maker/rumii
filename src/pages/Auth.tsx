@@ -140,6 +140,15 @@ const Auth = () => {
   };
 
   const handleResendVerification = async () => {
+    if (resendAttempts >= 3) {
+      toast({
+        title: "Limit reached",
+        description: "You've used all 3 resend attempts. Please check your spam folder or try again later.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!formData.email.trim()) {
       toast({
         title: "Email required",
