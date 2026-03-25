@@ -88,6 +88,14 @@ const PropertyDetail = () => {
     }
   }, [property?.description]);
 
+  // Fetch city center coordinates for public map display (privacy: no exact location)
+  useEffect(() => {
+    if (!property?.city) return;
+    getCityCenter(property.city).then((coords) => {
+      if (coords) setCityCoords(coords);
+    });
+  }, [property?.city]);
+
   useEffect(() => {
     if (!property?.latitude || !property?.longitude) return;
     const fetchSchools = async () => {
@@ -123,7 +131,7 @@ const PropertyDetail = () => {
   }, [property?.latitude, property?.longitude]);
 
   useEffect(() => {
-    if (!miniMapRef.current || !property?.latitude || !property?.longitude) return;
+    if (!miniMapRef.current || !cityCoords) return;
     if (miniMapInstance.current) {
       miniMapInstance.current.remove();
       miniMapInstance.current = null;
@@ -136,7 +144,7 @@ const PropertyDetail = () => {
       doubleClickZoom: false,
       touchZoom: false,
       attributionControl: false,
-    }).setView([property.latitude, property.longitude], 15);
+    }).setView([cityCoords.lat, cityCoords.lng], 13);
 
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
@@ -151,7 +159,7 @@ const PropertyDetail = () => {
       iconAnchor: [12, 41],
     });
 
-    L.marker([property.latitude, property.longitude], { icon }).addTo(map);
+    L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
     miniMapInstance.current = map;
 
     return () => {
@@ -160,7 +168,7 @@ const PropertyDetail = () => {
         miniMapInstance.current = null;
       }
     };
-  }, [property?.latitude, property?.longitude]);
+  }, [cityCoords]);
 
   useEffect(() => {
     if (!mapExpanded || !expandedMapRef.current || !property?.latitude || !property?.longitude) return;
