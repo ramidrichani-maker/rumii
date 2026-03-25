@@ -32,6 +32,8 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
   const [agentId, setAgentId] = useState<string | null>(null);
   const [busySlots, setBusySlots] = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [existingBooking, setExistingBooking] = useState(false);
+  const [checkingExisting, setCheckingExisting] = useState(false);
 
   const timeSlots = [
     "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
