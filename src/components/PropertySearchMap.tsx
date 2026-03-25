@@ -33,6 +33,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
   className = "",
   onPropertySelect
 }) => {
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
