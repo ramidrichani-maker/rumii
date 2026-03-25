@@ -91,13 +91,17 @@ const PropertyDetail = () => {
     }
   }, [property?.description]);
 
-  // Fetch city center coordinates for public map display (privacy: no exact location)
+  // Admins see exact location; regular users see city center for privacy
   useEffect(() => {
+    if (isAdmin && property?.latitude && property?.longitude) {
+      setCityCoords({ lat: property.latitude, lng: property.longitude });
+      return;
+    }
     if (!property?.city) return;
     getCityCenter(property.city).then((coords) => {
       if (coords) setCityCoords(coords);
     });
-  }, [property?.city]);
+  }, [property?.city, property?.latitude, property?.longitude, isAdmin]);
 
   useEffect(() => {
     if (!property?.latitude || !property?.longitude) return;
