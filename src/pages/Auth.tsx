@@ -463,7 +463,7 @@ const Auth = () => {
                         variant="link"
                         className="text-sm p-0 h-auto font-normal"
                         onClick={handleResendVerification}
-                        disabled={isLoading || resendCooldown > 0}
+                        disabled={isLoading || resendCooldown > 0 || resendAttempts >= 3}
                       >
                         {resendCooldown > 0
                           ? `Resend available in ${resendCooldown}s`
