@@ -15,6 +15,7 @@ const Auth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -168,6 +169,16 @@ const Auth = () => {
           title: "Verification email sent",
           description: `A new confirmation link was sent to ${formData.email}.`
         });
+        setResendCooldown(30);
+        const interval = setInterval(() => {
+          setResendCooldown(prev => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
       }
     } catch {
       toast({
@@ -440,9 +451,11 @@ const Auth = () => {
                         variant="link"
                         className="text-sm p-0 h-auto font-normal"
                         onClick={handleResendVerification}
-                        disabled={isLoading}
+                        disabled={isLoading || resendCooldown > 0}
                       >
-                        Resend verification email
+                        {resendCooldown > 0
+                          ? `Resend available in ${resendCooldown}s`
+                          : 'Resend verification email'}
                       </Button>
                     </div>
                   )}
