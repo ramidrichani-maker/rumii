@@ -52,6 +52,7 @@ const PropertyDetail = () => {
   const [showGallery, setShowGallery] = useState(false);
   const [showFloorPlan, setShowFloorPlan] = useState(false);
   const [showMapOverlay, setShowMapOverlay] = useState(false);
+  const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const miniMapRef = useRef<HTMLDivElement>(null);
   const miniMapInstance = useRef<L.Map | null>(null);
