@@ -224,7 +224,7 @@ const PropertyDetail = () => {
   }, [mapExpanded, cityCoords, satelliteView]);
 
   useEffect(() => {
-    if (!showMapOverlay || !overlayMapRef.current || !property?.latitude || !property?.longitude) return;
+    if (!showMapOverlay || !overlayMapRef.current || !cityCoords) return;
 
     const timer = setTimeout(() => {
       if (overlayMapInstance.current) {
@@ -233,8 +233,8 @@ const PropertyDetail = () => {
       }
 
       const map = L.map(overlayMapRef.current!, { attributionControl: false }).setView(
-        [property.latitude!, property.longitude!],
-        15
+        [cityCoords.lat, cityCoords.lng],
+        13
       );
 
       L.tileLayer(
@@ -250,7 +250,7 @@ const PropertyDetail = () => {
         iconAnchor: [12, 41],
       });
 
-      L.marker([property.latitude!, property.longitude!], { icon }).addTo(map);
+      L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
       overlayMapInstance.current = map;
     }, 50);
 
@@ -261,7 +261,7 @@ const PropertyDetail = () => {
         overlayMapInstance.current = null;
       }
     };
-  }, [showMapOverlay, property?.latitude, property?.longitude]);
+  }, [showMapOverlay, cityCoords]);
 
   const imageCount = property?.images?.length || 0;
   const carousel = useSwipeCarousel(imageCount);
