@@ -4,6 +4,7 @@ import { MapPin, Loader2 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { getCityCenter } from '@/utils/cityCenter';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Property {
   id: string;
@@ -32,6 +33,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
   className = "",
   onPropertySelect
 }) => {
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -110,25 +113,30 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
           popupAnchor: [0, -24],
         });
 
-        // Batch geocode unique cities
-        const uniqueCities = [...new Set(properties.map(p => p.city).filter(Boolean))];
-        const cityCenters: Record<string, { lat: number; lng: number }> = {};
-        await Promise.all(uniqueCities.map(async (city) => {
-          const center = await getCityCenter(city);
-          if (center) cityCenters[city] = center;
-        }));
+        // Admins see exact location; regular users see city center
+        let cityCenters: Record<string, { lat: number; lng: number }> = {};
+        if (!isAdmin) {
+          const uniqueCities = [...new Set(properties.map(p => p.city).filter(Boolean))];
+          await Promise.all(uniqueCities.map(async (city) => {
+            const center = await getCityCenter(city);
+            if (center) cityCenters[city] = center;
+          }));
+        }
 
         const bounds = L.latLngBounds([]);
 
         properties.forEach(property => {
-          const center = cityCenters[property.city];
-          if (!center) return;
+          let markerLat: number, markerLng: number;
 
-          // Add small random offset so markers for same city don't stack exactly
-          const jitterLat = (Math.random() - 0.5) * 0.008;
-          const jitterLng = (Math.random() - 0.5) * 0.008;
-          const markerLat = center.lat + jitterLat;
-          const markerLng = center.lng + jitterLng;
+          if (isAdmin && property.latitude && property.longitude) {
+            markerLat = property.latitude;
+            markerLng = property.longitude;
+          } else {
+            const center = cityCenters[property.city];
+            if (!center) return;
+            markerLat = center.lat + (Math.random() - 0.5) * 0.008;
+            markerLng = center.lng + (Math.random() - 0.5) * 0.008;
+          }
 
           const marker = L.marker([markerLat, markerLng], { icon: propertyIcon })
             .addTo(leafletMapRef.current!);

@@ -8,6 +8,7 @@ import AgentContactBox from "@/components/AgentContactBox";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getCityCenter } from "@/utils/cityCenter";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Property {
   id: string;
@@ -41,6 +42,8 @@ interface NearbySchool {
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -88,13 +91,17 @@ const PropertyDetail = () => {
     }
   }, [property?.description]);
 
-  // Fetch city center coordinates for public map display (privacy: no exact location)
+  // Admins see exact location; regular users see city center for privacy
   useEffect(() => {
+    if (isAdmin && property?.latitude && property?.longitude) {
+      setCityCoords({ lat: property.latitude, lng: property.longitude });
+      return;
+    }
     if (!property?.city) return;
     getCityCenter(property.city).then((coords) => {
       if (coords) setCityCoords(coords);
     });
-  }, [property?.city]);
+  }, [property?.city, property?.latitude, property?.longitude, isAdmin]);
 
   useEffect(() => {
     if (!property?.latitude || !property?.longitude) return;
@@ -144,7 +151,7 @@ const PropertyDetail = () => {
       doubleClickZoom: false,
       touchZoom: false,
       attributionControl: false,
-    }).setView([cityCoords.lat, cityCoords.lng], 13);
+    }).setView([cityCoords.lat, cityCoords.lng], isAdmin ? 15 : 13);
 
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
@@ -181,7 +188,7 @@ const PropertyDetail = () => {
 
       const map = L.map(expandedMapRef.current!, { attributionControl: false }).setView(
         [cityCoords.lat, cityCoords.lng],
-        13
+        isAdmin ? 15 : 13
       );
 
       const streetLayer = L.tileLayer(
@@ -234,7 +241,7 @@ const PropertyDetail = () => {
 
       const map = L.map(overlayMapRef.current!, { attributionControl: false }).setView(
         [cityCoords.lat, cityCoords.lng],
-        13
+        isAdmin ? 15 : 13
       );
 
       L.tileLayer(
