@@ -151,7 +151,7 @@ const PropertyDetail = () => {
       doubleClickZoom: false,
       touchZoom: false,
       attributionControl: false,
-    }).setView([cityCoords.lat, cityCoords.lng], 13);
+    }).setView([cityCoords.lat, cityCoords.lng], isAdmin ? 15 : 13);
 
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
