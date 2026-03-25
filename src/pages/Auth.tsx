@@ -16,6 +16,7 @@ const Auth = () => {
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendAttempts, setResendAttempts] = useState(0);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -139,6 +140,15 @@ const Auth = () => {
   };
 
   const handleResendVerification = async () => {
+    if (resendAttempts >= 3) {
+      toast({
+        title: "Limit reached",
+        description: "You've used all 3 resend attempts. Please check your spam folder or try again later.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!formData.email.trim()) {
       toast({
         title: "Email required",
@@ -169,6 +179,7 @@ const Auth = () => {
           title: "Verification email sent",
           description: `A new confirmation link was sent to ${formData.email}.`
         });
+        setResendAttempts(prev => prev + 1);
         setResendCooldown(30);
         const interval = setInterval(() => {
           setResendCooldown(prev => {
@@ -452,11 +463,13 @@ const Auth = () => {
                         variant="link"
                         className="text-sm p-0 h-auto font-normal"
                         onClick={handleResendVerification}
-                        disabled={isLoading || resendCooldown > 0}
+                        disabled={isLoading || resendCooldown > 0 || resendAttempts >= 3}
                       >
-                        {resendCooldown > 0
-                          ? `Resend available in ${resendCooldown}s`
-                          : 'Resend verification email'}
+                        {resendAttempts >= 3
+                          ? 'Max attempts reached'
+                          : resendCooldown > 0
+                            ? `Resend available in ${resendCooldown}s`
+                            : `Resend verification email (${3 - resendAttempts} left)`}
                       </Button>
                     </div>
                   )}
