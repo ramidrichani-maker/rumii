@@ -422,25 +422,28 @@ const Auth = () => {
 
                   {!isSignUp && (
                     <div className="mt-2 text-center">
-                      <div className="flex flex-col items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="link"
-                          className="text-sm p-0 h-auto font-normal"
-                          onClick={() => setShowForgotPassword(true)}
-                        >
-                          Forgot password?
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="link"
-                          className="text-sm p-0 h-auto font-normal"
-                          onClick={handleResendVerification}
-                          disabled={isLoading}
-                        >
-                          Resend verification email
-                        </Button>
-                      </div>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="text-sm p-0 h-auto font-normal"
+                        onClick={() => setShowForgotPassword(true)}
+                      >
+                        Forgot password?
+                      </Button>
+                    </div>
+                  )}
+
+                  {isSignUp && (
+                    <div className="mt-2 text-center">
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="text-sm p-0 h-auto font-normal"
+                        onClick={handleResendVerification}
+                        disabled={isLoading}
+                      >
+                        Resend verification email
+                      </Button>
                     </div>
                   )}
                 </form>
