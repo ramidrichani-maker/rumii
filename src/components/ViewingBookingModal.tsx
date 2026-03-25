@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Clock, Calendar as CalendarIcon } from "lucide-react";
+import { Clock, Calendar as CalendarIcon, Mail, Phone } from "lucide-react";
 import { format, addDays, isBefore, startOfToday } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,9 +19,10 @@ interface ViewingBookingModalProps {
     price: number;
     listing_type: string;
   };
+  agencyId?: string | null;
 }
 
-const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalProps) => {
+const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBookingModalProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -34,10 +35,33 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [existingBooking, setExistingBooking] = useState(false);
   const [checkingExisting, setCheckingExisting] = useState(false);
+  const [isOracleEstates, setIsOracleEstates] = useState<boolean | null>(null);
+  const [checkingAgency, setCheckingAgency] = useState(true);
 
   const timeSlots = [
     "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
   ];
+
+  // Check if agency is Oracle Estates
+  useEffect(() => {
+    if (!isOpen) return;
+    const checkAgency = async () => {
+      setCheckingAgency(true);
+      if (!agencyId) {
+        setIsOracleEstates(false);
+        setCheckingAgency(false);
+        return;
+      }
+      const { data } = await supabase
+        .from('agencies')
+        .select('name')
+        .eq('id', agencyId)
+        .single();
+      setIsOracleEstates(data?.name?.toLowerCase() === 'oracle estates');
+      setCheckingAgency(false);
+    };
+    checkAgency();
+  }, [isOpen, agencyId]);
 
   // Fetch assigned agent and check for existing booking
   useEffect(() => {
@@ -75,7 +99,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
       setBusySlots([]);
       return;
     }
-    setSelectedTime(""); // Reset time when date changes
+    setSelectedTime("");
     const fetchBusySlots = async () => {
       setLoadingSlots(true);
       try {
@@ -104,29 +128,61 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
     return `${displayHour}:${mins} ${suffix}`;
   };
 
-  const handleBookViewing = async () => {
-    if (!selectedDate || !selectedTime || !user) {
-      toast({
-        title: "Missing Information",
-        description: "Please select both date and time for your viewing",
-        variant: "destructive"
-      });
+  // Simple viewing request for non-Oracle properties
+  const handleSimpleRequest = async () => {
+    if (!user) {
+      toast({ title: "Sign in required", description: "Please sign in to request a viewing", variant: "destructive" });
       return;
     }
-
     if (!confirmByEmail && !confirmByPhone) {
-      toast({
-        title: "Missing Confirmation Method",
-        description: "Please select at least one confirmation method",
-        variant: "destructive"
-      });
+      toast({ title: "Missing Contact Method", description: "Please select how you'd like to be contacted", variant: "destructive" });
       return;
     }
 
     setLoading(true);
-
     try {
-      const { data: existingBooking, error: checkError } = await supabase
+      const confirmMethods = [];
+      if (confirmByEmail) confirmMethods.push('email');
+      if (confirmByPhone) confirmMethods.push('phone');
+
+      const { error } = await supabase
+        .from('property_viewings')
+        .insert({
+          property_id: property.id,
+          user_id: user.id,
+          viewing_date: format(new Date(), 'yyyy-MM-dd'),
+          viewing_time: '00:00',
+          status: 'pending',
+          notes: `Contact preference: ${confirmMethods.join(', ')} (no date/time selected - external agency)`
+        });
+
+      if (error) throw error;
+
+      toast({ title: "Viewing Requested!", description: "Your viewing request has been submitted. The agent will contact you to arrange a date and time." });
+      onClose();
+      setConfirmByEmail(false);
+      setConfirmByPhone(false);
+    } catch (error) {
+      console.error('Error requesting viewing:', error);
+      toast({ title: "Request Failed", description: "There was an error submitting your request. Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBookViewing = async () => {
+    if (!selectedDate || !selectedTime || !user) {
+      toast({ title: "Missing Information", description: "Please select both date and time for your viewing", variant: "destructive" });
+      return;
+    }
+    if (!confirmByEmail && !confirmByPhone) {
+      toast({ title: "Missing Confirmation Method", description: "Please select at least one confirmation method", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: existingSlot, error: checkError } = await supabase
         .from('property_viewings')
         .select('id')
         .eq('property_id', property.id)
@@ -136,13 +192,8 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
         .maybeSingle();
 
       if (checkError) throw checkError;
-
-      if (existingBooking) {
-        toast({
-          title: "Time Slot Unavailable",
-          description: "This time slot is already booked. Please select another time.",
-          variant: "destructive"
-        });
+      if (existingSlot) {
+        toast({ title: "Time Slot Unavailable", description: "This time slot is already booked. Please select another time.", variant: "destructive" });
         return;
       }
 
@@ -163,36 +214,22 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
 
       if (insertError) throw insertError;
 
-      toast({
-        title: "Viewing Requested!",
-        description: "Your viewing request has been submitted. You'll receive a notification once it's confirmed.",
-      });
-
+      toast({ title: "Viewing Requested!", description: "Your viewing request has been submitted. You'll receive a notification once it's confirmed." });
       onClose();
       setSelectedDate(undefined);
       setSelectedTime("");
       setConfirmByEmail(false);
       setConfirmByPhone(false);
-
     } catch (error) {
       console.error('Error booking viewing:', error);
-      toast({
-        title: "Booking Failed",
-        description: "There was an error submitting your viewing request. Please try again.",
-        variant: "destructive"
-      });
+      toast({ title: "Booking Failed", description: "There was an error submitting your viewing request. Please try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
   const formatPrice = (price: number, listingType: string) => {
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
+    const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
     return `${formatter.format(price)}${listingType === 'rent' ? '/mo' : ''}`;
   };
 
@@ -208,13 +245,16 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
-          <DialogTitle>Book a Property Viewing</DialogTitle>
+          <DialogTitle>{isOracleEstates ? 'Book a Property Viewing' : 'Request a Viewing'}</DialogTitle>
           <DialogDescription>
-            Schedule a viewing for {property.address} • {formatPrice(property.price, property.listing_type)}
+            {isOracleEstates
+              ? `Schedule a viewing for ${property.address} • ${formatPrice(property.price, property.listing_type)}`
+              : `Request a viewing for ${property.address} • ${formatPrice(property.price, property.listing_type)}`
+            }
           </DialogDescription>
         </DialogHeader>
 
-        {checkingExisting ? (
+        {(checkingExisting || checkingAgency) ? (
           <p className="text-muted-foreground text-center py-8">Checking availability...</p>
         ) : existingBooking ? (
           <div className="bg-muted p-6 rounded-lg text-center space-y-2 my-4">
@@ -224,10 +264,52 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
               <Button variant="outline" onClick={onClose}>Close</Button>
             </div>
           </div>
+        ) : !isOracleEstates ? (
+          /* Non-Oracle Estates: Simple request with contact preference only */
+          <div className="space-y-6 py-4">
+            <div className="bg-muted p-4 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground">
+                This property is managed by an external agency. Submit a viewing request and the agent will contact you to arrange a suitable date and time.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-foreground">How would you like to be contacted? <span className="text-destructive">*</span></p>
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+                  <Checkbox
+                    checked={confirmByEmail}
+                    onCheckedChange={(checked) => setConfirmByEmail(checked === true)}
+                  />
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm">Contact me by email</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+                  <Checkbox
+                    checked={confirmByPhone}
+                    onCheckedChange={(checked) => setConfirmByPhone(checked === true)}
+                  />
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm">Contact me by phone</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 border-t pt-4">
+              <Button variant="outline" onClick={onClose}>Cancel</Button>
+              <Button
+                onClick={handleSimpleRequest}
+                disabled={!hasConfirmation || loading}
+                className="min-w-[120px]"
+              >
+                {loading ? "Submitting..." : "Request Viewing"}
+              </Button>
+            </div>
+          </div>
         ) : (
+          /* Oracle Estates: Full date/time booking */
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-4">
-              {/* Date Selection */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <CalendarIcon className="w-5 h-5" />
@@ -242,7 +324,6 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
                 />
               </div>
 
-              {/* Time Selection */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Clock className="w-5 h-5" />
@@ -287,7 +368,6 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
               </div>
             </div>
 
-            {/* Summary, Confirmation Options & Action */}
             {selectedDate && selectedTime && (
               <div className="border-t pt-4 space-y-4">
                 <div className="bg-muted p-4 rounded-lg">
@@ -320,9 +400,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
             )}
 
             <div className="flex justify-end gap-2 border-t pt-4">
-              <Button variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
+              <Button variant="outline" onClick={onClose}>Cancel</Button>
               <Button
                 onClick={handleBookViewing}
                 disabled={!selectedDate || !selectedTime || !hasConfirmation || loading}
