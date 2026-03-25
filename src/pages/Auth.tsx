@@ -207,7 +207,7 @@ const Auth = () => {
           return;
         }
 
-        if (!formData.full_name) {
+        if (!formData.full_name || !formData.phone_number) {
           toast({
             title: "Error",
             description: "Please fill in all required fields",
@@ -363,7 +363,7 @@ const Auth = () => {
 
                   {isSignUp && (
                     <div className="space-y-2">
-                      <Label htmlFor="phone_number">Phone Number <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                      <Label htmlFor="phone_number">Phone Number</Label>
                       <Input
                         id="phone_number"
                         name="phone_number"
@@ -371,6 +371,7 @@ const Auth = () => {
                         placeholder="+961 XX XXX XXX"
                         value={formData.phone_number}
                         onChange={handleInputChange}
+                        required
                       />
                     </div>
                   )}
