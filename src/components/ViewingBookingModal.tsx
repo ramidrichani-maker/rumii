@@ -39,7 +39,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
     "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
   ];
 
-  // Fetch assigned agent for property
+  // Fetch assigned agent and check for existing booking
   useEffect(() => {
     if (!isOpen || !property.id) return;
     const fetchAgent = async () => {
@@ -51,8 +51,23 @@ const ViewingBookingModal = ({ isOpen, onClose, property }: ViewingBookingModalP
         .maybeSingle();
       setAgentId(data?.agent_id || null);
     };
+    const checkExistingBooking = async () => {
+      if (!user) return;
+      setCheckingExisting(true);
+      const { data } = await supabase
+        .from('property_viewings')
+        .select('id')
+        .eq('property_id', property.id)
+        .eq('user_id', user.id)
+        .in('status', ['pending', 'confirmed'])
+        .limit(1)
+        .maybeSingle();
+      setExistingBooking(!!data);
+      setCheckingExisting(false);
+    };
     fetchAgent();
-  }, [isOpen, property.id]);
+    checkExistingBooking();
+  }, [isOpen, property.id, user]);
 
   // Fetch agent's busy slots for selected date
   useEffect(() => {
