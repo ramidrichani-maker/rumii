@@ -15,6 +15,7 @@ const Auth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
