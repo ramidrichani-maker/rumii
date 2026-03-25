@@ -66,6 +66,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   searchRadius = 1,
   embedded = false,
 }) => {
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
