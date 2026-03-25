@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import AgentContactBox from "@/components/AgentContactBox";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { getCityCenter } from "@/utils/cityCenter";
 
 interface Property {
   id: string;
