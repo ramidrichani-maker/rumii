@@ -207,7 +207,7 @@ const Auth = () => {
           return;
         }
 
-        if (!formData.full_name) {
+        if (!formData.full_name || !formData.phone_number) {
           toast({
             title: "Error",
             description: "Please fill in all required fields",
