@@ -182,26 +182,26 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
+          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
             <div className="space-y-3">
               {/* Min / Max toggle buttons */}
               <div className="flex gap-2">
                 <button
                   onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
-                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                     activeBedroomTab === 'min'
                       ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background hover:border-primary/50'
+                      : 'border-border bg-background/15 hover:border-primary/50'
                   }`}
                 >
                   Min: {minBedrooms || 'No min'}
                 </button>
                 <button
                   onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
-                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                     activeBedroomTab === 'max'
                       ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background hover:border-primary/50'
+                      : 'border-border bg-background/15 hover:border-primary/50'
                   }`}
                 >
                   Max: {maxBedrooms || 'No max'}
@@ -210,16 +210,16 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Options list */}
               {activeBedroomTab && (
-                <div className="grid grid-cols-2 gap-1 max-h-52 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
                   <button
                     onClick={() => {
                       if (activeBedroomTab === 'min') onMinBedroomsChange('');
                       else onMaxBedroomsChange('');
                     }}
-                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                       (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
                     {activeBedroomTab === 'min' ? 'No min' : 'No max'}
@@ -231,10 +231,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       <button
                         key={`${activeBedroomTab}-${opt}`}
                         onClick={() => onChange(currentVal === opt ? '' : opt)}
-                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           currentVal === opt
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background hover:border-primary/50'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
                         }`}
                       >
                         {opt}
