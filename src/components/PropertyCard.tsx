@@ -188,7 +188,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     >
       {/* Left: Image */}
       <div
-        className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden"
+        className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden touch-pan-y"
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
         onTouchEnd={imageCarousel.onTouchEnd}
