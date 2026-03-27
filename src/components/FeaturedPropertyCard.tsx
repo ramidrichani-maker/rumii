@@ -47,8 +47,12 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   return (
     <Link to={`/property/${property.id}`}>
       <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer group">
-        <div className="relative h-48 bg-muted rounded-t-lg overflow-hidden">
-          {images.length > 0 ? (
+        <div
+          className="relative h-48 bg-muted rounded-t-lg overflow-hidden touch-pan-y"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
             <div
               className="flex h-full"
               style={{
