@@ -331,14 +331,14 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
-            <div className="grid grid-cols-2 gap-1 max-h-64 overflow-y-auto">
+          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+            <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
               <button
                 onClick={() => onPropertyTypesChange([])}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                   selectedPropertyTypes.length === 0
                     ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background hover:border-primary/50'
+                    : 'border-transparent bg-transparent hover:border-primary/50'
                 }`}
               >
                 <Checkbox
@@ -360,10 +360,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onPropertyTypesChange([...selectedPropertyTypes, typeId]);
                       }
                     }}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                       isSelected
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
                     <Checkbox
