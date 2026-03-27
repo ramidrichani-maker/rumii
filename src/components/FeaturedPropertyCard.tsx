@@ -58,8 +58,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               className="flex h-full"
               style={{
                 width: `${images.length * 100}%`,
-                transform: `translateX(-${imgIndex * (100 / images.length)}%)`,
-                transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: `translateX(calc(-${imgIndex * (100 / images.length)}% + ${swipeOffset}px))`,
+                transition: swipeOffset ? 'none' : 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
               {images.map((src, i) => (
