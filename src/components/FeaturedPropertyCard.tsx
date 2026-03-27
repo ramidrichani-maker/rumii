@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { Badge } from "@/components/ui/badge";
 import { Bed, Bath, Square, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -24,9 +24,9 @@ interface FeaturedPropertyCardProps {
 }
 
 const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }: FeaturedPropertyCardProps) => {
-  const [imgIndex, setImgIndex] = useState(0);
   const images = property.images?.length ? property.images : [];
   const hasMultiple = images.length > 1;
+  const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd } = useSwipeCarousel(images.length);
 
   const formatPrice = (price: number, listingType: string) => {
     return listingType === 'rent' ? `$${price?.toLocaleString()}/mo` : `$${price?.toLocaleString()}`;
@@ -35,19 +35,24 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   const goLeft = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setImgIndex(imgIndex === 0 ? images.length - 1 : imgIndex - 1);
+    goTo("left");
   };
 
   const goRight = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setImgIndex(imgIndex === images.length - 1 ? 0 : imgIndex + 1);
+    goTo("right");
   };
 
   return (
     <Link to={`/property/${property.id}`}>
       <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer group">
-        <div className="relative h-48 bg-muted rounded-t-lg overflow-hidden">
+        <div
+          className="relative h-48 bg-muted rounded-t-lg overflow-hidden touch-pan-y"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
           {images.length > 0 ? (
             <div
               className="flex h-full"
