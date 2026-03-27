@@ -394,36 +394,36 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 <div className="flex gap-2 mb-2">
                   <button
                     onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'min' ? null : 'min')}
-                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                       activeFilterBedroomTab === 'min'
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-border bg-background/15 hover:border-primary/50'
                     }`}
                   >
                     Min: {minBedrooms || 'No min'}
                   </button>
                   <button
                     onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'max' ? null : 'max')}
-                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                       activeFilterBedroomTab === 'max'
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-border bg-background/15 hover:border-primary/50'
                     }`}
                   >
                     Max: {maxBedrooms || 'No max'}
                   </button>
                 </div>
                 {activeFilterBedroomTab && (
-                  <div className="grid grid-cols-2 gap-1 max-h-40 overflow-y-auto">
+                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
                     <button
                       onClick={() => {
                         if (activeFilterBedroomTab === 'min') onMinBedroomsChange('');
                         else onMaxBedroomsChange('');
                       }}
-                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                         (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
                           ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-background hover:border-primary/50'
+                          : 'border-transparent bg-transparent hover:border-primary/50'
                       }`}
                     >
                       {activeFilterBedroomTab === 'min' ? 'No min' : 'No max'}
@@ -435,10 +435,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         <button
                           key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
                           onClick={() => onChange(currentVal === opt ? '' : opt)}
-                          className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                          className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                             currentVal === opt
                               ? 'border-primary bg-primary text-primary-foreground'
-                              : 'border-border bg-background hover:border-primary/50'
+                              : 'border-transparent bg-transparent hover:border-primary/50'
                           }`}
                         >
                           {opt}
