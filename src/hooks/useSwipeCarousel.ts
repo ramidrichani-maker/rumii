@@ -64,5 +64,6 @@ export function useSwipeCarousel(totalImages: number) {
     onTouchStart,
     onTouchMove,
     onTouchEnd,
+    wasSwipe,
   };
 }
