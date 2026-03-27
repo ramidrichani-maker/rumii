@@ -31,7 +31,7 @@ const generatePriceOptions = (): { label: string; value: string }[] => {
     { label: "No max", value: "" },
   ];
   const prices: number[] = [];
-  for (let p = 10000; p < 250000; p += 10000) prices.push(p);
+  for (let p = 50000; p < 250000; p += 10000) prices.push(p);
   for (let p = 250000; p < 500000; p += 25000) prices.push(p);
   for (let p = 500000; p < 1000000; p += 50000) prices.push(p);
   for (let p = 1000000; p < 3000000; p += 100000) prices.push(p);
