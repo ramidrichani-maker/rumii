@@ -7,6 +7,7 @@ export function useSwipeCarousel(totalImages: number) {
   const touchStartX = useRef(0);
   const touchCurrentX = useRef(0);
   const isSwiping = useRef(false);
+  const didSwipe = useRef(false);
 
   const goTo = useCallback(
     (direction: "left" | "right") => {
