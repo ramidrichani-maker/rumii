@@ -146,26 +146,32 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         <div className="flex gap-3 overflow-x-auto md:overflow-x-visible w-full md:w-auto shrink-0">
-        {/* Radius Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        {/* Radius Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
             <Button variant="outline" className="h-12 px-4 gap-2 min-w-[130px]">
               <span className="text-sm font-medium">Radius: {selectedLabel}</span>
               <ChevronDown className="w-4 h-4" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-popover z-50">
-            {radiusOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={() => onRadiusChange(option.value)}
-                className={radius === option.value ? 'bg-primary/10 text-primary' : ''}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+            <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+              {radiusOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => onRadiusChange(option.value)}
+                  className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                    radius === option.value
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-transparent bg-transparent hover:border-primary/50'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* Bedrooms Popover */}
         <Popover>
@@ -176,26 +182,26 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
+          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
             <div className="space-y-3">
               {/* Min / Max toggle buttons */}
               <div className="flex gap-2">
                 <button
                   onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
-                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                     activeBedroomTab === 'min'
                       ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background hover:border-primary/50'
+                      : 'border-border bg-background/15 hover:border-primary/50'
                   }`}
                 >
                   Min: {minBedrooms || 'No min'}
                 </button>
                 <button
                   onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
-                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                     activeBedroomTab === 'max'
                       ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background hover:border-primary/50'
+                      : 'border-border bg-background/15 hover:border-primary/50'
                   }`}
                 >
                   Max: {maxBedrooms || 'No max'}
@@ -204,16 +210,16 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Options list */}
               {activeBedroomTab && (
-                <div className="grid grid-cols-2 gap-1 max-h-52 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
                   <button
                     onClick={() => {
                       if (activeBedroomTab === 'min') onMinBedroomsChange('');
                       else onMaxBedroomsChange('');
                     }}
-                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                       (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
                     {activeBedroomTab === 'min' ? 'No min' : 'No max'}
@@ -225,10 +231,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       <button
                         key={`${activeBedroomTab}-${opt}`}
                         onClick={() => onChange(currentVal === opt ? '' : opt)}
-                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           currentVal === opt
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background hover:border-primary/50'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
                         }`}
                       >
                         {opt}
@@ -325,14 +331,14 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-72 bg-popover z-50 p-4">
-            <div className="grid grid-cols-2 gap-1 max-h-64 overflow-y-auto">
+          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+            <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
               <button
                 onClick={() => onPropertyTypesChange([])}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                   selectedPropertyTypes.length === 0
                     ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background hover:border-primary/50'
+                    : 'border-transparent bg-transparent hover:border-primary/50'
                 }`}
               >
                 <Checkbox
@@ -354,10 +360,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onPropertyTypesChange([...selectedPropertyTypes, typeId]);
                       }
                     }}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                       isSelected
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
                     <Checkbox
@@ -380,7 +386,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-[400px] bg-popover z-50 p-4 max-h-[80vh] overflow-y-auto">
+          <PopoverContent align="end" className="w-[400px] bg-background/15 backdrop-blur-md z-50 p-4 max-h-[80vh] overflow-y-auto border-border/50 rounded-2xl">
             <div className="space-y-5">
               {/* Bedrooms section */}
               <div>
@@ -388,36 +394,36 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 <div className="flex gap-2 mb-2">
                   <button
                     onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'min' ? null : 'min')}
-                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                       activeFilterBedroomTab === 'min'
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-border bg-background/15 hover:border-primary/50'
                     }`}
                   >
                     Min: {minBedrooms || 'No min'}
                   </button>
                   <button
                     onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'max' ? null : 'max')}
-                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                       activeFilterBedroomTab === 'max'
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-border bg-background/15 hover:border-primary/50'
                     }`}
                   >
                     Max: {maxBedrooms || 'No max'}
                   </button>
                 </div>
                 {activeFilterBedroomTab && (
-                  <div className="grid grid-cols-2 gap-1 max-h-40 overflow-y-auto">
+                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
                     <button
                       onClick={() => {
                         if (activeFilterBedroomTab === 'min') onMinBedroomsChange('');
                         else onMaxBedroomsChange('');
                       }}
-                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                         (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
                           ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-background hover:border-primary/50'
+                          : 'border-transparent bg-transparent hover:border-primary/50'
                       }`}
                     >
                       {activeFilterBedroomTab === 'min' ? 'No min' : 'No max'}
@@ -429,10 +435,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         <button
                           key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
                           onClick={() => onChange(currentVal === opt ? '' : opt)}
-                          className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                          className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                             currentVal === opt
                               ? 'border-primary bg-primary text-primary-foreground'
-                              : 'border-border bg-background hover:border-primary/50'
+                              : 'border-transparent bg-transparent hover:border-primary/50'
                           }`}
                         >
                           {opt}
@@ -512,13 +518,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               {/* Property Type section */}
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-2">Property Type</h4>
-                <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
                   <button
                     onClick={() => onPropertyTypesChange([])}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                       selectedPropertyTypes.length === 0
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
                     <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
@@ -537,10 +543,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                             onPropertyTypesChange([...selectedPropertyTypes, typeId]);
                           }
                         }}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                        className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                           isSelected
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background hover:border-primary/50'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
                         }`}
                       >
                         <Checkbox checked={isSelected} className="pointer-events-none" />
