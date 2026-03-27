@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { Badge } from "@/components/ui/badge";
 import { Bed, Bath, Square, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
