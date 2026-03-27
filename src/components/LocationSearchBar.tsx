@@ -278,38 +278,40 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Options list */}
               {activePriceTab && (
-                <div className="grid grid-cols-1 gap-1 max-h-52 overflow-y-auto rounded-2xl bg-background/50 backdrop-blur-sm p-2 w-1/2">
-                  <button
-                    onClick={() => {
-                      if (activePriceTab === 'min') onBarMinPriceChange('');
-                      else onBarMaxPriceChange('');
-                    }}
-                    className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
-                      (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
-                    }`}
-                  >
-                    {activePriceTab === 'min' ? 'No min' : 'No max'}
-                  </button>
-                  {priceOptions.map((price) => {
-                    const val = String(price);
-                    const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
-                    const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
-                    return (
-                      <button
-                        key={`${activePriceTab}-${price}`}
-                        onClick={() => onChange(currentVal === val ? '' : val)}
-                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
-                          currentVal === val
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background hover:border-primary/50'
-                        }`}
-                      >
-                        {formatPrice(price)}{price === 10000000 ? '+' : ''}
-                      </button>
-                    );
-                  })}
+                <div className={`flex ${activePriceTab === 'min' ? 'justify-start' : 'justify-end'}`}>
+                  <div className="grid grid-cols-1 gap-1 max-h-52 overflow-y-auto rounded-2xl bg-background/30 backdrop-blur-sm p-2 w-fit">
+                    <button
+                      onClick={() => {
+                        if (activePriceTab === 'min') onBarMinPriceChange('');
+                        else onBarMaxPriceChange('');
+                      }}
+                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                        (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-background/50 hover:border-primary/50'
+                      }`}
+                    >
+                      {activePriceTab === 'min' ? 'No min' : 'No max'}
+                    </button>
+                    {priceOptions.map((price) => {
+                      const val = String(price);
+                      const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
+                      const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                      return (
+                        <button
+                          key={`${activePriceTab}-${price}`}
+                          onClick={() => onChange(currentVal === val ? '' : val)}
+                          className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                            currentVal === val
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-border bg-background/50 hover:border-primary/50'
+                          }`}
+                        >
+                          {formatPrice(price)}{price === 10000000 ? '+' : ''}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
