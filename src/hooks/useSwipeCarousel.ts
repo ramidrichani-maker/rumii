@@ -42,6 +42,9 @@ export function useSwipeCarousel(totalImages: number) {
     isSwiping.current = false;
     const diff = touchCurrentX.current - touchStartX.current;
     const threshold = 50;
+    if (Math.abs(diff) > 10) {
+      didSwipe.current = true;
+    }
     if (diff < -threshold) {
       goTo("right");
     } else if (diff > threshold) {
@@ -49,6 +52,8 @@ export function useSwipeCarousel(totalImages: number) {
     }
     setSwipeOffset(0);
   }, [goTo]);
+
+  const wasSwipe = useCallback(() => didSwipe.current, []);
 
   return {
     currentIndex,
