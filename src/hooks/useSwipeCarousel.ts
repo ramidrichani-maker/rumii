@@ -27,6 +27,7 @@ export function useSwipeCarousel(totalImages: number) {
     touchStartX.current = e.touches[0].clientX;
     touchCurrentX.current = e.touches[0].clientX;
     isSwiping.current = true;
+    didSwipe.current = false;
   }, []);
 
   const onTouchMove = useCallback((e: TouchEvent) => {
