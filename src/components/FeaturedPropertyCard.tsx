@@ -24,9 +24,9 @@ interface FeaturedPropertyCardProps {
 }
 
 const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }: FeaturedPropertyCardProps) => {
-  const [imgIndex, setImgIndex] = useState(0);
   const images = property.images?.length ? property.images : [];
   const hasMultiple = images.length > 1;
+  const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd } = useSwipeCarousel(images.length);
 
   const formatPrice = (price: number, listingType: string) => {
     return listingType === 'rent' ? `$${price?.toLocaleString()}/mo` : `$${price?.toLocaleString()}`;
@@ -35,13 +35,13 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   const goLeft = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setImgIndex(imgIndex === 0 ? images.length - 1 : imgIndex - 1);
+    goTo("left");
   };
 
   const goRight = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setImgIndex(imgIndex === images.length - 1 ? 0 : imgIndex + 1);
+    goTo("right");
   };
 
   return (
