@@ -146,26 +146,32 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         <div className="flex gap-3 overflow-x-auto md:overflow-x-visible w-full md:w-auto shrink-0">
-        {/* Radius Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        {/* Radius Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
             <Button variant="outline" className="h-12 px-4 gap-2 min-w-[130px]">
               <span className="text-sm font-medium">Radius: {selectedLabel}</span>
               <ChevronDown className="w-4 h-4" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-popover z-50">
-            {radiusOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={() => onRadiusChange(option.value)}
-                className={radius === option.value ? 'bg-primary/10 text-primary' : ''}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+            <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+              {radiusOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => onRadiusChange(option.value)}
+                  className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                    radius === option.value
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-transparent bg-transparent hover:border-primary/50'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* Bedrooms Popover */}
         <Popover>
