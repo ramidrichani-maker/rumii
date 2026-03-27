@@ -250,48 +250,44 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-           <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50">
+           <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
             <div className="space-y-3">
               {/* Min / Max toggle buttons */}
               <div className="flex gap-2">
-                {(!activePriceTab || activePriceTab === 'min') && (
                 <button
                   onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
-                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                     activePriceTab === 'min'
                       ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background/30 hover:border-primary/50'
+                      : 'border-border bg-background/15 hover:border-primary/50'
                   }`}
                 >
                   Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
                 </button>
-                )}
-                {(!activePriceTab || activePriceTab === 'max') && (
                 <button
                   onClick={() => setActivePriceTab(activePriceTab === 'max' ? null : 'max')}
-                  className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                     activePriceTab === 'max'
                       ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background/30 hover:border-primary/50'
+                      : 'border-border bg-background/15 hover:border-primary/50'
                   }`}
                 >
                   Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
                 </button>
-                )}
               </div>
 
               {/* Options list */}
               {activePriceTab && (
-                <div className="grid grid-cols-1 gap-1 max-h-52 overflow-y-auto rounded-2xl bg-background/10 backdrop-blur-sm p-2 w-fit">
+                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
                     <button
                       onClick={() => {
                         if (activePriceTab === 'min') onBarMinPriceChange('');
                         else onBarMaxPriceChange('');
                       }}
-                      className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                         (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
                           ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-background/20 hover:border-primary/50'
+                          : 'border-transparent bg-transparent hover:border-primary/50'
                       }`}
                     >
                       {activePriceTab === 'min' ? 'No min' : 'No max'}
@@ -304,10 +300,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         <button
                           key={`${activePriceTab}-${price}`}
                           onClick={() => onChange(currentVal === val ? '' : val)}
-                          className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                          className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                             currentVal === val
                               ? 'border-primary bg-primary text-primary-foreground'
-                              : 'border-border bg-background/20 hover:border-primary/50'
+                              : 'border-transparent bg-transparent hover:border-primary/50'
                           }`}
                         >
                           {formatPrice(price)}{price === 10000000 ? '+' : ''}
@@ -453,42 +449,38 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-2">Price</h4>
                 <div className="flex gap-2 mb-2">
-                  {(!activeFilterPriceTab || activeFilterPriceTab === 'min') && (
                   <button
                     onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'min' ? null : 'min')}
-                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                       activeFilterPriceTab === 'min'
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/30 hover:border-primary/50'
+                        : 'border-border bg-background/15 hover:border-primary/50'
                     }`}
                   >
                     Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
                   </button>
-                  )}
-                  {(!activeFilterPriceTab || activeFilterPriceTab === 'max') && (
                   <button
                     onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'max' ? null : 'max')}
-                    className={`flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
                       activeFilterPriceTab === 'max'
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/30 hover:border-primary/50'
+                        : 'border-border bg-background/15 hover:border-primary/50'
                     }`}
                   >
                     Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
                   </button>
-                  )}
                 </div>
                 {activeFilterPriceTab && (
-                  <div className="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto rounded-2xl bg-background/10 backdrop-blur-sm p-2 w-fit">
+                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
                       <button
                         onClick={() => {
                           if (activeFilterPriceTab === 'min') onBarMinPriceChange('');
                           else onBarMaxPriceChange('');
                         }}
-                        className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           (activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background/20 hover:border-primary/50'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
                         }`}
                       >
                         {activeFilterPriceTab === 'min' ? 'No min' : 'No max'}
@@ -501,10 +493,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           <button
                             key={`filter-price-${activeFilterPriceTab}-${price}`}
                             onClick={() => onChange(currentVal === val ? '' : val)}
-                            className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors text-left ${
+                            className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                               currentVal === val
                                 ? 'border-primary bg-primary text-primary-foreground'
-                                : 'border-border bg-background/20 hover:border-primary/50'
+                                : 'border-transparent bg-transparent hover:border-primary/50'
                             }`}
                           >
                             {formatPrice(price)}{price === 10000000 ? '+' : ''}
