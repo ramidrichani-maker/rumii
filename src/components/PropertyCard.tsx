@@ -181,11 +181,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   return (
     <Card
       className="animate-fade-in hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-row overflow-hidden"
-      onClick={() => navigate(`/property/${property.id}`)}
+      onClick={() => {
+        if (imageCarousel.wasSwipe()) return;
+        navigate(`/property/${property.id}`);
+      }}
     >
       {/* Left: Image */}
       <div
-        className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden"
+        className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden touch-pan-y"
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
         onTouchEnd={imageCarousel.onTouchEnd}

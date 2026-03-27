@@ -26,7 +26,7 @@ interface FeaturedPropertyCardProps {
 const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }: FeaturedPropertyCardProps) => {
   const images = property.images?.length ? property.images : [];
   const hasMultiple = images.length > 1;
-  const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd } = useSwipeCarousel(images.length);
+  const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd, wasSwipe } = useSwipeCarousel(images.length);
 
   const formatPrice = (price: number, listingType: string) => {
     return listingType === 'rent' ? `$${price?.toLocaleString()}/mo` : `$${price?.toLocaleString()}`;
@@ -45,8 +45,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   };
 
   return (
-    <Link to={`/property/${property.id}`}>
-      <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer group">
+    <Link to={`/property/${property.id}`} onClick={(e) => { if (wasSwipe()) e.preventDefault(); }}>
+      <Card className="hover:shadow-lg transition-shadow duration-300 h-full cursor-pointer group touch-pan-y">
         <div
           className="relative h-48 bg-muted rounded-t-lg overflow-hidden touch-pan-y"
           onTouchStart={onTouchStart}
@@ -58,8 +58,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               className="flex h-full"
               style={{
                 width: `${images.length * 100}%`,
-                transform: `translateX(-${imgIndex * (100 / images.length)}%)`,
-                transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: `translateX(calc(-${imgIndex * (100 / images.length)}% + ${swipeOffset}px))`,
+                transition: swipeOffset ? 'none' : 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
               {images.map((src, i) => (

@@ -7,6 +7,7 @@ export function useSwipeCarousel(totalImages: number) {
   const touchStartX = useRef(0);
   const touchCurrentX = useRef(0);
   const isSwiping = useRef(false);
+  const didSwipe = useRef(false);
 
   const goTo = useCallback(
     (direction: "left" | "right") => {
@@ -26,6 +27,7 @@ export function useSwipeCarousel(totalImages: number) {
     touchStartX.current = e.touches[0].clientX;
     touchCurrentX.current = e.touches[0].clientX;
     isSwiping.current = true;
+    didSwipe.current = false;
   }, []);
 
   const onTouchMove = useCallback((e: TouchEvent) => {
@@ -40,6 +42,9 @@ export function useSwipeCarousel(totalImages: number) {
     isSwiping.current = false;
     const diff = touchCurrentX.current - touchStartX.current;
     const threshold = 50;
+    if (Math.abs(diff) > 10) {
+      didSwipe.current = true;
+    }
     if (diff < -threshold) {
       goTo("right");
     } else if (diff > threshold) {
@@ -47,6 +52,8 @@ export function useSwipeCarousel(totalImages: number) {
     }
     setSwipeOffset(0);
   }, [goTo]);
+
+  const wasSwipe = useCallback(() => didSwipe.current, []);
 
   return {
     currentIndex,
@@ -57,5 +64,6 @@ export function useSwipeCarousel(totalImages: number) {
     onTouchStart,
     onTouchMove,
     onTouchEnd,
+    wasSwipe,
   };
 }
