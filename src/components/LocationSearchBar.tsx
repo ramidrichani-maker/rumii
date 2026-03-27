@@ -278,7 +278,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Options list */}
               {activePriceTab && (
-                <div className="grid grid-cols-2 gap-1 max-h-52 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-1 max-h-52 overflow-y-auto rounded-2xl bg-background/80 backdrop-blur-sm p-2">
                   <button
                     onClick={() => {
                       if (activePriceTab === 'min') onBarMinPriceChange('');
