@@ -518,13 +518,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               {/* Property Type section */}
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-2">Property Type</h4>
-                <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
                   <button
                     onClick={() => onPropertyTypesChange([])}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                       selectedPropertyTypes.length === 0
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
                     <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
@@ -543,10 +543,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                             onPropertyTypesChange([...selectedPropertyTypes, typeId]);
                           }
                         }}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-medium transition-colors text-left ${
+                        className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                           isSelected
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background hover:border-primary/50'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
                         }`}
                       >
                         <Checkbox checked={isSelected} className="pointer-events-none" />
@@ -555,7 +555,6 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     );
                   })}
                 </div>
-              </div>
 
               {/* Unfurnished toggle */}
               {onUnfurnishedChange !== undefined && (
