@@ -53,6 +53,7 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
+          {images.length > 0 ? (
             <div
               className="flex h-full"
               style={{
