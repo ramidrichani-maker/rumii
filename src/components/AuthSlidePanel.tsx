@@ -296,18 +296,19 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
       {/* Overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+          style={{ zIndex: 9998 }}
           onClick={handleClose}
         />
       )}
 
       {/* Panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[25%] sm:min-w-[360px] bg-background border-l border-border z-50 shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-screen w-full sm:w-[25%] sm:min-w-[360px] bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ zIndex: 9999 }}
       >
-        <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">
             <div className="flex items-center gap-3">
@@ -560,7 +561,6 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
               </div>
             )}
           </div>
-        </div>
       </div>
     </>
   );
