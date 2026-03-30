@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { resendSignupVerification, startEmailAuthFlow, verifySignupOtp } from '@/utils/authEmailFlow';
 
 type Step = 'email' | 'password' | 'verify-email' | 'create-account' | 'forgot-password' | 'reset-password';
 
@@ -36,32 +37,35 @@ const Auth = () => {
       toast({ title: 'Email required', description: 'Please enter your email address.', variant: 'destructive' });
       return;
     }
+
     setIsLoading(true);
     try {
-      const { error: otpProbe } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
-        options: { shouldCreateUser: false }
-      });
+      const { error, nextStep } = await startEmailAuthFlow(email);
 
-      if (otpProbe) {
-        await sendVerificationOtp();
+      if (error || !nextStep) {
+        toast({ title: 'Error', description: error?.message ?? 'Could not continue with this email.', variant: 'destructive' });
+        return;
+      }
+
+      setPassword('');
+      setOtp('');
+
+      if (nextStep === 'verify-email') {
         setStep('verify-email');
+        toast({ title: 'Verification code sent', description: `A 6-digit code has been sent to ${email.trim().toLowerCase()}` });
       } else {
         setStep('password');
       }
     } catch {
-      await sendVerificationOtp();
-      setStep('verify-email');
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   };
 
   const sendVerificationOtp = async () => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { shouldCreateUser: true }
-    });
+    const { error } = await resendSignupVerification(email);
+
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
@@ -172,11 +176,8 @@ const Auth = () => {
     }
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
-        token: otp,
-        type: 'email',
-      });
+      const { error } = await verifySignupOtp(email, otp);
+
       if (error) {
         toast({ title: 'Invalid code', description: 'The code is invalid or has expired.', variant: 'destructive' });
       } else {
@@ -242,10 +243,8 @@ const Auth = () => {
           redirectTo: `${window.location.origin}/reset-password`,
         });
       } else {
-        await supabase.auth.signInWithOtp({
-          email: email.trim(),
-          options: { shouldCreateUser: true }
-        });
+        await sendVerificationOtp();
+        return;
       }
       toast({ title: 'Code resent', description: 'A new code has been sent to your email.' });
     } catch {
