@@ -63,15 +63,8 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
     }
     setIsLoading(true);
     try {
-      // Check if user exists by looking up profiles
-      const { data: existingUsers, error: lookupError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', (await supabase.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: false } })).data?.user?.id ?? '___none___')
-        .limit(1);
-
-      // Better approach: try signInWithOtp with shouldCreateUser: false
-      // If it fails, the user doesn't exist
+      // Try signInWithOtp with shouldCreateUser: false
+      // If user doesn't exist, this will return an error
       const { error: otpProbe } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: { shouldCreateUser: false }
@@ -86,7 +79,6 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
         setStep('password');
       }
     } catch {
-      // Default to new user flow
       await sendVerificationOtp();
       setStep('verify-email');
     } finally {
