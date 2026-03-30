@@ -292,7 +292,7 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
     else if (step === 'create-account') setStep('verify-email');
   };
 
-  return (
+  return createPortal(
     <>
       {/* Overlay */}
       {open && (
@@ -305,10 +305,10 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
 
       {/* Panel */}
       <div
-        className={`fixed top-0 right-0 h-screen w-full sm:w-[25%] sm:min-w-[360px] bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed top-0 right-0 h-screen w-full sm:w-[25%] sm:min-w-[360px] border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ zIndex: 9999 }}
+        style={{ zIndex: 9999, backgroundColor: 'hsl(var(--background))' }}
       >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">
