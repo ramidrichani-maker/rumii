@@ -229,11 +229,10 @@ export const Navbar = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </> : <Link to="/auth">
-                <Button>Sign In</Button>
-              </Link>}
+              </> : <Button onClick={() => setAuthPanelOpen(true)}>Sign In</Button>}
           </div>
         </div>
       </div>
+      <AuthSlidePanel open={authPanelOpen} onClose={() => setAuthPanelOpen(false)} />
     </nav>;
 };
