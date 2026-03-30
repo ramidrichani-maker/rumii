@@ -1,303 +1,277 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Eye, EyeOff, Mail } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
+type Step = 'email' | 'password' | 'verify-email' | 'create-account' | 'forgot-password' | 'reset-password';
+
 const Auth = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [step, setStep] = useState<Step>('email');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const [resendAttempts, setResendAttempts] = useState(0);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    full_name: '',
-    phone_number: ''
-  });
+  const [staySignedIn, setStaySignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const { signUp, signIn } = useAuth();
+  const [otp, setOtp] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
+  const { signIn } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    try {
-      const isLovableDomain =
-        window.location.hostname.includes("lovable.app") ||
-        window.location.hostname.includes("lovableproject.com");
-
-      if (isLovableDomain) {
-        // In Lovable preview, bypass auth-bridge to avoid iframe/cookie issues
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/`,
-            skipBrowserRedirect: true,
-          }
-        });
-        if (error) throw error;
-        if (data?.url) {
-          window.location.href = data.url;
-        }
-      } else {
-        // On custom domains, use normal flow
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/`
-          }
-        });
-        if (error) throw error;
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error?.message || "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAppleSignIn = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: `${window.location.origin}/`
-        }
-      });
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Check your email",
-          description: "We've sent you a password reset link and a 6-digit verification code.",
-        });
-        setShowForgotPassword(false);
-        setResetEmail('');
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResendVerification = async () => {
-    if (resendAttempts >= 3) {
-      toast({
-        title: "Limit reached",
-        description: "You've used all 3 resend attempts. Please check your spam folder or try again later.",
-        variant: "destructive"
-      });
+  const handleContinueEmail = async () => {
+    if (!email.trim()) {
+      toast({ title: 'Email required', description: 'Please enter your email address.', variant: 'destructive' });
       return;
     }
-
-    if (!formData.email.trim()) {
-      toast({
-        title: "Email required",
-        description: "Enter your email first, then resend verification.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: formData.email.trim(),
-        options: {
-          emailRedirectTo: `${window.location.origin}/`
-        }
+      const { error: otpProbe } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: { shouldCreateUser: false }
       });
 
-      if (error) {
-        toast({
-          title: "Could not resend",
-          description: error.message,
-          variant: "destructive"
-        });
+      if (otpProbe) {
+        await sendVerificationOtp();
+        setStep('verify-email');
       } else {
-        toast({
-          title: "Verification email sent",
-          description: `A new confirmation link was sent to ${formData.email}.`
-        });
-        setResendAttempts(prev => prev + 1);
-        setResendCooldown(30);
-        const interval = setInterval(() => {
-          setResendCooldown(prev => {
-            if (prev <= 1) {
-              clearInterval(interval);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
+        setStep('password');
       }
     } catch {
-      toast({
-        title: "Error",
-        description: "Could not resend verification right now. Please try again.",
-        variant: "destructive"
-      });
+      await sendVerificationOtp();
+      setStep('verify-email');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const sendVerificationOtp = async () => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { shouldCreateUser: true }
+    });
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Verification code sent', description: `A 6-digit code has been sent to ${email}` });
+    }
+  };
+
+  const handleSignIn = async () => {
+    if (!password) {
+      toast({ title: 'Password required', description: 'Please enter your password.', variant: 'destructive' });
+      return;
+    }
     setIsLoading(true);
-
     try {
-      if (isSignUp) {
-        if (formData.password !== formData.confirmPassword) {
-          toast({
-            title: "Error",
-            description: "Passwords do not match",
-            variant: "destructive"
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        if (!formData.full_name || !formData.phone_number) {
-          toast({
-            title: "Error",
-            description: "Please fill in all required fields",
-            variant: "destructive"
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        const { error, isExistingUser } = await signUp(formData.email, formData.password, {
-          full_name: formData.full_name,
-          phone_number: formData.phone_number || '',
-          role: 'user'
-        });
-
-        if (error) {
-          if (error.message.includes('already registered')) {
-            toast({
-              title: "Account exists",
-              description: "This email is already registered. Please sign in instead.",
-              variant: "destructive"
-            });
-          } else {
-            toast({
-              title: "Sign up failed",
-              description: error.message,
-              variant: "destructive"
-            });
-          }
-        } else if (isExistingUser) {
-          toast({
-            title: "Account already exists",
-            description: "This email is already registered. Please sign in or resend verification.",
-          });
-          setIsSignUp(false);
-          setShowEmailForm(true);
-          setFormData(prev => ({ ...prev, password: '', confirmPassword: '', full_name: '', phone_number: '' }));
+      const { error } = await signIn(email.trim(), password);
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          toast({ title: 'Sign in failed', description: 'Invalid email or password.', variant: 'destructive' });
+        } else if (error.message.includes('Email not confirmed')) {
+          toast({ title: 'Email not verified', description: 'Please verify your email first.', variant: 'destructive' });
         } else {
-          toast({
-            title: "Check your email!",
-            description: "We've sent a confirmation link to " + formData.email + ". Please verify your email before signing in. Check your spam folder if you don't see it.",
-          });
-          setIsSignUp(false);
-          setShowEmailForm(true);
-          setFormData(prev => ({ ...prev, password: '', confirmPassword: '', full_name: '', phone_number: '' }));
+          toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
         }
       } else {
-        const { error } = await signIn(formData.email, formData.password);
-
-        if (error) {
-          if (error.message.includes('Invalid login credentials')) {
-            toast({
-              title: "Sign in failed",
-              description: "Invalid email or password. Please try again.",
-              variant: "destructive"
-            });
-          } else {
-            toast({
-              title: "Sign in failed",
-              description: error.message,
-              variant: "destructive"
-            });
-          }
-        } else {
-          toast({
-            title: "Welcome back!",
-            description: "You have been signed in successfully.",
-          });
-          navigate('/');
-        }
+        toast({ title: 'Welcome back!', description: 'You have been signed in successfully.' });
+        navigate('/');
       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
+    } catch {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      } else {
+        toast({ title: 'Code sent', description: 'A 6-digit verification code has been sent to your email. It expires in 10 minutes.' });
+        setStep('forgot-password');
+      }
+    } catch {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyResetCode = async () => {
+    if (otp.length !== 6) {
+      toast({ title: 'Invalid code', description: 'Please enter the 6-digit code.', variant: 'destructive' });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: otp,
+        type: 'recovery',
+      });
+      if (error) {
+        toast({ title: 'Invalid code', description: 'The code is invalid or has expired.', variant: 'destructive' });
+      } else {
+        setStep('reset-password');
+        toast({ title: 'Code verified', description: 'You can now set a new password.' });
+      }
+    } catch {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (newPassword.length < 6) {
+      toast({ title: 'Password too short', description: 'Password must be at least 6 characters.', variant: 'destructive' });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      toast({ title: "Passwords don't match", description: 'Please make sure passwords match.', variant: 'destructive' });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      } else {
+        toast({ title: 'Password updated', description: 'Your password has been changed successfully.' });
+        navigate('/');
+      }
+    } catch {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    if (otp.length !== 6) {
+      toast({ title: 'Invalid code', description: 'Please enter the 6-digit code.', variant: 'destructive' });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: otp,
+        type: 'email',
+      });
+      if (error) {
+        toast({ title: 'Invalid code', description: 'The code is invalid or has expired.', variant: 'destructive' });
+      } else {
+        setStep('create-account');
+        toast({ title: 'Email verified', description: 'Now finish creating your account.' });
+      }
+    } catch {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateAccount = async () => {
+    if (!firstName.trim() || !lastName.trim() || !phone.trim() || !password) {
+      toast({ title: 'All fields required', description: 'Please fill in all fields.', variant: 'destructive' });
+      return;
+    }
+    if (password.length < 6) {
+      toast({ title: 'Password too short', description: 'Password must be at least 6 characters.', variant: 'destructive' });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error: pwError } = await supabase.auth.updateUser({ password });
+      if (pwError) {
+        toast({ title: 'Error', description: pwError.message, variant: 'destructive' });
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            full_name: `${firstName.trim()} ${lastName.trim()}`,
+            phone_number: phone.trim(),
+          })
+          .eq('user_id', currentUser.id);
+
+        if (profileError) {
+          toast({ title: 'Error', description: profileError.message, variant: 'destructive' });
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      toast({ title: 'Account created!', description: 'Welcome to Oracle Estates.' });
+      navigate('/');
+    } catch {
+      toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      if (step === 'forgot-password') {
+        await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+      } else {
+        await supabase.auth.signInWithOtp({
+          email: email.trim(),
+          options: { shouldCreateUser: true }
+        });
+      }
+      toast({ title: 'Code resent', description: 'A new code has been sent to your email.' });
+    } catch {
+      toast({ title: 'Error', description: 'Could not resend code.', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const canGoBack = step !== 'email';
+  const handleBack = () => {
+    setOtp('');
+    if (step === 'password' || step === 'verify-email') setStep('email');
+    else if (step === 'forgot-password') setStep('password');
+    else if (step === 'reset-password') setStep('forgot-password');
+    else if (step === 'create-account') setStep('verify-email');
+  };
+
+  const getTitle = () => {
+    switch (step) {
+      case 'email': return 'Sign in or create an account';
+      case 'password': return 'Sign in';
+      case 'verify-email': return 'Verify your email';
+      case 'create-account': return 'Finish creating your account';
+      case 'forgot-password': return 'Reset password';
+      case 'reset-password': return 'Set new password';
     }
   };
 
@@ -305,287 +279,254 @@ const Auth = () => {
     <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
+          {canGoBack ? (
+            <button onClick={handleBack} className="inline-flex items-center text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </button>
+          ) : (
+            <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Link>
+          )}
         </div>
 
         <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">
-              {showForgotPassword ? 'Reset Password' : (isSignUp ? 'Create Account' : 'Sign In')}
-            </CardTitle>
-            <CardDescription className="text-center">
-              {showForgotPassword
-                ? 'Enter your email to receive a password reset link'
-                : (isSignUp 
-                  ? 'Choose how you want to create your account' 
-                  : 'Choose how you want to sign in')
-              }
-            </CardDescription>
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">{getTitle()}</CardTitle>
           </CardHeader>
           <CardContent>
-            {showForgotPassword ? (
-              <form onSubmit={handleForgotPassword} className="space-y-4">
+            {/* Step: Email */}
+            {step === 'email' && (
+              <div className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="reset-email">Email</Label>
+                  <Label htmlFor="auth-email">Email address</Label>
                   <Input
-                    id="reset-email"
+                    id="auth-email"
                     type="email"
-                    placeholder="john@example.com"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    required
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleContinueEmail()}
+                    autoFocus
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send Reset Link"}
+                <Button className="w-full" onClick={handleContinueEmail} disabled={isLoading}>
+                  {isLoading ? 'Checking...' : 'Continue'}
                 </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => {
-                    setShowForgotPassword(false);
-                    setResetEmail('');
-                  }}
-                >
-                  Back to Sign In
-                </Button>
-              </form>
-            ) : showEmailForm ? (
-              <>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {isSignUp && (
-                    <div className="space-y-2">
-                      <Label htmlFor="full_name">Full Name</Label>
-                      <Input
-                        id="full_name"
-                        name="full_name"
-                        type="text"
-                        placeholder="John Doe"
-                        value={formData.full_name}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  )}
+              </div>
+            )}
 
-                  {isSignUp && (
-                    <div className="space-y-2">
-                      <Label htmlFor="phone_number">Phone Number</Label>
-                      <Input
-                        id="phone_number"
-                        name="phone_number"
-                        type="tel"
-                        placeholder="+961 XX XXX XXX"
-                        value={formData.phone_number}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  )}
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+            {/* Step: Password (existing user) */}
+            {step === 'password' && (
+              <div className="space-y-5">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Signing in as</p>
+                  <p className="text-sm font-medium text-foreground">{email}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-password">Password</Label>
+                  <div className="relative">
                     <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
+                      id="auth-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSignIn()}
+                      autoFocus
                     />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-
-                  {isSignUp && (
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
-                      <Input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type="password"
-                        placeholder="Confirm your password"
-                        value={formData.confirmPassword}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  )}
-
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Please wait..." : (isSignUp ? "Create Account" : "Sign In")}
-                  </Button>
-
-                  {!isSignUp && (
-                    <div className="mt-2 text-center">
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="text-sm p-0 h-auto font-normal"
-                        onClick={() => setShowForgotPassword(true)}
-                      >
-                        Forgot password?
-                      </Button>
-                    </div>
-                  )}
-
-                  {isSignUp && (
-                    <div className="mt-2 text-center">
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="text-sm p-0 h-auto font-normal"
-                        onClick={handleResendVerification}
-                        disabled={isLoading || resendCooldown > 0 || resendAttempts >= 3}
-                      >
-                        {resendAttempts >= 3
-                          ? 'Max attempts reached'
-                          : resendCooldown > 0
-                            ? `Resend available in ${resendCooldown}s`
-                            : `Resend verification email (${3 - resendAttempts} left)`}
-                      </Button>
-                    </div>
-                  )}
-                </form>
-
-                <div className="mt-4">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="w-full"
-                    onClick={() => setShowEmailForm(false)}
-                  >
-                    Back to options
-                  </Button>
                 </div>
-
-                <div className="mt-4 text-center text-sm">
-                  {isSignUp ? (
-                    <>
-                      Already have an account?{" "}
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto font-normal"
-                        onClick={() => setIsSignUp(false)}
-                      >
-                        Sign in
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      Don't have an account?{" "}
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto font-normal"
-                        onClick={() => setIsSignUp(true)}
-                      >
-                        Sign up
-                      </Button>
-                    </>
-                  )}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="stay-signed-in"
+                    checked={staySignedIn}
+                    onCheckedChange={(checked) => setStaySignedIn(!!checked)}
+                  />
+                  <Label htmlFor="stay-signed-in" className="text-sm text-muted-foreground cursor-pointer">Stay signed in</Label>
                 </div>
-              </>
-            ) : (
-              <div className="space-y-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full flex items-center justify-center gap-3"
-                  onClick={handleGoogleSignIn}
-                  disabled={isLoading}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  Continue with Google
+                <Button className="w-full" onClick={handleSignIn} disabled={isLoading}>
+                  {isLoading ? 'Signing in...' : 'Sign in'}
                 </Button>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">Or</span>
-                  </div>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full flex items-center justify-center gap-3"
-                  onClick={() => setShowEmailForm(true)}
-                >
-                  <Mail className="w-5 h-5" />
-                  Continue with Email
+                <Button variant="link" className="w-full text-sm p-0 h-auto" onClick={handleForgotPassword} disabled={isLoading}>
+                  Forgot password?
                 </Button>
+              </div>
+            )}
 
-                <div className="mt-4 text-center text-sm">
-                  {isSignUp ? (
-                    <>
-                      Already have an account?{" "}
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto font-normal"
-                        onClick={() => setIsSignUp(false)}
-                      >
-                        Sign in
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      Don't have an account?{" "}
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto font-normal"
-                        onClick={() => setIsSignUp(true)}
-                      >
-                        Sign up
-                      </Button>
-                    </>
-                  )}
+            {/* Step: Verify Email (new user) */}
+            {step === 'verify-email' && (
+              <div className="space-y-5">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">We've sent a 6-digit code to</p>
+                  <p className="text-sm font-medium text-foreground">{email}</p>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-otp">Verification code</Label>
+                  <Input
+                    id="auth-otp"
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onKeyDown={(e) => e.key === 'Enter' && handleVerifyEmail()}
+                    maxLength={6}
+                    autoFocus
+                  />
+                </div>
+                <Button className="w-full" onClick={handleVerifyEmail} disabled={isLoading || otp.length !== 6}>
+                  {isLoading ? 'Verifying...' : 'Verify'}
+                </Button>
+                <Button variant="link" className="w-full text-sm p-0 h-auto" onClick={handleResendCode} disabled={isLoading}>
+                  Resend code
+                </Button>
+              </div>
+            )}
+
+            {/* Step: Create Account */}
+            {step === 'create-account' && (
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="auth-firstname">First name</Label>
+                  <Input
+                    id="auth-firstname"
+                    type="text"
+                    placeholder="First name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-lastname">Last name</Label>
+                  <Input
+                    id="auth-lastname"
+                    type="text"
+                    placeholder="Last name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-phone">Mobile number</Label>
+                  <Input
+                    id="auth-phone"
+                    type="tel"
+                    placeholder="+961 XX XXX XXX"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-create-password">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="auth-create-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Create a password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="stay-signed-in-create"
+                    checked={staySignedIn}
+                    onCheckedChange={(checked) => setStaySignedIn(!!checked)}
+                  />
+                  <Label htmlFor="stay-signed-in-create" className="text-sm text-muted-foreground cursor-pointer">Stay signed in</Label>
+                </div>
+                <Button className="w-full" onClick={handleCreateAccount} disabled={isLoading}>
+                  {isLoading ? 'Creating account...' : 'Create account'}
+                </Button>
+              </div>
+            )}
+
+            {/* Step: Forgot Password - Enter Code */}
+            {step === 'forgot-password' && (
+              <div className="space-y-5">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">We've sent a 6-digit code to</p>
+                  <p className="text-sm font-medium text-foreground">{email}</p>
+                  <p className="text-xs text-muted-foreground">The code expires in 10 minutes.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-reset-otp">Verification code</Label>
+                  <Input
+                    id="auth-reset-otp"
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onKeyDown={(e) => e.key === 'Enter' && handleVerifyResetCode()}
+                    maxLength={6}
+                    autoFocus
+                  />
+                </div>
+                <Button className="w-full" onClick={handleVerifyResetCode} disabled={isLoading || otp.length !== 6}>
+                  {isLoading ? 'Verifying...' : 'Verify code'}
+                </Button>
+                <Button variant="link" className="w-full text-sm p-0 h-auto" onClick={handleResendCode} disabled={isLoading}>
+                  Resend code
+                </Button>
+              </div>
+            )}
+
+            {/* Step: Reset Password */}
+            {step === 'reset-password' && (
+              <div className="space-y-5">
+                <p className="text-sm text-muted-foreground">Enter your new password below.</p>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-new-password">New password</Label>
+                  <div className="relative">
+                    <Input
+                      id="auth-new-password"
+                      type={showNewPassword ? 'text' : 'password'}
+                      placeholder="New password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="auth-confirm-new-password">Confirm new password</Label>
+                  <Input
+                    id="auth-confirm-new-password"
+                    type="password"
+                    placeholder="Confirm new password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
+                  />
+                </div>
+                <Button className="w-full" onClick={handleResetPassword} disabled={isLoading}>
+                  {isLoading ? 'Updating...' : 'Update password'}
+                </Button>
               </div>
             )}
           </CardContent>
