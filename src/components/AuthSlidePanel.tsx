@@ -100,13 +100,12 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: {
-        shouldCreateUser: false,
-        data: { otp_type: 'verification' }
+        shouldCreateUser: true,
       }
     });
-    // Even if this fails (user doesn't exist), we show the verify screen
-    // The actual account will be created after verification
-    if (!error) {
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
       toast({ title: 'Verification code sent', description: `A 6-digit code has been sent to ${email}` });
     }
   };
