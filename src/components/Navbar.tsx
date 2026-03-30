@@ -9,7 +9,9 @@ import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
+import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
+  const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const auth = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -227,11 +229,10 @@ export const Navbar = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </> : <Link to="/auth">
-                <Button>Sign In</Button>
-              </Link>}
+              </> : <Button onClick={() => setAuthPanelOpen(true)}>Sign In</Button>}
           </div>
         </div>
       </div>
+      <AuthSlidePanel open={authPanelOpen} onClose={() => setAuthPanelOpen(false)} />
     </nav>;
 };
