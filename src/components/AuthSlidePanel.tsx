@@ -279,7 +279,7 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
       } else {
         await supabase.auth.signInWithOtp({
           email: email.trim(),
-          options: { shouldCreateUser: false }
+          options: { shouldCreateUser: true }
         });
       }
       toast({ title: 'Code resent', description: 'A new code has been sent to your email.' });
