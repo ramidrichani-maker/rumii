@@ -561,7 +561,6 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
               </div>
             )}
           </div>
-        </div>
       </div>
     </>
   );
