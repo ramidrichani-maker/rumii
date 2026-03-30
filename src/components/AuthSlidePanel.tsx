@@ -63,32 +63,22 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
     }
     setIsLoading(true);
     try {
-      // Try signing in with a dummy password to check if user exists
-      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: '___probe___' });
-      if (error?.message?.includes('Invalid login credentials')) {
-        // User exists - ask for password
-        setStep('password');
-      } else if (error?.message?.includes('Email not confirmed')) {
-        // User exists but not confirmed
-        setStep('password');
+      // Try signInWithOtp with shouldCreateUser: false
+      // If user doesn't exist, this will return an error
+      const { error: otpProbe } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: { shouldCreateUser: false }
+      });
+
+      if (otpProbe) {
+        // User doesn't exist — send verification OTP for new user
+        await sendVerificationOtp();
+        setStep('verify-email');
       } else {
-        // User doesn't exist - send verification OTP
-        const { error: otpError } = await supabase.auth.signInWithOtp({
-          email: email.trim(),
-          options: { shouldCreateUser: false }
-        });
-        // If OTP fails because user doesn't exist, that's expected for new users
-        // We'll send a signup OTP instead
-        if (otpError) {
-          // New user - send signup verification
-          await sendVerificationOtp();
-          setStep('verify-email');
-        } else {
-          setStep('password');
-        }
+        // User exists — ask for password
+        setStep('password');
       }
     } catch {
-      // Default to new user flow
       await sendVerificationOtp();
       setStep('verify-email');
     } finally {
