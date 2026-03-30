@@ -234,17 +234,34 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
     }
     setIsLoading(true);
     try {
-      const { error } = await signUp(email.trim(), password, {
-        full_name: `${firstName.trim()} ${lastName.trim()}`,
-        phone_number: phone.trim(),
-        role: 'user'
-      });
-      if (error) {
-        toast({ title: 'Error', description: error.message, variant: 'destructive' });
-      } else {
-        toast({ title: 'Account created!', description: 'Welcome to Oracle Estates.' });
-        handleClose();
+      // User was already created by signInWithOtp + verifyOtp, so update their password and profile
+      const { error: pwError } = await supabase.auth.updateUser({ password });
+      if (pwError) {
+        toast({ title: 'Error', description: pwError.message, variant: 'destructive' });
+        setIsLoading(false);
+        return;
       }
+
+      // Update profile with name and phone
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            full_name: `${firstName.trim()} ${lastName.trim()}`,
+            phone_number: phone.trim(),
+          })
+          .eq('user_id', currentUser.id);
+
+        if (profileError) {
+          toast({ title: 'Error', description: profileError.message, variant: 'destructive' });
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      toast({ title: 'Account created!', description: 'Welcome to Oracle Estates.' });
+      handleClose();
     } catch {
       toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
     } finally {
@@ -262,7 +279,7 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
       } else {
         await supabase.auth.signInWithOtp({
           email: email.trim(),
-          options: { shouldCreateUser: false }
+          options: { shouldCreateUser: true }
         });
       }
       toast({ title: 'Code resent', description: 'A new code has been sent to your email.' });
