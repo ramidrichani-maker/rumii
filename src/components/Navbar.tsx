@@ -9,7 +9,9 @@ import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
+import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
+  const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const auth = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
