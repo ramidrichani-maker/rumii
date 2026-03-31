@@ -8,11 +8,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
+  const [buyMenuOpen, setBuyMenuOpen] = useState(false);
+  const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const auth = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
