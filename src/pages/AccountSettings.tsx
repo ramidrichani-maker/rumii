@@ -383,6 +383,43 @@ export default function AccountSettings() {
 
       <Card className="mt-6">
         <CardHeader>
+          <CardTitle className="text-lg">Contact Preferences</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Marketing Emails</p>
+                <p className="text-xs text-muted-foreground">Receive promotional emails and offers</p>
+              </div>
+            </div>
+            <Switch
+              checked={marketingEmails}
+              onCheckedChange={setMarketingEmails}
+            />
+          </div>
+
+          <div className="border-t border-border" />
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Saved Property Alerts</p>
+                <p className="text-xs text-muted-foreground">Get notified about updates on your saved properties</p>
+              </div>
+            </div>
+            <Switch
+              checked={savedPropertyAlerts}
+              onCheckedChange={setSavedPropertyAlerts}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
           <CardTitle className="text-lg">Account Security</CardTitle>
         </CardHeader>
         <CardContent className="space-y-1">
