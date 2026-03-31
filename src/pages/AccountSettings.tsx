@@ -193,7 +193,7 @@ export default function AccountSettings() {
                   ) : (
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-sm font-medium text-foreground">{profile.full_name || 'Not set'}</p>
-                      <Button size="sm" variant="ghost" onClick={() => setIsEditingName(true)}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => setIsEditingName(true)}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
                     </div>
                   )}
                 </div>
