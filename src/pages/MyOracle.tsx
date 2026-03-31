@@ -116,6 +116,21 @@ export default function MyOracle() {
     setMyPlaces((data as any) || []);
   };
 
+  const fetchSavedAreas = async () => {
+    const { data } = await supabase
+      .from('saved_search_areas' as any)
+      .select('*')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    setSavedAreas((data as any) || []);
+  };
+
+  const handleDeleteArea = async (id: string) => {
+    await supabase.from('saved_search_areas' as any).delete().eq('id', id);
+    setSavedAreas(prev => prev.filter(a => a.id !== id));
+    toast({ title: "Area deleted" });
+  };
+
   const formatPrice = (property: { price: number | null; rental_price: number | null; listing_type: string }) => {
     if (property.listing_type === 'rent' && property.rental_price) {
       return `€${property.rental_price.toLocaleString()}/mo`;
