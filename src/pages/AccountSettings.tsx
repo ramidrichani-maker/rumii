@@ -134,39 +134,37 @@ export default function AccountSettings() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="mx-auto py-8 px-4 max-w-6xl">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Account Settings</h1>
 
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar */}
-        <nav className="md:w-56 shrink-0">
-          <Card>
-            <CardContent className="p-2">
-              {sidebarItems.map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => setActiveSection(item.key)}
-                  className={cn(
-                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
-                    activeSection === item.key
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  )}
-                >
-                  {item.icon}
-                  {item.label}
-                </button>
-              ))}
-            </CardContent>
-          </Card>
+        <nav className="md:w-64 shrink-0">
+          <div className="space-y-1">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setActiveSection(item.key)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-base font-medium transition-colors text-left',
+                  activeSection === item.key
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                {item.icon}
+                {item.label}
+              </button>
+            ))}
+          </div>
         </nav>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           {activeSection === 'personal' && (
             <Card>
-              <CardContent className="p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-foreground">Personal Details</h2>
+              <CardContent className="p-8 space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">Personal Details</h2>
 
                 {/* Full Name */}
                 <div>
@@ -195,7 +193,7 @@ export default function AccountSettings() {
                   ) : (
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-sm font-medium text-foreground">{profile.full_name || 'Not set'}</p>
-                      <Button size="sm" variant="ghost" onClick={() => setIsEditingName(true)}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => setIsEditingName(true)}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
                     </div>
                   )}
                 </div>
@@ -208,7 +206,7 @@ export default function AccountSettings() {
                   {emailStep === 'idle' && (
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-sm font-medium text-foreground">{user.email}</p>
-                      <Button size="sm" variant="ghost" onClick={() => setEmailStep('form')}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEmailStep('form')}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
                     </div>
                   )}
                   {emailStep === 'form' && (
@@ -270,7 +268,7 @@ export default function AccountSettings() {
                   ) : (
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-sm font-medium text-foreground">{profile.phone_number || 'Not set'}</p>
-                      <Button size="sm" variant="ghost" onClick={() => setIsEditingPhone(true)}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => setIsEditingPhone(true)}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
                     </div>
                   )}
                 </div>
@@ -280,8 +278,8 @@ export default function AccountSettings() {
 
           {activeSection === 'contact' && (
             <Card>
-              <CardContent className="p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-foreground">Contact Preferences</h2>
+              <CardContent className="p-8 space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">Contact Preferences</h2>
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -312,8 +310,8 @@ export default function AccountSettings() {
 
           {activeSection === 'security' && (
             <Card>
-              <CardContent className="p-6 space-y-1">
-                <h2 className="text-lg font-semibold text-foreground mb-4">Account Security</h2>
+              <CardContent className="p-8 space-y-1">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Account Security</h2>
 
                 <button
                   onClick={() => navigate('/change-password')}
