@@ -35,6 +35,7 @@ export default function AccountSettings() {
       const parts = profile.full_name.split(' ');
       setFirstName(parts[0] || '');
       setLastName(parts.slice(1).join(' ') || '');
+      setNewPhone(profile.phone_number || '');
     }
   }, [profile]);
 
