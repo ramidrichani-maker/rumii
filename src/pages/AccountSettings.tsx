@@ -163,8 +163,8 @@ export default function AccountSettings() {
         <div className="flex-1 min-w-0">
           {activeSection === 'personal' && (
             <Card>
-              <CardContent className="p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-foreground">Personal Details</h2>
+              <CardContent className="p-8 space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">Personal Details</h2>
 
                 {/* Full Name */}
                 <div>
