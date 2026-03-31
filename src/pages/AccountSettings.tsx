@@ -380,7 +380,7 @@ export default function AccountSettings() {
         <CardHeader>
           <CardTitle className="text-lg">Account Security</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-1">
           <button
             onClick={() => navigate('/change-password')}
             className="w-full flex items-center justify-between py-3 px-1 hover:bg-muted/50 rounded-md transition-colors"
@@ -391,8 +391,68 @@ export default function AccountSettings() {
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
+
+          <div className="border-t border-border" />
+
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="w-full flex items-center justify-between py-3 px-1 hover:bg-destructive/10 rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Trash2 className="h-4 w-4 text-destructive" />
+              <span className="text-sm font-medium text-destructive">Delete Account</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-destructive" />
+          </button>
         </CardContent>
       </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action is permanent and cannot be undone. All your data will be deleted, including your listings, viewings, messages, and account information.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 py-2">
+            <Label htmlFor="deletePassword" className="text-sm">Enter your password to confirm</Label>
+            <div className="relative">
+              <Input
+                id="deletePassword"
+                type={showDeletePassword ? 'text' : 'password'}
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Your current password"
+                disabled={deletingAccount}
+              />
+              <button
+                type="button"
+                onClick={() => setShowDeletePassword(!showDeletePassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              >
+                {showDeletePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              disabled={deletingAccount}
+              onClick={() => { setDeletePassword(''); setShowDeletePassword(false); }}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAccount}
+              disabled={deletingAccount || !deletePassword.trim()}
+            >
+              {deletingAccount ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Delete Account
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
