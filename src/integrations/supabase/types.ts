@@ -912,6 +912,33 @@ export type Database = {
           },
         ]
       }
+      saved_search_areas: {
+        Row: {
+          coordinates: Json
+          created_at: string
+          id: string
+          name: string
+          page: string
+          user_id: string
+        }
+        Insert: {
+          coordinates: Json
+          created_at?: string
+          id?: string
+          name?: string
+          page?: string
+          user_id: string
+        }
+        Update: {
+          coordinates?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          page?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_settings: {
         Row: {
           created_at: string
