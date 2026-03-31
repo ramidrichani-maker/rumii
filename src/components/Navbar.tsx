@@ -93,24 +93,18 @@ export const Navbar = () => {
           </Link>
           {profile?.role !== 'customer_support' ? (
             <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-[1.05rem] gap-1">
-                    Buy <ChevronDown className="h-3.5 w-3.5 opacity-60" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[25vw] min-w-[240px]">
-                  <DropdownMenuItem asChild>
-                    <Link to="/purchase" className="cursor-pointer">Property for sale</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/new-homes" className="cursor-pointer">New homes for sale</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/agent-valuation" className="cursor-pointer">Property valuation request</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
+                  setBuyMenuOpen(true);
+                }}
+                onMouseLeave={() => {
+                  buyMenuTimeout.current = setTimeout(() => setBuyMenuOpen(false), 150);
+                }}
+              >
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+              </div>
               <Link to="/rent">
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </Link>
