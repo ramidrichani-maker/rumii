@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Loader2, Pencil, X, Check, Phone, ChevronRight, Lock, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Pencil, X, Check, Phone, ChevronRight, Lock, Trash2, Eye, EyeOff, Mail, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import {
@@ -47,6 +48,10 @@ export default function AccountSettings() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [savingEmail, setSavingEmail] = useState(false);
+
+  // Contact preferences
+  const [marketingEmails, setMarketingEmails] = useState(true);
+  const [savedPropertyAlerts, setSavedPropertyAlerts] = useState(true);
 
   useEffect(() => {
     if (profile) {
@@ -372,6 +377,43 @@ export default function AccountSettings() {
                 </Button>
               </div>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Contact Preferences</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Marketing Emails</p>
+                <p className="text-xs text-muted-foreground">Receive promotional emails and offers</p>
+              </div>
+            </div>
+            <Switch
+              checked={marketingEmails}
+              onCheckedChange={setMarketingEmails}
+            />
+          </div>
+
+          <div className="border-t border-border" />
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Saved Property Alerts</p>
+                <p className="text-xs text-muted-foreground">Get notified about updates on your saved properties</p>
+              </div>
+            </div>
+            <Switch
+              checked={savedPropertyAlerts}
+              onCheckedChange={setSavedPropertyAlerts}
+            />
           </div>
         </CardContent>
       </Card>
