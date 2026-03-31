@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
 import Purchase from "./pages/Purchase";
+import ChangePassword from "./pages/ChangePassword";
 import Rent from "./pages/Rent";
 import ListProperty from "./pages/ListProperty";
 import Auth from "./pages/Auth";
@@ -92,6 +93,7 @@ const AppRoutes = () => {
           <Route path="/support-portal" element={<SupportPortal />} />
           <Route path="/my-oracle" element={<MyOracle />} />
           <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/change-password" element={<ChangePassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

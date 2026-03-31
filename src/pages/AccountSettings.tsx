@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Pencil, X, Check, Phone } from 'lucide-react';
+import { Loader2, Pencil, X, Check, Phone, ChevronRight, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 export default function AccountSettings() {
   const { user, profile, updateProfile } = useAuth();
+  const navigate = useNavigate();
 
   // Name editing
   const [isEditingName, setIsEditingName] = useState(false);
@@ -330,6 +332,24 @@ export default function AccountSettings() {
               </div>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Account Security</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <button
+            onClick={() => navigate('/change-password')}
+            className="w-full flex items-center justify-between py-3 px-1 hover:bg-muted/50 rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Lock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Change Password</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
         </CardContent>
       </Card>
     </div>
