@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Pencil, X, Check } from 'lucide-react';
+import { Loader2, Pencil, X, Check, Phone } from 'lucide-react';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 export default function AccountSettings() {
@@ -17,6 +17,11 @@ export default function AccountSettings() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [savingName, setSavingName] = useState(false);
+
+  // Phone editing
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [newPhone, setNewPhone] = useState('');
+  const [savingPhone, setSavingPhone] = useState(false);
 
   // Email change
   const [emailStep, setEmailStep] = useState<'idle' | 'form' | 'otp'>('idle');
@@ -30,6 +35,7 @@ export default function AccountSettings() {
       const parts = profile.full_name.split(' ');
       setFirstName(parts[0] || '');
       setLastName(parts.slice(1).join(' ') || '');
+      setNewPhone(profile.phone_number || '');
     }
   }, [profile]);
 
@@ -57,6 +63,28 @@ export default function AccountSettings() {
       setLastName(parts.slice(1).join(' ') || '');
     }
     setIsEditingName(false);
+  };
+
+  // Phone handlers
+  const handleSavePhone = async () => {
+    if (!newPhone.trim()) {
+      toast.error('Phone number is required');
+      return;
+    }
+    setSavingPhone(true);
+    const { error } = await updateProfile({ phone_number: newPhone.trim() });
+    setSavingPhone(false);
+    if (error) {
+      toast.error('Failed to update phone number');
+    } else {
+      toast.success('Phone number updated successfully');
+      setIsEditingPhone(false);
+    }
+  };
+
+  const handleCancelPhone = () => {
+    setNewPhone(profile?.phone_number || '');
+    setIsEditingPhone(false);
   };
 
   const handleEmailChangeRequest = async () => {
@@ -264,6 +292,41 @@ export default function AccountSettings() {
                     Cancel
                   </Button>
                 </div>
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-border" />
+
+          {/* Phone Number Change */}
+          <div>
+            <Label className="text-sm text-muted-foreground">Phone Number</Label>
+            {isEditingPhone ? (
+              <div className="mt-2 space-y-3">
+                <Input
+                  id="newPhone"
+                  type="tel"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  placeholder="Enter new phone number"
+                  disabled={savingPhone}
+                  className="mt-1"
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSavePhone} disabled={savingPhone}>
+                    {savingPhone ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4 mr-1" /> Save</>}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCancelPhone} disabled={savingPhone}>
+                    <X className="h-4 w-4 mr-1" /> Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-sm font-medium text-foreground">{profile.phone_number || 'Not set'}</p>
+                <Button size="sm" variant="ghost" onClick={() => setIsEditingPhone(true)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
               </div>
             )}
           </div>
