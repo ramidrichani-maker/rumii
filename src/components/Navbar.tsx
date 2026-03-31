@@ -3,22 +3,18 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, ChevronDown } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
+  const [buyMenuOpen, setBuyMenuOpen] = useState(false);
+  const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const auth = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -88,7 +84,7 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-  return <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  return <nav className="relative border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 shrink-0">
@@ -97,24 +93,18 @@ export const Navbar = () => {
           </Link>
           {profile?.role !== 'customer_support' ? (
             <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-[1.05rem] gap-1">
-                    Buy <ChevronDown className="h-3.5 w-3.5 opacity-60" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[25vw] min-w-[240px]">
-                  <DropdownMenuItem asChild>
-                    <Link to="/purchase" className="cursor-pointer">Property for sale</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/new-homes" className="cursor-pointer">New homes for sale</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/agent-valuation" className="cursor-pointer">Property valuation request</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
+                  setBuyMenuOpen(true);
+                }}
+                onMouseLeave={() => {
+                  buyMenuTimeout.current = setTimeout(() => setBuyMenuOpen(false), 150);
+                }}
+              >
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+              </div>
               <Link to="/rent">
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </Link>
@@ -157,7 +147,44 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Profile Side Panel */}
+      {/* Buy Mega Menu */}
+      {buyMenuOpen && (
+        <div
+          className="absolute left-0 right-0 top-full bg-background border-b border-border shadow-lg z-50"
+          style={{ height: '25vh' }}
+          onMouseEnter={() => {
+            if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
+          }}
+          onMouseLeave={() => {
+            buyMenuTimeout.current = setTimeout(() => setBuyMenuOpen(false), 150);
+          }}
+        >
+          <div className="container mx-auto px-4 py-6 flex flex-col justify-center h-full space-y-2">
+            <Link
+              to="/purchase"
+              onClick={() => setBuyMenuOpen(false)}
+              className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+            >
+              Property for sale
+            </Link>
+            <Link
+              to="/new-homes"
+              onClick={() => setBuyMenuOpen(false)}
+              className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+            >
+              New homes for sale
+            </Link>
+            <Link
+              to="/agent-valuation"
+              onClick={() => setBuyMenuOpen(false)}
+              className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+            >
+              Property valuation request
+            </Link>
+          </div>
+        </div>
+      )}
+
       {createPortal(
         <>
           {profilePanelOpen && (
