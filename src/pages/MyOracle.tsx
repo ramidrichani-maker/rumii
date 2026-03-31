@@ -33,22 +33,25 @@ interface Property {
   address: string;
   city: string;
   property_type: string;
-  images: string[] | null;
-  price: number | null;
+  images: string[];
+  price: number;
   rental_price: number | null;
-  listing_type: string;
-  status: string;
+  listing_type: 'rent' | 'sale' | 'both';
+  status: 'pending' | 'approved' | 'rejected';
   bedrooms: number;
   bathrooms: number;
   square_meters: number;
   description?: string | null;
-  amenities?: string[] | null;
+  amenities: string[];
   latitude?: number | null;
   longitude?: number | null;
-  municipality?: string | null;
-  year_built?: number | null;
+  municipality?: string;
+  year_built?: number;
   floors?: number | null;
   unfurnished?: boolean;
+  created_at: string;
+  user_id: string;
+  agency_id?: string | null;
 }
 
 export default function MyOracle() {
