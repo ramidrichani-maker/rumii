@@ -6,13 +6,29 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Pencil, X, Check, Phone, ChevronRight, Lock } from 'lucide-react';
+import { Loader2, Pencil, X, Check, Phone, ChevronRight, Lock, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AccountSettings() {
-  const { user, profile, updateProfile } = useAuth();
+  const { user, profile, updateProfile, signOut } = useAuth();
   const navigate = useNavigate();
+
+  // Delete account
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Name editing
   const [isEditingName, setIsEditingName] = useState(false);
@@ -155,6 +171,31 @@ export default function AccountSettings() {
     setNewEmail('');
     setCurrentPassword('');
     setOtpCode('');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      toast.error('Please enter your password');
+      return;
+    }
+    setDeletingAccount(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-own-account', {
+        body: { password: deletePassword },
+      });
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        setDeletingAccount(false);
+        return;
+      }
+      toast.success('Your account has been deleted');
+      await signOut();
+      navigate('/');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete account');
+      setDeletingAccount(false);
+    }
   };
 
   if (!profile || !user) {
@@ -339,7 +380,7 @@ export default function AccountSettings() {
         <CardHeader>
           <CardTitle className="text-lg">Account Security</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-1">
           <button
             onClick={() => navigate('/change-password')}
             className="w-full flex items-center justify-between py-3 px-1 hover:bg-muted/50 rounded-md transition-colors"
@@ -350,8 +391,68 @@ export default function AccountSettings() {
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
+
+          <div className="border-t border-border" />
+
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="w-full flex items-center justify-between py-3 px-1 hover:bg-destructive/10 rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Trash2 className="h-4 w-4 text-destructive" />
+              <span className="text-sm font-medium text-destructive">Delete Account</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-destructive" />
+          </button>
         </CardContent>
       </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action is permanent and cannot be undone. All your data will be deleted, including your listings, viewings, messages, and account information.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 py-2">
+            <Label htmlFor="deletePassword" className="text-sm">Enter your password to confirm</Label>
+            <div className="relative">
+              <Input
+                id="deletePassword"
+                type={showDeletePassword ? 'text' : 'password'}
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Your current password"
+                disabled={deletingAccount}
+              />
+              <button
+                type="button"
+                onClick={() => setShowDeletePassword(!showDeletePassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              >
+                {showDeletePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              disabled={deletingAccount}
+              onClick={() => { setDeletePassword(''); setShowDeletePassword(false); }}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAccount}
+              disabled={deletingAccount || !deletePassword.trim()}
+            >
+              {deletingAccount ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Delete Account
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
