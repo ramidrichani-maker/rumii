@@ -267,6 +267,50 @@ export default function AccountSettings() {
 
                 <div className="border-t border-border" />
 
+                {/* Address */}
+                <div>
+                  <Label className="text-sm text-muted-foreground">Address</Label>
+                  {isEditingAddress ? (
+                    <div className="mt-2 space-y-3">
+                      <Input
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Enter your address"
+                        disabled={savingAddress}
+                        className="mt-1"
+                      />
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={handleSaveAddress} disabled={savingAddress}>
+                          {savingAddress ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4 mr-1" /> Save</>}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={handleCancelAddress} disabled={savingAddress}>
+                          <X className="h-4 w-4 mr-1" /> Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-sm font-medium text-foreground">{address || 'No address added'}</p>
+                      {address ? (
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" onClick={() => setIsEditingAddress(true)}>
+                            <Pencil className="h-4 w-4 mr-1" /> Edit
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={handleRemoveAddress}>
+                            <X className="h-4 w-4 mr-1" /> Remove
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="ghost" onClick={() => setIsEditingAddress(true)}>
+                          <Plus className="h-4 w-4 mr-1" /> Add
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-border" />
+
                 {/* Phone */}
                 <div>
                   <Label className="text-sm text-muted-foreground">Phone Number</Label>
