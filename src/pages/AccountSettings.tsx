@@ -18,6 +18,11 @@ export default function AccountSettings() {
   const [lastName, setLastName] = useState('');
   const [savingName, setSavingName] = useState(false);
 
+  // Phone editing
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [newPhone, setNewPhone] = useState('');
+  const [savingPhone, setSavingPhone] = useState(false);
+
   // Email change
   const [emailStep, setEmailStep] = useState<'idle' | 'form' | 'otp'>('idle');
   const [newEmail, setNewEmail] = useState('');
