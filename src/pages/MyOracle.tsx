@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, Mail, Heart, Home, PlusCircle, MapPin, ChevronRight } from 'lucide-react';
+import { Loader2, Mail, Heart, Home, PlusCircle, MapPin, ChevronRight, Map, Trash2 } from 'lucide-react';
 import PropertyDetailModal from '@/components/PropertyDetailModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface Enquiry {
   id: string;
@@ -54,18 +55,28 @@ interface Property {
   agency_id?: string | null;
 }
 
+interface SavedArea {
+  id: string;
+  name: string;
+  coordinates: string;
+  page: string;
+  created_at: string;
+}
+
 export default function MyOracle() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [favorites, setFavorites] = useState<Property[]>([]);
   const [myPlaces, setMyPlaces] = useState<Property[]>([]);
+  const [savedAreas, setSavedAreas] = useState<SavedArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
   useEffect(() => {
     if (user) {
-      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces()]).finally(() => setLoading(false));
+      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -103,6 +114,21 @@ export default function MyOracle() {
       .eq('user_id', user?.id)
       .order('created_at', { ascending: false });
     setMyPlaces((data as any) || []);
+  };
+
+  const fetchSavedAreas = async () => {
+    const { data } = await supabase
+      .from('saved_search_areas' as any)
+      .select('*')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    setSavedAreas((data as any) || []);
+  };
+
+  const handleDeleteArea = async (id: string) => {
+    await supabase.from('saved_search_areas' as any).delete().eq('id', id);
+    setSavedAreas(prev => prev.filter(a => a.id !== id));
+    toast({ title: "Area deleted" });
   };
 
   const formatPrice = (property: { price: number | null; rental_price: number | null; listing_type: string }) => {
@@ -227,6 +253,44 @@ export default function MyOracle() {
           </div>
         )}
       </section>
+      {/* Saved Search Areas */}
+      {savedAreas.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mb-4 mt-2">
+            <Map className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-semibold text-foreground">Saved Search Areas</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {savedAreas.map((area) => {
+              const coords = typeof area.coordinates === 'string' ? JSON.parse(area.coordinates) : area.coordinates;
+              const pointCount = Array.isArray(coords) ? coords.length : 0;
+              return (
+                <Card key={area.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div
+                      className="cursor-pointer flex-1"
+                      onClick={() => navigate(`/${area.page}`)}
+                    >
+                      <p className="font-medium text-sm text-foreground">{area.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {pointCount} points • {area.page === 'purchase' ? 'Buy' : 'Rent'} • {new Date(area.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive h-8 w-8"
+                      onClick={() => handleDeleteArea(area.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <Separator />
 

@@ -240,6 +240,25 @@ const Purchase = () => {
     setDrawnPolygon(polygon);
   }, [setDrawnPolygon]);
 
+  const handleSaveArea = useCallback(async (coordinates: { latitude: number; longitude: number }[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Sign in required", description: "Please sign in to save search areas.", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from('saved_search_areas' as any).insert({
+      user_id: user.id,
+      name: locationInput || 'Custom Area',
+      coordinates: JSON.stringify(coordinates),
+      page: 'purchase',
+    });
+    if (error) {
+      toast({ title: "Error", description: "Failed to save area.", variant: "destructive" });
+    } else {
+      toast({ title: "Area saved", description: "You can view it in My Oracle." });
+    }
+  }, [locationInput]);
+
   const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
   return (
@@ -370,6 +389,7 @@ const Purchase = () => {
                 initialSearchLocation={locationInput}
                 searchRadius={radius}
                 embedded={true}
+                onSaveArea={handleSaveArea}
               />
             </div>
           )}
@@ -412,6 +432,7 @@ const Purchase = () => {
             initialSearchLocation={locationInput}
             searchRadius={radius}
             embedded={true}
+            onSaveArea={handleSaveArea}
           />
         )}
       </div>

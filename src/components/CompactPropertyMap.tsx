@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Locate, Search, Maximize2, PenTool, Trash2 } from 'lucide-react';
+import { MapPin, Locate, Search, Maximize2, PenTool, Trash2, Save } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw';
@@ -52,6 +52,8 @@ interface CompactPropertyMapProps {
   searchRadius?: number;
   /** When true, hides the internal header/controls (parent manages chrome) */
   embedded?: boolean;
+  /** Callback when user wants to save the drawn area */
+  onSaveArea?: (coordinates: DrawnPolygonCoordinate[]) => void;
 }
 
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
@@ -65,6 +67,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   initialSearchLocation = '',
   searchRadius = 1,
   embedded = false,
+  onSaveArea,
 }) => {
   const { profile } = useAuth();
   const isAdmin = profile?.role === 'admin';
@@ -651,13 +654,32 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
                 Cancel Drawing
               </button>
             ) : hasDrawnArea ? (
-              <button
-                onClick={clearDrawnArea}
-                className="px-3 py-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-destructive/10 text-destructive transition-colors text-xs font-medium flex items-center gap-1"
-              >
-                <Trash2 className="w-3 h-3" />
-                Clear Area
-              </button>
+              <div className="flex gap-1">
+                {onSaveArea && (
+                  <button
+                    onClick={() => {
+                      const layers = drawnItemsRef.current?.getLayers();
+                      if (layers && layers.length > 0) {
+                        const layer = layers[0] as L.Polygon;
+                        const latLngs = layer.getLatLngs()[0] as L.LatLng[];
+                        const coords: DrawnPolygonCoordinate[] = latLngs.map(ll => ({ latitude: ll.lat, longitude: ll.lng }));
+                        onSaveArea(coords);
+                      }
+                    }}
+                    className="px-3 py-1.5 rounded-md bg-primary/90 text-primary-foreground shadow-sm hover:bg-primary transition-colors text-xs font-medium flex items-center gap-1"
+                  >
+                    <Save className="w-3 h-3" />
+                    Save Area
+                  </button>
+                )}
+                <button
+                  onClick={clearDrawnArea}
+                  className="px-3 py-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-destructive/10 text-destructive transition-colors text-xs font-medium flex items-center gap-1"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Clear Area
+                </button>
+              </div>
             ) : (
               <button
                 onClick={startDrawing}
@@ -717,15 +739,35 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
                       Cancel
                     </Button>
                   ) : hasDrawnArea ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={clearDrawnArea}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Clear Area
-                    </Button>
+                    <div className="flex gap-1">
+                      {onSaveArea && (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => {
+                            const layers = drawnItemsRef.current?.getLayers();
+                            if (layers && layers.length > 0) {
+                              const layer = layers[0] as L.Polygon;
+                              const latLngs = layer.getLatLngs()[0] as L.LatLng[];
+                              const coords: DrawnPolygonCoordinate[] = latLngs.map(ll => ({ latitude: ll.lat, longitude: ll.lng }));
+                              onSaveArea(coords);
+                            }
+                          }}
+                        >
+                          <Save className="h-4 w-4 mr-1" />
+                          Save Area
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={clearDrawnArea}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Clear Area
+                      </Button>
+                    </div>
                   ) : (
                     <Button
                       size="sm"
