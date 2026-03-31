@@ -48,6 +48,10 @@ export default function AccountSettings() {
   const [otpCode, setOtpCode] = useState('');
   const [savingEmail, setSavingEmail] = useState(false);
 
+  // Contact preferences
+  const [marketingEmails, setMarketingEmails] = useState(true);
+  const [savedPropertyAlerts, setSavedPropertyAlerts] = useState(true);
+
   useEffect(() => {
     if (profile) {
       const parts = profile.full_name.split(' ');
