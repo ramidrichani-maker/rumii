@@ -240,6 +240,11 @@ export const Navbar = () => {
                 </Link>
               )}
 
+              <Link to="/account-settings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                <Settings className="h-4 w-4 text-muted-foreground" />
+                <span>Settings</span>
+              </Link>
+
               <div className="border-t border-border my-3" />
 
               <button onClick={() => { setProfilePanelOpen(false); handleSignOut(); }} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors w-full text-left">

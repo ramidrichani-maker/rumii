@@ -1,0 +1,274 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { Loader2, Pencil, X, Check } from 'lucide-react';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+
+export default function AccountSettings() {
+  const { user, profile, updateProfile } = useAuth();
+
+  // Name editing
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [savingName, setSavingName] = useState(false);
+
+  // Email change
+  const [emailStep, setEmailStep] = useState<'idle' | 'form' | 'otp'>('idle');
+  const [newEmail, setNewEmail] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      const parts = profile.full_name.split(' ');
+      setFirstName(parts[0] || '');
+      setLastName(parts.slice(1).join(' ') || '');
+    }
+  }, [profile]);
+
+  const handleSaveName = async () => {
+    if (!firstName.trim()) {
+      toast.error('First name is required');
+      return;
+    }
+    setSavingName(true);
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    const { error } = await updateProfile({ full_name: fullName });
+    setSavingName(false);
+    if (error) {
+      toast.error('Failed to update name');
+    } else {
+      toast.success('Name updated successfully');
+      setIsEditingName(false);
+    }
+  };
+
+  const handleCancelName = () => {
+    if (profile) {
+      const parts = profile.full_name.split(' ');
+      setFirstName(parts[0] || '');
+      setLastName(parts.slice(1).join(' ') || '');
+    }
+    setIsEditingName(false);
+  };
+
+  const handleEmailChangeRequest = async () => {
+    if (!newEmail.trim()) {
+      toast.error('Please enter a new email');
+      return;
+    }
+    if (!currentPassword.trim()) {
+      toast.error('Please enter your current password');
+      return;
+    }
+
+    setSavingEmail(true);
+
+    // Verify current password by attempting sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user?.email || '',
+      password: currentPassword,
+    });
+
+    if (signInError) {
+      setSavingEmail(false);
+      toast.error('Incorrect password');
+      return;
+    }
+
+    // Request email change - Supabase sends a confirmation to the new email
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    setSavingEmail(false);
+
+    if (error) {
+      toast.error(error.message || 'Failed to request email change');
+    } else {
+      toast.success('A verification code has been sent to your new email');
+      setEmailStep('otp');
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otpCode.length !== 6) {
+      toast.error('Please enter the 6-digit code');
+      return;
+    }
+
+    setSavingEmail(true);
+    const { error } = await supabase.auth.verifyOtp({
+      email: newEmail,
+      token: otpCode,
+      type: 'email_change',
+    });
+    setSavingEmail(false);
+
+    if (error) {
+      toast.error(error.message || 'Invalid verification code');
+    } else {
+      toast.success('Email changed successfully');
+      setEmailStep('idle');
+      setNewEmail('');
+      setCurrentPassword('');
+      setOtpCode('');
+    }
+  };
+
+  const handleCancelEmailChange = () => {
+    setEmailStep('idle');
+    setNewEmail('');
+    setCurrentPassword('');
+    setOtpCode('');
+  };
+
+  if (!profile || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-8 px-4 max-w-2xl">
+      <h1 className="text-2xl font-bold mb-6 text-foreground">Account Settings</h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Personal Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Full Name */}
+          <div>
+            <Label className="text-sm text-muted-foreground">Full Name</Label>
+            {isEditingName ? (
+              <div className="mt-2 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="firstName" className="text-xs">First Name</Label>
+                    <Input
+                      id="firstName"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      disabled={savingName}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName" className="text-xs">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      disabled={savingName}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSaveName} disabled={savingName}>
+                    {savingName ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4 mr-1" /> Save</>}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCancelName} disabled={savingName}>
+                    <X className="h-4 w-4 mr-1" /> Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-sm font-medium text-foreground">{profile.full_name || 'Not set'}</p>
+                <Button size="sm" variant="ghost" onClick={() => setIsEditingName(true)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-border" />
+
+          {/* Email Change */}
+          <div>
+            <Label className="text-sm text-muted-foreground">Email</Label>
+            {emailStep === 'idle' && (
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-sm font-medium text-foreground">{user.email}</p>
+                <Button size="sm" variant="ghost" onClick={() => setEmailStep('form')}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
+            {emailStep === 'form' && (
+              <div className="mt-2 space-y-3">
+                <div>
+                  <Label htmlFor="newEmail" className="text-xs">New Email</Label>
+                  <Input
+                    id="newEmail"
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="Enter new email address"
+                    disabled={savingEmail}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="currentPassword" className="text-xs">Current Password</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter your current password"
+                    disabled={savingEmail}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleEmailChangeRequest} disabled={savingEmail}>
+                    {savingEmail ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Verification Code'}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCancelEmailChange} disabled={savingEmail}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {emailStep === 'otp' && (
+              <div className="mt-2 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Enter the 6-digit code sent to <span className="font-medium text-foreground">{newEmail}</span>
+                </p>
+                <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleVerifyOtp} disabled={savingEmail || otpCode.length !== 6}>
+                    {savingEmail ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Verify & Change Email'}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCancelEmailChange} disabled={savingEmail}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
