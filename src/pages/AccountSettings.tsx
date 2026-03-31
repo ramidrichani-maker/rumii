@@ -134,31 +134,29 @@ export default function AccountSettings() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="mx-auto py-8 px-4 max-w-6xl">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Account Settings</h1>
 
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar */}
-        <nav className="md:w-56 shrink-0">
-          <Card>
-            <CardContent className="p-2">
-              {sidebarItems.map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => setActiveSection(item.key)}
-                  className={cn(
-                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
-                    activeSection === item.key
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  )}
-                >
-                  {item.icon}
-                  {item.label}
-                </button>
-              ))}
-            </CardContent>
-          </Card>
+        <nav className="md:w-64 shrink-0">
+          <div className="space-y-1">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setActiveSection(item.key)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-base font-medium transition-colors text-left',
+                  activeSection === item.key
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                {item.icon}
+                {item.label}
+              </button>
+            ))}
+          </div>
         </nav>
 
         {/* Content */}
