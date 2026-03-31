@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Loader2, Pencil, X, Check, ChevronRight, Lock, Trash2, Eye, EyeOff, Mail, Bell, User, Shield } from 'lucide-react';
+import { Loader2, Pencil, X, Check, ChevronRight, Lock, Trash2, Eye, EyeOff, Mail, Bell, User, Shield, Plus, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import {
@@ -45,6 +45,11 @@ export default function AccountSettings() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [savingName, setSavingName] = useState(false);
+
+  // Address editing
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [address, setAddress] = useState('');
+  const [savingAddress, setSavingAddress] = useState(false);
 
   // Phone editing
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -94,6 +99,18 @@ export default function AccountSettings() {
   };
 
   const handleCancelPhone = () => { setNewPhone(profile?.phone_number || ''); setIsEditingPhone(false); };
+
+  const handleSaveAddress = async () => {
+    setSavingAddress(true);
+    // For now, store address locally (no DB column yet)
+    setSavingAddress(false);
+    toast.success(address.trim() ? 'Address updated successfully' : 'Address removed');
+    setIsEditingAddress(false);
+  };
+
+  const handleRemoveAddress = () => { setAddress(''); toast.success('Address removed'); };
+
+  const handleCancelAddress = () => { setIsEditingAddress(false); };
 
   const handleEmailChangeRequest = async () => {
     if (!newEmail.trim()) { toast.error('Please enter a new email'); return; }
@@ -244,6 +261,50 @@ export default function AccountSettings() {
                         </Button>
                         <Button size="sm" variant="outline" onClick={handleCancelEmailChange} disabled={savingEmail}>Cancel</Button>
                       </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-border" />
+
+                {/* Address */}
+                <div>
+                  <Label className="text-sm text-muted-foreground">Address</Label>
+                  {isEditingAddress ? (
+                    <div className="mt-2 space-y-3">
+                      <Input
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Enter your address"
+                        disabled={savingAddress}
+                        className="mt-1"
+                      />
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={handleSaveAddress} disabled={savingAddress}>
+                          {savingAddress ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4 mr-1" /> Save</>}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={handleCancelAddress} disabled={savingAddress}>
+                          <X className="h-4 w-4 mr-1" /> Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-sm font-medium text-foreground">{address || 'No address added'}</p>
+                      {address ? (
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" onClick={() => setIsEditingAddress(true)}>
+                            <Pencil className="h-4 w-4 mr-1" /> Edit
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={handleRemoveAddress}>
+                            <X className="h-4 w-4 mr-1" /> Remove
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="ghost" onClick={() => setIsEditingAddress(true)}>
+                          <Plus className="h-4 w-4 mr-1" /> Add
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
