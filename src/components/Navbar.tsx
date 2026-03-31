@@ -3,7 +3,13 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -91,20 +97,29 @@ export const Navbar = () => {
           </Link>
           {profile?.role !== 'customer_support' ? (
             <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
-              <Link to="/purchase">
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-[1.05rem] gap-1">
+                    Buy <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-[25vw] min-w-[240px]">
+                  <DropdownMenuItem asChild>
+                    <Link to="/purchase" className="cursor-pointer">Property for sale</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/new-homes" className="cursor-pointer">New homes for sale</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/agent-valuation" className="cursor-pointer">Property valuation request</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Link to="/rent">
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </Link>
               <Link to="/find-agents">
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
-              </Link>
-              <Link to="/new-homes">
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">New homes</Button>
-              </Link>
-              <Link to="/agent-valuation">
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Agent valuation</Button>
               </Link>
             </nav>
           ) : (
