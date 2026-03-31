@@ -295,6 +295,41 @@ export default function AccountSettings() {
               </div>
             )}
           </div>
+
+          <div className="border-t border-border" />
+
+          {/* Phone Number Change */}
+          <div>
+            <Label className="text-sm text-muted-foreground">Phone Number</Label>
+            {isEditingPhone ? (
+              <div className="mt-2 space-y-3">
+                <Input
+                  id="newPhone"
+                  type="tel"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  placeholder="Enter new phone number"
+                  disabled={savingPhone}
+                  className="mt-1"
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSavePhone} disabled={savingPhone}>
+                    {savingPhone ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4 mr-1" /> Save</>}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCancelPhone} disabled={savingPhone}>
+                    <X className="h-4 w-4 mr-1" /> Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-sm font-medium text-foreground">{profile.phone_number || 'Not set'}</p>
+                <Button size="sm" variant="ghost" onClick={() => setIsEditingPhone(true)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
