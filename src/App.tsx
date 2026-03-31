@@ -31,6 +31,7 @@ import FindAgents from "./pages/FindAgents";
 import Messages from "./pages/Messages";
 import AgentValuation from "./pages/AgentValuation";
 import SupportPortal from "./pages/SupportPortal";
+import MyOracle from "./pages/MyOracle";
 import { FloatingChatWidget } from "./components/FloatingChatWidget";
 import { SupportReviewWidget } from "./components/SupportReviewWidget";
 
