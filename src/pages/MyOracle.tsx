@@ -55,18 +55,28 @@ interface Property {
   agency_id?: string | null;
 }
 
+interface SavedArea {
+  id: string;
+  name: string;
+  coordinates: string;
+  page: string;
+  created_at: string;
+}
+
 export default function MyOracle() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [favorites, setFavorites] = useState<Property[]>([]);
   const [myPlaces, setMyPlaces] = useState<Property[]>([]);
+  const [savedAreas, setSavedAreas] = useState<SavedArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
   useEffect(() => {
     if (user) {
-      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces()]).finally(() => setLoading(false));
+      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas()]).finally(() => setLoading(false));
     }
   }, [user]);
 
