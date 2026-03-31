@@ -133,12 +133,9 @@ export const Navbar = () => {
                   )}
                 </Link>
                 
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0" onClick={() => setProfilePanelOpen(true)}>
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">
-                      {profile?.full_name ? getInitials(profile.full_name) : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
+                <Button variant="ghost" className="flex items-center gap-2 px-3 py-1.5 rounded-full" onClick={() => setProfilePanelOpen(true)}>
+                  <User className="h-4 w-4" />
+                  <span className="text-sm font-medium">My Oracle</span>
                 </Button>
               </> : <Button onClick={() => setAuthPanelOpen(true)}>Sign In</Button>}
           </div>
