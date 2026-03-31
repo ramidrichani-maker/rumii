@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, Mail, Heart, Home, PlusCircle, MapPin, ChevronRight } from 'lucide-react';
+import { Loader2, Mail, Heart, Home, PlusCircle, MapPin, ChevronRight, Map, Trash2 } from 'lucide-react';
 import PropertyDetailModal from '@/components/PropertyDetailModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface Enquiry {
   id: string;
