@@ -173,6 +173,31 @@ export default function AccountSettings() {
     setOtpCode('');
   };
 
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      toast.error('Please enter your password');
+      return;
+    }
+    setDeletingAccount(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-own-account', {
+        body: { password: deletePassword },
+      });
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        setDeletingAccount(false);
+        return;
+      }
+      toast.success('Your account has been deleted');
+      await signOut();
+      navigate('/');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete account');
+      setDeletingAccount(false);
+    }
+  };
+
   if (!profile || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
