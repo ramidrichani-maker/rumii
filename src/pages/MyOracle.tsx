@@ -291,12 +291,11 @@ export default function MyOracle() {
         )}
       </section>
 
-      {selectedProperty && (
-        <PropertyDetailModal
-          property={selectedProperty}
-          onClose={() => setSelectedProperty(null)}
-        />
-      )}
+      <PropertyDetailModal
+        property={selectedProperty}
+        isOpen={!!selectedProperty}
+        onClose={() => setSelectedProperty(null)}
+      />
     </div>
   );
 }
