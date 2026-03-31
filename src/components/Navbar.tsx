@@ -175,8 +175,13 @@ export const Navbar = () => {
                       {profile.role}
                     </Badge>
                   )}
+                  <Link to="/my-oracle" onClick={() => setProfilePanelOpen(false)} className="mt-2">
+                    <Button size="sm" variant="outline" className="w-full gap-2">
+                      <Eye className="h-4 w-4" />
+                      View My Oracle
+                    </Button>
+                  </Link>
                 </div>
-              </div>
               <button onClick={() => setProfilePanelOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
