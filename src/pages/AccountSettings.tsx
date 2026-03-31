@@ -334,6 +334,24 @@ export default function AccountSettings() {
           </div>
         </CardContent>
       </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Account Security</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <button
+            onClick={() => navigate('/change-password')}
+            className="w-full flex items-center justify-between py-3 px-1 hover:bg-muted/50 rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Lock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Change Password</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
