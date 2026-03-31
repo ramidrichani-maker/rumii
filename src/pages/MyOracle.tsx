@@ -253,6 +253,44 @@ export default function MyOracle() {
           </div>
         )}
       </section>
+      {/* Saved Search Areas */}
+      {savedAreas.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mb-4 mt-2">
+            <Map className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-semibold text-foreground">Saved Search Areas</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {savedAreas.map((area) => {
+              const coords = typeof area.coordinates === 'string' ? JSON.parse(area.coordinates) : area.coordinates;
+              const pointCount = Array.isArray(coords) ? coords.length : 0;
+              return (
+                <Card key={area.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div
+                      className="cursor-pointer flex-1"
+                      onClick={() => navigate(`/${area.page}`)}
+                    >
+                      <p className="font-medium text-sm text-foreground">{area.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {pointCount} points • {area.page === 'purchase' ? 'Buy' : 'Rent'} • {new Date(area.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive h-8 w-8"
+                      onClick={() => handleDeleteArea(area.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <Separator />
 
