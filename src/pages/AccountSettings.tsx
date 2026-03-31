@@ -65,6 +65,28 @@ export default function AccountSettings() {
     setIsEditingName(false);
   };
 
+  // Phone handlers
+  const handleSavePhone = async () => {
+    if (!newPhone.trim()) {
+      toast.error('Phone number is required');
+      return;
+    }
+    setSavingPhone(true);
+    const { error } = await updateProfile({ phone_number: newPhone.trim() });
+    setSavingPhone(false);
+    if (error) {
+      toast.error('Failed to update phone number');
+    } else {
+      toast.success('Phone number updated successfully');
+      setIsEditingPhone(false);
+    }
+  };
+
+  const handleCancelPhone = () => {
+    setNewPhone(profile?.phone_number || '');
+    setIsEditingPhone(false);
+  };
+
   const handleEmailChangeRequest = async () => {
     if (!newEmail.trim()) {
       toast.error('Please enter a new email');
