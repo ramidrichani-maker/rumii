@@ -46,6 +46,11 @@ export default function AccountSettings() {
   const [lastName, setLastName] = useState('');
   const [savingName, setSavingName] = useState(false);
 
+  // Address editing
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [address, setAddress] = useState('');
+  const [savingAddress, setSavingAddress] = useState(false);
+
   // Phone editing
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [newPhone, setNewPhone] = useState('');
