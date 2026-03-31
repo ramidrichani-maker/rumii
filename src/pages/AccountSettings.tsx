@@ -278,8 +278,8 @@ export default function AccountSettings() {
 
           {activeSection === 'contact' && (
             <Card>
-              <CardContent className="p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-foreground">Contact Preferences</h2>
+              <CardContent className="p-8 space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">Contact Preferences</h2>
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
