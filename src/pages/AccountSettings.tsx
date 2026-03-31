@@ -21,8 +21,14 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export default function AccountSettings() {
-  const { user, profile, updateProfile } = useAuth();
+  const { user, profile, updateProfile, signOut } = useAuth();
   const navigate = useNavigate();
+
+  // Delete account
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Name editing
   const [isEditingName, setIsEditingName] = useState(false);
