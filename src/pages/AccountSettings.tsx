@@ -100,6 +100,18 @@ export default function AccountSettings() {
 
   const handleCancelPhone = () => { setNewPhone(profile?.phone_number || ''); setIsEditingPhone(false); };
 
+  const handleSaveAddress = async () => {
+    setSavingAddress(true);
+    // For now, store address locally (no DB column yet)
+    setSavingAddress(false);
+    toast.success(address.trim() ? 'Address updated successfully' : 'Address removed');
+    setIsEditingAddress(false);
+  };
+
+  const handleRemoveAddress = () => { setAddress(''); toast.success('Address removed'); };
+
+  const handleCancelAddress = () => { setIsEditingAddress(false); };
+
   const handleEmailChangeRequest = async () => {
     if (!newEmail.trim()) { toast.error('Please enter a new email'); return; }
     if (!currentPassword.trim()) { toast.error('Please enter your current password'); return; }
