@@ -739,15 +739,35 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
                       Cancel
                     </Button>
                   ) : hasDrawnArea ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={clearDrawnArea}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Clear Area
-                    </Button>
+                    <div className="flex gap-1">
+                      {onSaveArea && (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => {
+                            const layers = drawnItemsRef.current?.getLayers();
+                            if (layers && layers.length > 0) {
+                              const layer = layers[0] as L.Polygon;
+                              const latLngs = layer.getLatLngs()[0] as L.LatLng[];
+                              const coords: DrawnPolygonCoordinate[] = latLngs.map(ll => ({ latitude: ll.lat, longitude: ll.lng }));
+                              onSaveArea(coords);
+                            }
+                          }}
+                        >
+                          <Save className="h-4 w-4 mr-1" />
+                          Save Area
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={clearDrawnArea}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Clear Area
+                      </Button>
+                    </div>
                   ) : (
                     <Button
                       size="sm"
