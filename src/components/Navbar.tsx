@@ -132,7 +132,6 @@ export const Navbar = () => {
                     </Badge>
                   )}
                 </Link>
-                <NotificationBell />
                 
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0" onClick={() => setProfilePanelOpen(true)}>
                   <Avatar className="h-8 w-8">
