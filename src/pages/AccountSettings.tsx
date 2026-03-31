@@ -12,6 +12,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 
 export default function AccountSettings() {
   const { user, profile, updateProfile } = useAuth();
+  const navigate = useNavigate();
 
   // Name editing
   const [isEditingName, setIsEditingName] = useState(false);
