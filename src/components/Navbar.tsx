@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -201,10 +201,6 @@ export const Navbar = () => {
                     <Camera className="h-4 w-4 text-muted-foreground" />
                     <span>Photography Service</span>
                   </Link>
-                  <Link to="/investment-analytics" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
-                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                    <span>Investment Analytics</span>
-                  </Link>
                   <Link to="/my-listings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                     <Home className="h-4 w-4 text-muted-foreground" />
                     <span>My Listings</span>
@@ -215,7 +211,7 @@ export const Navbar = () => {
                   </Link>
                   {profile?.role === 'user' && (
                     <Link to="/my-viewings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
-                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                       <span>My Viewings</span>
                     </Link>
                   )}
@@ -242,7 +238,7 @@ export const Navbar = () => {
 
               <Link to="/account-settings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                 <Settings className="h-4 w-4 text-muted-foreground" />
-                <span>Settings</span>
+                <span>Account Settings</span>
               </Link>
 
               <div className="border-t border-border my-3" />
