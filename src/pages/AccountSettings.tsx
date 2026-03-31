@@ -206,7 +206,7 @@ export default function AccountSettings() {
                   {emailStep === 'idle' && (
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-sm font-medium text-foreground">{user.email}</p>
-                      <Button size="sm" variant="ghost" onClick={() => setEmailStep('form')}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEmailStep('form')}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
                     </div>
                   )}
                   {emailStep === 'form' && (
