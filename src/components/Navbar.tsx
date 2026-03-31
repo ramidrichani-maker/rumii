@@ -122,10 +122,6 @@ export const Navbar = () => {
           )}
 
           <div className="flex items-center space-x-4">
-            <Link to="/favorites" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              <Bookmark className="w-4 h-4" />
-              <span>Saved</span>
-            </Link>
             {user ? <>
                 <Link to="/messages" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative">
                   <MessageSquare className="w-4 h-4" />
@@ -188,6 +184,10 @@ export const Navbar = () => {
 
             {/* Menu Items */}
             <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+              <Link to="/favorites" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                <Bookmark className="h-4 w-4 text-muted-foreground" />
+                <span>Saved</span>
+              </Link>
               <Link to="/profile" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span>Profile</span>
