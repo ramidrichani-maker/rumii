@@ -67,6 +67,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   initialSearchLocation = '',
   searchRadius = 1,
   embedded = false,
+  onSaveArea,
 }) => {
   const { profile } = useAuth();
   const isAdmin = profile?.role === 'admin';
