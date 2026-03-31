@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
 import Purchase from "./pages/Purchase";
+import ChangePassword from "./pages/ChangePassword";
 import Rent from "./pages/Rent";
 import ListProperty from "./pages/ListProperty";
 import Auth from "./pages/Auth";
