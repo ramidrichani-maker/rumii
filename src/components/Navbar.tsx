@@ -122,10 +122,6 @@ export const Navbar = () => {
           )}
 
           <div className="flex items-center space-x-4">
-            <Link to="/favorites" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              <Bookmark className="w-4 h-4" />
-              <span>Saved</span>
-            </Link>
             {user ? <>
                 <Link to="/messages" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative">
                   <MessageSquare className="w-4 h-4" />
