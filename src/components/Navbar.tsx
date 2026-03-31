@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
+  const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const auth = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
