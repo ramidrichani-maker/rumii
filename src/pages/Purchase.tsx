@@ -389,6 +389,7 @@ const Purchase = () => {
                 initialSearchLocation={locationInput}
                 searchRadius={radius}
                 embedded={true}
+                onSaveArea={handleSaveArea}
               />
             </div>
           )}
