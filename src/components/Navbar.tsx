@@ -182,6 +182,7 @@ export const Navbar = () => {
                     </Button>
                   </Link>
                 </div>
+              </div>
               <button onClick={() => setProfilePanelOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
