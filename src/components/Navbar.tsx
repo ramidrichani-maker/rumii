@@ -138,102 +138,117 @@ export const Navbar = () => {
                 </Link>
                 <NotificationBell />
                 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="text-xs">
-                          {profile?.full_name ? getInitials(profile.full_name) : 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {profile?.full_name || 'User'}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user.email}
-                        </p>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <Badge variant={getRoleBadgeVariant(profile?.role || 'user')} className="text-xs">
-                            {profile?.role || 'user'}
-                          </Badge>
-                        </div>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    {profile?.role !== 'customer_support' && (
-                      <>
-                        <DropdownMenuItem asChild>
-                          <Link to="/request-photography" className="flex items-center">
-                            <Camera className="mr-2 h-4 w-4" />
-                            <span>Photography Service</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/investment-analytics" className="flex items-center">
-                            <BarChart3 className="mr-2 h-4 w-4" />
-                            <span>Investment Analytics</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/my-listings" className="flex items-center">
-                            <Home className="mr-2 h-4 w-4" />
-                            <span>My Listings</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/list-property" className="flex items-center">
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            <span>List Property</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        {profile?.role === 'user' && <DropdownMenuItem asChild>
-                            <Link to="/my-viewings" className="flex items-center">
-                              <Settings className="mr-2 h-4 w-4" />
-                              <span>My Viewings</span>
-                            </Link>
-                          </DropdownMenuItem>}
-                      </>
-                    )}
-                    {profile?.role === 'admin' && <DropdownMenuItem asChild>
-                        <Link to="/admin" className="flex items-center">
-                          <Shield className="mr-2 h-4 w-4" />
-                          <span>Admin Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>}
-                    {(profile?.role === 'agent' || profile?.role === 'admin') && <DropdownMenuItem asChild>
-                        <Link to="/agent-portal" className="flex items-center">
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Agent Portal</span>
-                        </Link>
-                      </DropdownMenuItem>}
-                    {profile?.role === 'customer_support' && <DropdownMenuItem asChild>
-                        <Link to="/support-portal" className="flex items-center">
-                          <HeadphonesIcon className="mr-2 h-4 w-4" />
-                          <span>Support Portal</span>
-                        </Link>
-                      </DropdownMenuItem>}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Sign out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0" onClick={() => setProfilePanelOpen(true)}>
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="text-xs">
+                      {profile?.full_name ? getInitials(profile.full_name) : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
               </> : <Button onClick={() => setAuthPanelOpen(true)}>Sign In</Button>}
           </div>
         </div>
       </div>
+
+      {/* Profile Side Panel */}
+      {createPortal(
+        <>
+          {profilePanelOpen && (
+            <div
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+              style={{ zIndex: 9998 }}
+              onClick={() => setProfilePanelOpen(false)}
+            />
+          )}
+          <div
+            className={`fixed top-0 right-0 h-screen w-full sm:w-[25%] sm:min-w-[320px] border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+              profilePanelOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
+            style={{ zIndex: 9999, backgroundColor: 'hsl(var(--background))' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none text-foreground">
+                  {profile?.full_name || 'User'}
+                </p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  {user?.email}
+                </p>
+                <div className="flex items-center space-x-2 mt-2">
+                  <Badge variant={getRoleBadgeVariant(profile?.role || 'user')} className="text-xs">
+                    {profile?.role || 'user'}
+                  </Badge>
+                </div>
+              </div>
+              <button onClick={() => setProfilePanelOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Menu Items */}
+            <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+              <Link to="/profile" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span>Profile</span>
+              </Link>
+              {profile?.role !== 'customer_support' && (
+                <>
+                  <Link to="/request-photography" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                    <Camera className="h-4 w-4 text-muted-foreground" />
+                    <span>Photography Service</span>
+                  </Link>
+                  <Link to="/investment-analytics" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                    <span>Investment Analytics</span>
+                  </Link>
+                  <Link to="/my-listings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                    <Home className="h-4 w-4 text-muted-foreground" />
+                    <span>My Listings</span>
+                  </Link>
+                  <Link to="/list-property" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                    <PlusCircle className="h-4 w-4 text-muted-foreground" />
+                    <span>List Property</span>
+                  </Link>
+                  {profile?.role === 'user' && (
+                    <Link to="/my-viewings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <span>My Viewings</span>
+                    </Link>
+                  )}
+                </>
+              )}
+              {profile?.role === 'admin' && (
+                <Link to="/admin" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                  <span>Admin Dashboard</span>
+                </Link>
+              )}
+              {(profile?.role === 'agent' || profile?.role === 'admin') && (
+                <Link to="/agent-portal" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span>Agent Portal</span>
+                </Link>
+              )}
+              {profile?.role === 'customer_support' && (
+                <Link to="/support-portal" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                  <HeadphonesIcon className="h-4 w-4 text-muted-foreground" />
+                  <span>Support Portal</span>
+                </Link>
+              )}
+
+              <div className="border-t border-border my-3" />
+
+              <button onClick={() => { setProfilePanelOpen(false); handleSignOut(); }} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors w-full text-left">
+                <LogOut className="h-4 w-4 text-muted-foreground" />
+                <span>Sign out</span>
+              </button>
+            </nav>
+          </div>
+        </>,
+        document.body
+      )}
+
       <AuthSlidePanel open={authPanelOpen} onClose={() => setAuthPanelOpen(false)} />
     </nav>;
 };
