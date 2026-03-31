@@ -52,6 +52,8 @@ interface CompactPropertyMapProps {
   searchRadius?: number;
   /** When true, hides the internal header/controls (parent manages chrome) */
   embedded?: boolean;
+  /** Callback when user wants to save the drawn area */
+  onSaveArea?: (coordinates: DrawnPolygonCoordinate[]) => void;
 }
 
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
