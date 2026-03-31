@@ -160,17 +160,21 @@ export const Navbar = () => {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-border">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none text-foreground">
-                  {profile?.full_name || 'User'}
-                </p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user?.email}
-                </p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <Badge variant={getRoleBadgeVariant(profile?.role || 'user')} className="text-xs">
-                    {profile?.role || 'user'}
-                  </Badge>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="text-sm font-semibold bg-primary text-primary-foreground">
+                    {profile?.full_name ? getInitials(profile.full_name) : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium leading-none text-foreground">
+                    {profile?.full_name?.split(' ')[0] || 'User'}
+                  </p>
+                  {profile?.role && profile.role !== 'user' && (
+                    <Badge variant={getRoleBadgeVariant(profile.role)} className="text-xs mt-1 w-fit">
+                      {profile.role}
+                    </Badge>
+                  )}
                 </div>
               </div>
               <button onClick={() => setProfilePanelOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
