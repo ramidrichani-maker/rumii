@@ -310,8 +310,8 @@ export default function AccountSettings() {
 
           {activeSection === 'security' && (
             <Card>
-              <CardContent className="p-6 space-y-1">
-                <h2 className="text-lg font-semibold text-foreground mb-4">Account Security</h2>
+              <CardContent className="p-8 space-y-1">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Account Security</h2>
 
                 <button
                   onClick={() => navigate('/change-password')}
