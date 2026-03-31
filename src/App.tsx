@@ -93,6 +93,7 @@ const AppRoutes = () => {
           <Route path="/support-portal" element={<SupportPortal />} />
           <Route path="/my-oracle" element={<MyOracle />} />
           <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/change-password" element={<ChangePassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
