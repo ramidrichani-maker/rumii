@@ -14,6 +14,7 @@ export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const [buyMenuOpen, setBuyMenuOpen] = useState(false);
+  const [rentMenuOpen, setRentMenuOpen] = useState(false);
   const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
@@ -99,15 +100,23 @@ export const Navbar = () => {
                 onMouseEnter={() => {
                   if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
                   setBuyMenuOpen(true);
+                  setRentMenuOpen(false);
                 }}
-                onClick={() => setBuyMenuOpen(prev => !prev)}
+                onClick={() => { setBuyMenuOpen(prev => !prev); setRentMenuOpen(false); }}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
-              <Link to="/rent" onMouseEnter={() => setBuyMenuOpen(false)}>
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  setRentMenuOpen(true);
+                  setBuyMenuOpen(false);
+                }}
+                onClick={() => { setRentMenuOpen(prev => !prev); setBuyMenuOpen(false); }}
+              >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
-              </Link>
-              <Link to="/find-agents" onMouseEnter={() => setBuyMenuOpen(false)}>
+              </div>
+              <Link to="/find-agents" onMouseEnter={() => { setBuyMenuOpen(false); setRentMenuOpen(false); }}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
               </Link>
             </nav>
@@ -153,6 +162,7 @@ export const Navbar = () => {
             className="fixed inset-0"
             style={{ zIndex: 9000 }}
             onClick={() => setBuyMenuOpen(false)}
+            onMouseEnter={() => setBuyMenuOpen(false)}
           />
           <div
             className="fixed left-0 right-0 border-b border-border shadow-lg"
@@ -185,6 +195,43 @@ export const Navbar = () => {
               >
                 Property valuation request
               </Link>
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
+
+      {/* Rent Mega Menu */}
+      {rentMenuOpen && createPortal(
+        <>
+          <div
+            className="fixed inset-0"
+            style={{ zIndex: 9000 }}
+            onClick={() => setRentMenuOpen(false)}
+            onMouseEnter={() => setRentMenuOpen(false)}
+          />
+          <div
+            className="fixed left-0 right-0 border-b border-border shadow-lg"
+            style={{ 
+              zIndex: 9001, 
+              height: '25vh', 
+              backgroundColor: '#f0f0f0',
+              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
+            }}
+          >
+            <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
+              <Link
+                to="/rent"
+                onClick={() => setRentMenuOpen(false)}
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                Property to rent
+              </Link>
+              <span
+                className="px-4 py-3 rounded-md text-sm font-medium text-muted-foreground cursor-default"
+              >
+                Student property to rent
+              </span>
             </div>
           </div>
         </>,
