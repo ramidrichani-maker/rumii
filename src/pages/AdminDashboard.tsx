@@ -34,12 +34,6 @@ import { SupportDashboard } from "@/components/SupportDashboard";
 import { Navigate } from "react-router-dom";
 
 const AdminDashboard = () => {
-  const { user, profile, loading: authLoading } = useAuth();
-
-  if (authLoading) return null;
-  if (!user || profile?.role !== 'admin') {
-    return <Navigate to="/auth" replace />;
-  }
   const [pendingProperties, setPendingProperties] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
@@ -56,7 +50,7 @@ const AdminDashboard = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
   
-  const { user } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -66,6 +60,11 @@ const AdminDashboard = () => {
       loadViewings();
     }
   }, [user]);
+
+  if (authLoading) return null;
+  if (!user || profile?.role !== 'admin') {
+    return <Navigate to="/auth" replace />;
+  }
 
   const loadPendingProperties = async () => {
     try {
