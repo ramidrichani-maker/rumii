@@ -13,10 +13,27 @@ import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
-  const [buyMenuOpen, setBuyMenuOpen] = useState(false);
-  const [rentMenuOpen, setRentMenuOpen] = useState(false);
-  const [commercialMenuOpen, setCommercialMenuOpen] = useState(false);
-  const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [activeMenu, setActiveMenu] = useState<'buy' | 'rent' | 'commercial' | null>(null);
+  const menuCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openMenu = (menu: 'buy' | 'rent' | 'commercial') => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+    setActiveMenu(menu);
+  };
+
+  const scheduleClose = () => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+    menuCloseTimeout.current = setTimeout(() => setActiveMenu(null), 150);
+  };
+
+  const cancelClose = () => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+  };
+
+  const closeMenu = () => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+    setActiveMenu(null);
+  };
   const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
   const navigate = useNavigate();
@@ -98,38 +115,28 @@ export const Navbar = () => {
             <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
               <div
                 className="relative"
-                onMouseEnter={() => {
-                  if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
-                  setBuyMenuOpen(true);
-                  setRentMenuOpen(false);
-                  setCommercialMenuOpen(false);
-                }}
-                onClick={() => { setBuyMenuOpen(prev => !prev); setRentMenuOpen(false); setCommercialMenuOpen(false); }}
+                onMouseEnter={() => openMenu('buy')}
+                onMouseLeave={scheduleClose}
+                onClick={() => setActiveMenu(prev => prev === 'buy' ? null : 'buy')}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
               <div
                 className="relative"
-                onMouseEnter={() => {
-                  setRentMenuOpen(true);
-                  setBuyMenuOpen(false);
-                  setCommercialMenuOpen(false);
-                }}
-                onClick={() => { setRentMenuOpen(prev => !prev); setBuyMenuOpen(false); setCommercialMenuOpen(false); }}
+                onMouseEnter={() => openMenu('rent')}
+                onMouseLeave={scheduleClose}
+                onClick={() => setActiveMenu(prev => prev === 'rent' ? null : 'rent')}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </div>
-              <Link to="/find-agents" onMouseEnter={() => { setBuyMenuOpen(false); setRentMenuOpen(false); setCommercialMenuOpen(false); }}>
+              <Link to="/find-agents" onMouseEnter={() => closeMenu()}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
               </Link>
               <div
                 className="relative"
-                onMouseEnter={() => {
-                  setCommercialMenuOpen(true);
-                  setBuyMenuOpen(false);
-                  setRentMenuOpen(false);
-                }}
-                onClick={() => { setCommercialMenuOpen(prev => !prev); setBuyMenuOpen(false); setRentMenuOpen(false); }}
+                onMouseEnter={() => openMenu('commercial')}
+                onMouseLeave={scheduleClose}
+                onClick={() => setActiveMenu(prev => prev === 'commercial' ? null : 'commercial')}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Commercial</Button>
               </div>
@@ -169,13 +176,13 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Buy Mega Menu */}
-      {buyMenuOpen && createPortal(
+      {/* Mega Menus */}
+      {activeMenu && createPortal(
         <>
           <div
             className="fixed inset-0"
             style={{ zIndex: 9000 }}
-            onClick={() => setBuyMenuOpen(false)}
+            onClick={closeMenu}
           />
           <div
             className="fixed left-0 right-0 border-b border-border shadow-lg"
@@ -185,106 +192,43 @@ export const Navbar = () => {
               backgroundColor: '#f0f0f0',
               top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
             }}
-            onMouseLeave={() => setBuyMenuOpen(false)}
+            onMouseEnter={cancelClose}
+            onMouseLeave={scheduleClose}
           >
             <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
-              <Link
-                to="/purchase"
-                onClick={() => setBuyMenuOpen(false)}
-                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                Property for sale
-              </Link>
-              <Link
-                to="/new-homes"
-                onClick={() => setBuyMenuOpen(false)}
-                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                New homes for sale
-              </Link>
-              <Link
-                to="/agent-valuation"
-                onClick={() => setBuyMenuOpen(false)}
-                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                Property valuation request
-              </Link>
-            </div>
-          </div>
-        </>,
-        document.body
-      )}
-
-      {/* Rent Mega Menu */}
-      {rentMenuOpen && createPortal(
-        <>
-          <div
-            className="fixed inset-0"
-            style={{ zIndex: 9000 }}
-            onClick={() => setRentMenuOpen(false)}
-          />
-          <div
-            className="fixed left-0 right-0 border-b border-border shadow-lg"
-            style={{ 
-              zIndex: 9001, 
-              height: '25vh', 
-              backgroundColor: '#f0f0f0',
-              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
-            }}
-            onMouseLeave={() => setRentMenuOpen(false)}
-          >
-            <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
-              <Link
-                to="/rent"
-                onClick={() => setRentMenuOpen(false)}
-                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                Property to rent
-              </Link>
-              <span
-                className="px-4 py-3 rounded-md text-sm font-medium text-muted-foreground cursor-default"
-              >
-                Student property to rent
-              </span>
-            </div>
-          </div>
-        </>,
-        document.body
-      )}
-
-      {/* Commercial Mega Menu */}
-      {commercialMenuOpen && createPortal(
-        <>
-          <div
-            className="fixed inset-0"
-            style={{ zIndex: 9000 }}
-            onClick={() => setCommercialMenuOpen(false)}
-          />
-          <div
-            className="fixed left-0 right-0 border-b border-border shadow-lg"
-            style={{ 
-              zIndex: 9001, 
-              height: '25vh', 
-              backgroundColor: '#f0f0f0',
-              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
-            }}
-            onMouseLeave={() => setCommercialMenuOpen(false)}
-          >
-            <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
-              <Link
-                to="/rent?type=commercial"
-                onClick={() => setCommercialMenuOpen(false)}
-                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                Commercial property to rent
-              </Link>
-              <Link
-                to="/purchase?type=commercial"
-                onClick={() => setCommercialMenuOpen(false)}
-                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-              >
-                Commercial property for sale
-              </Link>
+              {activeMenu === 'buy' && (
+                <>
+                  <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    Property for sale
+                  </Link>
+                  <Link to="/new-homes" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    New homes for sale
+                  </Link>
+                  <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    Property valuation request
+                  </Link>
+                </>
+              )}
+              {activeMenu === 'rent' && (
+                <>
+                  <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    Property to rent
+                  </Link>
+                  <span className="px-4 py-3 rounded-md text-sm font-medium text-muted-foreground cursor-default">
+                    Student property to rent
+                  </span>
+                </>
+              )}
+              {activeMenu === 'commercial' && (
+                <>
+                  <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    Commercial property to rent
+                  </Link>
+                  <Link to="/purchase?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    Commercial property for sale
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </>,
