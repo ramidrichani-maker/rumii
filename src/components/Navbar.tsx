@@ -120,10 +120,19 @@ export const Navbar = () => {
   return <nav ref={navRef} className="relative border-b bg-background" style={{ zIndex: 50, overflow: 'visible' }}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2 shrink-0">
-            <Home className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">Oracle Estates</span>
-          </Link>
+          <div className="flex items-center space-x-2 shrink-0">
+            <button
+              className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <Link to="/" className="flex items-center space-x-2">
+              <Home className="w-6 h-6 text-primary" />
+              <span className="text-xl font-bold">Oracle Estates</span>
+            </Link>
+          </div>
           {profile?.role !== 'customer_support' ? (
             <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
               <div
