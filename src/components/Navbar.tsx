@@ -252,7 +252,45 @@ export const Navbar = () => {
         document.body
       )}
 
-      {createPortal(
+      {/* Commercial Mega Menu */}
+      {commercialMenuOpen && createPortal(
+        <>
+          <div
+            className="fixed inset-0"
+            style={{ zIndex: 9000 }}
+            onClick={() => setCommercialMenuOpen(false)}
+            onMouseEnter={() => setCommercialMenuOpen(false)}
+          />
+          <div
+            className="fixed left-0 right-0 border-b border-border shadow-lg"
+            style={{ 
+              zIndex: 9001, 
+              height: '25vh', 
+              backgroundColor: '#f0f0f0',
+              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
+            }}
+          >
+            <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
+              <Link
+                to="/rent?type=commercial"
+                onClick={() => setCommercialMenuOpen(false)}
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                Commercial property to rent
+              </Link>
+              <Link
+                to="/purchase?type=commercial"
+                onClick={() => setCommercialMenuOpen(false)}
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                Commercial property for sale
+              </Link>
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
+
         <>
           {profilePanelOpen && (
             <div
