@@ -15,7 +15,14 @@ const HeroSearch = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
+  const [searchPressed, setSearchPressed] = useState(false);
+
   const handleSearch = () => {
+    if (isMobile && !searchQuery) {
+      // On mobile with no query, show draw option instead of navigating
+      setSearchPressed(true);
+      return;
+    }
     const route = listingMode === 'buy' ? '/purchase' : '/rent';
     const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : '';
     navigate(`${route}${params}`);
