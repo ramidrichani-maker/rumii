@@ -84,7 +84,7 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-  return <nav className="relative border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  return <nav className="relative border-b bg-background backdrop-blur supports-[backdrop-filter]:bg-background" style={{ zIndex: 50 }}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 shrink-0">
@@ -99,6 +99,7 @@ export const Navbar = () => {
                   if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
                   setBuyMenuOpen(true);
                 }}
+                onClick={() => setBuyMenuOpen(prev => !prev)}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
