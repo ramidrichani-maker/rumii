@@ -203,15 +203,17 @@ export const Navbar = () => {
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
         >
-          <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8 py-8">
+          <div className="container mx-auto px-4 h-full flex items-start justify-start gap-8 py-8">
             {activeMenu === 'buy' && (
               <>
-                <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Property for sale
-                </Link>
-                <Link to="/new-homes" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  New homes for sale
-                </Link>
+                <div className="flex flex-col gap-1">
+                  <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    Property for sale
+                  </Link>
+                  <Link to="/new-homes" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                    New homes for sale
+                  </Link>
+                </div>
                 <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
                   Property valuation request
                 </Link>
