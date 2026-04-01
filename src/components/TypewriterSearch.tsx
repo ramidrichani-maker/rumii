@@ -15,7 +15,7 @@ const TYPE_SPEED = 80;
 const DELETE_SPEED = 50;
 const PAUSE_DURATION = 1000;
 
-const TypewriterSearch = ({ value, onChange, className }: TypewriterSearchProps) => {
+const TypewriterSearch = ({ value, onChange, className, onFocus, onBlur }: TypewriterSearchProps) => {
   const [placeholder, setPlaceholder] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
