@@ -34,6 +34,18 @@ export const Navbar = () => {
     if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
     setActiveMenu(null);
   };
+
+  // Close dropdown on click outside (replaces backdrop overlay that caused flickering)
+  useEffect(() => {
+    if (!activeMenu) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (navRef.current?.contains(target)) return;
+      closeMenu();
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeMenu]);
   const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
   const navigate = useNavigate();
