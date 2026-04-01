@@ -99,16 +99,13 @@ export const Navbar = () => {
                   if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
                   setBuyMenuOpen(true);
                 }}
-                onMouseLeave={() => {
-                  buyMenuTimeout.current = setTimeout(() => setBuyMenuOpen(false), 150);
-                }}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
-              <Link to="/rent">
+              <Link to="/rent" onMouseEnter={() => setBuyMenuOpen(false)}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </Link>
-              <Link to="/find-agents">
+              <Link to="/find-agents" onMouseEnter={() => setBuyMenuOpen(false)}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
               </Link>
             </nav>
