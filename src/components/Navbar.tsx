@@ -100,15 +100,23 @@ export const Navbar = () => {
                 onMouseEnter={() => {
                   if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
                   setBuyMenuOpen(true);
+                  setRentMenuOpen(false);
                 }}
-                onClick={() => setBuyMenuOpen(prev => !prev)}
+                onClick={() => { setBuyMenuOpen(prev => !prev); setRentMenuOpen(false); }}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
-              <Link to="/rent" onMouseEnter={() => setBuyMenuOpen(false)}>
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  setRentMenuOpen(true);
+                  setBuyMenuOpen(false);
+                }}
+                onClick={() => { setRentMenuOpen(prev => !prev); setBuyMenuOpen(false); }}
+              >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
-              </Link>
-              <Link to="/find-agents" onMouseEnter={() => setBuyMenuOpen(false)}>
+              </div>
+              <Link to="/find-agents" onMouseEnter={() => { setBuyMenuOpen(false); setRentMenuOpen(false); }}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
               </Link>
             </nav>
