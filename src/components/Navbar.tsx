@@ -15,6 +15,7 @@ export const Navbar = () => {
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const [buyMenuOpen, setBuyMenuOpen] = useState(false);
   const [rentMenuOpen, setRentMenuOpen] = useState(false);
+  const [commercialMenuOpen, setCommercialMenuOpen] = useState(false);
   const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
