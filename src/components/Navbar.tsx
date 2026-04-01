@@ -113,8 +113,9 @@ export const Navbar = () => {
                 onMouseEnter={() => {
                   setRentMenuOpen(true);
                   setBuyMenuOpen(false);
+                  setCommercialMenuOpen(false);
                 }}
-                onClick={() => { setRentMenuOpen(prev => !prev); setBuyMenuOpen(false); }}
+                onClick={() => { setRentMenuOpen(prev => !prev); setBuyMenuOpen(false); setCommercialMenuOpen(false); }}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </div>
