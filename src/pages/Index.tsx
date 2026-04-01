@@ -90,7 +90,7 @@ const Index = () => {
             {featuredSales.length > 0 && (
               <div>
                 <ScrollReveal animation="fade-left">
-                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Sale</h3>
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Listings</h3>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredSales.map((property, index) => (
