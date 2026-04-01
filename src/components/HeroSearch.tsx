@@ -86,8 +86,8 @@ const HeroSearch = () => {
         </Button>
       </div>
 
-      {/* Mobile draw area option */}
-      {isMobile && (
+      {/* Mobile draw area option - only shown after search is pressed */}
+      {isMobile && searchPressed && (
         <div className="mt-4">
           {!showDrawMap ? (
             <button
