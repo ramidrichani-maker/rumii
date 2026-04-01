@@ -6,6 +6,8 @@ interface TypewriterSearchProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const PLACEHOLDER_WORDS = ['area', 'post code', 'city', 'school', 'university', 'mall'];
