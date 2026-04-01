@@ -117,9 +117,20 @@ export const Navbar = () => {
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </div>
-              <Link to="/find-agents" onMouseEnter={() => { setBuyMenuOpen(false); setRentMenuOpen(false); }}>
+              <Link to="/find-agents" onMouseEnter={() => { setBuyMenuOpen(false); setRentMenuOpen(false); setCommercialMenuOpen(false); }}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
               </Link>
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  setCommercialMenuOpen(true);
+                  setBuyMenuOpen(false);
+                  setRentMenuOpen(false);
+                }}
+                onClick={() => { setCommercialMenuOpen(prev => !prev); setBuyMenuOpen(false); setRentMenuOpen(false); }}
+              >
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Commercial</Button>
+              </div>
             </nav>
           ) : (
             <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
