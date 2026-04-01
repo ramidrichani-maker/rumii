@@ -203,7 +203,7 @@ export const Navbar = () => {
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
         >
-          <div className="container mx-auto px-4 h-full flex items-start justify-start gap-8 py-8">
+          <div className="container mx-auto px-4 h-full flex items-start justify-center gap-8 py-8">
             {activeMenu === 'buy' && (
               <>
                 <div className="flex flex-col gap-1">
