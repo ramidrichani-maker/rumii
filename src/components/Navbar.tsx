@@ -190,60 +190,54 @@ export const Navbar = () => {
 
       {/* Mega Menus */}
       {activeMenu && createPortal(
-        <>
-          <div
-            className="fixed inset-0"
-            style={{ zIndex: 9000 }}
-            onClick={closeMenu}
-          />
-          <div
-            className="fixed left-0 right-0 border-b border-border shadow-lg"
-            style={{ 
-              zIndex: 9001, 
-              height: '25vh', 
-              backgroundColor: '#f0f0f0',
-              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
-            }}
-            onMouseEnter={cancelClose}
-            onMouseLeave={scheduleClose}
-          >
-            <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
-              {activeMenu === 'buy' && (
-                <>
-                  <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    Property for sale
-                  </Link>
-                  <Link to="/new-homes" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    New homes for sale
-                  </Link>
-                  <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    Property valuation request
-                  </Link>
-                </>
-              )}
-              {activeMenu === 'rent' && (
-                <>
-                  <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    Property to rent
-                  </Link>
-                  <span className="px-4 py-3 rounded-md text-sm font-medium text-muted-foreground cursor-default">
-                    Student property to rent
-                  </span>
-                </>
-              )}
-              {activeMenu === 'commercial' && (
-                <>
-                  <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    Commercial property to rent
-                  </Link>
-                  <Link to="/purchase?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    Commercial property for sale
-                  </Link>
-                </>
-              )}
-            </div>
+        <div
+          className="fixed left-0 right-0 border-b border-border shadow-lg"
+          style={{ 
+            zIndex: 9001, 
+            backgroundColor: '#f0f0f0',
+            top: ((navRef.current?.getBoundingClientRect().bottom ?? 0) - 10) + 'px',
+            paddingTop: '10px',
+            paddingBottom: '40px',
+          }}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        >
+          <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8 py-8">
+            {activeMenu === 'buy' && (
+              <>
+                <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Property for sale
+                </Link>
+                <Link to="/new-homes" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  New homes for sale
+                </Link>
+                <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Property valuation request
+                </Link>
+              </>
+            )}
+            {activeMenu === 'rent' && (
+              <>
+                <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Property to rent
+                </Link>
+                <span className="px-4 py-3 rounded-md text-sm font-medium text-muted-foreground cursor-default">
+                  Student property to rent
+                </span>
+              </>
+            )}
+            {activeMenu === 'commercial' && (
+              <>
+                <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Commercial property to rent
+                </Link>
+                <Link to="/purchase?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Commercial property for sale
+                </Link>
+              </>
+            )}
           </div>
-        </>,
+        </div>,
         document.body
       )}
       {createPortal(
