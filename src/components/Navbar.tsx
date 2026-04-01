@@ -150,30 +150,31 @@ export const Navbar = () => {
           <div
             className="fixed inset-0 z-40"
             onClick={() => setBuyMenuOpen(false)}
+            onMouseEnter={() => setBuyMenuOpen(false)}
           />
           <div
-            className="absolute left-0 right-0 top-full bg-background border-b border-border shadow-lg z-50"
-            style={{ height: '25vh' }}
+            className="absolute left-0 right-0 top-full border-b border-border shadow-lg z-50"
+            style={{ height: '25vh', backgroundColor: '#f0f0f0' }}
           >
-            <div className="container mx-auto px-4 py-6 flex flex-col justify-center h-full space-y-2">
+            <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
               <Link
                 to="/purchase"
                 onClick={() => setBuyMenuOpen(false)}
-                className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
               >
                 Property for sale
               </Link>
               <Link
                 to="/new-homes"
                 onClick={() => setBuyMenuOpen(false)}
-                className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
               >
                 New homes for sale
               </Link>
               <Link
                 to="/agent-valuation"
                 onClick={() => setBuyMenuOpen(false)}
-                className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
               >
                 Property valuation request
               </Link>
