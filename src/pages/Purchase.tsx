@@ -45,9 +45,10 @@ const Purchase = () => {
   const urlMinBeds = searchParams.get('minBeds') || '';
   const urlMaxPrice = searchParams.get('maxPrice') || '';
   const urlMinYearBuilt = searchParams.get('minYearBuilt') || '';
+  const urlType = searchParams.get('type') || '';
   const [locationInput, setLocationInput] = useState(searchQuery);
   const [radius, setRadius] = useState(0);
-  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>(urlType ? [urlType] : []);
   const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 1000]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
   const [minBedrooms, setMinBedrooms] = useState(1);

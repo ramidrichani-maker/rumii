@@ -15,6 +15,7 @@ export const Navbar = () => {
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const [buyMenuOpen, setBuyMenuOpen] = useState(false);
   const [rentMenuOpen, setRentMenuOpen] = useState(false);
+  const [commercialMenuOpen, setCommercialMenuOpen] = useState(false);
   const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
@@ -101,8 +102,9 @@ export const Navbar = () => {
                   if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
                   setBuyMenuOpen(true);
                   setRentMenuOpen(false);
+                  setCommercialMenuOpen(false);
                 }}
-                onClick={() => { setBuyMenuOpen(prev => !prev); setRentMenuOpen(false); }}
+                onClick={() => { setBuyMenuOpen(prev => !prev); setRentMenuOpen(false); setCommercialMenuOpen(false); }}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
@@ -111,14 +113,26 @@ export const Navbar = () => {
                 onMouseEnter={() => {
                   setRentMenuOpen(true);
                   setBuyMenuOpen(false);
+                  setCommercialMenuOpen(false);
                 }}
-                onClick={() => { setRentMenuOpen(prev => !prev); setBuyMenuOpen(false); }}
+                onClick={() => { setRentMenuOpen(prev => !prev); setBuyMenuOpen(false); setCommercialMenuOpen(false); }}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
               </div>
-              <Link to="/find-agents" onMouseEnter={() => { setBuyMenuOpen(false); setRentMenuOpen(false); }}>
+              <Link to="/find-agents" onMouseEnter={() => { setBuyMenuOpen(false); setRentMenuOpen(false); setCommercialMenuOpen(false); }}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
               </Link>
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  setCommercialMenuOpen(true);
+                  setBuyMenuOpen(false);
+                  setRentMenuOpen(false);
+                }}
+                onClick={() => { setCommercialMenuOpen(prev => !prev); setBuyMenuOpen(false); setRentMenuOpen(false); }}
+              >
+                <Button variant="ghost" size="sm" className="text-[1.05rem]">Commercial</Button>
+              </div>
             </nav>
           ) : (
             <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
@@ -238,6 +252,44 @@ export const Navbar = () => {
         document.body
       )}
 
+      {/* Commercial Mega Menu */}
+      {commercialMenuOpen && createPortal(
+        <>
+          <div
+            className="fixed inset-0"
+            style={{ zIndex: 9000 }}
+            onClick={() => setCommercialMenuOpen(false)}
+            onMouseEnter={() => setCommercialMenuOpen(false)}
+          />
+          <div
+            className="fixed left-0 right-0 border-b border-border shadow-lg"
+            style={{ 
+              zIndex: 9001, 
+              height: '25vh', 
+              backgroundColor: '#f0f0f0',
+              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
+            }}
+          >
+            <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
+              <Link
+                to="/rent?type=commercial"
+                onClick={() => setCommercialMenuOpen(false)}
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                Commercial property to rent
+              </Link>
+              <Link
+                to="/purchase?type=commercial"
+                onClick={() => setCommercialMenuOpen(false)}
+                className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                Commercial property for sale
+              </Link>
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
       {createPortal(
         <>
           {profilePanelOpen && (
