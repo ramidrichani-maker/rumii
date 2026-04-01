@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House, Map, Maximize2, Minimize2, X } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import CompactPropertyMap from "@/components/CompactPropertyMap";
@@ -41,6 +41,7 @@ const amenities = [
 
 const Purchase = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const searchQuery = searchParams.get('search') || '';
   const urlMinBeds = searchParams.get('minBeds') || '';
   const urlMaxPrice = searchParams.get('maxPrice') || '';
@@ -80,6 +81,18 @@ const Purchase = () => {
   }, []);
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
+
+  // Apply polygon from router state (e.g. drawn on home page)
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.drawnPolygon && Array.isArray(state.drawnPolygon)) {
+      setDrawnPolygon(state.drawnPolygon);
+      setShowMap(true);
+      // Clear state so it doesn't re-apply on re-renders
+      window.history.replaceState({}, '');
+    }
+  }, []);
+
 
   const togglePropertyType = (typeId: string) => {
     setSelectedPropertyTypes(prev =>
