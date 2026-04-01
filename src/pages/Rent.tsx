@@ -392,6 +392,7 @@ const Rent = () => {
                 searchRadius={radius}
                 embedded={true}
                 onSaveArea={handleSaveArea}
+                initialPolygon={initialPolygon}
               />
             </div>
           )}
