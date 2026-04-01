@@ -79,11 +79,14 @@ const Rent = () => {
 
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
 
+  const [initialPolygon, setInitialPolygon] = useState<{ latitude: number; longitude: number }[] | null>(null);
+
   // Apply polygon from router state (e.g. drawn on home page)
   useEffect(() => {
     const state = location.state as any;
     if (state?.drawnPolygon && Array.isArray(state.drawnPolygon)) {
       setDrawnPolygon(state.drawnPolygon);
+      setInitialPolygon(state.drawnPolygon);
       setShowMap(true);
       window.history.replaceState({}, '');
     }
@@ -389,6 +392,7 @@ const Rent = () => {
                 searchRadius={radius}
                 embedded={true}
                 onSaveArea={handleSaveArea}
+                initialPolygon={initialPolygon}
               />
             </div>
           )}
@@ -432,6 +436,7 @@ const Rent = () => {
             searchRadius={radius}
             embedded={true}
             onSaveArea={handleSaveArea}
+            initialPolygon={initialPolygon}
           />
         )}
       </div>

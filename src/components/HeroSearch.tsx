@@ -15,7 +15,14 @@ const HeroSearch = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
+  const [searchPressed, setSearchPressed] = useState(false);
+
   const handleSearch = () => {
+    if (isMobile && !searchQuery) {
+      // On mobile with no query, show draw option instead of navigating
+      setSearchPressed(true);
+      return;
+    }
     const route = listingMode === 'buy' ? '/purchase' : '/rent';
     const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : '';
     navigate(`${route}${params}`);
@@ -79,8 +86,8 @@ const HeroSearch = () => {
         </Button>
       </div>
 
-      {/* Mobile draw area option */}
-      {isMobile && (
+      {/* Mobile draw area option - only shown after search is pressed */}
+      {isMobile && searchPressed && (
         <div className="mt-4">
           {!showDrawMap ? (
             <button
