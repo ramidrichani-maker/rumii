@@ -290,7 +290,7 @@ export const Navbar = () => {
         </>,
         document.body
       )}
-
+      {createPortal(
         <>
           {profilePanelOpen && (
             <div
