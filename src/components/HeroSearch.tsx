@@ -12,17 +12,11 @@ const HeroSearch = () => {
   const [listingMode, setListingMode] = useState<'buy' | 'rent'>('buy');
   const [searchQuery, setSearchQuery] = useState('');
   const [showDrawMap, setShowDrawMap] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const [searchPressed, setSearchPressed] = useState(false);
-
   const handleSearch = () => {
-    if (isMobile && !searchQuery) {
-      // On mobile with no query, show draw option instead of navigating
-      setSearchPressed(true);
-      return;
-    }
     const route = listingMode === 'buy' ? '/purchase' : '/rent';
     const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : '';
     navigate(`${route}${params}`);
@@ -70,11 +64,34 @@ const HeroSearch = () => {
 
       {/* Search bar */}
       <div className="flex gap-3" onKeyDown={handleKeyDown}>
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <TypewriterSearch
             value={searchQuery}
             onChange={setSearchQuery}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => {
+              // Small delay so tap on dropdown registers before it hides
+              setTimeout(() => setInputFocused(false), 200);
+            }}
           />
+
+          {/* Dropdown with "Draw your search area" when input is focused on mobile */}
+          {isMobile && inputFocused && !showDrawMap && (
+            <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <button
+                onClick={() => {
+                  setShowDrawMap(true);
+                  setInputFocused(false);
+                }}
+                className="w-full py-3.5 px-4 text-sm font-medium text-primary hover:bg-accent transition-colors flex items-center gap-3"
+              >
+                <span className="inline-block w-5 h-5 rounded-full border-2 border-primary/50 relative flex-shrink-0">
+                  <span className="absolute inset-1 rounded-full bg-primary/30" />
+                </span>
+                Draw your search area
+              </button>
+            </div>
+          )}
         </div>
         <Button
           onClick={handleSearch}
@@ -86,24 +103,12 @@ const HeroSearch = () => {
         </Button>
       </div>
 
-      {/* Mobile draw area option - only shown after search is pressed */}
-      {isMobile && searchPressed && (
+      {/* Mobile draw map */}
+      {isMobile && showDrawMap && (
         <div className="mt-4">
-          {!showDrawMap ? (
-            <button
-              onClick={() => setShowDrawMap(true)}
-              className="w-full py-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="inline-block w-5 h-5 rounded-full border-2 border-primary/50 relative">
-                <span className="absolute inset-1 rounded-full bg-primary/30" />
-              </span>
-              Draw your search area
-            </button>
-          ) : (
-            <Suspense fallback={<div className="h-[340px] rounded-xl bg-muted animate-pulse mt-4" />}>
-              <DrawSearchArea onDrawComplete={handleDrawComplete} />
-            </Suspense>
-          )}
+          <Suspense fallback={<div className="h-[340px] rounded-xl bg-muted animate-pulse mt-4" />}>
+            <DrawSearchArea onDrawComplete={handleDrawComplete} />
+          </Suspense>
         </div>
       )}
     </div>
