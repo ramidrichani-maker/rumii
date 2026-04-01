@@ -189,13 +189,14 @@ export const Navbar = () => {
       </div>
 
       {/* Mega Menus */}
-      {activeMenu && createPortal(
+      {activeMenu && (
         <div
-          className="fixed left-0 right-0 border-b border-border shadow-lg"
+          className="absolute left-0 right-0 border-b border-border shadow-lg"
           style={{ 
             zIndex: 9001, 
             backgroundColor: '#f0f0f0',
-            top: ((navRef.current?.getBoundingClientRect().bottom ?? 0) - 10) + 'px',
+            top: '100%',
+            marginTop: '-10px',
             paddingTop: '10px',
             paddingBottom: '40px',
           }}
@@ -237,8 +238,7 @@ export const Navbar = () => {
               </>
             )}
           </div>
-        </div>,
-        document.body
+        </div>
       )}
       {createPortal(
         <>
