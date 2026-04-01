@@ -14,6 +14,7 @@ export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<'buy' | 'rent' | 'commercial' | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const openMenu = (menu: 'buy' | 'rent' | 'commercial') => {
