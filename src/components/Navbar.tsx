@@ -13,10 +13,27 @@ import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
-  const [buyMenuOpen, setBuyMenuOpen] = useState(false);
-  const [rentMenuOpen, setRentMenuOpen] = useState(false);
-  const [commercialMenuOpen, setCommercialMenuOpen] = useState(false);
-  const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [activeMenu, setActiveMenu] = useState<'buy' | 'rent' | 'commercial' | null>(null);
+  const menuCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openMenu = (menu: 'buy' | 'rent' | 'commercial') => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+    setActiveMenu(menu);
+  };
+
+  const scheduleClose = () => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+    menuCloseTimeout.current = setTimeout(() => setActiveMenu(null), 150);
+  };
+
+  const cancelClose = () => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+  };
+
+  const closeMenu = () => {
+    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+    setActiveMenu(null);
+  };
   const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
   const navigate = useNavigate();
