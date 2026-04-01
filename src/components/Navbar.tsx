@@ -102,8 +102,9 @@ export const Navbar = () => {
                   if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
                   setBuyMenuOpen(true);
                   setRentMenuOpen(false);
+                  setCommercialMenuOpen(false);
                 }}
-                onClick={() => { setBuyMenuOpen(prev => !prev); setRentMenuOpen(false); }}
+                onClick={() => { setBuyMenuOpen(prev => !prev); setRentMenuOpen(false); setCommercialMenuOpen(false); }}
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
