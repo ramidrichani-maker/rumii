@@ -407,6 +407,7 @@ const Purchase = () => {
                 searchRadius={radius}
                 embedded={true}
                 onSaveArea={handleSaveArea}
+                initialPolygon={initialPolygon}
               />
             </div>
           )}
