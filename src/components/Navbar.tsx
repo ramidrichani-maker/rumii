@@ -160,7 +160,7 @@ export const Navbar = () => {
               zIndex: 9001, 
               height: '25vh', 
               backgroundColor: '#f0f0f0',
-              top: document.querySelector('nav')?.getBoundingClientRect().bottom + 'px'
+              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
             }}
           >
             <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
