@@ -84,7 +84,7 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-  return <nav className="relative border-b bg-background backdrop-blur supports-[backdrop-filter]:bg-background" style={{ zIndex: 50 }}>
+  return <nav className="relative border-b bg-background" style={{ zIndex: 50, overflow: 'visible' }}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 shrink-0">
