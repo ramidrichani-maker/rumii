@@ -54,6 +54,8 @@ interface CompactPropertyMapProps {
   embedded?: boolean;
   /** Callback when user wants to save the drawn area */
   onSaveArea?: (coordinates: DrawnPolygonCoordinate[]) => void;
+  /** Pre-drawn polygon to render on mount (e.g. from homepage draw) */
+  initialPolygon?: DrawnPolygonCoordinate[] | null;
 }
 
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
