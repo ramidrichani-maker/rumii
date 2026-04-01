@@ -176,7 +176,6 @@ export const Navbar = () => {
             className="fixed inset-0"
             style={{ zIndex: 9000 }}
             onClick={() => setBuyMenuOpen(false)}
-            onMouseEnter={() => setBuyMenuOpen(false)}
           />
           <div
             className="fixed left-0 right-0 border-b border-border shadow-lg"
@@ -186,6 +185,7 @@ export const Navbar = () => {
               backgroundColor: '#f0f0f0',
               top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
             }}
+            onMouseLeave={() => setBuyMenuOpen(false)}
           >
             <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
               <Link
@@ -222,7 +222,6 @@ export const Navbar = () => {
             className="fixed inset-0"
             style={{ zIndex: 9000 }}
             onClick={() => setRentMenuOpen(false)}
-            onMouseEnter={() => setRentMenuOpen(false)}
           />
           <div
             className="fixed left-0 right-0 border-b border-border shadow-lg"
@@ -232,6 +231,7 @@ export const Navbar = () => {
               backgroundColor: '#f0f0f0',
               top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
             }}
+            onMouseLeave={() => setRentMenuOpen(false)}
           >
             <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
               <Link
@@ -259,7 +259,6 @@ export const Navbar = () => {
             className="fixed inset-0"
             style={{ zIndex: 9000 }}
             onClick={() => setCommercialMenuOpen(false)}
-            onMouseEnter={() => setCommercialMenuOpen(false)}
           />
           <div
             className="fixed left-0 right-0 border-b border-border shadow-lg"
@@ -269,6 +268,7 @@ export const Navbar = () => {
               backgroundColor: '#f0f0f0',
               top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
             }}
+            onMouseLeave={() => setCommercialMenuOpen(false)}
           >
             <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
               <Link
