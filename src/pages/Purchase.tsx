@@ -82,11 +82,14 @@ const Purchase = () => {
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
 
+  const [initialPolygon, setInitialPolygon] = useState<{ latitude: number; longitude: number }[] | null>(null);
+
   // Apply polygon from router state (e.g. drawn on home page)
   useEffect(() => {
     const state = location.state as any;
     if (state?.drawnPolygon && Array.isArray(state.drawnPolygon)) {
       setDrawnPolygon(state.drawnPolygon);
+      setInitialPolygon(state.drawnPolygon);
       setShowMap(true);
       // Clear state so it doesn't re-apply on re-renders
       window.history.replaceState({}, '');
