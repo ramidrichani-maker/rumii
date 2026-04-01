@@ -41,6 +41,7 @@ const amenities = [
 
 const Rent = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const searchQuery = searchParams.get('search') || '';
   const urlType = searchParams.get('type') || '';
   const [locationInput, setLocationInput] = useState(searchQuery);
@@ -77,6 +78,17 @@ const Rent = () => {
   }, []);
 
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
+
+  // Apply polygon from router state (e.g. drawn on home page)
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.drawnPolygon && Array.isArray(state.drawnPolygon)) {
+      setDrawnPolygon(state.drawnPolygon);
+      setShowMap(true);
+      window.history.replaceState({}, '');
+    }
+  }, []);
+
 
   const togglePropertyType = (typeId: string) => {
     setSelectedPropertyTypes(prev => prev.includes(typeId) ? prev.filter(id => id !== typeId) : [...prev, typeId]);

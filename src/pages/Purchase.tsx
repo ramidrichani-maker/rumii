@@ -41,6 +41,7 @@ const amenities = [
 
 const Purchase = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const searchQuery = searchParams.get('search') || '';
   const urlMinBeds = searchParams.get('minBeds') || '';
   const urlMaxPrice = searchParams.get('maxPrice') || '';
@@ -80,6 +81,18 @@ const Purchase = () => {
   }, []);
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
+
+  // Apply polygon from router state (e.g. drawn on home page)
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.drawnPolygon && Array.isArray(state.drawnPolygon)) {
+      setDrawnPolygon(state.drawnPolygon);
+      setShowMap(true);
+      // Clear state so it doesn't re-apply on re-renders
+      window.history.replaceState({}, '');
+    }
+  }, []);
+
 
   const togglePropertyType = (typeId: string) => {
     setSelectedPropertyTypes(prev =>
