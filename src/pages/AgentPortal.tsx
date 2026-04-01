@@ -33,7 +33,7 @@ interface PropertyViewing {
 }
 
 const AgentPortal = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [viewings, setViewings] = useState<PropertyViewing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,15 +44,12 @@ const AgentPortal = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
 
-  // Check if user is agent or admin
-  if (!user || (profile?.role !== 'agent' && profile?.role !== 'admin')) {
-    return <Navigate to="/auth" replace />;
-  }
-
   useEffect(() => {
-    fetchViewings();
-    fetchAssignedProperties();
-    fetchFeaturedRequests();
+    if (user) {
+      fetchViewings();
+      fetchAssignedProperties();
+      fetchFeaturedRequests();
+    }
   }, [user]);
 
   const fetchViewings = async () => {
