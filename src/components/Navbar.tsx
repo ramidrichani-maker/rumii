@@ -15,6 +15,7 @@ export const Navbar = () => {
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const [buyMenuOpen, setBuyMenuOpen] = useState(false);
   const buyMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -84,7 +85,7 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-  return <nav className="relative border-b bg-background backdrop-blur supports-[backdrop-filter]:bg-background" style={{ zIndex: 50 }}>
+  return <nav ref={navRef} className="relative border-b bg-background" style={{ zIndex: 50, overflow: 'visible' }}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 shrink-0">
@@ -146,16 +147,21 @@ export const Navbar = () => {
       </div>
 
       {/* Buy Mega Menu */}
-      {buyMenuOpen && (
+      {buyMenuOpen && createPortal(
         <>
           <div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0"
+            style={{ zIndex: 9000 }}
             onClick={() => setBuyMenuOpen(false)}
-            onMouseEnter={() => setBuyMenuOpen(false)}
           />
           <div
-            className="absolute left-0 right-0 top-full border-b border-border shadow-lg z-50"
-            style={{ height: '25vh', backgroundColor: '#f0f0f0' }}
+            className="fixed left-0 right-0 border-b border-border shadow-lg"
+            style={{ 
+              zIndex: 9001, 
+              height: '25vh', 
+              backgroundColor: '#f0f0f0',
+              top: (navRef.current?.getBoundingClientRect().bottom ?? 0) + 'px'
+            }}
           >
             <div className="container mx-auto px-4 h-full flex items-center justify-start gap-8">
               <Link
@@ -181,7 +187,8 @@ export const Navbar = () => {
               </Link>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
 
       {createPortal(
