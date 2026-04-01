@@ -146,40 +146,40 @@ export const Navbar = () => {
 
       {/* Buy Mega Menu */}
       {buyMenuOpen && (
-        <div
-          className="absolute left-0 right-0 top-full bg-background border-b border-border shadow-lg z-50"
-          style={{ height: '25vh' }}
-          onMouseEnter={() => {
-            if (buyMenuTimeout.current) clearTimeout(buyMenuTimeout.current);
-          }}
-          onMouseLeave={() => {
-            buyMenuTimeout.current = setTimeout(() => setBuyMenuOpen(false), 150);
-          }}
-        >
-          <div className="container mx-auto px-4 py-6 flex flex-col justify-center h-full space-y-2">
-            <Link
-              to="/purchase"
-              onClick={() => setBuyMenuOpen(false)}
-              className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-            >
-              Property for sale
-            </Link>
-            <Link
-              to="/new-homes"
-              onClick={() => setBuyMenuOpen(false)}
-              className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-            >
-              New homes for sale
-            </Link>
-            <Link
-              to="/agent-valuation"
-              onClick={() => setBuyMenuOpen(false)}
-              className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
-            >
-              Property valuation request
-            </Link>
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setBuyMenuOpen(false)}
+          />
+          <div
+            className="absolute left-0 right-0 top-full bg-background border-b border-border shadow-lg z-50"
+            style={{ height: '25vh' }}
+          >
+            <div className="container mx-auto px-4 py-6 flex flex-col justify-center h-full space-y-2">
+              <Link
+                to="/purchase"
+                onClick={() => setBuyMenuOpen(false)}
+                className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                Property for sale
+              </Link>
+              <Link
+                to="/new-homes"
+                onClick={() => setBuyMenuOpen(false)}
+                className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                New homes for sale
+              </Link>
+              <Link
+                to="/agent-valuation"
+                onClick={() => setBuyMenuOpen(false)}
+                className="block px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
+              >
+                Property valuation request
+              </Link>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {createPortal(
