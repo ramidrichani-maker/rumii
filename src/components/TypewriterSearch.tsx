@@ -6,6 +6,8 @@ interface TypewriterSearchProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const PLACEHOLDER_WORDS = ['area', 'post code', 'city', 'school', 'university', 'mall'];
@@ -13,7 +15,7 @@ const TYPE_SPEED = 80;
 const DELETE_SPEED = 50;
 const PAUSE_DURATION = 1000;
 
-const TypewriterSearch = ({ value, onChange, className }: TypewriterSearchProps) => {
+const TypewriterSearch = ({ value, onChange, className, onFocus, onBlur }: TypewriterSearchProps) => {
   const [placeholder, setPlaceholder] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -52,6 +54,8 @@ const TypewriterSearch = ({ value, onChange, className }: TypewriterSearchProps)
       ref={inputRef}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onFocus={onFocus}
+      onBlur={onBlur}
       placeholder={placeholder || 'Search for area'}
       className={cn(
         'h-14 text-base md:text-lg border-2 border-border/50 bg-background/80 backdrop-blur-sm rounded-xl px-5 focus-visible:ring-primary/30',
