@@ -198,12 +198,12 @@ export const Navbar = () => {
             top: '100%',
             marginTop: '-10px',
             paddingTop: '10px',
-            paddingBottom: '40px',
+            height: '120px',
           }}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
         >
-          <div className="w-full flex items-start justify-center gap-8 py-8 px-4">
+          <div className="w-full h-full flex items-center justify-center gap-8 px-4">
             {activeMenu === 'buy' && (
               <>
                 <div className="flex flex-col gap-1">
