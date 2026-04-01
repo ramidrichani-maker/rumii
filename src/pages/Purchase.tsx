@@ -23,7 +23,7 @@ const propertyTypes = [
   { id: "duplex", name: "Duplex", icon: Building },
   { id: "triplex", name: "Triplex", icon: Building },
   { id: "penthouse", name: "Penthouse", icon: Mountain },
-  { id: "commercial rental", name: "Commercial Rental", icon: Store },
+  { id: "commercial", name: "Commercial", icon: Store },
   { id: "farm house", name: "Farm House", icon: Tractor },
   { id: "building", name: "Building", icon: Building2 },
   { id: "venue", name: "Venue", icon: Building2 },

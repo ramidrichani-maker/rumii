@@ -33,7 +33,7 @@ const bedroomOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8', '9', '
 
 const propertyTypeOptions = [
   'Apartment', 'Villa', 'Beach House', 'Chalet', 'Duplex', 'Triplex',
-  'Penthouse', 'Commercial Rental', 'Farm House', 'Building', 'Venue',
+  'Penthouse', 'Commercial', 'Farm House', 'Building', 'Venue',
   'Studio', 'Rooftop', 'Land',
 ];
 
