@@ -797,9 +797,11 @@ export const BulkPropertyImport = () => {
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
-                              target.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No preview</div>';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
                             }}
                           />
+                          <div className="w-full h-full items-center justify-center text-xs text-muted-foreground" style={{ display: 'none' }}>No preview</div>
                         </div>
                       ) : (
                         <div className="shrink-0 w-16 h-16 rounded-md border bg-muted flex items-center justify-center">

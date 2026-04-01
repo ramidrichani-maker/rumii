@@ -31,7 +31,15 @@ import { format } from "date-fns";
 import { Mail } from "lucide-react";
 import { SupportDashboard } from "@/components/SupportDashboard";
 
+import { Navigate } from "react-router-dom";
+
 const AdminDashboard = () => {
+  const { user, profile, loading: authLoading } = useAuth();
+
+  if (authLoading) return null;
+  if (!user || profile?.role !== 'admin') {
+    return <Navigate to="/auth" replace />;
+  }
   const [pendingProperties, setPendingProperties] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
