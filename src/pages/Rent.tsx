@@ -79,18 +79,23 @@ const Rent = () => {
 
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
 
-  const [initialPolygon, setInitialPolygon] = useState<{ latitude: number; longitude: number }[] | null>(null);
+  // Read polygon from URL query param (passed from homepage draw)
+  const initialPolygon = useMemo(() => {
+    const raw = searchParams.get('polygon');
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) && parsed.length >= 3 ? parsed : null;
+    } catch { return null; }
+  }, [searchParams]);
 
-  // Apply polygon from router state (e.g. drawn on home page)
+  // Apply polygon filter when initialPolygon is available
   useEffect(() => {
-    const state = location.state as any;
-    if (state?.drawnPolygon && Array.isArray(state.drawnPolygon)) {
-      setDrawnPolygon(state.drawnPolygon);
-      setInitialPolygon(state.drawnPolygon);
+    if (initialPolygon) {
+      setDrawnPolygon(initialPolygon);
       setShowMap(true);
-      window.history.replaceState({}, '');
     }
-  }, []);
+  }, [initialPolygon]);
 
 
   const togglePropertyType = (typeId: string) => {
