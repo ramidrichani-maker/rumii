@@ -13,13 +13,14 @@ const HeroSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDrawMap, setShowDrawMap] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
+  const [drawnPolygon, setDrawnPolygon] = useState<{ latitude: number; longitude: number }[] | null>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
   const handleSearch = () => {
     const route = listingMode === 'buy' ? '/purchase' : '/rent';
     const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : '';
-    navigate(`${route}${params}`);
+    navigate(`${route}${params}`, drawnPolygon ? { state: { drawnPolygon } } : undefined);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
