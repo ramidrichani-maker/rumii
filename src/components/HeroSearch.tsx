@@ -19,8 +19,11 @@ const HeroSearch = () => {
 
   const handleSearch = () => {
     const route = listingMode === 'buy' ? '/purchase' : '/rent';
-    const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : '';
-    navigate(`${route}${params}`, drawnPolygon ? { state: { drawnPolygon } } : undefined);
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    if (drawnPolygon) params.set('polygon', JSON.stringify(drawnPolygon));
+    const qs = params.toString();
+    navigate(`${route}${qs ? `?${qs}` : ''}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
