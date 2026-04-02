@@ -28,8 +28,7 @@ const HeroSearch = () => {
   };
 
   const handleDrawComplete = (polygon: { latitude: number; longitude: number }[]) => {
-    const route = listingMode === 'buy' ? '/purchase' : '/rent';
-    navigate(route, { state: { drawnPolygon: polygon } });
+    setDrawnPolygon(polygon);
   };
 
   return (
