@@ -166,19 +166,6 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       leafletMapRef.current = map;
       setMapInitialized(true);
 
-      // Render initial polygon if provided (e.g. from homepage draw)
-      if (initialPolygon && initialPolygon.length >= 3 && drawnItems) {
-        const latLngs: L.LatLngExpression[] = initialPolygon.map(c => [c.latitude, c.longitude]);
-        const polygon = L.polygon(latLngs, {
-          color: 'hsl(262, 83%, 58%)',
-          fillColor: 'hsl(262, 83%, 58%)',
-          fillOpacity: 0.15,
-          weight: 2,
-        });
-        drawnItems.addLayer(polygon);
-        setHasDrawnArea(true);
-        map.fitBounds(polygon.getBounds(), { padding: [30, 30] });
-      }
 
     } catch (error) {
       console.error('Error initializing compact property search map:', error);
