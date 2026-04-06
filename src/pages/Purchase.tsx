@@ -280,6 +280,14 @@ const Purchase = () => {
     }
   }, [locationInput]);
 
+  // Resolve city centers for polygon filtering when properties load
+  useEffect(() => {
+    if (hasDrawnArea && properties.length > 0) {
+      const cities = properties.map(p => p.city).filter(Boolean);
+      resolveCityCenters(cities);
+    }
+  }, [properties, hasDrawnArea]);
+
   const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
   return (
