@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Phone, Mail, Building2, CalendarCheck } from "lucide-react";
+import { Phone, Mail, Building2, CalendarCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface AgentInfo {
   user_id: string;
@@ -79,13 +84,8 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
   const displayPhone = agent?.phone_number || "+96170612686";
   const displayAgentName = agent?.full_name || "Oracle Agent";
 
-  const handleCallClick = () => {
-    if (showPhone) {
-      window.location.href = `tel:${displayPhone}`;
-    } else {
-      setShowPhone(true);
-    }
-  };
+  const cleanPhone = displayPhone.replace(/[^+\d]/g, '');
+  const whatsappUrl = `https://wa.me/${cleanPhone.replace('+', '')}`;
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 space-y-4">
@@ -107,14 +107,32 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
         Request Viewing
       </Button>
 
-      <Button
-        variant="outline"
-        className="w-full gap-2"
-        onClick={handleCallClick}
-      >
-        <Phone className="w-4 h-4" />
-        {showPhone ? displayPhone : "Call agent"}
-      </Button>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="w-full gap-2">
+            <Phone className="w-4 h-4" />
+            Call agent
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-2 space-y-1">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2"
+            onClick={() => window.location.href = `tel:${cleanPhone}`}
+          >
+            <Phone className="w-4 h-4" />
+            {displayPhone}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 text-green-600 hover:text-green-700"
+            onClick={() => window.open(whatsappUrl, '_blank')}
+          >
+            <MessageCircle className="w-4 h-4" />
+            WhatsApp
+          </Button>
+        </PopoverContent>
+      </Popover>
 
       <Button
         className="w-full gap-2"
