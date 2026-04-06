@@ -84,13 +84,8 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
   const displayPhone = agent?.phone_number || "+96170612686";
   const displayAgentName = agent?.full_name || "Oracle Agent";
 
-  const handleCallClick = () => {
-    if (showPhone) {
-      window.location.href = `tel:${displayPhone}`;
-    } else {
-      setShowPhone(true);
-    }
-  };
+  const cleanPhone = displayPhone.replace(/[^+\d]/g, '');
+  const whatsappUrl = `https://wa.me/${cleanPhone.replace('+', '')}`;
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 space-y-4">
