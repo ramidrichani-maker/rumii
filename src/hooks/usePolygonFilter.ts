@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { getCityCenter } from '@/utils/cityCenter';
 
 interface Coordinate {
   latitude: number;
@@ -30,7 +31,7 @@ function isPointInPolygon(point: Coordinate, polygon: Coordinate[]): boolean {
 
 // Haversine distance in km between two coordinates
 function haversineDistance(a: Coordinate, b: Coordinate): number {
-  const R = 6371; // Earth radius in km
+  const R = 6371;
   const dLat = (b.latitude - a.latitude) * Math.PI / 180;
   const dLon = (b.longitude - a.longitude) * Math.PI / 180;
   const lat1 = a.latitude * Math.PI / 180;
@@ -52,8 +53,23 @@ function minDistanceToPolygon(point: Coordinate, polygon: Coordinate[]): number 
 
 export function usePolygonFilter() {
   const [drawnPolygon, setDrawnPolygon] = useState<Coordinate[] | null>(null);
+  const [cityCenters, setCityCenters] = useState<Record<string, { lat: number; lng: number }>>({});
 
-  const filterPropertiesByPolygon = useCallback(<T extends { latitude: number | null; longitude: number | null }>(
+  // Resolve city centers for a list of cities
+  const resolveCityCenters = useCallback(async (cities: string[]) => {
+    const unique = Array.from(new Set(cities.filter(Boolean)));
+    const missing = unique.filter(c => !cityCenters[c.trim().toLowerCase()]);
+    if (missing.length === 0) return;
+
+    const results: Record<string, { lat: number; lng: number }> = { ...cityCenters };
+    await Promise.all(missing.map(async (city) => {
+      const center = await getCityCenter(city);
+      if (center) results[city.trim().toLowerCase()] = center;
+    }));
+    setCityCenters(results);
+  }, [cityCenters]);
+
+  const filterPropertiesByPolygon = useCallback(<T extends { latitude: number | null; longitude: number | null; city?: string }>(
     properties: T[],
     radiusKm: number = 0
   ): T[] => {
@@ -62,24 +78,36 @@ export function usePolygonFilter() {
     }
 
     return properties.filter(property => {
-      if (property.latitude === null || property.longitude === null) {
-        return false;
+      let lat = property.latitude;
+      let lng = property.longitude;
+
+      // Fallback to city center if no exact coords
+      if (lat === null || lng === null) {
+        const city = property.city;
+        if (city) {
+          const center = cityCenters[city.trim().toLowerCase()];
+          if (center) {
+            lat = center.lat;
+            lng = center.lng;
+          }
+        }
       }
-      const point = { latitude: property.latitude, longitude: property.longitude };
+
+      if (lat === null || lng === null) return false;
+
+      const point = { latitude: lat, longitude: lng };
       
-      // Check if inside polygon
       if (isPointInPolygon(point, drawnPolygon)) {
         return true;
       }
       
-      // If radius is set, also include properties within radiusKm of the polygon boundary
       if (radiusKm > 0) {
         return minDistanceToPolygon(point, drawnPolygon) <= radiusKm;
       }
       
       return false;
     });
-  }, [drawnPolygon]);
+  }, [drawnPolygon, cityCenters]);
 
   const clearPolygon = useCallback(() => {
     setDrawnPolygon(null);
@@ -90,6 +118,7 @@ export function usePolygonFilter() {
     setDrawnPolygon,
     filterPropertiesByPolygon,
     clearPolygon,
-    hasDrawnArea: drawnPolygon !== null && drawnPolygon.length >= 3
+    hasDrawnArea: drawnPolygon !== null && drawnPolygon.length >= 3,
+    resolveCityCenters
   };
 }

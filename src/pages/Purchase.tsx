@@ -80,7 +80,7 @@ const Purchase = () => {
     }, 300);
   }, []);
   
-  const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
+  const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon, resolveCityCenters } = usePolygonFilter();
 
   // Read polygon from URL query param (passed from homepage draw)
   const initialPolygon = useMemo(() => {
@@ -279,6 +279,14 @@ const Purchase = () => {
       toast({ title: "Area saved", description: "You can view it in My Oracle." });
     }
   }, [locationInput]);
+
+  // Resolve city centers for polygon filtering when properties load
+  useEffect(() => {
+    if (hasDrawnArea && properties.length > 0) {
+      const cities = properties.map(p => p.city).filter(Boolean);
+      resolveCityCenters(cities);
+    }
+  }, [properties, hasDrawnArea]);
 
   const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
