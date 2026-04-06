@@ -57,7 +57,7 @@ export function usePolygonFilter() {
 
   // Resolve city centers for a list of cities
   const resolveCityCenters = useCallback(async (cities: string[]) => {
-    const unique = [...new Set(cities.filter(Boolean))];
+    const unique = Array.from(new Set(cities.filter(Boolean)));
     const missing = unique.filter(c => !cityCenters[c.trim().toLowerCase()]);
     if (missing.length === 0) return;
 
