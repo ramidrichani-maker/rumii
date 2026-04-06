@@ -80,7 +80,7 @@ const Purchase = () => {
     }, 300);
   }, []);
   
-  const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon } = usePolygonFilter();
+  const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon, resolveCityCenters } = usePolygonFilter();
 
   // Read polygon from URL query param (passed from homepage draw)
   const initialPolygon = useMemo(() => {
