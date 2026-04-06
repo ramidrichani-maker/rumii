@@ -9,7 +9,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ViewingBookingModal from "@/components/ViewingBookingModal";
 
 interface AgentInfo {
   user_id: string;
