@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Phone, Mail, Building2, CalendarCheck } from "lucide-react";
+import { Phone, Mail, Building2, CalendarCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import ViewingBookingModal from "@/components/ViewingBookingModal";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 
 interface AgentInfo {
