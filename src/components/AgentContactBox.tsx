@@ -107,14 +107,32 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
         Request Viewing
       </Button>
 
-      <Button
-        variant="outline"
-        className="w-full gap-2"
-        onClick={handleCallClick}
-      >
-        <Phone className="w-4 h-4" />
-        {showPhone ? displayPhone : "Call agent"}
-      </Button>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="w-full gap-2">
+            <Phone className="w-4 h-4" />
+            Call agent
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-2 space-y-1">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2"
+            onClick={() => window.location.href = `tel:${cleanPhone}`}
+          >
+            <Phone className="w-4 h-4" />
+            {displayPhone}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 text-green-600 hover:text-green-700"
+            onClick={() => window.open(whatsappUrl, '_blank')}
+          >
+            <MessageCircle className="w-4 h-4" />
+            WhatsApp
+          </Button>
+        </PopoverContent>
+      </Popover>
 
       <Button
         className="w-full gap-2"
