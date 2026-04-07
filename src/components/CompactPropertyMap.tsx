@@ -429,6 +429,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     if (!mapInitialized || !leafletMapRef.current) return;
 
     // If location is cleared, remove boundary/circle and clear polygon filter
+    // But preserve drawn area if an initialPolygon was provided (e.g. from homepage draw)
     if (!initialSearchLocation?.trim()) {
       if (searchBoundaryRef.current) {
         searchBoundaryRef.current.remove();
@@ -438,11 +439,14 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         searchCircleRef.current.remove();
         searchCircleRef.current = null;
       }
-      if (drawnItemsRef.current) {
-        drawnItemsRef.current.clearLayers();
+      // Only clear drawn area if there's no initialPolygon
+      if (!initialPolygon || initialPolygon.length < 3) {
+        if (drawnItemsRef.current) {
+          drawnItemsRef.current.clearLayers();
+        }
+        setHasDrawnArea(false);
+        onDrawnAreaChange?.(null);
       }
-      setHasDrawnArea(false);
-      onDrawnAreaChange?.(null);
       return;
     }
 
