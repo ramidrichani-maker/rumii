@@ -10,6 +10,7 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { getCityCenter } from '@/utils/cityCenter';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Property {
   id: string;
