@@ -758,10 +758,13 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     setIsDrawingMode(false);
     onDrawnAreaChange?.(null);
     
-    // Disable any active draw handler
     if (drawHandlerRef.current) {
       drawHandlerRef.current.disable();
       drawHandlerRef.current = null;
+    }
+    if (freehandCleanupRef.current) {
+      freehandCleanupRef.current();
+      freehandCleanupRef.current = null;
     }
   }, [onDrawnAreaChange]);
 
@@ -770,6 +773,10 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     if (drawHandlerRef.current) {
       drawHandlerRef.current.disable();
       drawHandlerRef.current = null;
+    }
+    if (freehandCleanupRef.current) {
+      freehandCleanupRef.current();
+      freehandCleanupRef.current = null;
     }
   }, []);
 
