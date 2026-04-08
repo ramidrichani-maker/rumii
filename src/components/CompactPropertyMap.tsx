@@ -74,6 +74,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   initialPolygon = null,
 }) => {
   const { profile } = useAuth();
+  const isMobile = useIsMobile();
   const isAdmin = profile?.role === 'admin';
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
