@@ -615,35 +615,140 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     setIsExpanded(!isExpanded);
   };
 
+  const freehandCleanupRef = useRef<(() => void) | null>(null);
+
   const startDrawing = useCallback(() => {
     if (!leafletMapRef.current || !mapInitialized) return;
     
     setIsDrawingMode(true);
-    
-    // Custom vertex icon — small greenish-yellow circle
-    const vertexIcon = new L.DivIcon({
-      className: 'leaflet-draw-vertex-icon',
-      iconSize: [12, 12],
-      iconAnchor: [6, 6],
-    });
 
-    // Create polygon draw handler
-    const drawHandler = new (L.Draw as any).Polygon(leafletMapRef.current, {
-      shapeOptions: {
-        color: 'hsl(var(--primary))',
-        fillColor: 'hsl(var(--primary))',
-        fillOpacity: 0.2,
-        weight: 2
-      },
-      icon: vertexIcon,
-      touchIcon: vertexIcon,
-      showArea: true,
-      metric: true
-    });
-    
-    drawHandlerRef.current = drawHandler;
-    drawHandler.enable();
-  }, [mapInitialized]);
+    if (isMobile) {
+      // Freehand drawing for mobile (same approach as homepage DrawSearchArea)
+      const map = leafletMapRef.current;
+      const drawingPoints: L.LatLng[] = [];
+      let polyline: L.Polyline | null = null;
+      let isActive = false;
+
+      map.dragging.disable();
+      map.getContainer().style.cursor = 'crosshair';
+
+      const addPoint = (latlng: L.LatLng) => {
+        drawingPoints.push(latlng);
+        if (polyline) polyline.remove();
+        polyline = L.polyline(drawingPoints, {
+          color: 'hsl(262, 83%, 58%)',
+          weight: 3,
+          dashArray: '6, 8',
+        }).addTo(map);
+      };
+
+      const onTouchMove = (e: TouchEvent) => {
+        if (!isActive) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = map.getContainer().getBoundingClientRect();
+        const point = map.containerPointToLatLng(
+          L.point(touch.clientX - rect.left, touch.clientY - rect.top)
+        );
+        addPoint(point);
+      };
+
+      const onMouseMove = (e: L.LeafletMouseEvent) => {
+        if (isActive) addPoint(e.latlng);
+      };
+
+      const finishDrawing = () => {
+        if (!isActive) return;
+        isActive = false;
+        map.dragging.enable();
+        map.getContainer().style.cursor = '';
+        map.off('mousemove', onMouseMove);
+        map.getContainer().removeEventListener('touchmove', onTouchMove);
+        map.off('mouseup');
+        map.getContainer().removeEventListener('touchend', finishDrawing);
+
+        if (polyline) { polyline.remove(); polyline = null; }
+
+        if (drawingPoints.length < 3) {
+          setIsDrawingMode(false);
+          return;
+        }
+
+        // Simplify points
+        const step = Math.max(1, Math.floor(drawingPoints.length / 50));
+        const simplified = drawingPoints.filter((_, i) => i % step === 0);
+        if (simplified.length < 3) { setIsDrawingMode(false); return; }
+
+        // Clear previous and add polygon
+        if (drawnItemsRef.current) drawnItemsRef.current.clearLayers();
+        const polygon = L.polygon(simplified, {
+          color: 'hsl(262, 83%, 58%)',
+          fillColor: 'hsl(262, 83%, 58%)',
+          fillOpacity: 0.15,
+          weight: 2,
+        });
+        drawnItemsRef.current?.addLayer(polygon);
+
+        const coordinates: DrawnPolygonCoordinate[] = simplified.map(ll => ({
+          latitude: ll.lat, longitude: ll.lng,
+        }));
+        setHasDrawnArea(true);
+        setIsDrawingMode(false);
+        onDrawnAreaChange?.(coordinates);
+      };
+
+      const onTouchStart = () => {
+        isActive = true;
+        map.getContainer().addEventListener('touchmove', onTouchMove, { passive: false });
+      };
+      const onMouseDown = () => {
+        isActive = true;
+        map.on('mousemove', onMouseMove);
+      };
+
+      map.on('mousedown', onMouseDown);
+      map.on('mouseup', finishDrawing);
+      map.getContainer().addEventListener('touchstart', onTouchStart, { passive: true });
+      map.getContainer().addEventListener('touchend', finishDrawing);
+
+      // Store cleanup so cancelDrawing / clearDrawnArea can tear down listeners
+      freehandCleanupRef.current = () => {
+        isActive = false;
+        map.dragging.enable();
+        map.getContainer().style.cursor = '';
+        map.off('mousedown', onMouseDown);
+        map.off('mousemove', onMouseMove);
+        map.off('mouseup', finishDrawing);
+        map.getContainer().removeEventListener('touchstart', onTouchStart);
+        map.getContainer().removeEventListener('touchmove', onTouchMove);
+        map.getContainer().removeEventListener('touchend', finishDrawing);
+        if (polyline) { polyline.remove(); }
+      };
+    } else {
+      // Desktop: use Leaflet Draw polygon handler (click-to-place vertices)
+      const vertexIcon = new L.DivIcon({
+        className: 'leaflet-draw-vertex-icon',
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+      });
+
+      const drawHandler = new (L.Draw as any).Polygon(leafletMapRef.current, {
+        shapeOptions: {
+          color: 'hsl(var(--primary))',
+          fillColor: 'hsl(var(--primary))',
+          fillOpacity: 0.2,
+          weight: 2
+        },
+        icon: vertexIcon,
+        touchIcon: vertexIcon,
+        showArea: true,
+        metric: true
+      });
+
+      drawHandlerRef.current = drawHandler;
+      drawHandler.enable();
+    }
+  }, [mapInitialized, isMobile, onDrawnAreaChange]);
 
   const clearDrawnArea = useCallback(() => {
     if (drawnItemsRef.current) {
