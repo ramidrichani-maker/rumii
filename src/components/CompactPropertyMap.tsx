@@ -841,7 +841,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         {isDrawingMode && (
           <div className="absolute top-3 left-3 right-3 z-[1000]">
             <p className="text-xs text-foreground bg-background/90 border border-border rounded-md px-3 py-1.5 shadow-sm">
-              Click on the map to draw a polygon. Click the first point to close the shape.
+              {isMobile ? 'Draw on the map with your finger' : 'Click on the map to draw a polygon. Click the first point to close the shape.'}
             </p>
           </div>
         )}
@@ -941,7 +941,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           </div>
           {isDrawingMode && (
             <p className="text-xs text-muted-foreground mt-2">
-              Click on the map to draw a polygon around your desired search area. Click the first point to close the shape.
+              {isMobile ? 'Draw on the map with your finger' : 'Click on the map to draw a polygon around your desired search area. Click the first point to close the shape.'}
             </p>
           )}
           {isExpanded && (
