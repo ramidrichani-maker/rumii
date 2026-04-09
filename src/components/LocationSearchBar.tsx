@@ -145,11 +145,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           />
         </div>
 
-        <div className="flex gap-3 overflow-x-auto md:overflow-x-visible w-full md:w-auto shrink-0">
+        <div className="flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0">
         {/* Radius Popover */}
-        <Popover>
+        <div className="flex items-center gap-2 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
+          <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[130px]">
+            <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
               <span className="text-sm font-medium">Radius: {selectedLabel}</span>
               <ChevronDown className="w-4 h-4" />
             </Button>
