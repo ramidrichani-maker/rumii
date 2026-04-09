@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,7 +40,9 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [isFavorited, setIsFavorited] = useState(false);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const imageCarousel = useSwipeCarousel(property.images?.length || 0);
   const [showPhone, setShowPhone] = useState(false);
@@ -191,7 +195,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden touch-pan-y"
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
-        onTouchEnd={imageCarousel.onTouchEnd}
+        onTouchEnd={() => {
+          imageCarousel.onTouchEnd();
+          // If it wasn't a swipe, open fullscreen on mobile
+          if (isMobile && !imageCarousel.wasSwipe() && property.images?.length > 0) {
+            setTimeout(() => {
+              if (!imageCarousel.wasSwipe()) {
+                setFullscreenOpen(true);
+              }
+            }, 10);
+          }
+        }}
       >
         {hasMultipleImages && (
           <>
@@ -358,6 +372,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
             listing_type: property.listing_type,
           }}
           agencyId={property.agency_id}
+        />
+      )}
+
+      {fullscreenOpen && property.images?.length > 0 && (
+        <FullscreenImageViewer
+          images={property.images}
+          initialIndex={imageCarousel.currentIndex}
+          onClose={() => setFullscreenOpen(false)}
         />
       )}
     </Card>
