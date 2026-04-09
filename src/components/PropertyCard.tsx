@@ -40,7 +40,9 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [isFavorited, setIsFavorited] = useState(false);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const imageCarousel = useSwipeCarousel(property.images?.length || 0);
   const [showPhone, setShowPhone] = useState(false);
@@ -193,7 +195,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden touch-pan-y"
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
-        onTouchEnd={imageCarousel.onTouchEnd}
+        onTouchEnd={(e) => {
+          imageCarousel.onTouchEnd(e);
+          // If it wasn't a swipe, open fullscreen on mobile
+          if (isMobile && !imageCarousel.wasSwipe() && property.images?.length > 0) {
+            setTimeout(() => {
+              if (!imageCarousel.wasSwipe()) {
+                setFullscreenOpen(true);
+              }
+            }, 10);
+          }
+        }}
       >
         {hasMultipleImages && (
           <>
