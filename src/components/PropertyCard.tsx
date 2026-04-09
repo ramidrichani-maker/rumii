@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
