@@ -146,147 +146,147 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0">
-        {/* Radius Popover */}
+        {/* Row 1: Radius */}
         <div className="flex items-center gap-2 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Search radius</span>
           <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
-              <span className="text-sm font-medium">Radius: {selectedLabel}</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
-            <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
-              {radiusOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => onRadiusChange(option.value)}
-                  className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                    radius === option.value
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-transparent bg-transparent hover:border-primary/50'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        {/* Bedrooms Popover */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[140px]">
-              <BedDouble className="w-4 h-4" />
-              <span className="text-sm font-medium">Bedrooms</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
-            <div className="space-y-3">
-              {/* Min / Max toggle buttons */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
-                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                    activeBedroomTab === 'min'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background/15 hover:border-primary/50'
-                  }`}
-                >
-                  Min: {minBedrooms || 'No min'}
-                </button>
-                <button
-                  onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
-                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                    activeBedroomTab === 'max'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background/15 hover:border-primary/50'
-                  }`}
-                >
-                  Max: {maxBedrooms || 'No max'}
-                </button>
-              </div>
-
-              {/* Options list */}
-              {activeBedroomTab && (
-                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
+                <span className="text-sm font-medium">Radius: {selectedLabel}</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+              <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+                {radiusOptions.map((option) => (
                   <button
-                    onClick={() => {
-                      if (activeBedroomTab === 'min') onMinBedroomsChange('');
-                      else onMaxBedroomsChange('');
-                    }}
+                    key={option.value}
+                    onClick={() => onRadiusChange(option.value)}
                     className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                      (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
+                      radius === option.value
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
-                    {activeBedroomTab === 'min' ? 'No min' : 'No max'}
+                    {option.label}
                   </button>
-                  {bedroomOptions.map((opt) => {
-                    const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
-                    const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
-                    return (
-                      <button
-                        key={`${activeBedroomTab}-${opt}`}
-                        onClick={() => onChange(currentVal === opt ? '' : opt)}
-                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                          currentVal === opt
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-transparent bg-transparent hover:border-primary/50'
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        {/* Price Popover */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[120px]">
-              <DollarSign className="w-4 h-4" />
-              <span className="text-sm font-medium">Price</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
-           <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
-            <div className="space-y-3">
-              {/* Min / Max toggle buttons */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
-                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                    activePriceTab === 'min'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background/15 hover:border-primary/50'
-                  }`}
-                >
-                  Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
-                </button>
-                <button
-                  onClick={() => setActivePriceTab(activePriceTab === 'max' ? null : 'max')}
-                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                    activePriceTab === 'max'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background/15 hover:border-primary/50'
-                  }`}
-                >
-                  Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
-                </button>
+                ))}
               </div>
+            </PopoverContent>
+          </Popover>
+        </div>
 
-              {/* Options list */}
-              {activePriceTab && (
-                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+        {/* Row 2: Bedrooms */}
+        <div className="flex items-center gap-2 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Bedrooms</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[140px] flex-1 md:flex-initial">
+                <BedDouble className="w-4 h-4" />
+                <span className="text-sm font-medium">Bedrooms</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                      activeBedroomTab === 'min'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background/15 hover:border-primary/50'
+                    }`}
+                  >
+                    Min: {minBedrooms || 'No min'}
+                  </button>
+                  <button
+                    onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                      activeBedroomTab === 'max'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background/15 hover:border-primary/50'
+                    }`}
+                  >
+                    Max: {maxBedrooms || 'No max'}
+                  </button>
+                </div>
+                {activeBedroomTab && (
+                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+                    <button
+                      onClick={() => {
+                        if (activeBedroomTab === 'min') onMinBedroomsChange('');
+                        else onMaxBedroomsChange('');
+                      }}
+                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                        (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-transparent bg-transparent hover:border-primary/50'
+                      }`}
+                    >
+                      {activeBedroomTab === 'min' ? 'No min' : 'No max'}
+                    </button>
+                    {bedroomOptions.map((opt) => {
+                      const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
+                      const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                      return (
+                        <button
+                          key={`${activeBedroomTab}-${opt}`}
+                          onClick={() => onChange(currentVal === opt ? '' : opt)}
+                          className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                            currentVal === opt
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-transparent bg-transparent hover:border-primary/50'
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Row 3: Price */}
+        <div className="flex items-center gap-2 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Price range</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[120px] flex-1 md:flex-initial">
+                <DollarSign className="w-4 h-4" />
+                <span className="text-sm font-medium">Price</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                      activePriceTab === 'min'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background/15 hover:border-primary/50'
+                    }`}
+                  >
+                    Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
+                  </button>
+                  <button
+                    onClick={() => setActivePriceTab(activePriceTab === 'max' ? null : 'max')}
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                      activePriceTab === 'max'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background/15 hover:border-primary/50'
+                    }`}
+                  >
+                    Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
+                  </button>
+                </div>
+                {activePriceTab && (
+                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
                     <button
                       onClick={() => {
                         if (activePriceTab === 'min') onBarMinPriceChange('');
@@ -318,76 +318,83 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         </button>
                       );
                     })}
-                </div>
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
+                  </div>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
 
-        {/* Property Type Popover */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[150px]">
-              <Home className="w-4 h-4" />
-              <span className="text-sm font-medium">Property Type</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
-            <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
-              <button
-                onClick={() => onPropertyTypesChange([])}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
-                  selectedPropertyTypes.length === 0
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-transparent bg-transparent hover:border-primary/50'
-                }`}
-              >
-                <Checkbox
-                  checked={selectedPropertyTypes.length === 0}
-                  className="pointer-events-none"
-                />
-                Show All
-              </button>
-              {propertyTypeOptions.map((type) => {
-                const typeId = type.toLowerCase();
-                const isSelected = selectedPropertyTypes.includes(typeId);
-                return (
-                  <button
-                    key={type}
-                    onClick={() => {
-                      if (isSelected) {
-                        onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
-                      } else {
-                        onPropertyTypesChange([...selectedPropertyTypes, typeId]);
-                      }
-                    }}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
-                      isSelected
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-transparent bg-transparent hover:border-primary/50'
-                    }`}
-                  >
-                    <Checkbox
-                      checked={isSelected}
-                      className="pointer-events-none"
-                    />
-                    {type}
-                  </button>
-                );
-              })}
-            </div>
-          </PopoverContent>
-        </Popover>
-        {/* Filter Popover */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="h-12 px-4 gap-2 min-w-[110px]">
-              <SlidersHorizontal className="w-4 h-4" />
-              <span className="text-sm font-medium">Filter</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
+        {/* Row 4: Property Type */}
+        <div className="flex items-center gap-2 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Property type</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[150px] flex-1 md:flex-initial">
+                <Home className="w-4 h-4" />
+                <span className="text-sm font-medium">Property Type</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+              <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+                <button
+                  onClick={() => onPropertyTypesChange([])}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                    selectedPropertyTypes.length === 0
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-transparent bg-transparent hover:border-primary/50'
+                  }`}
+                >
+                  <Checkbox
+                    checked={selectedPropertyTypes.length === 0}
+                    className="pointer-events-none"
+                  />
+                  Show All
+                </button>
+                {propertyTypeOptions.map((type) => {
+                  const typeId = type.toLowerCase();
+                  const isSelected = selectedPropertyTypes.includes(typeId);
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => {
+                        if (isSelected) {
+                          onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
+                        } else {
+                          onPropertyTypesChange([...selectedPropertyTypes, typeId]);
+                        }
+                      }}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                        isSelected
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-transparent bg-transparent hover:border-primary/50'
+                      }`}
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        className="pointer-events-none"
+                      />
+                      {type}
+                    </button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Row 5: Advanced Filter */}
+        <div className="flex items-center gap-2 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Advanced</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[110px] flex-1 md:flex-initial">
+                <SlidersHorizontal className="w-4 h-4" />
+                <span className="text-sm font-medium">Filter</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
           <PopoverContent align="end" className="w-[400px] bg-background/15 backdrop-blur-md z-50 p-4 max-h-[80vh] overflow-y-auto border-border/50 rounded-2xl">
             <div className="space-y-5">
               {/* Bedrooms section */}
