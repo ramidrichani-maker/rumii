@@ -680,6 +680,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </PopoverContent>
         </Popover>
         </div>
+        </div>
       </div>
     </div>
   );
