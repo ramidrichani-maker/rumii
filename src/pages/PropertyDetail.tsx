@@ -689,6 +689,14 @@ const PropertyDetail = () => {
           <div ref={overlayMapRef} className="flex-1" />
         </div>
       )}
+
+      {fullscreenOpen && property.images?.length > 0 && (
+        <FullscreenImageViewer
+          images={property.images}
+          initialIndex={carousel.currentIndex}
+          onClose={() => setFullscreenOpen(false)}
+        />
+      )}
     </div>
   );
 };
