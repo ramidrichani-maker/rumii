@@ -374,6 +374,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           agencyId={property.agency_id}
         />
       )}
+
+      {fullscreenOpen && property.images?.length > 0 && (
+        <FullscreenImageViewer
+          images={property.images}
+          initialIndex={imageCarousel.currentIndex}
+          onClose={() => setFullscreenOpen(false)}
+        />
+      )}
     </Card>
   );
 };
