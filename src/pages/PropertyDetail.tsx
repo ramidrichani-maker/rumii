@@ -3,6 +3,8 @@ import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import { Button } from "@/components/ui/button";
 import AgentContactBox from "@/components/AgentContactBox";
 import L from "leaflet";
@@ -56,6 +58,8 @@ const PropertyDetail = () => {
   const [showFloorPlan, setShowFloorPlan] = useState(false);
   const [showMapOverlay, setShowMapOverlay] = useState(false);
   const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const miniMapRef = useRef<HTMLDivElement>(null);
   const miniMapInstance = useRef<L.Map | null>(null);
@@ -331,7 +335,14 @@ const PropertyDetail = () => {
           className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-muted group"
           onTouchStart={carousel.onTouchStart}
           onTouchMove={carousel.onTouchMove}
-          onTouchEnd={carousel.onTouchEnd}
+          onTouchEnd={() => {
+            carousel.onTouchEnd();
+            if (isMobile && !carousel.wasSwipe() && property.images?.length > 0) {
+              setTimeout(() => {
+                if (!carousel.wasSwipe()) setFullscreenOpen(true);
+              }, 10);
+            }
+          }}
         >
           <div
             className="flex h-full"
@@ -677,6 +688,14 @@ const PropertyDetail = () => {
           </div>
           <div ref={overlayMapRef} className="flex-1" />
         </div>
+      )}
+
+      {fullscreenOpen && property.images?.length > 0 && (
+        <FullscreenImageViewer
+          images={property.images}
+          initialIndex={carousel.currentIndex}
+          onClose={() => setFullscreenOpen(false)}
+        />
       )}
     </div>
   );
