@@ -180,76 +180,139 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
         {/* Row 2: Bedrooms */}
         <div className="flex flex-col gap-1 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Bedrooms</span>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[140px] flex-1 md:flex-initial">
-                <BedDouble className="w-4 h-4" />
-                <span className="text-sm font-medium">Bedrooms</span>
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
-              <div className="space-y-3">
-                <div className="flex gap-2">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">No. of bedrooms</span>
+          {/* Mobile: inline min/max */}
+          {isMobile ? (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                    activeBedroomTab === 'min'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background/15 hover:border-primary/50'
+                  }`}
+                >
+                  Min: {minBedrooms || 'No min'}
+                </button>
+                <button
+                  onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                    activeBedroomTab === 'max'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background/15 hover:border-primary/50'
+                  }`}
+                >
+                  Max: {maxBedrooms || 'No max'}
+                </button>
+              </div>
+              {activeBedroomTab && (
+                <div className="grid grid-cols-1 gap-1 max-h-48 overflow-y-auto rounded-2xl p-2 w-full bg-background/15 backdrop-blur-md border border-border/50">
                   <button
-                    onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activeBedroomTab === 'min'
+                    onClick={() => {
+                      if (activeBedroomTab === 'min') onMinBedroomsChange('');
+                      else onMaxBedroomsChange('');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                      (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
-                    Min: {minBedrooms || 'No min'}
+                    {activeBedroomTab === 'min' ? 'No min' : 'No max'}
                   </button>
-                  <button
-                    onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activeBedroomTab === 'max'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
-                  >
-                    Max: {maxBedrooms || 'No max'}
-                  </button>
+                  {bedroomOptions.map((opt) => {
+                    const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
+                    const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                    return (
+                      <button
+                        key={`${activeBedroomTab}-${opt}`}
+                        onClick={() => onChange(currentVal === opt ? '' : opt)}
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          currentVal === opt
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
                 </div>
-                {activeBedroomTab && (
-                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+              )}
+            </div>
+          ) : (
+            /* Desktop: popover */
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-12 px-4 gap-2 min-w-[140px]">
+                  <BedDouble className="w-4 h-4" />
+                  <span className="text-sm font-medium">Bedrooms</span>
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => {
-                        if (activeBedroomTab === 'min') onMinBedroomsChange('');
-                        else onMaxBedroomsChange('');
-                      }}
-                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                        (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
+                      onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
+                      className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        activeBedroomTab === 'min'
                           ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-transparent bg-transparent hover:border-primary/50'
+                          : 'border-border bg-background/15 hover:border-primary/50'
                       }`}
                     >
-                      {activeBedroomTab === 'min' ? 'No min' : 'No max'}
+                      Min: {minBedrooms || 'No min'}
                     </button>
-                    {bedroomOptions.map((opt) => {
-                      const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
-                      const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
-                      return (
-                        <button
-                          key={`${activeBedroomTab}-${opt}`}
-                          onClick={() => onChange(currentVal === opt ? '' : opt)}
-                          className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                            currentVal === opt
-                              ? 'border-primary bg-primary text-primary-foreground'
-                              : 'border-transparent bg-transparent hover:border-primary/50'
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      );
-                    })}
+                    <button
+                      onClick={() => setActiveBedroomTab(activeBedroomTab === 'max' ? null : 'max')}
+                      className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        activeBedroomTab === 'max'
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-background/15 hover:border-primary/50'
+                      }`}
+                    >
+                      Max: {maxBedrooms || 'No max'}
+                    </button>
                   </div>
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
+                  {activeBedroomTab && (
+                    <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+                      <button
+                        onClick={() => {
+                          if (activeBedroomTab === 'min') onMinBedroomsChange('');
+                          else onMaxBedroomsChange('');
+                        }}
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
+                        }`}
+                      >
+                        {activeBedroomTab === 'min' ? 'No min' : 'No max'}
+                      </button>
+                      {bedroomOptions.map((opt) => {
+                        const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
+                        const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                        return (
+                          <button
+                            key={`${activeBedroomTab}-${opt}`}
+                            onClick={() => onChange(currentVal === opt ? '' : opt)}
+                            className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                              currentVal === opt
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-transparent bg-transparent hover:border-primary/50'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Row 3: Price */}
