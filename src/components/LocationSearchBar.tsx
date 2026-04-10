@@ -147,8 +147,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
         <div className="flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0">
         {/* Row 1: Radius */}
-        <div className="flex items-center gap-2 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Search radius</span>
+        <div className="flex flex-col gap-1 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
@@ -177,8 +177,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 2: Bedrooms */}
-        <div className="flex items-center gap-2 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Bedrooms</span>
+        <div className="flex flex-col gap-1 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Bedrooms</span>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[140px] flex-1 md:flex-initial">
@@ -251,8 +251,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 3: Price */}
-        <div className="flex items-center gap-2 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Price range</span>
+        <div className="flex flex-col gap-1 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Price range</span>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[120px] flex-1 md:flex-initial">
@@ -326,8 +326,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 4: Property Type */}
-        <div className="flex items-center gap-2 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Property type</span>
+        <div className="flex flex-col gap-1 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Property type</span>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[150px] flex-1 md:flex-initial">
@@ -385,8 +385,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 5: Advanced Filter */}
-        <div className="flex items-center gap-2 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden w-24 shrink-0">Advanced</span>
+        <div className="flex flex-col gap-1 md:contents">
+          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[110px] flex-1 md:flex-initial">
