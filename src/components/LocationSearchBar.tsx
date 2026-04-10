@@ -126,6 +126,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     unfurnishedOnly,
     onUnfurnishedChange,
   } = props;
+  const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
