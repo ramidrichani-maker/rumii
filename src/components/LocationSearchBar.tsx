@@ -318,76 +318,138 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Row 3: Price */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Price range</span>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[120px] flex-1 md:flex-initial">
-                <DollarSign className="w-4 h-4" />
-                <span className="text-sm font-medium">Price</span>
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
-              <div className="space-y-3">
-                <div className="flex gap-2">
+          {isMobile ? (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                    activePriceTab === 'min'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background/15 hover:border-primary/50'
+                  }`}
+                >
+                  Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
+                </button>
+                <button
+                  onClick={() => setActivePriceTab(activePriceTab === 'max' ? null : 'max')}
+                  className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                    activePriceTab === 'max'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-background/15 hover:border-primary/50'
+                  }`}
+                >
+                  Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
+                </button>
+              </div>
+              {activePriceTab && (
+                <div className="grid grid-cols-1 gap-1 max-h-48 overflow-y-auto rounded-2xl p-2 w-full bg-background/15 backdrop-blur-md border border-border/50">
                   <button
-                    onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activePriceTab === 'min'
+                    onClick={() => {
+                      if (activePriceTab === 'min') onBarMinPriceChange('');
+                      else onBarMaxPriceChange('');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                      (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
                         ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
                     }`}
                   >
-                    Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
+                    {activePriceTab === 'min' ? 'No min' : 'No max'}
                   </button>
-                  <button
-                    onClick={() => setActivePriceTab(activePriceTab === 'max' ? null : 'max')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activePriceTab === 'max'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
-                  >
-                    Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
-                  </button>
+                  {priceOptions.map((price) => {
+                    const val = String(price);
+                    const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
+                    const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                    return (
+                      <button
+                        key={`${activePriceTab}-${price}`}
+                        onClick={() => onChange(currentVal === val ? '' : val)}
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          currentVal === val
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
+                        }`}
+                      >
+                        {formatPrice(price)}{price === 10000000 ? '+' : ''}
+                      </button>
+                    );
+                  })}
                 </div>
-                {activePriceTab && (
-                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+              )}
+            </div>
+          ) : (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-12 px-4 gap-2 min-w-[120px]">
+                  <DollarSign className="w-4 h-4" />
+                  <span className="text-sm font-medium">Price</span>
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => {
-                        if (activePriceTab === 'min') onBarMinPriceChange('');
-                        else onBarMaxPriceChange('');
-                      }}
-                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                        (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
+                      onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
+                      className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        activePriceTab === 'min'
                           ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-transparent bg-transparent hover:border-primary/50'
+                          : 'border-border bg-background/15 hover:border-primary/50'
                       }`}
                     >
-                      {activePriceTab === 'min' ? 'No min' : 'No max'}
+                      Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
                     </button>
-                    {priceOptions.map((price) => {
-                      const val = String(price);
-                      const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
-                      const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
-                      return (
-                        <button
-                          key={`${activePriceTab}-${price}`}
-                          onClick={() => onChange(currentVal === val ? '' : val)}
-                          className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                            currentVal === val
-                              ? 'border-primary bg-primary text-primary-foreground'
-                              : 'border-transparent bg-transparent hover:border-primary/50'
-                          }`}
-                        >
-                          {formatPrice(price)}{price === 10000000 ? '+' : ''}
-                        </button>
-                      );
-                    })}
+                    <button
+                      onClick={() => setActivePriceTab(activePriceTab === 'max' ? null : 'max')}
+                      className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        activePriceTab === 'max'
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border bg-background/15 hover:border-primary/50'
+                      }`}
+                    >
+                      Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
+                    </button>
                   </div>
-                )}
-              </div>
-            </PopoverContent>
-          </Popover>
+                  {activePriceTab && (
+                    <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+                      <button
+                        onClick={() => {
+                          if (activePriceTab === 'min') onBarMinPriceChange('');
+                          else onBarMaxPriceChange('');
+                        }}
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
+                        }`}
+                      >
+                        {activePriceTab === 'min' ? 'No min' : 'No max'}
+                      </button>
+                      {priceOptions.map((price) => {
+                        const val = String(price);
+                        const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
+                        const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                        return (
+                          <button
+                            key={`${activePriceTab}-${price}`}
+                            onClick={() => onChange(currentVal === val ? '' : val)}
+                            className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                              currentVal === val
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-transparent bg-transparent hover:border-primary/50'
+                            }`}
+                          >
+                            {formatPrice(price)}{price === 10000000 ? '+' : ''}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Row 4: Property Type */}
