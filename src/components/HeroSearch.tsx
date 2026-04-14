@@ -32,6 +32,13 @@ const HeroSearch = () => {
 
   const handleDrawComplete = (polygon: { latitude: number; longitude: number }[]) => {
     setDrawnPolygon(polygon);
+    // Navigate immediately when area is drawn
+    const route = listingMode === 'buy' ? '/purchase' : '/rent';
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    params.set('polygon', JSON.stringify(polygon));
+    const qs = params.toString();
+    navigate(`${route}${qs ? `?${qs}` : ''}`);
   };
 
   return (
