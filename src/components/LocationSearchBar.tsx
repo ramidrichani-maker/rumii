@@ -235,6 +235,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     onClick={() => {
                       if (activeBedroomTab === 'min') onMinBedroomsChange('');
                       else onMaxBedroomsChange('');
+                      setActiveBedroomTab(null);
                     }}
                     className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                       (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
@@ -250,7 +251,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     return (
                       <button
                         key={`${activeBedroomTab}-${opt}`}
-                        onClick={() => onChange(currentVal === opt ? '' : opt)}
+                        onClick={() => {
+                          onChange(currentVal === opt ? '' : opt);
+                          setActiveBedroomTab(null);
+                        }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           currentVal === opt
                             ? 'border-primary bg-primary text-primary-foreground'
@@ -371,6 +375,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     onClick={() => {
                       if (activePriceTab === 'min') onBarMinPriceChange('');
                       else onBarMaxPriceChange('');
+                      setActivePriceTab(null);
                     }}
                     className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                       (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
@@ -387,7 +392,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     return (
                       <button
                         key={`${activePriceTab}-${price}`}
-                        onClick={() => onChange(currentVal === val ? '' : val)}
+                        onClick={() => {
+                          onChange(currentVal === val ? '' : val);
+                          setActivePriceTab(null);
+                        }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           currentVal === val
                             ? 'border-primary bg-primary text-primary-foreground'
