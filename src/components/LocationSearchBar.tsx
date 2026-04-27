@@ -830,6 +830,33 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </PopoverContent>
         </Popover>
         </div>
+        {(minBedrooms || maxBedrooms || barMinPrice || barMaxPrice ||
+          selectedPropertyTypes.length > 0 || selectedMustHaves.length > 0 ||
+          selectedFeatures.length > 0 || addedToOracle || keywords ||
+          unfurnishedOnly || radius > 0) && (
+          <button
+            onClick={() => {
+              onMinBedroomsChange('');
+              onMaxBedroomsChange('');
+              onBarMinPriceChange('');
+              onBarMaxPriceChange('');
+              onPropertyTypesChange([]);
+              onMustHavesChange([]);
+              onFeaturesChange([]);
+              onAddedToOracleChange('');
+              onKeywordsChange('');
+              onRadiusChange(0);
+              if (onUnfurnishedChange) onUnfurnishedChange(false);
+              setActiveBedroomTab(null);
+              setActivePriceTab(null);
+              setActiveFilterBedroomTab(null);
+              setActiveFilterPriceTab(null);
+            }}
+            className="md:hidden h-10 px-4 rounded-xl border border-border bg-background/15 text-sm font-medium hover:border-primary/50 transition-colors"
+          >
+            Clear all filters
+          </button>
+        )}
         </div>
       </div>
     </div>
