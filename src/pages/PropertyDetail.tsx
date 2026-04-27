@@ -405,7 +405,13 @@ const PropertyDetail = () => {
           )}
 
           {/* Bottom overlay bar */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center gap-2 px-3 py-2 bg-black/60 backdrop-blur-sm">
+          <div
+            className="absolute bottom-0 left-0 right-0 z-10 flex items-center gap-2 px-3 py-2 bg-black/60 backdrop-blur-sm"
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Photos button */}
             {photoCount > 0 && (
               <button
