@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
 import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal } from 'lucide-react';
@@ -133,6 +133,29 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
+  const bedroomMobileRef = useRef<HTMLDivElement>(null);
+  const priceMobileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    if (!activeBedroomTab && !activePriceTab) return;
+    const handler = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (activeBedroomTab && bedroomMobileRef.current && !bedroomMobileRef.current.contains(target)) {
+        setActiveBedroomTab(null);
+      }
+      if (activePriceTab && priceMobileRef.current && !priceMobileRef.current.contains(target)) {
+        setActivePriceTab(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, [isMobile, activeBedroomTab, activePriceTab]);
+
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
@@ -183,7 +206,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">No. of bedrooms</span>
           {/* Mobile: inline min/max */}
           {isMobile ? (
-            <div className="space-y-2">
+            <div className="space-y-2" ref={bedroomMobileRef}>
               <div className="flex gap-2">
                 <button
                   onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
@@ -319,7 +342,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Price range</span>
           {isMobile ? (
-            <div className="space-y-2">
+            <div className="space-y-2" ref={priceMobileRef}>
               <div className="flex gap-2">
                 <button
                   onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
