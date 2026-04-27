@@ -206,7 +206,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">No. of bedrooms</span>
           {/* Mobile: inline min/max */}
           {isMobile ? (
-            <div className="space-y-2">
+            <div className="space-y-2" ref={bedroomMobileRef}>
               <div className="flex gap-2">
                 <button
                   onClick={() => setActiveBedroomTab(activeBedroomTab === 'min' ? null : 'min')}
@@ -342,7 +342,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Price range</span>
           {isMobile ? (
-            <div className="space-y-2">
+            <div className="space-y-2" ref={priceMobileRef}>
               <div className="flex gap-2">
                 <button
                   onClick={() => setActivePriceTab(activePriceTab === 'min' ? null : 'min')}
