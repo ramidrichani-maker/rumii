@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,6 +31,7 @@ const formSchema = z.object({
   unfurnished: z.boolean(),
   status: z.enum(["pending", "approved", "rejected"]),
   amenities: z.array(z.string()).optional(),
+  description: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -58,6 +60,7 @@ interface Property {
   last_renovated: number | null;
   price_negotiable: boolean | null;
   unfurnished: boolean;
+  description?: string | null;
 }
 
 interface AdminPropertyEditFormProps {
@@ -101,6 +104,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
       unfurnished: property.unfurnished,
       status: property.status as "pending" | "approved" | "rejected",
       amenities: property.amenities || [],
+      description: property.description || "",
     },
   });
 
@@ -147,6 +151,7 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         unfurnished: data.unfurnished,
         status: data.status,
         amenities: selectedAmenities,
+        description: data.description || null,
         agency_id: selectedAgency,
         updated_at: new Date().toISOString(),
       };
@@ -468,6 +473,25 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
             ))}
           </div>
         </div>
+
+        {/* Description */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Describe the property's ambience, features, and highlights..."
+                  className="min-h-[140px] resize-y"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Actions */}
         <div className="flex justify-end gap-2 pt-4 border-t">
