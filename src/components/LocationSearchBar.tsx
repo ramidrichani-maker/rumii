@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
 import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal } from 'lucide-react';
