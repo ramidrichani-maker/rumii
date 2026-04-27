@@ -88,12 +88,7 @@ export const SupportReviewWidget = () => {
       <Sheet open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) { setSubmitted(false); setDefaultTab("review"); } }}>
         <SheetContent side="right" className="w-full sm:max-w-xl p-0 flex flex-col h-full">
           <SheetHeader className="p-4 border-b">
-            <div className="flex items-center justify-between">
-              <SheetTitle>Help & Feedback</SheetTitle>
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <SheetTitle>Help & Feedback</SheetTitle>
           </SheetHeader>
 
           <Tabs value={defaultTab} onValueChange={(v) => setDefaultTab(v)} className="flex-1 flex flex-col overflow-hidden">
