@@ -133,6 +133,29 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
+  const bedroomMobileRef = useRef<HTMLDivElement>(null);
+  const priceMobileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    if (!activeBedroomTab && !activePriceTab) return;
+    const handler = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (activeBedroomTab && bedroomMobileRef.current && !bedroomMobileRef.current.contains(target)) {
+        setActiveBedroomTab(null);
+      }
+      if (activePriceTab && priceMobileRef.current && !priceMobileRef.current.contains(target)) {
+        setActivePriceTab(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, [isMobile, activeBedroomTab, activePriceTab]);
+
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
