@@ -159,7 +159,7 @@ export default function MyListings() {
                       size="sm"
                       variant="outline"
                       className="flex-1"
-                      onClick={() => navigate(`/purchase/${property.id}`)}
+                      onClick={() => navigate(`/property/${property.id}`)}
                     >
                       <Eye className="w-4 h-4 mr-1" />
                       View
