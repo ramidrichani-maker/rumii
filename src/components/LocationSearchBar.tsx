@@ -230,7 +230,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 </button>
               </div>
               {activeBedroomTab && (
-                <div className="grid grid-cols-1 gap-1 max-h-48 overflow-y-auto rounded-2xl p-2 w-full bg-background/15 backdrop-blur-md border border-border/50">
+                <div className="grid grid-cols-1 gap-1 max-h-[70vh] overflow-y-auto rounded-2xl p-2 w-full bg-background/15 backdrop-blur-md border border-border/50">
                   <button
                     onClick={() => {
                       if (activeBedroomTab === 'min') onMinBedroomsChange('');
@@ -370,7 +370,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 </button>
               </div>
               {activePriceTab && (
-                <div className="grid grid-cols-1 gap-1 max-h-48 overflow-y-auto rounded-2xl p-2 w-full bg-background/15 backdrop-blur-md border border-border/50">
+                <div className="grid grid-cols-1 gap-1 max-h-[70vh] overflow-y-auto rounded-2xl p-2 w-full bg-background/15 backdrop-blur-md border border-border/50">
                   <button
                     onClick={() => {
                       if (activePriceTab === 'min') onBarMinPriceChange('');
