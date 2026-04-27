@@ -375,6 +375,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     onClick={() => {
                       if (activePriceTab === 'min') onBarMinPriceChange('');
                       else onBarMaxPriceChange('');
+                      setActivePriceTab(null);
                     }}
                     className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                       (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
@@ -391,7 +392,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     return (
                       <button
                         key={`${activePriceTab}-${price}`}
-                        onClick={() => onChange(currentVal === val ? '' : val)}
+                        onClick={() => {
+                          onChange(currentVal === val ? '' : val);
+                          setActivePriceTab(null);
+                        }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           currentVal === val
                             ? 'border-primary bg-primary text-primary-foreground'
