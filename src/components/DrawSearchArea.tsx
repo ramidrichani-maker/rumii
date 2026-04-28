@@ -100,15 +100,24 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       addPoint(point);
     };
 
+    const onMouseDown = () => {
+      map.on('mousemove', onMouseMove);
+    };
+    const onTouchStart = () => {
+      map.getContainer().addEventListener('touchmove', onTouchMove, { passive: false });
+    };
+
     const finishDrawing = () => {
       if (!isDrawingRef.current) return;
       isDrawingRef.current = false;
       setIsDrawing(false);
       map.dragging.enable();
       map.getContainer().style.cursor = '';
+      map.off('mousedown', onMouseDown);
       map.off('mousemove', onMouseMove);
       map.getContainer().removeEventListener('touchmove', onTouchMove);
-      map.off('mouseup');
+      map.off('mouseup', finishDrawing);
+      map.getContainer().removeEventListener('touchstart', onTouchStart);
       map.getContainer().removeEventListener('touchend', finishDrawing);
 
       if (polylineRef.current) {
@@ -134,14 +143,10 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       setHasPolygon(true);
     };
 
-    map.on('mousedown', () => {
-      map.on('mousemove', onMouseMove);
-    });
+    map.on('mousedown', onMouseDown);
     map.on('mouseup', finishDrawing);
 
-    map.getContainer().addEventListener('touchstart', () => {
-      map.getContainer().addEventListener('touchmove', onTouchMove, { passive: false });
-    }, { once: false });
+    map.getContainer().addEventListener('touchstart', onTouchStart, { passive: true });
     map.getContainer().addEventListener('touchend', finishDrawing);
   }, []);
 
