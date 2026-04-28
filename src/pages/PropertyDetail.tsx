@@ -48,6 +48,10 @@ const PropertyDetail = () => {
   const isAdmin = profile?.role === 'admin';
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [mapExpanded, setMapExpanded] = useState(false);
