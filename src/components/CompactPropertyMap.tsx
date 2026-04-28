@@ -664,7 +664,9 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         map.getContainer().style.cursor = '';
         map.off('mousemove', onMouseMove);
         map.getContainer().removeEventListener('touchmove', onTouchMove);
-        map.off('mouseup');
+        map.off('mouseup', finishDrawing);
+        map.off('mousedown', onMouseDown);
+        map.getContainer().removeEventListener('touchstart', onTouchStart);
         map.getContainer().removeEventListener('touchend', finishDrawing);
 
         if (polyline) { polyline.remove(); polyline = null; }
@@ -695,6 +697,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         setHasDrawnArea(true);
         setIsDrawingMode(false);
         onDrawnAreaChange?.(coordinates);
+        // Clear cleanup ref since we've already torn down listeners
+        freehandCleanupRef.current = null;
       };
 
       const onTouchStart = () => {
