@@ -28,6 +28,11 @@ const AgentEnquiry = () => {
   const [submitting, setSubmitting] = useState(false);
   const [propertyAddress, setPropertyAddress] = useState("");
 
+  // Ensure page opens scrolled to top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Pre-fill user data
   useEffect(() => {
     if (profile?.full_name) setFullName(profile.full_name);
