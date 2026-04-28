@@ -93,9 +93,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       cancelled = true;
-      supabase.rpc('end_user_session', { _user_id: userId }).catch((error) => {
-        console.error('Error ending user session:', error);
-      });
+      (async () => {
+        try {
+          await supabase.rpc('end_user_session', { _user_id: userId });
+        } catch (error) {
+          console.error('Error ending user session:', error);
+        }
+      })();
     };
   }, [user?.id]);
 
