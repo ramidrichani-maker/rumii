@@ -43,44 +43,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Start user session tracking
-          setTimeout(async () => {
-            try {
-              await supabase.rpc('start_user_session', {
-                _user_id: session.user.id,
-                _ip_address: null, // Could be obtained from a service
-                _user_agent: navigator.userAgent
-              });
-            } catch (error) {
-              console.error('Error starting user session:', error);
-            }
-            
-            // Fetch user profile
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .single();
-            setProfile(profileData);
-          }, 0);
-        } else {
-          // End user session when logging out
-          if (user?.id) {
-            setTimeout(async () => {
-              try {
-                await supabase.rpc('end_user_session', {
-                  _user_id: user.id
-                });
-              } catch (error) {
-                console.error('Error ending user session:', error);
-              }
-            }, 0);
-          }
+        if (!session?.user) {
           setProfile(null);
         }
         setLoading(false);
@@ -91,24 +57,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single()
-          .then(({ data: profileData }) => {
-            setProfile(profileData);
-            setLoading(false);
-          });
-      } else {
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Fetch profile + start session tracking outside of onAuthStateChange to
+  // avoid deadlocking the supabase auth client during OTP verification.
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let cancelled = false;
+    const userId = user.id;
+
+    (async () => {
+      try {
+        await supabase.rpc('start_user_session', {
+          _user_id: userId,
+          _ip_address: null,
+          _user_agent: navigator.userAgent,
+        });
+      } catch (error) {
+        console.error('Error starting user session:', error);
+      }
+
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (!cancelled) setProfile(profileData);
+    })();
+
+    return () => {
+      cancelled = true;
+      supabase.rpc('end_user_session', { _user_id: userId }).catch((error) => {
+        console.error('Error ending user session:', error);
+      });
+    };
+  }, [user?.id]);
 
   const signUp = async (email: string, password: string, userData: { full_name: string; phone_number: string; role: string }) => {
     const redirectUrl = `${window.location.origin}/`;
