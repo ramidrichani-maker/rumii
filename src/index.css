@@ -44,6 +44,9 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Brand: Nature dark green for "Trust" emphasis */
+    --nature-green: 150 50% 18%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 30 15% 30%;
     --sidebar-primary: 30 20% 65%;
