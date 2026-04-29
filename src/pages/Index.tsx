@@ -49,11 +49,11 @@ const Index = () => {
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-16">
         <ScrollReveal animation="fade-up">
-          <div className="text-center mb-10">
-            <h1 className="text-5xl font-bold mb-4 text-foreground">
-              <span style={{ color: '#1B4332' }}>Trust</span> the process
+          <div className="text-center mb-8 md:mb-12 px-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight mb-3 md:mb-5 text-foreground leading-tight">
+              <span className="text-nature-green font-bold">Trust</span> the process
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed">
               with the MENA's credible choice of homes
             </p>
           </div>
