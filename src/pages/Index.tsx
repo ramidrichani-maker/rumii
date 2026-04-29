@@ -50,9 +50,11 @@ const Index = () => {
       <div className="container mx-auto px-4 py-16">
         <ScrollReveal animation="fade-up">
           <div className="text-center mb-10">
-            <h1 className="text-5xl font-bold mb-4 text-foreground">Find Your Perfect Property</h1>
+            <h1 className="text-5xl font-bold mb-4 text-foreground">
+              <span style={{ color: '#1B4332' }}>Trust</span> the process
+            </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Whether you're looking to buy or rent, we've got you covered.
+              with the MENA's credible choice of homes
             </p>
           </div>
         </ScrollReveal>
