@@ -50,7 +50,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-16">
         <ScrollReveal animation="fade-up">
           <div className="text-center mb-8 md:mb-12 px-2">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight mb-3 md:mb-5 leading-tight text-accent">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight mb-3 md:mb-5 leading-tight text-accent-foreground">
               <span className="text-nature-green font-bold">Trust</span> the process
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed">
