@@ -333,7 +333,14 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             window.location.href = `/property/${property.id}`;
           });
 
-          marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 260, className: 'property-rich-popup', autoPan: false });
+          marker.bindPopup(popupContent, {
+            maxWidth: 280,
+            minWidth: 260,
+            className: 'property-rich-popup',
+            autoPan: true,
+            autoPanPadding: [20, 20],
+            keepInView: true,
+          });
           
           // Open popup on click
           marker.on('click', () => {
