@@ -394,6 +394,18 @@ const PropertyDetail = () => {
             }
           }}
         >
+          {/* Mobile share button: top-right over image */}
+          <button
+            type="button"
+            onClick={handleShare}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            aria-label="Share property"
+            className="md:hidden absolute top-3 right-3 z-20 flex items-center justify-center w-9 h-9 rounded-full bg-background/85 backdrop-blur-sm shadow-md hover:bg-background transition-colors"
+          >
+            <Share2 className="w-4 h-4 text-foreground" />
+          </button>
           {showGallery ? (
             <div className="p-3 pb-16 grid grid-cols-2 gap-2 bg-muted">
               {(property.images || []).map((img, i) => (
