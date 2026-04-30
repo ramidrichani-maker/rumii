@@ -1535,9 +1535,9 @@ const ListProperty = () => {
               const imgs = uploadedImages
                 .filter((i) => i.persisted)
                 .map((i) => ({ path: i.persisted!.path }));
-              purgePersistedMedia(imgs, persistedFloorPlan);
+              purgePersistedMedia(imgs, persistedFloorPlans);
               setUploadedImages((prev) => prev.filter((i) => !i.persisted));
-              setPersistedFloorPlan(null);
+              setPersistedFloorPlans([]);
               setPendingData(null);
               clearPendingPersistence();
             }
