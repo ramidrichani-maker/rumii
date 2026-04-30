@@ -578,16 +578,23 @@ const ListProperty = () => {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => {
+            onSubmit={form.handleSubmit(async (data) => {
               const role = profile?.role;
               const isClient = !role || role === "user";
               if (isClient) {
-                setPendingData(data);
-                try {
-                  localStorage.setItem('rumi:pendingListing', JSON.stringify(data));
-                } catch (err) {
-                  console.error('Failed to persist pending listing', err);
+                // Validate room types before uploading anything
+                const unassigned = uploadedImages.filter(img => !img.roomType);
+                if (unassigned.length > 0) {
+                  toast({
+                    title: "Room Types Required",
+                    description: "Please select a room type for all uploaded images.",
+                    variant: "destructive"
+                  });
+                  return;
                 }
+                const ok = await persistPendingListing(data);
+                if (!ok) return;
+                setPendingData(data);
                 setShowClientConfirm(true);
                 return;
               }
