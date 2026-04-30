@@ -1345,8 +1345,23 @@ const ListProperty = () => {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit" size="lg" className="px-8" disabled={isSubmitting || isPreparingConfirm}>
-                {isPreparingConfirm ? "Preparing..." : isSubmitting ? "Submitting..." : "List Property"}
+              <Button
+                type="submit"
+                size="lg"
+                className="px-8"
+                disabled={
+                  isSubmitting ||
+                  isPreparingConfirm ||
+                  uploadedImages.some(img => img.status === 'uploading')
+                }
+              >
+                {isPreparingConfirm
+                  ? "Preparing..."
+                  : isSubmitting
+                  ? "Submitting..."
+                  : uploadedImages.some(img => img.status === 'uploading')
+                  ? "Uploading media..."
+                  : "List Property"}
               </Button>
             </div>
           </form>
