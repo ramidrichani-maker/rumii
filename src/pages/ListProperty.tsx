@@ -349,7 +349,50 @@ const ListProperty = () => {
   };
 
   const removeFile = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages(prev => {
+      const target = prev[index];
+      // If the file was already uploaded to the pending area, delete it from storage.
+      if (target?.persisted?.path) {
+        supabase.storage.from('property-images').remove([target.persisted.path]).catch((err) => {
+          console.error('Failed to remove persisted media', err);
+        });
+      }
+      const next = prev.filter((_, i) => i !== index);
+      // Keep localStorage in sync if a pending listing is being held
+      try {
+        const raw = localStorage.getItem(PENDING_STORAGE_KEY);
+        if (raw) {
+          const saved = JSON.parse(raw) as PendingListingPayload;
+          saved.images = next
+            .filter((img) => img.persisted)
+            .map((img) => ({ ...(img.persisted as PersistedFloorPlan), roomType: img.roomType }));
+          localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(saved));
+        }
+      } catch (err) {
+        console.error('Failed to update pending listing after removal', err);
+      }
+      return next;
+    });
+  };
+
+  const removeFloorPlan = () => {
+    if (persistedFloorPlan?.path) {
+      supabase.storage.from('property-images').remove([persistedFloorPlan.path]).catch((err) => {
+        console.error('Failed to remove persisted floor plan', err);
+      });
+    }
+    setPersistedFloorPlan(null);
+    setFloorPlanFile(null);
+    try {
+      const raw = localStorage.getItem(PENDING_STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as PendingListingPayload;
+        saved.floorPlan = null;
+        localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(saved));
+      }
+    } catch (err) {
+      console.error('Failed to update pending listing after floor plan removal', err);
+    }
   };
   const handleAmenityToggle = (amenity: string) => {
     const updatedAmenities = selectedAmenities.includes(amenity) ? selectedAmenities.filter(a => a !== amenity) : [...selectedAmenities, amenity];
