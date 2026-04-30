@@ -427,8 +427,10 @@ const ListProperty = () => {
       let imageUrls: string[] = [];
       let floorPlanUrl: string | null = null;
 
-      // Upload floor plan if provided
-      if (floorPlanFile) {
+      // Use already-uploaded floor plan (from pending persistence) if present
+      if (persistedFloorPlan) {
+        floorPlanUrl = persistedFloorPlan.url;
+      } else if (floorPlanFile) {
         const fileExt = floorPlanFile.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
@@ -441,10 +443,14 @@ const ListProperty = () => {
         floorPlanUrl = publicUrl;
       }
 
-      // Upload images to Supabase storage if there are any
+      // Upload images to Supabase storage (skip ones already persisted to pending area)
       if (uploadedImages.length > 0) {
         const uploadPromises = uploadedImages.map(async (uploadedImage, index) => {
+          if (uploadedImage.persisted) {
+            return uploadedImage.persisted.url;
+          }
           const file = uploadedImage.file;
+          if (!file) return null;
           const roomType = uploadedImage.roomType.toLowerCase().replace(/['\s]/g, '-');
           const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${roomType}_${index}.${fileExt}`;
@@ -465,7 +471,8 @@ const ListProperty = () => {
           return publicUrl;
         });
 
-        imageUrls = await Promise.all(uploadPromises);
+        const results = await Promise.all(uploadPromises);
+        imageUrls = results.filter((u): u is string => !!u);
       }
 
       // Insert property data with image URLs
@@ -527,6 +534,9 @@ const ListProperty = () => {
       setSelectedAmenities([]);
       setUploadedImages([]);
       setFloorPlanFile(null);
+      setPersistedFloorPlan(null);
+      // Pending listing has been consumed — clear localStorage marker
+      clearPendingPersistence();
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
