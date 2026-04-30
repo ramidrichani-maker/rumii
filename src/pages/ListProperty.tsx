@@ -898,21 +898,37 @@ const ListProperty = () => {
                       <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-muted rounded-lg">
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-16 h-16 bg-background rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
-                            {uploadedImage.file.type.startsWith('image/') ? (
-                              <img 
-                                src={URL.createObjectURL(uploadedImage.file)} 
-                                alt="Preview" 
-                                className="w-full h-full object-cover rounded"
-                              />
-                            ) : (
-                              <Upload className="w-6 h-6 text-muted-foreground" />
-                            )}
+                            {(() => {
+                              const previewUrl = getPreviewUrl(uploadedImage);
+                              const mediaType = getMediaType(uploadedImage);
+                              if (previewUrl && mediaType.startsWith('image/')) {
+                                return (
+                                  <img
+                                    src={previewUrl}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover rounded"
+                                  />
+                                );
+                              }
+                              if (previewUrl && mediaType.startsWith('video/')) {
+                                return (
+                                  <video
+                                    src={previewUrl}
+                                    className="w-full h-full object-cover rounded"
+                                    muted
+                                  />
+                                );
+                              }
+                              return <Upload className="w-6 h-6 text-muted-foreground" />;
+                            })()}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className="text-sm font-medium truncate block">{uploadedImage.file.name}</span>
-                            <p className="text-xs text-muted-foreground">
-                              {(uploadedImage.file.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
+                            <span className="text-sm font-medium truncate block">{getMediaName(uploadedImage)}</span>
+                            {getMediaSizeMB(uploadedImage) ? (
+                              <p className="text-xs text-muted-foreground">{getMediaSizeMB(uploadedImage)} MB</p>
+                            ) : (
+                              <p className="text-xs text-muted-foreground">Saved</p>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-2 sm:gap-3">
