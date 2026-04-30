@@ -224,37 +224,106 @@ const ListProperty = () => {
     localStorage.removeItem(PENDING_STORAGE_KEY);
   };
 
+  // Update a single image's status fields immutably.
+  const setImageStatus = (
+    index: number,
+    patch: Partial<Pick<UploadedImage, 'status' | 'progress' | 'error' | 'persisted' | 'file'>>,
+  ) => {
+    setUploadedImages(prev => prev.map((img, i) => (i === index ? { ...img, ...patch } : img)));
+  };
+
+  // Upload a single image entry. Returns the persisted metadata or null on failure.
+  const uploadSingleImage = async (
+    index: number,
+    img: UploadedImage,
+  ): Promise<{ url: string; path: string; name: string; type: string; roomType: string } | null> => {
+    if (img.persisted) {
+      return { ...img.persisted, roomType: img.roomType };
+    }
+    if (!img.file || !user) return null;
+    setImageStatus(index, { status: 'uploading', progress: 15, error: undefined });
+    const ext = img.file.name.split('.').pop() || 'bin';
+    const path = `${user.id}/pending/${Date.now()}_${index}.${ext}`;
+    try {
+      // Simulate progress mid-upload (Supabase JS upload has no progress event)
+      const tick = setTimeout(() => setImageStatus(index, { status: 'uploading', progress: 60 }), 250);
+      const { error: upErr } = await supabase.storage
+        .from('property-images')
+        .upload(path, img.file);
+      clearTimeout(tick);
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage
+        .from('property-images')
+        .getPublicUrl(path);
+      const persisted = {
+        url: publicUrl,
+        path,
+        name: img.file.name,
+        type: img.file.type,
+      };
+      setImageStatus(index, {
+        status: 'uploaded',
+        progress: 100,
+        persisted,
+        file: null,
+      });
+      return { ...persisted, roomType: img.roomType };
+    } catch (err: any) {
+      console.error('Image upload failed', err);
+      setImageStatus(index, {
+        status: 'failed',
+        progress: 0,
+        error: err?.message || 'Upload failed',
+      });
+      return null;
+    }
+  };
+
+  // Retry a single failed image upload.
+  const retryUploadAt = async (index: number) => {
+    const img = uploadedImages[index];
+    if (!img || img.status === 'uploading') return;
+    const result = await uploadSingleImage(index, img);
+    if (result) {
+      // Refresh persisted snapshot in localStorage if a pending payload exists
+      try {
+        const raw = localStorage.getItem(PENDING_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as PendingListingPayload;
+          parsed.images = parsed.images || [];
+          parsed.images.push(result);
+          localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(parsed));
+        }
+      } catch (e) {
+        console.error('Failed to update pending payload after retry', e);
+      }
+      toast({ title: 'Upload succeeded', description: result.name });
+    }
+  };
+
   // Upload all current media to storage, then persist metadata + form data
   // to localStorage so the user can resume after a refresh.
   const persistPendingListing = async (data: FormData) => {
     if (!user) return false;
     setIsPreparingConfirm(true);
     try {
-      // Upload only items that aren't already persisted
-      const persistedImages: Array<{ url: string; path: string; name: string; type: string; roomType: string }> = [];
-      for (let i = 0; i < uploadedImages.length; i++) {
-        const img = uploadedImages[i];
-        if (img.persisted) {
-          persistedImages.push({ ...img.persisted, roomType: img.roomType });
-          continue;
-        }
-        if (!img.file) continue;
-        const ext = img.file.name.split('.').pop() || 'bin';
-        const path = `${user.id}/pending/${Date.now()}_${i}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from('property-images')
-          .upload(path, img.file);
-        if (upErr) throw upErr;
-        const { data: { publicUrl } } = supabase.storage
-          .from('property-images')
-          .getPublicUrl(path);
-        persistedImages.push({
-          url: publicUrl,
-          path,
-          name: img.file.name,
-          type: img.file.type,
-          roomType: img.roomType,
+      // Upload only items that aren't already persisted; track per-file progress.
+      const snapshot = uploadedImages;
+      const results = await Promise.all(
+        snapshot.map((img, i) => uploadSingleImage(i, img)),
+      );
+      const persistedImages = results.filter(
+        (r): r is { url: string; path: string; name: string; type: string; roomType: string } => r !== null,
+      );
+      const failedCount = results.length - persistedImages.length;
+      if (failedCount > 0) {
+        toast({
+          title: `${failedCount} file${failedCount > 1 ? 's' : ''} failed to upload`,
+          description: 'Use Retry next to each failed file, or remove it before continuing.',
+          variant: 'destructive',
         });
+        setIsPreparingConfirm(false);
+        return false;
       }
 
       // Floor plan
@@ -287,6 +356,8 @@ const ListProperty = () => {
       setUploadedImages(persistedImages.map((m) => ({
         file: null,
         roomType: m.roomType,
+        status: 'uploaded',
+        progress: 100,
         persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
       })));
       if (fp) {
