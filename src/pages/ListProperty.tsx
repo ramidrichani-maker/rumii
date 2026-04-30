@@ -1089,6 +1089,72 @@ const ListProperty = () => {
 
                 {uploadedImages.length > 0 && (
                   <div className="mt-4 space-y-3">
+                    {(() => {
+                      const total = uploadedImages.length;
+                      const uploaded = uploadedImages.filter(i => i.status === 'uploaded' || i.persisted).length;
+                      const uploading = uploadedImages.filter(i => i.status === 'uploading').length;
+                      const failed = uploadedImages.filter(i => i.status === 'failed').length;
+                      const idle = total - uploaded - uploading - failed;
+                      const overall = total === 0
+                        ? 0
+                        : Math.round(
+                            (uploadedImages.reduce((sum, i) => {
+                              if (i.status === 'uploaded' || i.persisted) return sum + 100;
+                              if (i.status === 'uploading') return sum + (i.progress ?? 0);
+                              return sum;
+                            }, 0) / (total * 100)) * 100,
+                          );
+                      const allDone = uploading === 0 && failed === 0 && idle === 0 && uploaded === total && total > 0;
+                      return (
+                        <div
+                          className={`rounded-lg border p-3 space-y-2 ${
+                            failed > 0
+                              ? 'border-destructive/40 bg-destructive/5'
+                              : allDone
+                              ? 'border-primary/30 bg-primary/5'
+                              : 'border-border bg-muted/40'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2 text-sm">
+                            <div className="flex items-center gap-2 font-medium">
+                              {uploading > 0 ? (
+                                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                              ) : failed > 0 ? (
+                                <AlertTriangle className="h-4 w-4 text-destructive" />
+                              ) : allDone ? (
+                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                              ) : (
+                                <Upload className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span>
+                                {total} file{total > 1 ? 's' : ''} ·{' '}
+                                <span className="text-primary">{uploaded} uploaded</span>
+                                {uploading > 0 && (
+                                  <> · <span className="text-foreground">{uploading} uploading</span></>
+                                )}
+                                {failed > 0 && (
+                                  <> · <span className="text-destructive">{failed} failed</span></>
+                                )}
+                                {idle > 0 && (
+                                  <> · <span className="text-muted-foreground">{idle} pending</span></>
+                                )}
+                              </span>
+                            </div>
+                            <span className="text-xs text-muted-foreground tabular-nums">{overall}%</span>
+                          </div>
+                          <Progress value={overall} className="h-1.5" />
+                          {failed > 0 ? (
+                            <p className="text-[11px] text-destructive">
+                              Retry or remove failed files before continuing.
+                            </p>
+                          ) : uploading > 0 ? (
+                            <p className="text-[11px] text-muted-foreground">
+                              Please wait while your media finishes uploading.
+                            </p>
+                          ) : null}
+                        </div>
+                      );
+                    })()}
                     <h4 className="text-sm font-medium">Selected Files ({uploadedImages.length}):</h4>
                     <p className="text-xs text-muted-foreground">Please select a room type for each image</p>
                     {uploadedImages.map((uploadedImage, index) => (
