@@ -1006,15 +1006,21 @@ const ListProperty = () => {
                   />
                   <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
                 </div>
-                {floorPlanFile && (
+                {(floorPlanFile || persistedFloorPlan) && (
                   <div className="mt-3 flex items-center justify-between p-3 bg-muted rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-16 bg-background rounded overflow-hidden">
-                        <img src={URL.createObjectURL(floorPlanFile)} alt="Floor plan preview" className="w-full h-full object-cover" />
+                        <img
+                          src={floorPlanFile ? URL.createObjectURL(floorPlanFile) : persistedFloorPlan!.url}
+                          alt="Floor plan preview"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <span className="text-sm font-medium truncate">{floorPlanFile.name}</span>
+                      <span className="text-sm font-medium truncate">
+                        {floorPlanFile?.name || persistedFloorPlan?.name}
+                      </span>
                     </div>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFile(null)} className="text-destructive">
+                    <Button type="button" variant="ghost" size="sm" onClick={removeFloorPlan} className="text-destructive">
                       Remove
                     </Button>
                   </div>
