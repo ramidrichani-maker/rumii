@@ -1095,6 +1095,14 @@ const ListProperty = () => {
                       const uploading = uploadedImages.filter(i => i.status === 'uploading').length;
                       const failed = uploadedImages.filter(i => i.status === 'failed').length;
                       const idle = total - uploaded - uploading - failed;
+                      const mediaTypeOf = (i: UploadedImage) =>
+                        i.file?.type || i.persisted?.type || '';
+                      const imageCount = uploadedImages.filter(i => mediaTypeOf(i).startsWith('image/')).length;
+                      const videoCount = uploadedImages.filter(i => mediaTypeOf(i).startsWith('video/')).length;
+                      const breakdown = [
+                        imageCount > 0 ? `${imageCount} image${imageCount > 1 ? 's' : ''}` : null,
+                        videoCount > 0 ? `${videoCount} video${videoCount > 1 ? 's' : ''}` : null,
+                      ].filter(Boolean).join(' · ');
                       const overall = total === 0
                         ? 0
                         : Math.round(
@@ -1127,7 +1135,11 @@ const ListProperty = () => {
                                 <Upload className="h-4 w-4 text-muted-foreground" />
                               )}
                               <span>
-                                {total} file{total > 1 ? 's' : ''} ·{' '}
+                                {total} file{total > 1 ? 's' : ''}
+                                {breakdown && (
+                                  <span className="text-muted-foreground font-normal"> ({breakdown})</span>
+                                )}
+                                {' · '}
                                 <span className="text-primary">{uploaded} uploaded</span>
                                 {uploading > 0 && (
                                   <> · <span className="text-foreground">{uploading} uploading</span></>
@@ -1154,7 +1166,8 @@ const ListProperty = () => {
                           ) : allDone ? (
                             <p className="text-[11px] font-medium text-primary flex items-center gap-1">
                               <CheckCircle2 className="h-3 w-3" />
-                              Ready to list — all media uploaded.
+                              Ready to list — {total} file{total > 1 ? 's' : ''}
+                              {breakdown ? ` (${breakdown})` : ''} uploaded.
                             </p>
                           ) : idle > 0 ? (
                             <p className="text-[11px] text-muted-foreground">
