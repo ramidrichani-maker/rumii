@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Upload, Home, Camera } from "lucide-react";
+import { ArrowLeft, Upload, Home, Camera, AlertTriangle, RotateCw, X, CheckCircle2, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PropertyMap from "@/components/PropertyMap";
@@ -50,6 +51,14 @@ const roomTypes = [
 interface UploadedImage {
   file: File | null;
   roomType: string;
+  // Per-file upload state shown in the UI.
+  // 'idle'      -> selected, not yet uploaded
+  // 'uploading' -> upload in progress (progress bar shown)
+  // 'uploaded'  -> already in storage (persisted) or just succeeded
+  // 'failed'    -> last upload attempt failed; user can retry or remove
+  status?: 'idle' | 'uploading' | 'uploaded' | 'failed';
+  progress?: number; // 0-100
+  error?: string;
   // For files already uploaded to storage (e.g. restored after refresh)
   persisted?: {
     url: string;
@@ -57,6 +66,13 @@ interface UploadedImage {
     name: string;
     type: string;
   };
+}
+
+interface RejectedFile {
+  id: string;
+  name: string;
+  sizeMB: string;
+  reason: string;
 }
 
 interface PersistedFloorPlan {
@@ -113,6 +129,7 @@ const ListProperty = () => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [rejectedFiles, setRejectedFiles] = useState<RejectedFile[]>([]);
   const [persistedFloorPlan, setPersistedFloorPlan] = useState<PersistedFloorPlan | null>(null);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
@@ -151,6 +168,8 @@ const ListProperty = () => {
         setUploadedImages(saved.images.map((m) => ({
           file: null,
           roomType: m.roomType || '',
+          status: 'uploaded',
+          progress: 100,
           persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
         })));
       }
@@ -207,37 +226,106 @@ const ListProperty = () => {
     localStorage.removeItem(PENDING_STORAGE_KEY);
   };
 
+  // Update a single image's status fields immutably.
+  const setImageStatus = (
+    index: number,
+    patch: Partial<Pick<UploadedImage, 'status' | 'progress' | 'error' | 'persisted' | 'file'>>,
+  ) => {
+    setUploadedImages(prev => prev.map((img, i) => (i === index ? { ...img, ...patch } : img)));
+  };
+
+  // Upload a single image entry. Returns the persisted metadata or null on failure.
+  const uploadSingleImage = async (
+    index: number,
+    img: UploadedImage,
+  ): Promise<{ url: string; path: string; name: string; type: string; roomType: string } | null> => {
+    if (img.persisted) {
+      return { ...img.persisted, roomType: img.roomType };
+    }
+    if (!img.file || !user) return null;
+    setImageStatus(index, { status: 'uploading', progress: 15, error: undefined });
+    const ext = img.file.name.split('.').pop() || 'bin';
+    const path = `${user.id}/pending/${Date.now()}_${index}.${ext}`;
+    try {
+      // Simulate progress mid-upload (Supabase JS upload has no progress event)
+      const tick = setTimeout(() => setImageStatus(index, { status: 'uploading', progress: 60 }), 250);
+      const { error: upErr } = await supabase.storage
+        .from('property-images')
+        .upload(path, img.file);
+      clearTimeout(tick);
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage
+        .from('property-images')
+        .getPublicUrl(path);
+      const persisted = {
+        url: publicUrl,
+        path,
+        name: img.file.name,
+        type: img.file.type,
+      };
+      setImageStatus(index, {
+        status: 'uploaded',
+        progress: 100,
+        persisted,
+        file: null,
+      });
+      return { ...persisted, roomType: img.roomType };
+    } catch (err: any) {
+      console.error('Image upload failed', err);
+      setImageStatus(index, {
+        status: 'failed',
+        progress: 0,
+        error: err?.message || 'Upload failed',
+      });
+      return null;
+    }
+  };
+
+  // Retry a single failed image upload.
+  const retryUploadAt = async (index: number) => {
+    const img = uploadedImages[index];
+    if (!img || img.status === 'uploading') return;
+    const result = await uploadSingleImage(index, img);
+    if (result) {
+      // Refresh persisted snapshot in localStorage if a pending payload exists
+      try {
+        const raw = localStorage.getItem(PENDING_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as PendingListingPayload;
+          parsed.images = parsed.images || [];
+          parsed.images.push(result);
+          localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(parsed));
+        }
+      } catch (e) {
+        console.error('Failed to update pending payload after retry', e);
+      }
+      toast({ title: 'Upload succeeded', description: result.name });
+    }
+  };
+
   // Upload all current media to storage, then persist metadata + form data
   // to localStorage so the user can resume after a refresh.
   const persistPendingListing = async (data: FormData) => {
     if (!user) return false;
     setIsPreparingConfirm(true);
     try {
-      // Upload only items that aren't already persisted
-      const persistedImages: Array<{ url: string; path: string; name: string; type: string; roomType: string }> = [];
-      for (let i = 0; i < uploadedImages.length; i++) {
-        const img = uploadedImages[i];
-        if (img.persisted) {
-          persistedImages.push({ ...img.persisted, roomType: img.roomType });
-          continue;
-        }
-        if (!img.file) continue;
-        const ext = img.file.name.split('.').pop() || 'bin';
-        const path = `${user.id}/pending/${Date.now()}_${i}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from('property-images')
-          .upload(path, img.file);
-        if (upErr) throw upErr;
-        const { data: { publicUrl } } = supabase.storage
-          .from('property-images')
-          .getPublicUrl(path);
-        persistedImages.push({
-          url: publicUrl,
-          path,
-          name: img.file.name,
-          type: img.file.type,
-          roomType: img.roomType,
+      // Upload only items that aren't already persisted; track per-file progress.
+      const snapshot = uploadedImages;
+      const results = await Promise.all(
+        snapshot.map((img, i) => uploadSingleImage(i, img)),
+      );
+      const persistedImages = results.filter(
+        (r): r is { url: string; path: string; name: string; type: string; roomType: string } => r !== null,
+      );
+      const failedCount = results.length - persistedImages.length;
+      if (failedCount > 0) {
+        toast({
+          title: `${failedCount} file${failedCount > 1 ? 's' : ''} failed to upload`,
+          description: 'Use Retry next to each failed file, or remove it before continuing.',
+          variant: 'destructive',
         });
+        setIsPreparingConfirm(false);
+        return false;
       }
 
       // Floor plan
@@ -270,6 +358,8 @@ const ListProperty = () => {
       setUploadedImages(persistedImages.map((m) => ({
         file: null,
         roomType: m.roomType,
+        status: 'uploaded',
+        progress: 100,
         persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
       })));
       if (fp) {
@@ -341,40 +431,38 @@ const ListProperty = () => {
     const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
 
     const accepted: UploadedImage[] = [];
-    const rejected: string[] = [];
+    const rejected: RejectedFile[] = [];
+    const mkId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const sizeMB = (n: number) => (n / (1024 * 1024)).toFixed(1);
 
     for (const file of files) {
       const isImage = file.type.startsWith('image/');
       const isVideo = file.type.startsWith('video/');
       if (!isImage && !isVideo) {
-        rejected.push(`${file.name}: unsupported format`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Unsupported format' });
         continue;
       }
       if (isImage && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        rejected.push(`${file.name}: image must be JPG, PNG, WEBP or HEIC`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Image must be JPG, PNG, WEBP or HEIC' });
         continue;
       }
       if (isVideo && !ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        rejected.push(`${file.name}: video must be MP4, MOV or WEBM`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Video must be MP4, MOV or WEBM' });
         continue;
       }
       if (isImage && file.size > MAX_IMAGE_BYTES) {
-        rejected.push(`${file.name}: image exceeds 15MB`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Image exceeds 15MB limit' });
         continue;
       }
       if (isVideo && file.size > MAX_VIDEO_BYTES) {
-        rejected.push(`${file.name}: video exceeds 100MB`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Video exceeds 100MB limit' });
         continue;
       }
-      accepted.push({ file, roomType: '' });
+      accepted.push({ file, roomType: '', status: 'idle', progress: 0 });
     }
 
     if (rejected.length) {
-      toast({
-        title: 'Some files were skipped',
-        description: rejected.join('\n'),
-        variant: 'destructive',
-      });
+      setRejectedFiles(prev => [...prev, ...rejected]);
     }
     if (accepted.length) {
       setUploadedImages(prev => [...prev, ...accepted]);
@@ -382,6 +470,12 @@ const ListProperty = () => {
     // Reset input so re-selecting same file works
     event.target.value = '';
   };
+
+  const dismissRejectedFile = (id: string) => {
+    setRejectedFiles(prev => prev.filter(r => r.id !== id));
+  };
+
+  const dismissAllRejected = () => setRejectedFiles([]);
 
   const updateImageRoomType = (index: number, roomType: string) => {
     setUploadedImages(prev => prev.map((img, i) => 
@@ -931,12 +1025,61 @@ const ListProperty = () => {
                   </div>
                 </div>
                 
+                {rejectedFiles.length > 0 && (
+                  <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/5 p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm font-medium text-destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        {rejectedFiles.length} file{rejectedFiles.length > 1 ? 's' : ''} skipped
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={dismissAllRejected}
+                        className="h-7 text-xs"
+                      >
+                        Dismiss all
+                      </Button>
+                    </div>
+                    <ul className="space-y-1.5">
+                      {rejectedFiles.map((rf) => (
+                        <li key={rf.id} className="flex items-center justify-between gap-2 text-xs">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-medium">{rf.name}</p>
+                            <p className="text-muted-foreground">{rf.reason} · {rf.sizeMB} MB</p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => dismissRejectedFile(rf.id)}
+                            className="h-7 text-destructive hover:text-destructive"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-[11px] text-muted-foreground">
+                      To re-add a file, fix the issue (format or size) and select it again above.
+                    </p>
+                  </div>
+                )}
+
                 {uploadedImages.length > 0 && (
                   <div className="mt-4 space-y-3">
                     <h4 className="text-sm font-medium">Selected Files ({uploadedImages.length}):</h4>
                     <p className="text-xs text-muted-foreground">Please select a room type for each image</p>
                     {uploadedImages.map((uploadedImage, index) => (
-                      <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-muted rounded-lg">
+                      <div
+                        key={index}
+                        className={`flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg ${
+                          uploadedImage.status === 'failed'
+                            ? 'bg-destructive/5 border border-destructive/30'
+                            : 'bg-muted'
+                        }`}
+                      >
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-16 h-16 bg-background rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
                             {(() => {
@@ -964,8 +1107,28 @@ const ListProperty = () => {
                             })()}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className="text-sm font-medium truncate block">{getMediaName(uploadedImage)}</span>
-                            {getMediaSizeMB(uploadedImage) ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium truncate">{getMediaName(uploadedImage)}</span>
+                              {uploadedImage.status === 'uploaded' && (
+                                <CheckCircle2 className="h-3.5 w-3.5 text-primary flex-shrink-0" aria-label="Uploaded" />
+                              )}
+                              {uploadedImage.status === 'uploading' && (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground flex-shrink-0" aria-label="Uploading" />
+                              )}
+                              {uploadedImage.status === 'failed' && (
+                                <AlertTriangle className="h-3.5 w-3.5 text-destructive flex-shrink-0" aria-label="Failed" />
+                              )}
+                            </div>
+                            {uploadedImage.status === 'uploading' ? (
+                              <div className="mt-1 space-y-1">
+                                <Progress value={uploadedImage.progress ?? 0} className="h-1.5" />
+                                <p className="text-[11px] text-muted-foreground">Uploading… {uploadedImage.progress ?? 0}%</p>
+                              </div>
+                            ) : uploadedImage.status === 'failed' ? (
+                              <p className="text-xs text-destructive truncate">
+                                {uploadedImage.error || 'Upload failed'}
+                              </p>
+                            ) : getMediaSizeMB(uploadedImage) ? (
                               <p className="text-xs text-muted-foreground">{getMediaSizeMB(uploadedImage)} MB</p>
                             ) : (
                               <p className="text-xs text-muted-foreground">Saved</p>
@@ -988,11 +1151,24 @@ const ListProperty = () => {
                               ))}
                             </SelectContent>
                           </Select>
+                          {uploadedImage.status === 'failed' && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => retryUploadAt(index)}
+                              className="flex-shrink-0"
+                            >
+                              <RotateCw className="h-3.5 w-3.5 mr-1" />
+                              Retry
+                            </Button>
+                          )}
                           <Button 
                             type="button" 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => removeFile(index)}
+                            disabled={uploadedImage.status === 'uploading'}
                             className="text-destructive hover:text-destructive flex-shrink-0"
                           >
                             Remove
