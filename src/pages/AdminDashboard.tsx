@@ -52,15 +52,6 @@ const AdminDashboard = () => {
   
   const { user, profile, loading: authLoading } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      loadPendingProperties();
-      loadUsers();
-      loadAgents();
-      loadViewings();
-    }
-  }, [user]);
-
   if (authLoading) return null;
   if (!user || profile?.role !== 'admin') {
     return <Navigate to="/auth" replace />;
@@ -219,6 +210,16 @@ const AdminDashboard = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      loadPendingProperties();
+      loadUsers();
+      loadAgents();
+      loadViewings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleApproveProperty = async (propertyId: string) => {
     try {
