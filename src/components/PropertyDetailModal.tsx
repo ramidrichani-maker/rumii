@@ -25,7 +25,8 @@ import {
   Sparkles,
   Image as ImageIcon,
   Phone,
-  Mail
+  Mail,
+  Share2
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
