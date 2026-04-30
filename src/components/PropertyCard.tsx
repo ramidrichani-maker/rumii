@@ -3,7 +3,7 @@ import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2 } from "lucide-react";
+import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2, Share2 } from "lucide-react";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -165,6 +165,27 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     });
   };
 
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/property/${property.id}`;
+    const title = `${property.property_type} in ${property.city}`;
+    const text = `${title} — ${formatPrice(property.price, property.listing_type, property.rental_price)}`;
+    try {
+      if (typeof navigator !== 'undefined' && (navigator as any).share) {
+        await (navigator as any).share({ title, text, url });
+        return;
+      }
+    } catch {
+      // user cancelled or share failed — fall through to copy
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied", description: "Property link copied to clipboard." });
+    } catch {
+      toast({ title: "Couldn't copy link", description: url, variant: "destructive" });
+    }
+  };
+
   const truncateDescription = (desc?: string | null) => {
     if (!desc) return '';
     const sentences = desc.match(/[^.!?]+[.!?]+/g);
@@ -270,6 +291,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
               <span className="text-xs font-medium text-muted-foreground">{agencyName}</span>
             </div>
           )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 md:h-8 md:w-8"
+            onClick={handleShare}
+            aria-label="Share property"
+            title="Share link"
+          >
+            <Share2 className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
