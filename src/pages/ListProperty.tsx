@@ -335,11 +335,52 @@ const ListProperty = () => {
   }
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const newImages: UploadedImage[] = files.map(file => ({
-      file,
-      roomType: '' // Initially no room type selected
-    }));
-    setUploadedImages(prev => [...prev, ...newImages]);
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
+    const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB
+    const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
+
+    const accepted: UploadedImage[] = [];
+    const rejected: string[] = [];
+
+    for (const file of files) {
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      if (!isImage && !isVideo) {
+        rejected.push(`${file.name}: unsupported format`);
+        continue;
+      }
+      if (isImage && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        rejected.push(`${file.name}: image must be JPG, PNG, WEBP or HEIC`);
+        continue;
+      }
+      if (isVideo && !ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        rejected.push(`${file.name}: video must be MP4, MOV or WEBM`);
+        continue;
+      }
+      if (isImage && file.size > MAX_IMAGE_BYTES) {
+        rejected.push(`${file.name}: image exceeds 15MB`);
+        continue;
+      }
+      if (isVideo && file.size > MAX_VIDEO_BYTES) {
+        rejected.push(`${file.name}: video exceeds 100MB`);
+        continue;
+      }
+      accepted.push({ file, roomType: '' });
+    }
+
+    if (rejected.length) {
+      toast({
+        title: 'Some files were skipped',
+        description: rejected.join('\n'),
+        variant: 'destructive',
+      });
+    }
+    if (accepted.length) {
+      setUploadedImages(prev => [...prev, ...accepted]);
+    }
+    // Reset input so re-selecting same file works
+    event.target.value = '';
   };
 
   const updateImageRoomType = (index: number, roomType: string) => {
