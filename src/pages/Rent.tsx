@@ -112,7 +112,7 @@ const Rent = () => {
       let query = supabase
         .from('properties')
         .select('*')
-        .eq('listing_type', 'rent')
+        .in('listing_type', ['rent', 'both'])
         .eq('status', 'approved');
 
       if (selectedPropertyTypes.length > 0) {
