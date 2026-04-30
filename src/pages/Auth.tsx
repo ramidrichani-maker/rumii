@@ -227,7 +227,14 @@ const Auth = () => {
       }
 
       toast({ title: 'Account created!', description: 'Welcome to Rumi.' });
-      navigate('/');
+      // Ensure the auth state is refreshed so the app recognizes the user
+      // immediately without requiring a manual page refresh.
+      try {
+        await supabase.auth.refreshSession();
+      } catch {
+        // ignore; navigation will still proceed
+      }
+      navigate('/', { replace: true });
     } catch {
       toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
     } finally {
