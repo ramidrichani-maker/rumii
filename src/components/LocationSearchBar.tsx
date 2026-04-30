@@ -138,8 +138,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   // the mobile collapsed "Filters" button badge.
   const activeFilterCount = [
     radius !== 0,
-    !!barMinBedrooms,
-    !!barMaxBedrooms,
+    !!minBedrooms,
+    !!maxBedrooms,
     !!barMinPrice,
     !!barMaxPrice,
     selectedPropertyTypes.length > 0,
