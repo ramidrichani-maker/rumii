@@ -1360,64 +1360,84 @@ const ListProperty = () => {
             {/* Floor Plan Upload */}
             <Card>
               <CardHeader>
-                <CardTitle>Floor Plan (Optional)</CardTitle>
+                <CardTitle>Floor Plans (Optional)</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Upload one or more floor plans (e.g. for villas, triplexes, or buildings).
+                </p>
               </CardHeader>
               <CardContent>
                 <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
                   <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                   <Label htmlFor="floor-plan-upload" className="cursor-pointer">
-                    <span className="text-primary hover:text-primary/80">Click to upload floor plan</span>
+                    <span className="text-primary hover:text-primary/80">Click to upload floor plans</span>
                   </Label>
                   <Input
                     id="floor-plan-upload"
                     type="file"
+                    multiple
                      accept="image/jpeg,image/png,image/webp"
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
+                      const files = Array.from(e.target.files || []);
+                      if (files.length === 0) return;
                       const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
                       const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
-                      if (!ALLOWED.includes(file.type)) {
-                        toast({
-                          title: 'Unsupported floor plan format',
-                          description: 'Please upload a PNG, JPG or WEBP image.',
-                          variant: 'destructive',
-                        });
-                        e.target.value = '';
-                        return;
+                      const accepted: File[] = [];
+                      for (const file of files) {
+                        if (!ALLOWED.includes(file.type)) {
+                          toast({
+                            title: 'Unsupported floor plan format',
+                            description: `${file.name}: please upload PNG, JPG or WEBP.`,
+                            variant: 'destructive',
+                          });
+                          continue;
+                        }
+                        if (file.size > MAX_BYTES) {
+                          toast({
+                            title: 'Floor plan too large',
+                            description: `${file.name}: maximum size is 10MB.`,
+                            variant: 'destructive',
+                          });
+                          continue;
+                        }
+                        accepted.push(file);
                       }
-                      if (file.size > MAX_BYTES) {
-                        toast({
-                          title: 'Floor plan too large',
-                          description: 'Maximum size is 10MB.',
-                          variant: 'destructive',
-                        });
-                        e.target.value = '';
-                        return;
+                      if (accepted.length > 0) {
+                        setFloorPlanFiles(prev => [...prev, ...accepted]);
                       }
-                      setFloorPlanFile(file);
+                      e.target.value = '';
                     }}
                     className="hidden"
                   />
-                  <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
+                  <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 10MB each</p>
                 </div>
-                {(floorPlanFile || persistedFloorPlan) && (
-                  <div className="mt-3 flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-16 h-16 bg-background rounded overflow-hidden">
-                        <img
-                          src={floorPlanFile ? URL.createObjectURL(floorPlanFile) : persistedFloorPlan!.url}
-                          alt="Floor plan preview"
-                          className="w-full h-full object-cover"
-                        />
+                {(persistedFloorPlans.length > 0 || floorPlanFiles.length > 0) && (
+                  <div className="mt-3 space-y-2">
+                    {persistedFloorPlans.map((fp, idx) => (
+                      <div key={`p-${idx}`} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-16 h-16 bg-background rounded overflow-hidden flex-shrink-0">
+                            <img src={fp.url} alt={`Floor plan ${idx + 1}`} className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-sm font-medium truncate">{fp.name}</span>
+                        </div>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removePersistedFloorPlan(idx)} className="text-destructive">
+                          Remove
+                        </Button>
                       </div>
-                      <span className="text-sm font-medium truncate">
-                        {floorPlanFile?.name || persistedFloorPlan?.name}
-                      </span>
-                    </div>
-                    <Button type="button" variant="ghost" size="sm" onClick={removeFloorPlan} className="text-destructive">
-                      Remove
-                    </Button>
+                    ))}
+                    {floorPlanFiles.map((file, idx) => (
+                      <div key={`f-${idx}`} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-16 h-16 bg-background rounded overflow-hidden flex-shrink-0">
+                            <img src={URL.createObjectURL(file)} alt={`Floor plan ${idx + 1}`} className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-sm font-medium truncate">{file.name}</span>
+                        </div>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removePendingFloorPlan(idx)} className="text-destructive">
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </CardContent>
