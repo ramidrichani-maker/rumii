@@ -92,6 +92,54 @@ const PropertyDetail = () => {
     fetchProperty();
   }, [id]);
 
+  // Set Open Graph / Twitter meta tags so shared links unfurl with the property photo
+  useEffect(() => {
+    if (!property) return;
+
+    const formatPrice = () => {
+      if (property.listing_type === 'rent') return `$${property.price?.toLocaleString()}/mo`;
+      return `$${property.price?.toLocaleString()}`;
+    };
+
+    const title = `${property.property_type} in ${property.city} — ${formatPrice()}`;
+    const description = (property.description || `${property.bedrooms} bed · ${property.bathrooms} bath · ${property.square_meters}m² in ${property.city}`).slice(0, 200);
+    const image = property.images?.[0] || '';
+    const url = `${window.location.origin}/property/${property.id}`;
+
+    const upsertMeta = (selector: string, attr: 'name' | 'property', key: string, content: string) => {
+      let el = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+      return el;
+    };
+
+    const prevTitle = document.title;
+    document.title = title;
+
+    const created: HTMLMetaElement[] = [];
+    created.push(upsertMeta('meta[name="description"]', 'name', 'description', description));
+    created.push(upsertMeta('meta[property="og:title"]', 'property', 'og:title', title));
+    created.push(upsertMeta('meta[property="og:description"]', 'property', 'og:description', description));
+    created.push(upsertMeta('meta[property="og:type"]', 'property', 'og:type', 'website'));
+    created.push(upsertMeta('meta[property="og:url"]', 'property', 'og:url', url));
+    if (image) {
+      created.push(upsertMeta('meta[property="og:image"]', 'property', 'og:image', image));
+      created.push(upsertMeta('meta[property="og:image:alt"]', 'property', 'og:image:alt', title));
+      created.push(upsertMeta('meta[name="twitter:image"]', 'name', 'twitter:image', image));
+    }
+    created.push(upsertMeta('meta[name="twitter:card"]', 'name', 'twitter:card', image ? 'summary_large_image' : 'summary'));
+    created.push(upsertMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title));
+    created.push(upsertMeta('meta[name="twitter:description"]', 'name', 'twitter:description', description));
+
+    return () => {
+      document.title = prevTitle;
+    };
+  }, [property]);
+
   useEffect(() => {
     if (descriptionRef.current) {
       setDescriptionClamped(
