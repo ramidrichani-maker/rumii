@@ -97,6 +97,7 @@ interface LocationSearchBarProps {
   onKeywordsChange: (value: string) => void;
   unfurnishedOnly?: boolean;
   onUnfurnishedChange?: (value: boolean) => void;
+  trailingContent?: React.ReactNode;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -125,6 +126,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onKeywordsChange,
     unfurnishedOnly,
     onUnfurnishedChange,
+    trailingContent,
   } = props;
   const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
