@@ -648,31 +648,40 @@ export const AdminPropertyForm = () => {
           {/* Floor Plan Upload */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Floor Plan (Optional)</CardTitle>
+              <CardTitle className="text-lg">Floor Plans (Optional)</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Upload one or more floor plans (e.g. for villas, triplexes, or buildings).
+              </p>
             </CardHeader>
             <CardContent>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center">
                 <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                 <Label htmlFor="admin-floor-plan-upload" className="cursor-pointer">
-                  <span className="text-primary hover:text-primary/80">Click to upload floor plan</span>
+                  <span className="text-primary hover:text-primary/80">Click to upload floor plans</span>
                 </Label>
                 <Input
                   id="admin-floor-plan-upload"
                   type="file"
+                  multiple
                   accept="image/*"
                   onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setFloorPlanFile(file);
+                    const files = Array.from(e.target.files || []);
+                    if (files.length > 0) setFloorPlanFiles(prev => [...prev, ...files]);
+                    e.target.value = '';
                   }}
                   className="hidden"
                 />
               </div>
-              {floorPlanFile && (
-                <div className="mt-3 flex items-center justify-between p-2 bg-muted rounded">
-                  <span className="text-sm truncate">{floorPlanFile.name}</span>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFile(null)}>
-                    <X className="h-4 w-4" />
-                  </Button>
+              {floorPlanFiles.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {floorPlanFiles.map((file, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="text-sm truncate">{file.name}</span>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFiles(prev => prev.filter((_, i) => i !== idx))}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
