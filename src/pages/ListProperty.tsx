@@ -168,6 +168,8 @@ const ListProperty = () => {
         setUploadedImages(saved.images.map((m) => ({
           file: null,
           roomType: m.roomType || '',
+          status: 'uploaded',
+          progress: 100,
           persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
         })));
       }
