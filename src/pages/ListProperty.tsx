@@ -1023,12 +1023,61 @@ const ListProperty = () => {
                   </div>
                 </div>
                 
+                {rejectedFiles.length > 0 && (
+                  <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/5 p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm font-medium text-destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        {rejectedFiles.length} file{rejectedFiles.length > 1 ? 's' : ''} skipped
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={dismissAllRejected}
+                        className="h-7 text-xs"
+                      >
+                        Dismiss all
+                      </Button>
+                    </div>
+                    <ul className="space-y-1.5">
+                      {rejectedFiles.map((rf) => (
+                        <li key={rf.id} className="flex items-center justify-between gap-2 text-xs">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-medium">{rf.name}</p>
+                            <p className="text-muted-foreground">{rf.reason} · {rf.sizeMB} MB</p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => dismissRejectedFile(rf.id)}
+                            className="h-7 text-destructive hover:text-destructive"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-[11px] text-muted-foreground">
+                      To re-add a file, fix the issue (format or size) and select it again above.
+                    </p>
+                  </div>
+                )}
+
                 {uploadedImages.length > 0 && (
                   <div className="mt-4 space-y-3">
                     <h4 className="text-sm font-medium">Selected Files ({uploadedImages.length}):</h4>
                     <p className="text-xs text-muted-foreground">Please select a room type for each image</p>
                     {uploadedImages.map((uploadedImage, index) => (
-                      <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-muted rounded-lg">
+                      <div
+                        key={index}
+                        className={`flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg ${
+                          uploadedImage.status === 'failed'
+                            ? 'bg-destructive/5 border border-destructive/30'
+                            : 'bg-muted'
+                        }`}
+                      >
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-16 h-16 bg-background rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
                             {(() => {
@@ -1056,8 +1105,28 @@ const ListProperty = () => {
                             })()}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className="text-sm font-medium truncate block">{getMediaName(uploadedImage)}</span>
-                            {getMediaSizeMB(uploadedImage) ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium truncate">{getMediaName(uploadedImage)}</span>
+                              {uploadedImage.status === 'uploaded' && (
+                                <CheckCircle2 className="h-3.5 w-3.5 text-primary flex-shrink-0" aria-label="Uploaded" />
+                              )}
+                              {uploadedImage.status === 'uploading' && (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground flex-shrink-0" aria-label="Uploading" />
+                              )}
+                              {uploadedImage.status === 'failed' && (
+                                <AlertTriangle className="h-3.5 w-3.5 text-destructive flex-shrink-0" aria-label="Failed" />
+                              )}
+                            </div>
+                            {uploadedImage.status === 'uploading' ? (
+                              <div className="mt-1 space-y-1">
+                                <Progress value={uploadedImage.progress ?? 0} className="h-1.5" />
+                                <p className="text-[11px] text-muted-foreground">Uploading… {uploadedImage.progress ?? 0}%</p>
+                              </div>
+                            ) : uploadedImage.status === 'failed' ? (
+                              <p className="text-xs text-destructive truncate">
+                                {uploadedImage.error || 'Upload failed'}
+                              </p>
+                            ) : getMediaSizeMB(uploadedImage) ? (
                               <p className="text-xs text-muted-foreground">{getMediaSizeMB(uploadedImage)} MB</p>
                             ) : (
                               <p className="text-xs text-muted-foreground">Saved</p>
@@ -1080,11 +1149,24 @@ const ListProperty = () => {
                               ))}
                             </SelectContent>
                           </Select>
+                          {uploadedImage.status === 'failed' && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => retryUploadAt(index)}
+                              className="flex-shrink-0"
+                            >
+                              <RotateCw className="h-3.5 w-3.5 mr-1" />
+                              Retry
+                            </Button>
+                          )}
                           <Button 
                             type="button" 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => removeFile(index)}
+                            disabled={uploadedImage.status === 'uploading'}
                             className="text-destructive hover:text-destructive flex-shrink-0"
                           >
                             Remove
