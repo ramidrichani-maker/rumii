@@ -129,6 +129,7 @@ const ListProperty = () => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [rejectedFiles, setRejectedFiles] = useState<RejectedFile[]>([]);
   const [persistedFloorPlan, setPersistedFloorPlan] = useState<PersistedFloorPlan | null>(null);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
