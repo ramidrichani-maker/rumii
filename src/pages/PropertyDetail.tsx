@@ -36,11 +36,6 @@ interface Property {
   floor_plan_url?: string;
 }
 
-interface NearbySchool {
-  name: string;
-  distance: number; // km
-}
-
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -56,8 +51,6 @@ const PropertyDetail = () => {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [mapExpanded, setMapExpanded] = useState(false);
   const [satelliteView, setSatelliteView] = useState(false);
-  const [nearbySchools, setNearbySchools] = useState<NearbySchool[]>([]);
-  const [schoolsLoading, setSchoolsLoading] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showFloorPlan, setShowFloorPlan] = useState(false);
   const [showMapOverlay, setShowMapOverlay] = useState(false);
@@ -159,40 +152,6 @@ const PropertyDetail = () => {
       if (coords) setCityCoords(coords);
     });
   }, [property?.city, property?.latitude, property?.longitude, isAdmin]);
-
-  useEffect(() => {
-    if (!property?.latitude || !property?.longitude) return;
-    const fetchSchools = async () => {
-      setSchoolsLoading(true);
-      try {
-        const radius = 5000;
-        const query = `[out:json];node["amenity"="school"](around:${radius},${property.latitude},${property.longitude});out body 4;`;
-        const res = await fetch(
-          `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
-        );
-        const data = await res.json();
-        const schools: NearbySchool[] = (data.elements || [])
-          .filter((el: any) => el.tags?.name)
-          .map((el: any) => {
-            const dist = getDistanceKm(
-              property.latitude!,
-              property.longitude!,
-              el.lat,
-              el.lon
-            );
-            return { name: el.tags.name, distance: dist };
-          })
-          .sort((a: NearbySchool, b: NearbySchool) => a.distance - b.distance)
-          .slice(0, 4);
-        setNearbySchools(schools);
-      } catch {
-        setNearbySchools([]);
-      } finally {
-        setSchoolsLoading(false);
-      }
-    };
-    fetchSchools();
-  }, [property?.latitude, property?.longitude]);
 
   useEffect(() => {
     if (!miniMapRef.current || !cityCoords) return;
@@ -640,30 +599,6 @@ const PropertyDetail = () => {
               </div>
             )}
 
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3">Nearby schools</h3>
-              {schoolsLoading ? (
-                <p className="text-sm text-muted-foreground">Searching for nearby schools…</p>
-              ) : nearbySchools.length > 0 ? (
-                <>
-                  <ul className="space-y-2.5">
-                    {nearbySchools.map((school, i) => (
-                      <li key={i} className="flex items-center justify-between">
-                        <span className="text-sm text-foreground">{school.name}</span>
-                        <span className="text-sm text-muted-foreground">
-                          {school.distance.toFixed(1)} km
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    These distances are calculated in a straight line. The actual route and distance may vary.
-                  </p>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">No schools found nearby.</p>
-              )}
-            </div>
           </div>
         )}
         </div>
