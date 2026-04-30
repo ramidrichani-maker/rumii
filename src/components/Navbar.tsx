@@ -130,7 +130,7 @@ export const Navbar = () => {
             </button>
             <Link to="/" className="flex items-center space-x-2">
               <Home className="w-6 h-6 text-primary" />
-              <span className="text-xl font-bold">Oracle Estates</span>
+              <span className="text-xl font-bold">Rumi</span>
             </Link>
           </div>
           {profile?.role !== 'customer_support' ? (
@@ -191,7 +191,7 @@ export const Navbar = () => {
                 
                 <Button variant="ghost" className="flex items-center gap-2 px-3 py-1.5 rounded-full" onClick={() => setProfilePanelOpen(true)}>
                   <User className="h-4 w-4" />
-                  <span className="text-sm font-medium">My Oracle</span>
+                  <span className="text-sm font-medium">My Rumi</span>
                 </Button>
               </> : <Button onClick={() => setAuthPanelOpen(true)}>Sign In</Button>}
           </div>
@@ -272,7 +272,7 @@ export const Navbar = () => {
             <div className="flex items-center justify-between p-4 border-b border-border">
               <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center space-x-2">
                 <Home className="w-5 h-5 text-primary" />
-                <span className="text-lg font-bold">Oracle Estates</span>
+                <span className="text-lg font-bold">Rumi</span>
               </Link>
               <button onClick={() => setMobileMenuOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
@@ -370,7 +370,7 @@ export const Navbar = () => {
                     </Badge>
                   )}
                   <Link to="/my-oracle" onClick={() => setProfilePanelOpen(false)} className="mt-1 text-xs text-primary hover:underline">
-                    View My Oracle
+                    View My Rumi
                   </Link>
                 </div>
               </div>
