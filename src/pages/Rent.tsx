@@ -329,9 +329,22 @@ const Rent = () => {
           onKeywordsChange={setKeywords}
           unfurnishedOnly={unfurnishedOnly}
           onUnfurnishedChange={setUnfurnishedOnly}
+          trailingContent={
+            <button
+              onClick={() => showMap ? closeMap() : setShowMap(true)}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-200 ${
+                showMap
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background hover:border-primary/50 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Map className="w-4 h-4" />
+              Map View
+            </button>
+          }
         />
 
-        <div className="mb-4 flex items-center">
+        <div className="mb-4 hidden md:flex items-center">
           <button
             onClick={() => showMap ? closeMap() : setShowMap(true)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-200 ${
