@@ -692,16 +692,18 @@ const ListProperty = () => {
       // Record broker agreement for legal purposes
       const agreementText = "By listing this property, I agree that Rumi will act as my exclusive real estate broker, providing the full service of managing the property — including marketing, conducting viewings, and meeting with prospective buyers and renters on my behalf. I agree that upon a successful sale Rumi will receive a commission of 2.5% from the seller, and in the case of a rental agreement, a commission equal to one month's rent. I have read and agree to the full Terms of Service.";
       
-      const { error: agreementError } = await supabase.from('broker_agreements').insert({
-        user_id: user.id,
-        property_id: propertyData?.id || null,
-        full_name: profile?.full_name || user.email || '',
-        email: user.email || '',
-        terms_version: '1.0',
-        agreement_text: agreementText,
-        ip_address: null, // Could be captured via API if needed
-        user_agent: navigator.userAgent
-      });
+      const { error: agreementError } = await supabase.functions.invoke(
+        'record-broker-agreement',
+        {
+          body: {
+            property_id: propertyData?.id || null,
+            full_name: profile?.full_name || user.email || '',
+            email: user.email || '',
+            terms_version: '1.0',
+            agreement_text: agreementText,
+          },
+        }
+      );
 
       if (agreementError) {
         console.error('Error recording agreement:', agreementError);
