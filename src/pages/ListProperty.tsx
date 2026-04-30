@@ -369,25 +369,26 @@ const ListProperty = () => {
         return false;
       }
 
-      // Floor plan
-      let fp: PersistedFloorPlan | null = persistedFloorPlan;
-      if (!fp && floorPlanFile) {
-        const ext = floorPlanFile.name.split('.').pop() || 'bin';
-        const path = `${user.id}/pending/${Date.now()}_floor-plan.${ext}`;
+      // Floor plans (multiple)
+      const fps: PersistedFloorPlan[] = [...persistedFloorPlans];
+      for (let i = 0; i < floorPlanFiles.length; i++) {
+        const file = floorPlanFiles[i];
+        const ext = file.name.split('.').pop() || 'bin';
+        const path = `${user.id}/pending/${Date.now()}_${i}_floor-plan.${ext}`;
         const { error: upErr } = await supabase.storage
           .from('property-images')
-          .upload(path, floorPlanFile);
+          .upload(path, file);
         if (upErr) throw upErr;
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
           .getPublicUrl(path);
-        fp = { url: publicUrl, path, name: floorPlanFile.name, type: floorPlanFile.type };
+        fps.push({ url: publicUrl, path, name: file.name, type: file.type });
       }
 
       const payload: PendingListingPayload = {
         data,
         images: persistedImages,
-        floorPlan: fp,
+        floorPlans: fps,
       };
       try {
         localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(payload));
@@ -403,10 +404,8 @@ const ListProperty = () => {
         progress: 100,
         persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
       })));
-      if (fp) {
-        setPersistedFloorPlan(fp);
-        setFloorPlanFile(null);
-      }
+      setPersistedFloorPlans(fps);
+      setFloorPlanFiles([]);
       return true;
     } catch (err) {
       console.error('Error preparing pending listing:', err);
