@@ -119,7 +119,7 @@ const Purchase = () => {
       let query = supabase
         .from('properties')
         .select('*')
-        .eq('listing_type', 'sale')
+        .in('listing_type', ['sale', 'both'])
         .eq('status', 'approved');
 
       if (selectedPropertyTypes.length > 0) {
