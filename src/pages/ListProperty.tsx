@@ -926,7 +926,7 @@ const ListProperty = () => {
                     <Label htmlFor="file-upload" className="cursor-pointer">
                       <span className="text-primary hover:text-primary/80">Click to upload</span> or drag and drop
                     </Label>
-                    <Input id="file-upload" type="file" multiple accept="image/*,video/*" onChange={handleFileUpload} className="hidden" />
+                    <Input id="file-upload" type="file" multiple accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/webm" onChange={handleFileUpload} className="hidden" />
                     <p className="text-sm text-muted-foreground">PNG, JPG, MP4 up to 10MB each</p>
                   </div>
                 </div>
@@ -1038,7 +1038,7 @@ const ListProperty = () => {
                   <Input
                     id="floor-plan-upload"
                     type="file"
-                    accept="image/*"
+                     accept="image/jpeg,image/png,image/webp"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
