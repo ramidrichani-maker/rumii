@@ -626,54 +626,6 @@ const PropertyDetail = () => {
         </div>
       </div>
 
-      {/* Gallery overlay */}
-      {showGallery && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto">
-          <div className="max-w-5xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-foreground">
-                All Photos ({photoCount})
-              </h3>
-              <button
-                onClick={() => setShowGallery(false)}
-                className="p-2 rounded-full hover:bg-muted transition-colors"
-                aria-label="Close gallery"
-              >
-                <X className="w-5 h-5 text-foreground" />
-              </button>
-            </div>
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="flex-1 min-w-0">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {property.images.map((img, i) => (
-                    <div key={i} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      <img
-                        src={img}
-                        alt={`Photo ${i + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/placeholder.svg";
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="lg:w-[300px] shrink-0">
-                <AgentContactBox
-                  propertyId={property.id}
-                  agencyId={property.agency_id}
-                  propertyAddress={property.address}
-                  propertyType={property.property_type}
-                  propertyPrice={property.price}
-                  listingType={property.listing_type}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Floor plan overlay */}
       {showFloorPlan && property.floor_plan_url && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center">
