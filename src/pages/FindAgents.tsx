@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, MapPin, User, Briefcase, Loader2 } from 'lucide-react';
+import { Send, MapPin, Briefcase, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -10,26 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-
-const radiusOptions = [
-  { value: '0.2', label: '+0.2 km' },
-  { value: '0.5', label: '+0.5 km' },
-  { value: '1', label: '+1 km' },
-  { value: '2', label: '+2 km' },
-  { value: '3', label: '+3 km' },
-  { value: '5', label: '+5 km' },
-  { value: '10', label: '+10 km' },
-];
 
 const ORACLE_ESTATES_NAME = 'Oracle Estates';
 
@@ -37,8 +21,6 @@ const FindAgents = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [location, setLocation] = useState('');
-  const [radius, setRadius] = useState('1');
-  const [agentName, setAgentName] = useState('');
   const [agentType, setAgentType] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -83,11 +65,10 @@ const FindAgents = () => {
       }
 
       const agentTypeLabel = agentType === 'sales' ? 'Sales' : agentType === 'rent_out' ? 'Rent out' : agentType === 'commercial' ? 'Commercial' : 'Not specified';
-      const radiusLabel = radiusOptions.find(r => r.value === radius)?.label || radius + ' km';
       const clientName = profile?.full_name || 'A client';
       const clientPhone = profile?.phone_number || 'Not provided';
 
-      const messageBody = `New client enquiry from the Find Agents page:\n\nClient: ${clientName}\nPhone: ${clientPhone}\nEmail: ${user.email || 'Not provided'}\n\nSearch Criteria:\n- Location: ${location}\n- Search Radius: ${radiusLabel}\n- Agent Type: ${agentTypeLabel}${agentName ? `\n- Preferred Agent: ${agentName}` : ''}`;
+      const messageBody = `New client enquiry from the Find Agents page:\n\nClient: ${clientName}\nPhone: ${clientPhone}\nEmail: ${user.email || 'Not provided'}\n\nSearch Criteria:\n- Location: ${location}\n- Agent Type: ${agentTypeLabel}`;
 
       // Send a message to each Oracle Estates agent
       const messageInserts = agents.map(agent => ({
@@ -108,9 +89,7 @@ const FindAgents = () => {
         toast({ title: 'Request sent!', description: `Your details have been sent to ${agents.length} Oracle Estates agent${agents.length > 1 ? 's' : ''}. They will be in touch soon.` });
         // Reset form
         setLocation('');
-        setAgentName('');
         setAgentType('');
-        setRadius('1');
       }
     } catch (err) {
       console.error('Connect error:', err);
@@ -140,46 +119,6 @@ const FindAgents = () => {
                   placeholder="Enter a city, area, or governorate..."
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Search Radius */}
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-foreground">Search Radius</Label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full justify-between font-normal">
-                    {radiusOptions.find(r => r.value === radius)?.label || 'Select radius'}
-                    <span className="text-muted-foreground text-xs">▼</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                  {radiusOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onClick={() => setRadius(option.value)}
-                      className={radius === option.value ? 'bg-accent' : ''}
-                    >
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* Agent Name */}
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-foreground">
-                Agent Name <span className="text-muted-foreground font-normal">(optional)</span>
-              </Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by agent name..."
-                  value={agentName}
-                  onChange={(e) => setAgentName(e.target.value)}
                   className="pl-10"
                 />
               </div>
