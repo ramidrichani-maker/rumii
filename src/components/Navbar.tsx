@@ -130,7 +130,7 @@ export const Navbar = () => {
             </button>
             <Link to="/" className="flex items-center space-x-2">
               <Home className="w-6 h-6 text-primary" />
-              <span className="text-xl font-bold">Rumi</span>
+              <span className="text-xl font-bold text-teal-800">Rumi</span>
             </Link>
           </div>
           {profile?.role !== 'customer_support' ? (
