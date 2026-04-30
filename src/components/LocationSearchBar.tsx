@@ -97,6 +97,8 @@ interface LocationSearchBarProps {
   onKeywordsChange: (value: string) => void;
   unfurnishedOnly?: boolean;
   onUnfurnishedChange?: (value: boolean) => void;
+  newHomesOnly?: boolean;
+  onNewHomesOnlyChange?: (value: boolean) => void;
   trailingContent?: React.ReactNode;
 }
 
@@ -126,6 +128,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onKeywordsChange,
     unfurnishedOnly,
     onUnfurnishedChange,
+    newHomesOnly,
+    onNewHomesOnlyChange,
     trailingContent,
   } = props;
   const isMobile = useIsMobile();
@@ -151,6 +155,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     !!addedToOracle,
     !!keywords,
     !!unfurnishedOnly,
+    !!newHomesOnly,
   ].filter(Boolean).length;
 
   const bedroomMobileRef = useRef<HTMLDivElement>(null);
