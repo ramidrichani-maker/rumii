@@ -609,22 +609,21 @@ const ListProperty = () => {
       }
 
       let imageUrls: string[] = [];
-      let floorPlanUrl: string | null = null;
+      let floorPlanUrls: string[] = persistedFloorPlans.map(fp => fp.url);
 
-      // Use already-uploaded floor plan (from pending persistence) if present
-      if (persistedFloorPlan) {
-        floorPlanUrl = persistedFloorPlan.url;
-      } else if (floorPlanFile) {
-        const fileExt = floorPlanFile.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
+      // Upload any newly added floor plan files (not yet persisted)
+      for (let i = 0; i < floorPlanFiles.length; i++) {
+        const file = floorPlanFiles[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}_${i}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
           .from('property-images')
-          .upload(fileName, floorPlanFile);
+          .upload(fileName, file);
         if (fpError) throw fpError;
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
           .getPublicUrl(fileName);
-        floorPlanUrl = publicUrl;
+        floorPlanUrls.push(publicUrl);
       }
 
       // Upload images to Supabase storage (skip ones already persisted to pending area)
@@ -680,7 +679,8 @@ const ListProperty = () => {
         apartments_count: data.apartmentsCount ? parseInt(data.apartmentsCount) : null,
         amenities: selectedAmenities,
         images: imageUrls,
-        floor_plan_url: floorPlanUrl,
+        floor_plan_url: floorPlanUrls[0] ?? null,
+        floor_plan_urls: floorPlanUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
@@ -717,8 +717,8 @@ const ListProperty = () => {
       form.reset();
       setSelectedAmenities([]);
       setUploadedImages([]);
-      setFloorPlanFile(null);
-      setPersistedFloorPlan(null);
+      setFloorPlanFiles([]);
+      setPersistedFloorPlans([]);
       // Pending listing has been consumed — clear localStorage marker
       clearPendingPersistence();
     } catch (error) {
