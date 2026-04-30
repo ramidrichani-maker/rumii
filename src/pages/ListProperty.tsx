@@ -307,7 +307,7 @@ const ListProperty = () => {
             ? { ...it, status: 'uploaded' as const, progress: 100, persisted, file: null }
             : it,
         );
-        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlan);
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
         return next;
       });
       return { ...persisted, roomType: img.roomType };
