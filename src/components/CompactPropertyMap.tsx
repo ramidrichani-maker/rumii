@@ -791,7 +791,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     }
   }, []);
 
-  const mapHeight = embedded ? height : (isExpanded ? "60vh" : height);
+  const mapHeight = embedded ? height : (isExpanded ? "calc(100vh - 220px)" : height);
   const mapClass = embedded
     ? (className || "h-full")
     : isExpanded
