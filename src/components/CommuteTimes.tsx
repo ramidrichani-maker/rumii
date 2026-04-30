@@ -107,7 +107,10 @@ export default function CommuteTimes({ originLat, originLng, city }: CommuteTime
     debounceRef.current = window.setTimeout(async () => {
       try {
         const q = city ? `${query}, ${city}` : query;
-        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=0&q=${encodeURIComponent(q)}`;
+        // Restrict geocoding to Lebanon (not surfaced in UI).
+        // Lebanon bounding box: west, north, east, south
+        const viewbox = "35.10,34.70,36.65,33.05";
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=0&countrycodes=lb&bounded=1&viewbox=${viewbox}&q=${encodeURIComponent(q)}`;
         const res = await fetch(url, {
           headers: { "Accept-Language": navigator.language || "en" },
         });
