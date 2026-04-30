@@ -51,14 +51,6 @@ export const SupportReviewWidget = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col items-end gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className="w-4 h-4 fill-amber-400 text-amber-400"
-                  />
-                ))}
-              </div>
               <Button
                 onClick={() => setIsOpen(true)}
                 variant="outline"
