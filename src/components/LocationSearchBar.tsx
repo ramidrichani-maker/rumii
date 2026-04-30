@@ -132,6 +132,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [radiusOpen, setRadiusOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
   // Count of active filters (excluding the location input itself), used for
