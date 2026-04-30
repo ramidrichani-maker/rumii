@@ -131,7 +131,24 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
+
+  // Count of active filters (excluding the location input itself), used for
+  // the mobile collapsed "Filters" button badge.
+  const activeFilterCount = [
+    radius !== 0,
+    !!minBedrooms,
+    !!maxBedrooms,
+    !!barMinPrice,
+    !!barMaxPrice,
+    selectedPropertyTypes.length > 0,
+    selectedMustHaves.length > 0,
+    selectedFeatures.length > 0,
+    !!addedToOracle,
+    !!keywords,
+    !!unfurnishedOnly,
+  ].filter(Boolean).length;
 
   const bedroomMobileRef = useRef<HTMLDivElement>(null);
   const priceMobileRef = useRef<HTMLDivElement>(null);
@@ -160,17 +177,41 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
       <div className="flex flex-col md:flex-row gap-3">
-        <div className="relative flex-1 min-w-0">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={location}
-            onChange={(e) => onLocationChange(e.target.value)}
-            placeholder="Search by area, city, address..."
-            className="pl-10 h-12 text-base"
-          />
+        <div className="flex gap-2 items-stretch md:flex-1 md:min-w-0">
+          <div className="relative flex-1 min-w-0">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={location}
+              onChange={(e) => onLocationChange(e.target.value)}
+              placeholder="Search by area, city, address..."
+              className="pl-10 h-12 text-base"
+            />
+          </div>
+          {/* Mobile-only: collapse all filters behind a single button */}
+          <button
+            type="button"
+            onClick={() => setMobileFiltersOpen(o => !o)}
+            aria-expanded={mobileFiltersOpen}
+            aria-controls="mobile-filters-panel"
+            className="md:hidden h-12 px-4 rounded-md border border-border bg-background/40 text-sm font-medium flex items-center gap-2 shrink-0 hover:border-primary/50 transition-colors"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="ml-1 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                {activeFilterCount}
+              </span>
+            )}
+            <ChevronDown
+              className={`w-4 h-4 transition-transform ${mobileFiltersOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
         </div>
 
-        <div className="flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0">
+        <div
+          id="mobile-filters-panel"
+          className={`${mobileFiltersOpen ? 'flex' : 'hidden'} md:flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0`}
+        >
         {/* Row 1: Radius */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
