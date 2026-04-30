@@ -1151,6 +1151,15 @@ const ListProperty = () => {
                             <p className="text-[11px] text-muted-foreground">
                               Please wait while your media finishes uploading.
                             </p>
+                          ) : allDone ? (
+                            <p className="text-[11px] font-medium text-primary flex items-center gap-1">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Ready to list — all media uploaded.
+                            </p>
+                          ) : idle > 0 ? (
+                            <p className="text-[11px] text-muted-foreground">
+                              {idle} file{idle > 1 ? 's' : ''} waiting to upload. They'll start when you click List Property.
+                            </p>
                           ) : null}
                         </div>
                       );
