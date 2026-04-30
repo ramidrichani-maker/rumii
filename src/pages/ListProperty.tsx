@@ -298,11 +298,15 @@ const ListProperty = () => {
         name: img.file.name,
         type: img.file.type,
       };
-      setImageStatus(index, {
-        status: 'uploaded',
-        progress: 100,
-        persisted,
-        file: null,
+      // Apply state and snapshot atomically using the freshly updated array.
+      setUploadedImages(prev => {
+        const next = prev.map((it, i) =>
+          i === index
+            ? { ...it, status: 'uploaded' as const, progress: 100, persisted, file: null }
+            : it,
+        );
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlan);
+        return next;
       });
       return { ...persisted, roomType: img.roomType };
     } catch (err: any) {
