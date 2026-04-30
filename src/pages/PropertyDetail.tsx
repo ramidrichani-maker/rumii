@@ -356,10 +356,6 @@ const PropertyDetail = () => {
     }
   };
 
-  const _placeholderUnused =
-    property.images && property.images.length > 0
-      ? property.images[currentImageIndex]
-      : null;
   const photoCount = property.images?.length || 0;
 
   const formatPrice = (price: number, listingType: string) => {
