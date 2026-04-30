@@ -639,6 +639,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       onClick={() => {
                         if (activeFilterBedroomTab === 'min') onMinBedroomsChange('');
                         else onMaxBedroomsChange('');
+                        setActiveFilterBedroomTab(null);
                       }}
                       className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                         (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
@@ -654,7 +655,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       return (
                         <button
                           key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
-                          onClick={() => onChange(currentVal === opt ? '' : opt)}
+                          onClick={() => {
+                            onChange(currentVal === opt ? '' : opt);
+                            setActiveFilterBedroomTab(null);
+                          }}
                           className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                             currentVal === opt
                               ? 'border-primary bg-primary text-primary-foreground'
@@ -702,6 +706,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onClick={() => {
                           if (activeFilterPriceTab === 'min') onBarMinPriceChange('');
                           else onBarMaxPriceChange('');
+                          setActiveFilterPriceTab(null);
                         }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           (activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
@@ -718,7 +723,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         return (
                           <button
                             key={`filter-price-${activeFilterPriceTab}-${price}`}
-                            onClick={() => onChange(currentVal === val ? '' : val)}
+                            onClick={() => {
+                              onChange(currentVal === val ? '' : val);
+                              setActiveFilterPriceTab(null);
+                            }}
                             className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                               currentVal === val
                                 ? 'border-primary bg-primary text-primary-foreground'
