@@ -64,6 +64,7 @@ const Purchase = () => {
   const [addedToOracle, setAddedToOracle] = useState('');
   const [keywords, setKeywords] = useState('');
   const [unfurnishedOnly, setUnfurnishedOnly] = useState(false);
+  const [newHomesOnly, setNewHomesOnly] = useState(!!urlMinYearBuilt);
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
@@ -193,11 +194,9 @@ const Purchase = () => {
         query = query.or(`address.ilike.%${keywords.trim()}%,city.ilike.%${keywords.trim()}%,municipality.ilike.%${keywords.trim()}%`);
       }
 
-      if (urlMinYearBuilt) {
-        const minYear = parseInt(urlMinYearBuilt);
-        if (minYear > 0) {
-          query = query.gte('year_built', minYear);
-        }
+      if (newHomesOnly) {
+        const minYear = new Date().getFullYear() - 5;
+        query = query.gte('year_built', minYear);
       }
 
       const { data, error } = await query;
@@ -239,7 +238,7 @@ const Purchase = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords, urlMinYearBuilt]);
+  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, newHomesOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords]);
 
   const handleLocationChange = (value: string) => {
     setLocationInput(value);
@@ -343,6 +342,8 @@ const Purchase = () => {
           onKeywordsChange={setKeywords}
           unfurnishedOnly={unfurnishedOnly}
           onUnfurnishedChange={setUnfurnishedOnly}
+          newHomesOnly={newHomesOnly}
+          onNewHomesOnlyChange={setNewHomesOnly}
           trailingContent={
             <button
               onClick={() => showMap ? closeMap() : setShowMap(true)}

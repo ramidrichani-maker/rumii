@@ -61,6 +61,7 @@ const Rent = () => {
   const [addedToOracle, setAddedToOracle] = useState('');
   const [keywords, setKeywords] = useState('');
   const [unfurnishedOnly, setUnfurnishedOnly] = useState(false);
+  const [newHomesOnly, setNewHomesOnly] = useState(false);
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
@@ -135,6 +136,11 @@ const Rent = () => {
 
       if (unfurnishedOnly) {
         query = query.eq('unfurnished', true);
+      }
+
+      if (newHomesOnly) {
+        const minYear = new Date().getFullYear() - 5;
+        query = query.gte('year_built', minYear);
       }
 
       if (priceRange[0] > 0) {
@@ -225,7 +231,7 @@ const Rent = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords]);
+  }, [selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, selectedAmenities, unfurnishedOnly, newHomesOnly, searchQuery, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedMustHaves, selectedFeatures, addedToOracle, keywords]);
 
   const handleLocationChange = (value: string) => {
     setLocationInput(value);
@@ -329,6 +335,8 @@ const Rent = () => {
           onKeywordsChange={setKeywords}
           unfurnishedOnly={unfurnishedOnly}
           onUnfurnishedChange={setUnfurnishedOnly}
+          newHomesOnly={newHomesOnly}
+          onNewHomesOnlyChange={setNewHomesOnly}
           trailingContent={
             <button
               onClick={() => showMap ? closeMap() : setShowMap(true)}

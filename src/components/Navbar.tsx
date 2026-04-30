@@ -216,14 +216,9 @@ export const Navbar = () => {
           <div className="w-full h-full flex items-center justify-center gap-8 px-4">
             {activeMenu === 'buy' && (
               <>
-                <div className="flex flex-col gap-1">
-                  <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    Property for sale
-                  </Link>
-                  <Link to="/new-homes" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                    New homes for sale
-                  </Link>
-                </div>
+                <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Property for sale
+                </Link>
                 <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
                   Property valuation request
                 </Link>
@@ -292,9 +287,6 @@ export const Navbar = () => {
                     <p className="px-3 py-2 text-sm font-semibold text-foreground">Buy</p>
                     <Link to="/purchase" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Property for sale
-                    </Link>
-                    <Link to="/new-homes" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      New homes for sale
                     </Link>
                     <Link to="/agent-valuation" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Property valuation request
