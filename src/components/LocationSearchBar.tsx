@@ -157,7 +157,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   }, [isMobile, activeBedroomTab, activePriceTab]);
 
   return (
-    <div className="mb-6 sticky top-0 z-30 bg-background pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent">
+    <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
       <div className="flex flex-col md:flex-row gap-3">
         <div className="relative flex-1 min-w-0">
