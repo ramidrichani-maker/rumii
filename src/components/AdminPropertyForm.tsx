@@ -98,7 +98,7 @@ const convertToJpeg = (file: File): Promise<File> => {
 export const AdminPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [floorPlanFiles, setFloorPlanFiles] = useState<File[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -191,13 +191,13 @@ export const AdminPropertyForm = () => {
     
     try {
       let imageUrls: string[] = [];
-      let floorPlanUrl: string | null = null;
+      let floorPlanUrls: string[] = [];
 
-      // Upload floor plan
-      if (floorPlanFile) {
-        const convertedFp = await convertToJpeg(floorPlanFile);
+      // Upload floor plans (multiple)
+      for (let i = 0; i < floorPlanFiles.length; i++) {
+        const convertedFp = await convertToJpeg(floorPlanFiles[i]);
         const fileExt = convertedFp.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
+        const fileName = `${user.id}/${Date.now()}_${i}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
           .from('property-images')
           .upload(fileName, convertedFp);
@@ -205,7 +205,7 @@ export const AdminPropertyForm = () => {
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
           .getPublicUrl(fileName);
-        floorPlanUrl = publicUrl;
+        floorPlanUrls.push(publicUrl);
       }
 
       if (uploadedImages.length > 0) {
@@ -249,7 +249,8 @@ export const AdminPropertyForm = () => {
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
         images: imageUrls,
-        floor_plan_url: floorPlanUrl,
+        floor_plan_url: floorPlanUrls[0] ?? null,
+        floor_plan_urls: floorPlanUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
@@ -267,7 +268,7 @@ export const AdminPropertyForm = () => {
       form.reset();
       setSelectedAmenities([]);
       setUploadedImages([]);
-      setFloorPlanFile(null);
+      setFloorPlanFiles([]);
       setSelectedAgency(null);
       setSelectedAgency(null);
     } catch (error) {
@@ -647,31 +648,40 @@ export const AdminPropertyForm = () => {
           {/* Floor Plan Upload */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Floor Plan (Optional)</CardTitle>
+              <CardTitle className="text-lg">Floor Plans (Optional)</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Upload one or more floor plans (e.g. for villas, triplexes, or buildings).
+              </p>
             </CardHeader>
             <CardContent>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center">
                 <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                 <Label htmlFor="admin-floor-plan-upload" className="cursor-pointer">
-                  <span className="text-primary hover:text-primary/80">Click to upload floor plan</span>
+                  <span className="text-primary hover:text-primary/80">Click to upload floor plans</span>
                 </Label>
                 <Input
                   id="admin-floor-plan-upload"
                   type="file"
+                  multiple
                   accept="image/*"
                   onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setFloorPlanFile(file);
+                    const files = Array.from(e.target.files || []);
+                    if (files.length > 0) setFloorPlanFiles(prev => [...prev, ...files]);
+                    e.target.value = '';
                   }}
                   className="hidden"
                 />
               </div>
-              {floorPlanFile && (
-                <div className="mt-3 flex items-center justify-between p-2 bg-muted rounded">
-                  <span className="text-sm truncate">{floorPlanFile.name}</span>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFile(null)}>
-                    <X className="h-4 w-4" />
-                  </Button>
+              {floorPlanFiles.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {floorPlanFiles.map((file, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="text-sm truncate">{file.name}</span>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFiles(prev => prev.filter((_, i) => i !== idx))}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>

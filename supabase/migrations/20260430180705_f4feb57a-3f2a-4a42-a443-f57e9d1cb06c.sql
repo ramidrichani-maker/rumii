@@ -1,0 +1,2 @@
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS floor_plan_urls text[] NOT NULL DEFAULT '{}';
+UPDATE public.properties SET floor_plan_urls = ARRAY[floor_plan_url] WHERE floor_plan_url IS NOT NULL AND (floor_plan_urls IS NULL OR array_length(floor_plan_urls, 1) IS NULL);

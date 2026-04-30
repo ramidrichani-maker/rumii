@@ -504,6 +504,7 @@ export type Database = {
           description: string | null
           featured_section: string | null
           floor_plan_url: string | null
+          floor_plan_urls: string[]
           floors: number | null
           id: string
           images: string[] | null
@@ -536,6 +537,7 @@ export type Database = {
           description?: string | null
           featured_section?: string | null
           floor_plan_url?: string | null
+          floor_plan_urls?: string[]
           floors?: number | null
           id?: string
           images?: string[] | null
@@ -568,6 +570,7 @@ export type Database = {
           description?: string | null
           featured_section?: string | null
           floor_plan_url?: string | null
+          floor_plan_urls?: string[]
           floors?: number | null
           id?: string
           images?: string[] | null

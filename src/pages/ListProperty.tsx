@@ -85,7 +85,7 @@ interface PersistedFloorPlan {
 interface PendingListingPayload {
   data: any; // FormData (looser typing for storage)
   images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>;
-  floorPlan: PersistedFloorPlan | null;
+  floorPlans: PersistedFloorPlan[];
 }
 
 const PENDING_STORAGE_KEY = 'rumi:pendingListing';
@@ -128,9 +128,9 @@ const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [floorPlanFiles, setFloorPlanFiles] = useState<File[]>([]);
   const [rejectedFiles, setRejectedFiles] = useState<RejectedFile[]>([]);
-  const [persistedFloorPlan, setPersistedFloorPlan] = useState<PersistedFloorPlan | null>(null);
+  const [persistedFloorPlans, setPersistedFloorPlans] = useState<PersistedFloorPlan[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -173,8 +173,10 @@ const ListProperty = () => {
           persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
         })));
       }
-      if (saved.floorPlan) {
-        setPersistedFloorPlan(saved.floorPlan);
+      const restoredFloorPlans = (saved as any).floorPlans
+        ?? ((saved as any).floorPlan ? [(saved as any).floorPlan] : []);
+      if (Array.isArray(restoredFloorPlans) && restoredFloorPlans.length > 0) {
+        setPersistedFloorPlans(restoredFloorPlans);
       }
       setPendingData(saved.data as FormData);
       setShowClientConfirm(true);
@@ -208,11 +210,11 @@ const ListProperty = () => {
   // Delete previously persisted temp media from storage (used on cancel)
   const purgePersistedMedia = async (
     images: Array<{ path: string }>,
-    floorPlan: PersistedFloorPlan | null
+    floorPlans: PersistedFloorPlan[]
   ) => {
     const paths = [
       ...images.map((i) => i.path),
-      ...(floorPlan ? [floorPlan.path] : []),
+      ...floorPlans.map((fp) => fp.path),
     ].filter(Boolean);
     if (paths.length === 0) return;
     try {
@@ -232,7 +234,7 @@ const ListProperty = () => {
   // confirmation dialog.
   const savePendingSnapshot = (
     images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>,
-    floorPlan: PersistedFloorPlan | null,
+    floorPlans: PersistedFloorPlan[],
     data?: FormData,
   ) => {
     try {
@@ -241,7 +243,7 @@ const ListProperty = () => {
       const merged: PendingListingPayload = {
         data: (data ?? existing.data ?? form.getValues()) as any,
         images,
-        floorPlan,
+        floorPlans,
       };
       localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(merged));
     } catch (err) {
@@ -305,7 +307,7 @@ const ListProperty = () => {
             ? { ...it, status: 'uploaded' as const, progress: 100, persisted, file: null }
             : it,
         );
-        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlan);
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
         return next;
       });
       return { ...persisted, roomType: img.roomType };
@@ -367,25 +369,26 @@ const ListProperty = () => {
         return false;
       }
 
-      // Floor plan
-      let fp: PersistedFloorPlan | null = persistedFloorPlan;
-      if (!fp && floorPlanFile) {
-        const ext = floorPlanFile.name.split('.').pop() || 'bin';
-        const path = `${user.id}/pending/${Date.now()}_floor-plan.${ext}`;
+      // Floor plans (multiple)
+      const fps: PersistedFloorPlan[] = [...persistedFloorPlans];
+      for (let i = 0; i < floorPlanFiles.length; i++) {
+        const file = floorPlanFiles[i];
+        const ext = file.name.split('.').pop() || 'bin';
+        const path = `${user.id}/pending/${Date.now()}_${i}_floor-plan.${ext}`;
         const { error: upErr } = await supabase.storage
           .from('property-images')
-          .upload(path, floorPlanFile);
+          .upload(path, file);
         if (upErr) throw upErr;
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
           .getPublicUrl(path);
-        fp = { url: publicUrl, path, name: floorPlanFile.name, type: floorPlanFile.type };
+        fps.push({ url: publicUrl, path, name: file.name, type: file.type });
       }
 
       const payload: PendingListingPayload = {
         data,
         images: persistedImages,
-        floorPlan: fp,
+        floorPlans: fps,
       };
       try {
         localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(payload));
@@ -401,10 +404,8 @@ const ListProperty = () => {
         progress: 100,
         persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
       })));
-      if (fp) {
-        setPersistedFloorPlan(fp);
-        setFloorPlanFile(null);
-      }
+      setPersistedFloorPlans(fps);
+      setFloorPlanFiles([]);
       return true;
     } catch (err) {
       console.error('Error preparing pending listing:', err);
@@ -521,7 +522,7 @@ const ListProperty = () => {
       const next = prev.map((img, i) => (i === index ? { ...img, roomType } : img));
       // If we have any persisted media + a saved pending payload, keep it in sync
       if (next.some(i => i.persisted) && localStorage.getItem(PENDING_STORAGE_KEY)) {
-        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlan);
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
       }
       return next;
     });
@@ -554,24 +555,28 @@ const ListProperty = () => {
     });
   };
 
-  const removeFloorPlan = () => {
-    if (persistedFloorPlan?.path) {
-      supabase.storage.from('property-images').remove([persistedFloorPlan.path]).catch((err) => {
+  const removePersistedFloorPlan = (idx: number) => {
+    const target = persistedFloorPlans[idx];
+    if (target?.path) {
+      supabase.storage.from('property-images').remove([target.path]).catch((err) => {
         console.error('Failed to remove persisted floor plan', err);
       });
     }
-    setPersistedFloorPlan(null);
-    setFloorPlanFile(null);
+    const nextPersisted = persistedFloorPlans.filter((_, i) => i !== idx);
+    setPersistedFloorPlans(nextPersisted);
     try {
       const raw = localStorage.getItem(PENDING_STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw) as PendingListingPayload;
-        saved.floorPlan = null;
+        saved.floorPlans = nextPersisted;
         localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(saved));
       }
     } catch (err) {
       console.error('Failed to update pending listing after floor plan removal', err);
     }
+  };
+  const removePendingFloorPlan = (idx: number) => {
+    setFloorPlanFiles(prev => prev.filter((_, i) => i !== idx));
   };
   const handleAmenityToggle = (amenity: string) => {
     const updatedAmenities = selectedAmenities.includes(amenity) ? selectedAmenities.filter(a => a !== amenity) : [...selectedAmenities, amenity];
@@ -604,22 +609,21 @@ const ListProperty = () => {
       }
 
       let imageUrls: string[] = [];
-      let floorPlanUrl: string | null = null;
+      let floorPlanUrls: string[] = persistedFloorPlans.map(fp => fp.url);
 
-      // Use already-uploaded floor plan (from pending persistence) if present
-      if (persistedFloorPlan) {
-        floorPlanUrl = persistedFloorPlan.url;
-      } else if (floorPlanFile) {
-        const fileExt = floorPlanFile.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
+      // Upload any newly added floor plan files (not yet persisted)
+      for (let i = 0; i < floorPlanFiles.length; i++) {
+        const file = floorPlanFiles[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}_${i}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
           .from('property-images')
-          .upload(fileName, floorPlanFile);
+          .upload(fileName, file);
         if (fpError) throw fpError;
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
           .getPublicUrl(fileName);
-        floorPlanUrl = publicUrl;
+        floorPlanUrls.push(publicUrl);
       }
 
       // Upload images to Supabase storage (skip ones already persisted to pending area)
@@ -675,7 +679,8 @@ const ListProperty = () => {
         apartments_count: data.apartmentsCount ? parseInt(data.apartmentsCount) : null,
         amenities: selectedAmenities,
         images: imageUrls,
-        floor_plan_url: floorPlanUrl,
+        floor_plan_url: floorPlanUrls[0] ?? null,
+        floor_plan_urls: floorPlanUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
@@ -712,8 +717,8 @@ const ListProperty = () => {
       form.reset();
       setSelectedAmenities([]);
       setUploadedImages([]);
-      setFloorPlanFile(null);
-      setPersistedFloorPlan(null);
+      setFloorPlanFiles([]);
+      setPersistedFloorPlans([]);
       // Pending listing has been consumed — clear localStorage marker
       clearPendingPersistence();
     } catch (error) {
@@ -1355,64 +1360,84 @@ const ListProperty = () => {
             {/* Floor Plan Upload */}
             <Card>
               <CardHeader>
-                <CardTitle>Floor Plan (Optional)</CardTitle>
+                <CardTitle>Floor Plans (Optional)</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Upload one or more floor plans (e.g. for villas, triplexes, or buildings).
+                </p>
               </CardHeader>
               <CardContent>
                 <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
                   <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                   <Label htmlFor="floor-plan-upload" className="cursor-pointer">
-                    <span className="text-primary hover:text-primary/80">Click to upload floor plan</span>
+                    <span className="text-primary hover:text-primary/80">Click to upload floor plans</span>
                   </Label>
                   <Input
                     id="floor-plan-upload"
                     type="file"
+                    multiple
                      accept="image/jpeg,image/png,image/webp"
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
+                      const files = Array.from(e.target.files || []);
+                      if (files.length === 0) return;
                       const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
                       const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
-                      if (!ALLOWED.includes(file.type)) {
-                        toast({
-                          title: 'Unsupported floor plan format',
-                          description: 'Please upload a PNG, JPG or WEBP image.',
-                          variant: 'destructive',
-                        });
-                        e.target.value = '';
-                        return;
+                      const accepted: File[] = [];
+                      for (const file of files) {
+                        if (!ALLOWED.includes(file.type)) {
+                          toast({
+                            title: 'Unsupported floor plan format',
+                            description: `${file.name}: please upload PNG, JPG or WEBP.`,
+                            variant: 'destructive',
+                          });
+                          continue;
+                        }
+                        if (file.size > MAX_BYTES) {
+                          toast({
+                            title: 'Floor plan too large',
+                            description: `${file.name}: maximum size is 10MB.`,
+                            variant: 'destructive',
+                          });
+                          continue;
+                        }
+                        accepted.push(file);
                       }
-                      if (file.size > MAX_BYTES) {
-                        toast({
-                          title: 'Floor plan too large',
-                          description: 'Maximum size is 10MB.',
-                          variant: 'destructive',
-                        });
-                        e.target.value = '';
-                        return;
+                      if (accepted.length > 0) {
+                        setFloorPlanFiles(prev => [...prev, ...accepted]);
                       }
-                      setFloorPlanFile(file);
+                      e.target.value = '';
                     }}
                     className="hidden"
                   />
-                  <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
+                  <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 10MB each</p>
                 </div>
-                {(floorPlanFile || persistedFloorPlan) && (
-                  <div className="mt-3 flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-16 h-16 bg-background rounded overflow-hidden">
-                        <img
-                          src={floorPlanFile ? URL.createObjectURL(floorPlanFile) : persistedFloorPlan!.url}
-                          alt="Floor plan preview"
-                          className="w-full h-full object-cover"
-                        />
+                {(persistedFloorPlans.length > 0 || floorPlanFiles.length > 0) && (
+                  <div className="mt-3 space-y-2">
+                    {persistedFloorPlans.map((fp, idx) => (
+                      <div key={`p-${idx}`} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-16 h-16 bg-background rounded overflow-hidden flex-shrink-0">
+                            <img src={fp.url} alt={`Floor plan ${idx + 1}`} className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-sm font-medium truncate">{fp.name}</span>
+                        </div>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removePersistedFloorPlan(idx)} className="text-destructive">
+                          Remove
+                        </Button>
                       </div>
-                      <span className="text-sm font-medium truncate">
-                        {floorPlanFile?.name || persistedFloorPlan?.name}
-                      </span>
-                    </div>
-                    <Button type="button" variant="ghost" size="sm" onClick={removeFloorPlan} className="text-destructive">
-                      Remove
-                    </Button>
+                    ))}
+                    {floorPlanFiles.map((file, idx) => (
+                      <div key={`f-${idx}`} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-16 h-16 bg-background rounded overflow-hidden flex-shrink-0">
+                            <img src={URL.createObjectURL(file)} alt={`Floor plan ${idx + 1}`} className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-sm font-medium truncate">{file.name}</span>
+                        </div>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removePendingFloorPlan(idx)} className="text-destructive">
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </CardContent>
@@ -1510,9 +1535,9 @@ const ListProperty = () => {
               const imgs = uploadedImages
                 .filter((i) => i.persisted)
                 .map((i) => ({ path: i.persisted!.path }));
-              purgePersistedMedia(imgs, persistedFloorPlan);
+              purgePersistedMedia(imgs, persistedFloorPlans);
               setUploadedImages((prev) => prev.filter((i) => !i.persisted));
-              setPersistedFloorPlan(null);
+              setPersistedFloorPlans([]);
               setPendingData(null);
               clearPendingPersistence();
             }
