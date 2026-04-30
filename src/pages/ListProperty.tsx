@@ -226,6 +226,41 @@ const ListProperty = () => {
     localStorage.removeItem(PENDING_STORAGE_KEY);
   };
 
+  // Save (or merge into) the pending listing payload in localStorage so that
+  // successfully-uploaded media — and the implicit "ready" state for those
+  // files — survives a page reload, even before the user opens the
+  // confirmation dialog.
+  const savePendingSnapshot = (
+    images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>,
+    floorPlan: PersistedFloorPlan | null,
+    data?: FormData,
+  ) => {
+    try {
+      const raw = localStorage.getItem(PENDING_STORAGE_KEY);
+      const existing: Partial<PendingListingPayload> = raw ? JSON.parse(raw) : {};
+      const merged: PendingListingPayload = {
+        data: (data ?? existing.data ?? form.getValues()) as any,
+        images,
+        floorPlan,
+      };
+      localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(merged));
+    } catch (err) {
+      console.error('Failed to save pending snapshot', err);
+    }
+  };
+
+  // Build the snapshot of currently-uploaded images for persistence.
+  const collectUploadedSnapshot = (images: UploadedImage[]) =>
+    images
+      .filter(i => i.persisted)
+      .map(i => ({
+        url: i.persisted!.url,
+        path: i.persisted!.path,
+        name: i.persisted!.name,
+        type: i.persisted!.type,
+        roomType: i.roomType,
+      }));
+
   // Update a single image's status fields immutably.
   const setImageStatus = (
     index: number,
