@@ -170,6 +170,27 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     const url = `${window.location.origin}/property/${property.id}`;
     const title = `${property.property_type} in ${property.city}`;
     const text = `${title} — ${formatPrice(property.price, property.listing_type, property.rental_price)}`;
+    const imageUrl = property.images?.[0];
+
+    // Try sharing with the property photo attached as a file (supported on most modern mobile browsers)
+    if (imageUrl && typeof navigator !== 'undefined' && (navigator as any).share && (navigator as any).canShare) {
+      try {
+        const res = await fetch(imageUrl, { mode: 'cors' });
+        if (res.ok) {
+          const blob = await res.blob();
+          const ext = (blob.type.split('/')[1] || 'jpg').split('+')[0];
+          const file = new File([blob], `property-${property.id}.${ext}`, { type: blob.type });
+          const shareData: any = { title, text, url, files: [file] };
+          if ((navigator as any).canShare(shareData)) {
+            await (navigator as any).share(shareData);
+            return;
+          }
+        }
+      } catch {
+        // fall through to text-only share
+      }
+    }
+
     try {
       if (typeof navigator !== 'undefined' && (navigator as any).share) {
         await (navigator as any).share({ title, text, url });
