@@ -112,6 +112,24 @@ const ListProperty = () => {
 
   const listingType = form.watch('listingType');
 
+  // Restore a pending listing (form values + dialog state) if the user
+  // refreshed or navigated away while the confirmation dialog was open.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('rumi:pendingListing');
+      if (!raw) return;
+      const saved = JSON.parse(raw) as FormData;
+      form.reset(saved);
+      if (Array.isArray(saved.amenities)) setSelectedAmenities(saved.amenities);
+      setPendingData(saved);
+      setShowClientConfirm(true);
+    } catch (err) {
+      console.error('Failed to restore pending listing', err);
+      localStorage.removeItem('rumi:pendingListing');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Guard against auth context not being ready - AFTER all hooks
   if (!auth || auth.loading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
@@ -352,6 +370,11 @@ const ListProperty = () => {
               const isClient = !role || role === "user";
               if (isClient) {
                 setPendingData(data);
+                try {
+                  localStorage.setItem('rumi:pendingListing', JSON.stringify(data));
+                } catch (err) {
+                  console.error('Failed to persist pending listing', err);
+                }
                 setShowClientConfirm(true);
                 return;
               }
@@ -829,7 +852,16 @@ const ListProperty = () => {
           </form>
         </Form>
 
-        <AlertDialog open={showClientConfirm} onOpenChange={setShowClientConfirm}>
+        <AlertDialog
+          open={showClientConfirm}
+          onOpenChange={(open) => {
+            setShowClientConfirm(open);
+            if (!open) {
+              setPendingData(null);
+              localStorage.removeItem('rumi:pendingListing');
+            }
+          }}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Rumi Full-Service Listing</AlertDialogTitle>
@@ -853,7 +885,15 @@ const ListProperty = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel
+                disabled={isSubmitting}
+                onClick={() => {
+                  setPendingData(null);
+                  localStorage.removeItem('rumi:pendingListing');
+                }}
+              >
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 disabled={isSubmitting}
                 onClick={(e) => {
@@ -862,6 +902,7 @@ const ListProperty = () => {
                     const data = pendingData;
                     setShowClientConfirm(false);
                     setPendingData(null);
+                    localStorage.removeItem('rumi:pendingListing');
                     onSubmit(data);
                   }
                 }}
