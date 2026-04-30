@@ -335,11 +335,52 @@ const ListProperty = () => {
   }
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const newImages: UploadedImage[] = files.map(file => ({
-      file,
-      roomType: '' // Initially no room type selected
-    }));
-    setUploadedImages(prev => [...prev, ...newImages]);
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
+    const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB
+    const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
+
+    const accepted: UploadedImage[] = [];
+    const rejected: string[] = [];
+
+    for (const file of files) {
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      if (!isImage && !isVideo) {
+        rejected.push(`${file.name}: unsupported format`);
+        continue;
+      }
+      if (isImage && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        rejected.push(`${file.name}: image must be JPG, PNG, WEBP or HEIC`);
+        continue;
+      }
+      if (isVideo && !ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        rejected.push(`${file.name}: video must be MP4, MOV or WEBM`);
+        continue;
+      }
+      if (isImage && file.size > MAX_IMAGE_BYTES) {
+        rejected.push(`${file.name}: image exceeds 15MB`);
+        continue;
+      }
+      if (isVideo && file.size > MAX_VIDEO_BYTES) {
+        rejected.push(`${file.name}: video exceeds 100MB`);
+        continue;
+      }
+      accepted.push({ file, roomType: '' });
+    }
+
+    if (rejected.length) {
+      toast({
+        title: 'Some files were skipped',
+        description: rejected.join('\n'),
+        variant: 'destructive',
+      });
+    }
+    if (accepted.length) {
+      setUploadedImages(prev => [...prev, ...accepted]);
+    }
+    // Reset input so re-selecting same file works
+    event.target.value = '';
   };
 
   const updateImageRoomType = (index: number, roomType: string) => {
@@ -885,7 +926,7 @@ const ListProperty = () => {
                     <Label htmlFor="file-upload" className="cursor-pointer">
                       <span className="text-primary hover:text-primary/80">Click to upload</span> or drag and drop
                     </Label>
-                    <Input id="file-upload" type="file" multiple accept="image/*,video/*" onChange={handleFileUpload} className="hidden" />
+                    <Input id="file-upload" type="file" multiple accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/webm" onChange={handleFileUpload} className="hidden" />
                     <p className="text-sm text-muted-foreground">PNG, JPG, MP4 up to 10MB each</p>
                   </div>
                 </div>
@@ -997,10 +1038,31 @@ const ListProperty = () => {
                   <Input
                     id="floor-plan-upload"
                     type="file"
-                    accept="image/*"
+                     accept="image/jpeg,image/png,image/webp"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) setFloorPlanFile(file);
+                      if (!file) return;
+                      const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
+                      const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+                      if (!ALLOWED.includes(file.type)) {
+                        toast({
+                          title: 'Unsupported floor plan format',
+                          description: 'Please upload a PNG, JPG or WEBP image.',
+                          variant: 'destructive',
+                        });
+                        e.target.value = '';
+                        return;
+                      }
+                      if (file.size > MAX_BYTES) {
+                        toast({
+                          title: 'Floor plan too large',
+                          description: 'Maximum size is 10MB.',
+                          variant: 'destructive',
+                        });
+                        e.target.value = '';
+                        return;
+                      }
+                      setFloorPlanFile(file);
                     }}
                     className="hidden"
                   />
