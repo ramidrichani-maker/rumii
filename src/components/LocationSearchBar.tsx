@@ -185,8 +185,18 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               value={location}
               onChange={(e) => onLocationChange(e.target.value)}
               placeholder="Search by area, city, address..."
-              className="pl-10 h-12 text-base"
+              className="pl-10 pr-10 h-12 text-base"
             />
+            {location && (
+              <button
+                type="button"
+                onClick={() => onLocationChange('')}
+                aria-label="Clear location"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
           {/* Mobile-only: collapse all filters behind a single button */}
           <button
@@ -901,7 +911,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
         </div>
       </div>
-      {(activeFilterCount > 0 || !!location) && (
+      {activeFilterCount > 0 && (
         <div className="mt-3 flex flex-wrap justify-end items-center gap-2">
           {activeFilterCount > 0 && (
             <button
@@ -927,34 +937,6 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             >
               <X className="w-3.5 h-3.5" />
               Clear filters ({activeFilterCount})
-            </button>
-          )}
-          {(activeFilterCount > 0 || !!location) && (
-            <button
-              type="button"
-              onClick={() => {
-                // Clear all filters AND the location input
-                onMinBedroomsChange('');
-                onMaxBedroomsChange('');
-                onBarMinPriceChange('');
-                onBarMaxPriceChange('');
-                onPropertyTypesChange([]);
-                onMustHavesChange([]);
-                onFeaturesChange([]);
-                onAddedToOracleChange('');
-                onKeywordsChange('');
-                onRadiusChange(0);
-                if (onUnfurnishedChange) onUnfurnishedChange(false);
-                setActiveBedroomTab(null);
-                setActivePriceTab(null);
-                setActiveFilterBedroomTab(null);
-                setActiveFilterPriceTab(null);
-                onLocationChange('');
-              }}
-              className="h-9 px-4 rounded-xl border border-destructive/40 bg-destructive/5 text-destructive text-sm font-medium hover:bg-destructive/10 transition-colors inline-flex items-center gap-1.5"
-            >
-              <X className="w-3.5 h-3.5" />
-              Clear all (incl. location)
             </button>
           )}
         </div>
