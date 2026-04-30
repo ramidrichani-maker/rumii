@@ -35,6 +35,7 @@ interface Property {
   latitude?: number;
   longitude?: number;
   floor_plan_url?: string;
+  floor_plan_urls?: string[];
 }
 
 const PropertyDetail = () => {
@@ -54,6 +55,7 @@ const PropertyDetail = () => {
   const [satelliteView, setSatelliteView] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showFloorPlan, setShowFloorPlan] = useState(false);
+  const [floorPlanIndex, setFloorPlanIndex] = useState(0);
   const [showMapOverlay, setShowMapOverlay] = useState(false);
   const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
