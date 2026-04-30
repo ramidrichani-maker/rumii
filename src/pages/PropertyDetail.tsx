@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers, Share2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getCityCenter } from "@/utils/cityCenter";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 interface Property {
   id: string;
