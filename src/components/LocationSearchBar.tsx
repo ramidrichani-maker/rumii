@@ -185,8 +185,18 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               value={location}
               onChange={(e) => onLocationChange(e.target.value)}
               placeholder="Search by area, city, address..."
-              className="pl-10 h-12 text-base"
+              className="pl-10 pr-10 h-12 text-base"
             />
+            {location && (
+              <button
+                type="button"
+                onClick={() => onLocationChange('')}
+                aria-label="Clear location"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
           {/* Mobile-only: collapse all filters behind a single button */}
           <button
