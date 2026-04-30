@@ -25,7 +25,8 @@ import {
   Sparkles,
   Image as ImageIcon,
   Phone,
-  Mail
+  Mail,
+  Share2
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -278,6 +279,44 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             {getStatusBadge(property.status)}
           </div>
         </DialogHeader>
+
+        {/* Share button */}
+        <div className="flex justify-end -mt-2 mb-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async (e) => {
+              e.stopPropagation();
+              const url = `${window.location.origin}/property/${property.id}`;
+              const title = `${property.property_type} in ${property.city}`;
+              const text = property.address || title;
+              try {
+                const imageUrl = property.images?.find((m: string) => !isVideoUrl(m));
+                if (imageUrl) {
+                  try {
+                    const res = await fetch(imageUrl, { mode: 'cors' });
+                    const blob = await res.blob();
+                    const file = new File([blob], `property-${property.id}.jpg`, { type: blob.type });
+                    const shareData: any = { title, text, url, files: [file] };
+                    if (navigator.canShare && navigator.canShare(shareData)) {
+                      await navigator.share(shareData);
+                      return;
+                    }
+                  } catch {}
+                }
+                if (navigator.share) {
+                  await navigator.share({ title, text, url });
+                } else {
+                  await navigator.clipboard.writeText(url);
+                  toast({ title: "Link copied", description: "Property link copied to clipboard." });
+                }
+              } catch {}
+            }}
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            Share
+          </Button>
+        </div>
 
         {/* Images and Videos Carousel */}
         {property.images && property.images.length > 0 && (
