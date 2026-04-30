@@ -1065,8 +1065,8 @@ const ListProperty = () => {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit" size="lg" className="px-8" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "List Property"}
+              <Button type="submit" size="lg" className="px-8" disabled={isSubmitting || isPreparingConfirm}>
+                {isPreparingConfirm ? "Preparing..." : isSubmitting ? "Submitting..." : "List Property"}
               </Button>
             </div>
           </form>
@@ -1075,10 +1075,19 @@ const ListProperty = () => {
         <AlertDialog
           open={showClientConfirm}
           onOpenChange={(open) => {
+            // Block closing while a submission is in flight
+            if (!open && isSubmitting) return;
             setShowClientConfirm(open);
             if (!open) {
+              // Treat any close as a cancellation: purge persisted media
+              const imgs = uploadedImages
+                .filter((i) => i.persisted)
+                .map((i) => ({ path: i.persisted!.path }));
+              purgePersistedMedia(imgs, persistedFloorPlan);
+              setUploadedImages((prev) => prev.filter((i) => !i.persisted));
+              setPersistedFloorPlan(null);
               setPendingData(null);
-              localStorage.removeItem('rumi:pendingListing');
+              clearPendingPersistence();
             }
           }}
         >
@@ -1105,24 +1114,18 @@ const ListProperty = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel
-                disabled={isSubmitting}
-                onClick={() => {
-                  setPendingData(null);
-                  localStorage.removeItem('rumi:pendingListing');
-                }}
-              >
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 disabled={isSubmitting}
                 onClick={(e) => {
                   e.preventDefault();
                   if (pendingData) {
                     const data = pendingData;
-                    setShowClientConfirm(false);
                     setPendingData(null);
-                    localStorage.removeItem('rumi:pendingListing');
+                    // Note: we don't clear localStorage here — onSubmit will
+                    // do it on success. This way a mid-submit refresh can
+                    // still recover the pending listing.
+                    setShowClientConfirm(false);
                     onSubmit(data);
                   }
                 }}
