@@ -13,6 +13,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -86,6 +96,8 @@ const ListProperty = () => {
     lng: 35.5018
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showClientConfirm, setShowClientConfirm] = useState(false);
+  const [pendingData, setPendingData] = useState<FormData | null>(null);
   const auth = useAuth();
   const { user, profile } = auth;
   const form = useForm<FormData>({
@@ -266,7 +278,7 @@ const ListProperty = () => {
       if (error) throw error;
 
       // Record broker agreement for legal purposes
-      const agreementText = "By listing this property, I agree that Summit will act as my exclusive real estate broker. This includes providing professional agents, marketing services, property viewings, and facilitating the rental or sale process on my behalf. I have read and agree to the full Terms of Service.";
+      const agreementText = "By listing this property, I agree that Rumi will act as my exclusive real estate broker, providing the full service of managing the property — including marketing, conducting viewings, and meeting with prospective buyers and renters on my behalf. I agree that upon a successful sale Rumi will receive a commission of 2.5% from the seller, and in the case of a rental agreement, a commission equal to one month's rent. I have read and agree to the full Terms of Service.";
       
       const { error: agreementError } = await supabase.from('broker_agreements').insert({
         user_id: user.id,
