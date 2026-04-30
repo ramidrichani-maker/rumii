@@ -828,6 +828,49 @@ const ListProperty = () => {
             </div>
           </form>
         </Form>
+
+        <AlertDialog open={showClientConfirm} onOpenChange={setShowClientConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Rumi Full-Service Listing</AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <p>
+                    By confirming this listing, you agree that <strong>Rumi</strong> will provide the
+                    full service of managing your property. This includes marketing the listing,
+                    <strong> conducting all viewings</strong>, and meeting with prospective buyers and renters
+                    on your behalf.
+                  </p>
+                  <p>
+                    Upon a successful transaction, Rumi will receive:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>2.5% commission</strong> from the seller in the event of a sale.</li>
+                    <li><strong>One month's rent</strong> in the event of a rental agreement.</li>
+                  </ul>
+                  <p>Do you agree to these terms and wish to submit your listing?</p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={isSubmitting}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (pendingData) {
+                    const data = pendingData;
+                    setShowClientConfirm(false);
+                    setPendingData(null);
+                    onSubmit(data);
+                  }
+                }}
+              >
+                Agree & Submit
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>;
 };
