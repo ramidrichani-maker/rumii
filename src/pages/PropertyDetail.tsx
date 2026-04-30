@@ -7,6 +7,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import { Button } from "@/components/ui/button";
 import AgentContactBox from "@/components/AgentContactBox";
+import CommuteTimes from "@/components/CommuteTimes";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getCityCenter } from "@/utils/cityCenter";
@@ -664,6 +665,13 @@ const PropertyDetail = () => {
                 <div ref={expandedMapRef} className="flex-1" />
               </div>
             )}
+
+            {/* Commute time estimates */}
+            <CommuteTimes
+              originLat={cityCoords.lat}
+              originLng={cityCoords.lng}
+              city={property.city}
+            />
 
           </div>
         )}
