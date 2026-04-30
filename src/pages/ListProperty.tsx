@@ -727,6 +727,26 @@ const ListProperty = () => {
                   });
                   return;
                 }
+                // Block confirmation while any media is still uploading.
+                const stillUploading = uploadedImages.filter(img => img.status === 'uploading');
+                if (stillUploading.length > 0) {
+                  toast({
+                    title: "Uploads in progress",
+                    description: `Please wait — ${stillUploading.length} file${stillUploading.length > 1 ? 's are' : ' is'} still uploading.`,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                // Block confirmation if any media failed — user must retry or remove.
+                const failed = uploadedImages.filter(img => img.status === 'failed');
+                if (failed.length > 0) {
+                  toast({
+                    title: "Some uploads failed",
+                    description: `Retry or remove the ${failed.length} failed file${failed.length > 1 ? 's' : ''} before continuing.`,
+                    variant: "destructive",
+                  });
+                  return;
+                }
                 const ok = await persistPendingListing(data);
                 if (!ok) return;
                 setPendingData(data);
