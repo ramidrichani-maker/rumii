@@ -220,6 +220,19 @@ const Purchase = () => {
     fetchProperties();
   }, []);
 
+  // Realtime: refetch when properties change (new approvals, edits, deletes)
+  useEffect(() => {
+    const channel = supabase
+      .channel('purchase-properties-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'properties' },
+        () => { fetchProperties(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchProperties();

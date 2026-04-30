@@ -206,6 +206,19 @@ const Rent = () => {
     fetchProperties();
   }, []);
 
+  // Realtime: refetch when properties change (new approvals, edits, deletes)
+  useEffect(() => {
+    const channel = supabase
+      .channel('rent-properties-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'properties' },
+        () => { fetchProperties(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchProperties();
