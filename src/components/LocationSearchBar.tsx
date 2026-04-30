@@ -131,7 +131,24 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeBedroomTab, setActiveBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
+
+  // Count of active filters (excluding the location input itself), used for
+  // the mobile collapsed "Filters" button badge.
+  const activeFilterCount = [
+    radius !== 0,
+    !!barMinBedrooms,
+    !!barMaxBedrooms,
+    !!barMinPrice,
+    !!barMaxPrice,
+    selectedPropertyTypes.length > 0,
+    selectedMustHaves.length > 0,
+    selectedFeatures.length > 0,
+    !!addedToOracle,
+    !!keywords,
+    !!unfurnishedOnly,
+  ].filter(Boolean).length;
 
   const bedroomMobileRef = useRef<HTMLDivElement>(null);
   const priceMobileRef = useRef<HTMLDivElement>(null);
