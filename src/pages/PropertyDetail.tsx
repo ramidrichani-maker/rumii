@@ -63,6 +63,7 @@ const PropertyDetail = () => {
   const [showMapOverlay, setShowMapOverlay] = useState(false);
   const [cityCoords, setCityCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const isMobile = useIsMobile();
 
   const miniMapRef = useRef<HTMLDivElement>(null);
@@ -351,7 +352,16 @@ const PropertyDetail = () => {
           {showGallery ? (
             <div className="p-3 pb-16 grid grid-cols-2 gap-2 bg-muted">
               {(property.images || []).map((img, i) => (
-                <div key={i} className="aspect-[4/3] rounded-md overflow-hidden bg-background">
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    setFullscreenIndex(i);
+                    setFullscreenOpen(true);
+                  }}
+                  className="aspect-[4/3] rounded-md overflow-hidden bg-background block"
+                  aria-label={`Open photo ${i + 1} fullscreen`}
+                >
                   <img
                     src={img}
                     alt={`Photo ${i + 1}`}
@@ -360,7 +370,7 @@ const PropertyDetail = () => {
                       (e.target as HTMLImageElement).src = "/placeholder.svg";
                     }}
                   />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -674,7 +684,7 @@ const PropertyDetail = () => {
       {fullscreenOpen && property.images?.length > 0 && (
         <FullscreenImageViewer
           images={property.images}
-          initialIndex={carousel.currentIndex}
+          initialIndex={showGallery ? fullscreenIndex : carousel.currentIndex}
           onClose={() => setFullscreenOpen(false)}
         />
       )}
