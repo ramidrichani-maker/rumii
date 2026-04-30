@@ -353,6 +353,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onClick={() => {
                           if (activeBedroomTab === 'min') onMinBedroomsChange('');
                           else onMaxBedroomsChange('');
+                          setActiveBedroomTab(null);
                         }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
@@ -368,7 +369,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         return (
                           <button
                             key={`${activeBedroomTab}-${opt}`}
-                            onClick={() => onChange(currentVal === opt ? '' : opt)}
+                            onClick={() => {
+                              onChange(currentVal === opt ? '' : opt);
+                              setActiveBedroomTab(null);
+                            }}
                             className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                               currentVal === opt
                                 ? 'border-primary bg-primary text-primary-foreground'
