@@ -80,9 +80,9 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
     );
   }
 
-  const displayAgencyName = agencyName || "Oracle";
+  const displayAgencyName = agencyName || "Rumi";
   const displayPhone = agent?.phone_number || "+96170612686";
-  const displayAgentName = agent?.full_name || "Oracle Agent";
+  const displayAgentName = agent?.full_name || "Rumi Agent";
 
   const cleanPhone = displayPhone.replace(/[^+\d]/g, '');
   const whatsappUrl = `https://wa.me/${cleanPhone.replace('+', '')}`;
