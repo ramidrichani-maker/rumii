@@ -686,32 +686,57 @@ const PropertyDetail = () => {
       </div>
 
       {/* Floor plan overlay */}
-      {showFloorPlan && property.floor_plan_url && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center">
-          <div className="w-full max-w-4xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-foreground">Floor Plan</h3>
-              <button
-                onClick={() => setShowFloorPlan(false)}
-                className="p-2 rounded-full hover:bg-muted transition-colors"
-                aria-label="Close floor plan"
-              >
-                <X className="w-5 h-5 text-foreground" />
-              </button>
-            </div>
-            <div className="rounded-xl overflow-hidden bg-muted">
-              <img
-                src={property.floor_plan_url}
-                alt="Floor plan"
-                className="w-full h-auto object-contain max-h-[80vh]"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/placeholder.svg";
-                }}
-              />
+      {showFloorPlan && (() => {
+        const floorPlans = (property.floor_plan_urls && property.floor_plan_urls.length > 0)
+          ? property.floor_plan_urls
+          : (property.floor_plan_url ? [property.floor_plan_url] : []);
+        if (floorPlans.length === 0) return null;
+        const safeIdx = Math.min(floorPlanIndex, floorPlans.length - 1);
+        return (
+          <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center">
+            <div className="w-full max-w-4xl mx-auto px-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Floor Plan{floorPlans.length > 1 ? ` ${safeIdx + 1} / ${floorPlans.length}` : ""}
+                </h3>
+                <button
+                  onClick={() => setShowFloorPlan(false)}
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
+                  aria-label="Close floor plan"
+                >
+                  <X className="w-5 h-5 text-foreground" />
+                </button>
+              </div>
+              <div className="rounded-xl overflow-hidden bg-muted">
+                <img
+                  src={floorPlans[safeIdx]}
+                  alt={`Floor plan ${safeIdx + 1}`}
+                  className="w-full h-auto object-contain max-h-[70vh]"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/placeholder.svg";
+                  }}
+                />
+              </div>
+              {floorPlans.length > 1 && (
+                <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+                  {floorPlans.map((url, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setFloorPlanIndex(i)}
+                      className={`w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
+                        i === safeIdx ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
+                      }`}
+                      aria-label={`View floor plan ${i + 1}`}
+                    >
+                      <img src={url} alt={`Floor plan ${i + 1} thumbnail`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Map overlay (from image bar) */}
       {showMapOverlay && (
