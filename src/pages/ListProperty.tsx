@@ -13,6 +13,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -86,6 +96,8 @@ const ListProperty = () => {
     lng: 35.5018
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showClientConfirm, setShowClientConfirm] = useState(false);
+  const [pendingData, setPendingData] = useState<FormData | null>(null);
   const auth = useAuth();
   const { user, profile } = auth;
   const form = useForm<FormData>({
@@ -266,7 +278,7 @@ const ListProperty = () => {
       if (error) throw error;
 
       // Record broker agreement for legal purposes
-      const agreementText = "By listing this property, I agree that Summit will act as my exclusive real estate broker. This includes providing professional agents, marketing services, property viewings, and facilitating the rental or sale process on my behalf. I have read and agree to the full Terms of Service.";
+      const agreementText = "By listing this property, I agree that Rumi will act as my exclusive real estate broker, providing the full service of managing the property — including marketing, conducting viewings, and meeting with prospective buyers and renters on my behalf. I agree that upon a successful sale Rumi will receive a commission of 2.5% from the seller, and in the case of a rental agreement, a commission equal to one month's rent. I have read and agree to the full Terms of Service.";
       
       const { error: agreementError } = await supabase.from('broker_agreements').insert({
         user_id: user.id,
@@ -334,7 +346,19 @@ const ListProperty = () => {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit((data) => {
+              const role = profile?.role;
+              const isClient = !role || role === "user";
+              if (isClient) {
+                setPendingData(data);
+                setShowClientConfirm(true);
+                return;
+              }
+              onSubmit(data);
+            })}
+            className="space-y-8"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Basic Information */}
               <Card className="relative z-10">
@@ -779,9 +803,11 @@ const ListProperty = () => {
                           I agree to the broker terms
                         </FormLabel>
                         <p className="text-sm text-muted-foreground">
-                          By listing this property, I agree that Summit will act as my exclusive real estate broker. 
-                          This includes providing professional agents, marketing services, property viewings, 
-                          and facilitating the rental or sale process on my behalf.{" "}
+                          By listing this property, I agree that Rumi will act as my exclusive real estate broker
+                          and provide the full service of managing the property — including marketing,
+                          conducting viewings, and meeting with prospective buyers and renters on my behalf.
+                          Upon a successful sale, Rumi receives a commission of <strong>2.5% from the seller</strong>;
+                          in the case of a rental agreement, the commission is <strong>one month's rent</strong>.{" "}
                           <Link to="/terms-of-service" className="text-primary hover:underline" target="_blank">
                             Read full Terms of Service
                           </Link>
@@ -802,6 +828,49 @@ const ListProperty = () => {
             </div>
           </form>
         </Form>
+
+        <AlertDialog open={showClientConfirm} onOpenChange={setShowClientConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Rumi Full-Service Listing</AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <p>
+                    By confirming this listing, you agree that <strong>Rumi</strong> will provide the
+                    full service of managing your property. This includes marketing the listing,
+                    <strong> conducting all viewings</strong>, and meeting with prospective buyers and renters
+                    on your behalf.
+                  </p>
+                  <p>
+                    Upon a successful transaction, Rumi will receive:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>2.5% commission</strong> from the seller in the event of a sale.</li>
+                    <li><strong>One month's rent</strong> in the event of a rental agreement.</li>
+                  </ul>
+                  <p>Do you agree to these terms and wish to submit your listing?</p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={isSubmitting}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (pendingData) {
+                    const data = pendingData;
+                    setShowClientConfirm(false);
+                    setPendingData(null);
+                    onSubmit(data);
+                  }
+                }}
+              >
+                Agree & Submit
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>;
 };
