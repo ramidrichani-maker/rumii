@@ -195,7 +195,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             aria-controls="mobile-filters-panel"
             className="md:hidden h-12 px-4 rounded-md border border-border bg-background/40 text-sm font-medium flex items-center gap-2 shrink-0 hover:border-primary/50 transition-colors"
           >
-            <Filter className="w-4 h-4" />
+            <SlidersHorizontal className="w-4 h-4" />
             Filters
             {activeFilterCount > 0 && (
               <span className="ml-1 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
