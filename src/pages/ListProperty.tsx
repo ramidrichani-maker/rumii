@@ -522,7 +522,7 @@ const ListProperty = () => {
       const next = prev.map((img, i) => (i === index ? { ...img, roomType } : img));
       // If we have any persisted media + a saved pending payload, keep it in sync
       if (next.some(i => i.persisted) && localStorage.getItem(PENDING_STORAGE_KEY)) {
-        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlan);
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
       }
       return next;
     });
@@ -555,24 +555,28 @@ const ListProperty = () => {
     });
   };
 
-  const removeFloorPlan = () => {
-    if (persistedFloorPlan?.path) {
-      supabase.storage.from('property-images').remove([persistedFloorPlan.path]).catch((err) => {
+  const removePersistedFloorPlan = (idx: number) => {
+    const target = persistedFloorPlans[idx];
+    if (target?.path) {
+      supabase.storage.from('property-images').remove([target.path]).catch((err) => {
         console.error('Failed to remove persisted floor plan', err);
       });
     }
-    setPersistedFloorPlan(null);
-    setFloorPlanFile(null);
+    const nextPersisted = persistedFloorPlans.filter((_, i) => i !== idx);
+    setPersistedFloorPlans(nextPersisted);
     try {
       const raw = localStorage.getItem(PENDING_STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw) as PendingListingPayload;
-        saved.floorPlan = null;
+        saved.floorPlans = nextPersisted;
         localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(saved));
       }
     } catch (err) {
       console.error('Failed to update pending listing after floor plan removal', err);
     }
+  };
+  const removePendingFloorPlan = (idx: number) => {
+    setFloorPlanFiles(prev => prev.filter((_, i) => i !== idx));
   };
   const handleAmenityToggle = (amenity: string) => {
     const updatedAmenities = selectedAmenities.includes(amenity) ? selectedAmenities.filter(a => a !== amenity) : [...selectedAmenities, amenity];
