@@ -358,40 +358,38 @@ const ListProperty = () => {
     const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
 
     const accepted: UploadedImage[] = [];
-    const rejected: string[] = [];
+    const rejected: RejectedFile[] = [];
+    const mkId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const sizeMB = (n: number) => (n / (1024 * 1024)).toFixed(1);
 
     for (const file of files) {
       const isImage = file.type.startsWith('image/');
       const isVideo = file.type.startsWith('video/');
       if (!isImage && !isVideo) {
-        rejected.push(`${file.name}: unsupported format`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Unsupported format' });
         continue;
       }
       if (isImage && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        rejected.push(`${file.name}: image must be JPG, PNG, WEBP or HEIC`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Image must be JPG, PNG, WEBP or HEIC' });
         continue;
       }
       if (isVideo && !ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        rejected.push(`${file.name}: video must be MP4, MOV or WEBM`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Video must be MP4, MOV or WEBM' });
         continue;
       }
       if (isImage && file.size > MAX_IMAGE_BYTES) {
-        rejected.push(`${file.name}: image exceeds 15MB`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Image exceeds 15MB limit' });
         continue;
       }
       if (isVideo && file.size > MAX_VIDEO_BYTES) {
-        rejected.push(`${file.name}: video exceeds 100MB`);
+        rejected.push({ id: mkId(), name: file.name, sizeMB: sizeMB(file.size), reason: 'Video exceeds 100MB limit' });
         continue;
       }
-      accepted.push({ file, roomType: '' });
+      accepted.push({ file, roomType: '', status: 'idle', progress: 0 });
     }
 
     if (rejected.length) {
-      toast({
-        title: 'Some files were skipped',
-        description: rejected.join('\n'),
-        variant: 'destructive',
-      });
+      setRejectedFiles(prev => [...prev, ...rejected]);
     }
     if (accepted.length) {
       setUploadedImages(prev => [...prev, ...accepted]);
@@ -399,6 +397,12 @@ const ListProperty = () => {
     // Reset input so re-selecting same file works
     event.target.value = '';
   };
+
+  const dismissRejectedFile = (id: string) => {
+    setRejectedFiles(prev => prev.filter(r => r.id !== id));
+  };
+
+  const dismissAllRejected = () => setRejectedFiles([]);
 
   const updateImageRoomType = (index: number, roomType: string) => {
     setUploadedImages(prev => prev.map((img, i) => 
