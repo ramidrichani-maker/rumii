@@ -334,12 +334,12 @@ const PropertyDetail = () => {
           Back
         </Button>
 
-        {/* Image carousel */}
+        {/* Image carousel / inline gallery */}
         <div
-          className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-muted group"
-          onTouchStart={carousel.onTouchStart}
-          onTouchMove={carousel.onTouchMove}
-          onTouchEnd={() => {
+          className={`relative w-full rounded-xl overflow-hidden bg-muted group ${showGallery ? "" : "aspect-[16/10]"}`}
+          onTouchStart={showGallery ? undefined : carousel.onTouchStart}
+          onTouchMove={showGallery ? undefined : carousel.onTouchMove}
+          onTouchEnd={showGallery ? undefined : () => {
             carousel.onTouchEnd();
             if (isMobile && !carousel.wasSwipe() && property.images?.length > 0) {
               setTimeout(() => {
@@ -348,6 +348,23 @@ const PropertyDetail = () => {
             }
           }}
         >
+          {showGallery ? (
+            <div className="p-3 pb-16 grid grid-cols-2 gap-2 bg-muted">
+              {(property.images || []).map((img, i) => (
+                <div key={i} className="aspect-[4/3] rounded-md overflow-hidden bg-background">
+                  <img
+                    src={img}
+                    alt={`Photo ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/placeholder.svg";
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+          <>
           <div
             className="flex h-full"
             style={{
@@ -407,6 +424,8 @@ const PropertyDetail = () => {
               </div>
             </>
           )}
+          </>
+          )}
 
           {/* Bottom overlay bar */}
           <div
@@ -419,8 +438,8 @@ const PropertyDetail = () => {
             {/* Photos button */}
             {photoCount > 0 && (
               <button
-                onClick={() => setShowGallery(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
+                onClick={() => setShowGallery((v) => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors text-white text-sm font-medium ${showGallery ? "bg-white/35" : "bg-white/15 hover:bg-white/25"}`}
               >
                 <Image className="w-4 h-4" />
                 {photoCount} photo{photoCount !== 1 ? "s" : ""}
@@ -606,54 +625,6 @@ const PropertyDetail = () => {
         </div>
         </div>
       </div>
-
-      {/* Gallery overlay */}
-      {showGallery && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto">
-          <div className="max-w-5xl mx-auto px-4 py-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-foreground">
-                All Photos ({photoCount})
-              </h3>
-              <button
-                onClick={() => setShowGallery(false)}
-                className="p-2 rounded-full hover:bg-muted transition-colors"
-                aria-label="Close gallery"
-              >
-                <X className="w-5 h-5 text-foreground" />
-              </button>
-            </div>
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="flex-1 min-w-0">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {property.images.map((img, i) => (
-                    <div key={i} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      <img
-                        src={img}
-                        alt={`Photo ${i + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/placeholder.svg";
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="lg:w-[300px] shrink-0">
-                <AgentContactBox
-                  propertyId={property.id}
-                  agencyId={property.agency_id}
-                  propertyAddress={property.address}
-                  propertyType={property.property_type}
-                  propertyPrice={property.price}
-                  listingType={property.listing_type}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Floor plan overlay */}
       {showFloorPlan && property.floor_plan_url && (
