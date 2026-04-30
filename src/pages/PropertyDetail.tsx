@@ -537,6 +537,14 @@ const PropertyDetail = () => {
           </div>
         </div>
 
+        {/* Desktop share button: below image, left aligned */}
+        <div className="hidden md:flex mt-3">
+          <Button variant="outline" size="sm" onClick={handleShare}>
+            <Share2 className="w-4 h-4 mr-2" />
+            Share
+          </Button>
+        </div>
+
         {/* Property info */}
         <div className="mt-6 space-y-2">
           <p className="text-3xl font-bold text-foreground">
