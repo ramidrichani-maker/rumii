@@ -517,9 +517,14 @@ const ListProperty = () => {
   const dismissAllRejected = () => setRejectedFiles([]);
 
   const updateImageRoomType = (index: number, roomType: string) => {
-    setUploadedImages(prev => prev.map((img, i) => 
-      i === index ? { ...img, roomType } : img
-    ));
+    setUploadedImages(prev => {
+      const next = prev.map((img, i) => (i === index ? { ...img, roomType } : img));
+      // If we have any persisted media + a saved pending payload, keep it in sync
+      if (next.some(i => i.persisted) && localStorage.getItem(PENDING_STORAGE_KEY)) {
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlan);
+      }
+      return next;
+    });
   };
 
   const removeFile = (index: number) => {
