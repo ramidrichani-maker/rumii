@@ -226,7 +226,7 @@ const Auth = () => {
         }
       }
 
-      toast({ title: 'Account created!', description: 'Welcome to Oracle Estates.' });
+      toast({ title: 'Account created!', description: 'Welcome to Rumi.' });
       navigate('/');
     } catch {
       toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
