@@ -319,6 +319,47 @@ const PropertyDetail = () => {
     property.images && property.images.length > 0
       ? property.images[currentImageIndex]
       : null;
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!property) return;
+    const url = `${window.location.origin}/property/${property.id}`;
+    const title = `${property.property_type} in ${property.city}`;
+    const text = `${title} — $${property.price?.toLocaleString?.() ?? property.price}`;
+    const imageUrl = property.images?.[0];
+    if (imageUrl && (navigator as any).share && (navigator as any).canShare) {
+      try {
+        const res = await fetch(imageUrl, { mode: 'cors' });
+        if (res.ok) {
+          const blob = await res.blob();
+          const ext = (blob.type.split('/')[1] || 'jpg').split('+')[0];
+          const file = new File([blob], `property-${property.id}.${ext}`, { type: blob.type });
+          const shareData: any = { title, text, url, files: [file] };
+          if ((navigator as any).canShare(shareData)) {
+            await (navigator as any).share(shareData);
+            return;
+          }
+        }
+      } catch {}
+    }
+    try {
+      if ((navigator as any).share) {
+        await (navigator as any).share({ title, text, url });
+        return;
+      }
+    } catch {}
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied", description: "Property link copied to clipboard." });
+    } catch {
+      toast({ title: "Couldn't copy link", description: url, variant: "destructive" });
+    }
+  };
+
+  const _placeholderUnused =
+    property.images && property.images.length > 0
+      ? property.images[currentImageIndex]
+      : null;
   const photoCount = property.images?.length || 0;
 
   const formatPrice = (price: number, listingType: string) => {
