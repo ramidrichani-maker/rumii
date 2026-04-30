@@ -132,6 +132,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeFilterBedroomTab, setActiveFilterBedroomTab] = useState<'min' | 'max' | null>(null);
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [radiusOpen, setRadiusOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
   // Count of active filters (excluding the location input itself), used for
@@ -215,7 +216,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Row 1: Radius */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
-          <Popover>
+          <Popover open={radiusOpen} onOpenChange={setRadiusOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
                 <span className="text-sm font-medium">Radius: {selectedLabel}</span>
@@ -227,7 +228,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 {radiusOptions.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => onRadiusChange(option.value)}
+                    onClick={() => {
+                      onRadiusChange(option.value);
+                      setRadiusOpen(false);
+                    }}
                     className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                       radius === option.value
                         ? 'border-primary bg-primary text-primary-foreground'
@@ -349,6 +353,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onClick={() => {
                           if (activeBedroomTab === 'min') onMinBedroomsChange('');
                           else onMaxBedroomsChange('');
+                          setActiveBedroomTab(null);
                         }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           (activeBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
@@ -364,7 +369,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         return (
                           <button
                             key={`${activeBedroomTab}-${opt}`}
-                            onClick={() => onChange(currentVal === opt ? '' : opt)}
+                            onClick={() => {
+                              onChange(currentVal === opt ? '' : opt);
+                              setActiveBedroomTab(null);
+                            }}
                             className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                               currentVal === opt
                                 ? 'border-primary bg-primary text-primary-foreground'
@@ -489,6 +497,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onClick={() => {
                           if (activePriceTab === 'min') onBarMinPriceChange('');
                           else onBarMaxPriceChange('');
+                          setActivePriceTab(null);
                         }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           (activePriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
@@ -505,7 +514,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         return (
                           <button
                             key={`${activePriceTab}-${price}`}
-                            onClick={() => onChange(currentVal === val ? '' : val)}
+                            onClick={() => {
+                              onChange(currentVal === val ? '' : val);
+                              setActivePriceTab(null);
+                            }}
                             className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                               currentVal === val
                                 ? 'border-primary bg-primary text-primary-foreground'
@@ -627,6 +639,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       onClick={() => {
                         if (activeFilterBedroomTab === 'min') onMinBedroomsChange('');
                         else onMaxBedroomsChange('');
+                        setActiveFilterBedroomTab(null);
                       }}
                       className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                         (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
@@ -642,7 +655,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       return (
                         <button
                           key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
-                          onClick={() => onChange(currentVal === opt ? '' : opt)}
+                          onClick={() => {
+                            onChange(currentVal === opt ? '' : opt);
+                            setActiveFilterBedroomTab(null);
+                          }}
                           className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                             currentVal === opt
                               ? 'border-primary bg-primary text-primary-foreground'
@@ -690,6 +706,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onClick={() => {
                           if (activeFilterPriceTab === 'min') onBarMinPriceChange('');
                           else onBarMaxPriceChange('');
+                          setActiveFilterPriceTab(null);
                         }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                           (activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
@@ -706,7 +723,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         return (
                           <button
                             key={`filter-price-${activeFilterPriceTab}-${price}`}
-                            onClick={() => onChange(currentVal === val ? '' : val)}
+                            onClick={() => {
+                              onChange(currentVal === val ? '' : val);
+                              setActiveFilterPriceTab(null);
+                            }}
                             className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                               currentVal === val
                                 ? 'border-primary bg-primary text-primary-foreground'
