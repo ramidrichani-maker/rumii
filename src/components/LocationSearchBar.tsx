@@ -815,6 +815,19 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 </div>
               )}
 
+              {/* New homes only toggle */}
+              {onNewHomesOnlyChange !== undefined && (
+                <div className="mt-2">
+                  <button
+                    onClick={() => onNewHomesOnlyChange(!newHomesOnly)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                  >
+                    <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
+                    <span className="text-sm font-medium">Show only new homes (built in last 5 years)</span>
+                  </button>
+                </div>
+              )}
+
               <div className="border-t border-border" />
 
               {/* Must-Haves section */}
