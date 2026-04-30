@@ -881,32 +881,62 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
         </div>
       </div>
-      {activeFilterCount > 0 && (
-        <div className="mt-3 flex justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              onMinBedroomsChange('');
-              onMaxBedroomsChange('');
-              onBarMinPriceChange('');
-              onBarMaxPriceChange('');
-              onPropertyTypesChange([]);
-              onMustHavesChange([]);
-              onFeaturesChange([]);
-              onAddedToOracleChange('');
-              onKeywordsChange('');
-              onRadiusChange(0);
-              if (onUnfurnishedChange) onUnfurnishedChange(false);
-              setActiveBedroomTab(null);
-              setActivePriceTab(null);
-              setActiveFilterBedroomTab(null);
-              setActiveFilterPriceTab(null);
-            }}
-            className="h-9 px-4 rounded-xl border border-border bg-background/40 text-sm font-medium hover:border-primary/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
-          >
-            <X className="w-3.5 h-3.5" />
-            Clear filters ({activeFilterCount})
-          </button>
+      {(activeFilterCount > 0 || !!location) && (
+        <div className="mt-3 flex flex-wrap justify-end items-center gap-2">
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                onMinBedroomsChange('');
+                onMaxBedroomsChange('');
+                onBarMinPriceChange('');
+                onBarMaxPriceChange('');
+                onPropertyTypesChange([]);
+                onMustHavesChange([]);
+                onFeaturesChange([]);
+                onAddedToOracleChange('');
+                onKeywordsChange('');
+                onRadiusChange(0);
+                if (onUnfurnishedChange) onUnfurnishedChange(false);
+                setActiveBedroomTab(null);
+                setActivePriceTab(null);
+                setActiveFilterBedroomTab(null);
+                setActiveFilterPriceTab(null);
+              }}
+              className="h-9 px-4 rounded-xl border border-border bg-background/40 text-sm font-medium hover:border-primary/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear filters ({activeFilterCount})
+            </button>
+          )}
+          {(activeFilterCount > 0 || !!location) && (
+            <button
+              type="button"
+              onClick={() => {
+                // Clear all filters AND the location input
+                onMinBedroomsChange('');
+                onMaxBedroomsChange('');
+                onBarMinPriceChange('');
+                onBarMaxPriceChange('');
+                onPropertyTypesChange([]);
+                onMustHavesChange([]);
+                onFeaturesChange([]);
+                onAddedToOracleChange('');
+                onKeywordsChange('');
+                onRadiusChange(0);
+                if (onUnfurnishedChange) onUnfurnishedChange(false);
+                setActiveBedroomTab(null);
+                setActivePriceTab(null);
+                setActiveFilterBedroomTab(null);
+                setActiveFilterPriceTab(null);
+                onLocationChange('');
+              }}
+              className="h-9 px-4 rounded-xl border border-destructive/40 bg-destructive/5 text-destructive text-sm font-medium hover:bg-destructive/10 transition-colors inline-flex items-center gap-1.5"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear all (incl. location)
+            </button>
+          )}
         </div>
       )}
     </div>
