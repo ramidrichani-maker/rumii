@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
-import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal } from 'lucide-react';
+import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal, X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
@@ -879,11 +879,12 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </PopoverContent>
         </Popover>
         </div>
-        {(minBedrooms || maxBedrooms || barMinPrice || barMaxPrice ||
-          selectedPropertyTypes.length > 0 || selectedMustHaves.length > 0 ||
-          selectedFeatures.length > 0 || addedToOracle || keywords ||
-          unfurnishedOnly || radius > 0) && (
+        </div>
+      </div>
+      {activeFilterCount > 0 && (
+        <div className="mt-3 flex justify-end">
           <button
+            type="button"
             onClick={() => {
               onMinBedroomsChange('');
               onMaxBedroomsChange('');
@@ -901,13 +902,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               setActiveFilterBedroomTab(null);
               setActiveFilterPriceTab(null);
             }}
-            className="md:hidden h-10 px-4 rounded-xl border border-border bg-background/15 text-sm font-medium hover:border-primary/50 transition-colors"
+            className="h-9 px-4 rounded-xl border border-border bg-background/40 text-sm font-medium hover:border-primary/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
           >
-            Clear all filters
+            <X className="w-3.5 h-3.5" />
+            Clear filters ({activeFilterCount})
           </button>
-        )}
         </div>
-      </div>
+      )}
     </div>
   );
 };
