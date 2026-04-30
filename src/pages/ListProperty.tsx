@@ -48,9 +48,31 @@ const roomTypes = [
 ];
 
 interface UploadedImage {
-  file: File;
+  file: File | null;
   roomType: string;
+  // For files already uploaded to storage (e.g. restored after refresh)
+  persisted?: {
+    url: string;
+    path: string;
+    name: string;
+    type: string;
+  };
 }
+
+interface PersistedFloorPlan {
+  url: string;
+  path: string;
+  name: string;
+  type: string;
+}
+
+interface PendingListingPayload {
+  data: any; // FormData (looser typing for storage)
+  images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>;
+  floorPlan: PersistedFloorPlan | null;
+}
+
+const PENDING_STORAGE_KEY = 'rumi:pendingListing';
 
 const formSchema = z.object({
   municipality: z.string().min(1, "Governorate is required"),
@@ -91,6 +113,7 @@ const ListProperty = () => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [persistedFloorPlan, setPersistedFloorPlan] = useState<PersistedFloorPlan | null>(null);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -98,6 +121,7 @@ const ListProperty = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showClientConfirm, setShowClientConfirm] = useState(false);
   const [pendingData, setPendingData] = useState<FormData | null>(null);
+  const [isPreparingConfirm, setIsPreparingConfirm] = useState(false);
   const auth = useAuth();
   const { user, profile } = auth;
   const form = useForm<FormData>({
@@ -112,23 +136,159 @@ const ListProperty = () => {
 
   const listingType = form.watch('listingType');
 
-  // Restore a pending listing (form values + dialog state) if the user
-  // refreshed or navigated away while the confirmation dialog was open.
+  // Restore a pending listing (form values, uploaded media, dialog state) if
+  // the user refreshed or navigated away while the confirmation dialog was open.
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('rumi:pendingListing');
+      const raw = localStorage.getItem(PENDING_STORAGE_KEY);
       if (!raw) return;
-      const saved = JSON.parse(raw) as FormData;
-      form.reset(saved);
-      if (Array.isArray(saved.amenities)) setSelectedAmenities(saved.amenities);
-      setPendingData(saved);
+      const saved = JSON.parse(raw) as PendingListingPayload;
+      if (!saved?.data) return;
+      form.reset(saved.data);
+      if (Array.isArray(saved.data.amenities)) setSelectedAmenities(saved.data.amenities);
+      // Restore images as persisted-only entries (no File handle)
+      if (Array.isArray(saved.images)) {
+        setUploadedImages(saved.images.map((m) => ({
+          file: null,
+          roomType: m.roomType || '',
+          persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
+        })));
+      }
+      if (saved.floorPlan) {
+        setPersistedFloorPlan(saved.floorPlan);
+      }
+      setPendingData(saved.data as FormData);
       setShowClientConfirm(true);
     } catch (err) {
       console.error('Failed to restore pending listing', err);
-      localStorage.removeItem('rumi:pendingListing');
+      localStorage.removeItem(PENDING_STORAGE_KEY);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Helper: get a preview URL for either a freshly picked file or a persisted one
+  const getPreviewUrl = (img: UploadedImage): string | null => {
+    if (img.file) return URL.createObjectURL(img.file);
+    if (img.persisted) return img.persisted.url;
+    return null;
+  };
+
+  const getMediaType = (img: UploadedImage): string => {
+    return img.file?.type || img.persisted?.type || '';
+  };
+
+  const getMediaName = (img: UploadedImage): string => {
+    return img.file?.name || img.persisted?.name || 'file';
+  };
+
+  const getMediaSizeMB = (img: UploadedImage): string | null => {
+    if (!img.file) return null;
+    return (img.file.size / 1024 / 1024).toFixed(2);
+  };
+
+  // Delete previously persisted temp media from storage (used on cancel)
+  const purgePersistedMedia = async (
+    images: Array<{ path: string }>,
+    floorPlan: PersistedFloorPlan | null
+  ) => {
+    const paths = [
+      ...images.map((i) => i.path),
+      ...(floorPlan ? [floorPlan.path] : []),
+    ].filter(Boolean);
+    if (paths.length === 0) return;
+    try {
+      await supabase.storage.from('property-images').remove(paths);
+    } catch (err) {
+      console.error('Failed to purge pending media', err);
+    }
+  };
+
+  const clearPendingPersistence = () => {
+    localStorage.removeItem(PENDING_STORAGE_KEY);
+  };
+
+  // Upload all current media to storage, then persist metadata + form data
+  // to localStorage so the user can resume after a refresh.
+  const persistPendingListing = async (data: FormData) => {
+    if (!user) return false;
+    setIsPreparingConfirm(true);
+    try {
+      // Upload only items that aren't already persisted
+      const persistedImages: Array<{ url: string; path: string; name: string; type: string; roomType: string }> = [];
+      for (let i = 0; i < uploadedImages.length; i++) {
+        const img = uploadedImages[i];
+        if (img.persisted) {
+          persistedImages.push({ ...img.persisted, roomType: img.roomType });
+          continue;
+        }
+        if (!img.file) continue;
+        const ext = img.file.name.split('.').pop() || 'bin';
+        const path = `${user.id}/pending/${Date.now()}_${i}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from('property-images')
+          .upload(path, img.file);
+        if (upErr) throw upErr;
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(path);
+        persistedImages.push({
+          url: publicUrl,
+          path,
+          name: img.file.name,
+          type: img.file.type,
+          roomType: img.roomType,
+        });
+      }
+
+      // Floor plan
+      let fp: PersistedFloorPlan | null = persistedFloorPlan;
+      if (!fp && floorPlanFile) {
+        const ext = floorPlanFile.name.split('.').pop() || 'bin';
+        const path = `${user.id}/pending/${Date.now()}_floor-plan.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from('property-images')
+          .upload(path, floorPlanFile);
+        if (upErr) throw upErr;
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(path);
+        fp = { url: publicUrl, path, name: floorPlanFile.name, type: floorPlanFile.type };
+      }
+
+      const payload: PendingListingPayload = {
+        data,
+        images: persistedImages,
+        floorPlan: fp,
+      };
+      try {
+        localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(payload));
+      } catch (err) {
+        console.error('Failed to persist pending listing metadata', err);
+      }
+
+      // Reflect the uploads back into state so previews keep working
+      setUploadedImages(persistedImages.map((m) => ({
+        file: null,
+        roomType: m.roomType,
+        persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
+      })));
+      if (fp) {
+        setPersistedFloorPlan(fp);
+        setFloorPlanFile(null);
+      }
+      return true;
+    } catch (err) {
+      console.error('Error preparing pending listing:', err);
+      toast({
+        title: 'Upload failed',
+        description: 'Could not save your media for confirmation. Please try again.',
+        variant: 'destructive',
+      });
+      return false;
+    } finally {
+      setIsPreparingConfirm(false);
+    }
+  };
 
   // Guard against auth context not being ready - AFTER all hooks
   if (!auth || auth.loading) {
@@ -189,7 +349,50 @@ const ListProperty = () => {
   };
 
   const removeFile = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages(prev => {
+      const target = prev[index];
+      // If the file was already uploaded to the pending area, delete it from storage.
+      if (target?.persisted?.path) {
+        supabase.storage.from('property-images').remove([target.persisted.path]).catch((err) => {
+          console.error('Failed to remove persisted media', err);
+        });
+      }
+      const next = prev.filter((_, i) => i !== index);
+      // Keep localStorage in sync if a pending listing is being held
+      try {
+        const raw = localStorage.getItem(PENDING_STORAGE_KEY);
+        if (raw) {
+          const saved = JSON.parse(raw) as PendingListingPayload;
+          saved.images = next
+            .filter((img) => img.persisted)
+            .map((img) => ({ ...(img.persisted as PersistedFloorPlan), roomType: img.roomType }));
+          localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(saved));
+        }
+      } catch (err) {
+        console.error('Failed to update pending listing after removal', err);
+      }
+      return next;
+    });
+  };
+
+  const removeFloorPlan = () => {
+    if (persistedFloorPlan?.path) {
+      supabase.storage.from('property-images').remove([persistedFloorPlan.path]).catch((err) => {
+        console.error('Failed to remove persisted floor plan', err);
+      });
+    }
+    setPersistedFloorPlan(null);
+    setFloorPlanFile(null);
+    try {
+      const raw = localStorage.getItem(PENDING_STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as PendingListingPayload;
+        saved.floorPlan = null;
+        localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(saved));
+      }
+    } catch (err) {
+      console.error('Failed to update pending listing after floor plan removal', err);
+    }
   };
   const handleAmenityToggle = (amenity: string) => {
     const updatedAmenities = selectedAmenities.includes(amenity) ? selectedAmenities.filter(a => a !== amenity) : [...selectedAmenities, amenity];
@@ -224,8 +427,10 @@ const ListProperty = () => {
       let imageUrls: string[] = [];
       let floorPlanUrl: string | null = null;
 
-      // Upload floor plan if provided
-      if (floorPlanFile) {
+      // Use already-uploaded floor plan (from pending persistence) if present
+      if (persistedFloorPlan) {
+        floorPlanUrl = persistedFloorPlan.url;
+      } else if (floorPlanFile) {
         const fileExt = floorPlanFile.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
@@ -238,10 +443,14 @@ const ListProperty = () => {
         floorPlanUrl = publicUrl;
       }
 
-      // Upload images to Supabase storage if there are any
+      // Upload images to Supabase storage (skip ones already persisted to pending area)
       if (uploadedImages.length > 0) {
         const uploadPromises = uploadedImages.map(async (uploadedImage, index) => {
+          if (uploadedImage.persisted) {
+            return uploadedImage.persisted.url;
+          }
           const file = uploadedImage.file;
+          if (!file) return null;
           const roomType = uploadedImage.roomType.toLowerCase().replace(/['\s]/g, '-');
           const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${roomType}_${index}.${fileExt}`;
@@ -262,7 +471,8 @@ const ListProperty = () => {
           return publicUrl;
         });
 
-        imageUrls = await Promise.all(uploadPromises);
+        const results = await Promise.all(uploadPromises);
+        imageUrls = results.filter((u): u is string => !!u);
       }
 
       // Insert property data with image URLs
@@ -324,6 +534,9 @@ const ListProperty = () => {
       setSelectedAmenities([]);
       setUploadedImages([]);
       setFloorPlanFile(null);
+      setPersistedFloorPlan(null);
+      // Pending listing has been consumed — clear localStorage marker
+      clearPendingPersistence();
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
@@ -365,16 +578,23 @@ const ListProperty = () => {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => {
+            onSubmit={form.handleSubmit(async (data) => {
               const role = profile?.role;
               const isClient = !role || role === "user";
               if (isClient) {
-                setPendingData(data);
-                try {
-                  localStorage.setItem('rumi:pendingListing', JSON.stringify(data));
-                } catch (err) {
-                  console.error('Failed to persist pending listing', err);
+                // Validate room types before uploading anything
+                const unassigned = uploadedImages.filter(img => !img.roomType);
+                if (unassigned.length > 0) {
+                  toast({
+                    title: "Room Types Required",
+                    description: "Please select a room type for all uploaded images.",
+                    variant: "destructive"
+                  });
+                  return;
                 }
+                const ok = await persistPendingListing(data);
+                if (!ok) return;
+                setPendingData(data);
                 setShowClientConfirm(true);
                 return;
               }
@@ -678,21 +898,37 @@ const ListProperty = () => {
                       <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-muted rounded-lg">
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-16 h-16 bg-background rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
-                            {uploadedImage.file.type.startsWith('image/') ? (
-                              <img 
-                                src={URL.createObjectURL(uploadedImage.file)} 
-                                alt="Preview" 
-                                className="w-full h-full object-cover rounded"
-                              />
-                            ) : (
-                              <Upload className="w-6 h-6 text-muted-foreground" />
-                            )}
+                            {(() => {
+                              const previewUrl = getPreviewUrl(uploadedImage);
+                              const mediaType = getMediaType(uploadedImage);
+                              if (previewUrl && mediaType.startsWith('image/')) {
+                                return (
+                                  <img
+                                    src={previewUrl}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover rounded"
+                                  />
+                                );
+                              }
+                              if (previewUrl && mediaType.startsWith('video/')) {
+                                return (
+                                  <video
+                                    src={previewUrl}
+                                    className="w-full h-full object-cover rounded"
+                                    muted
+                                  />
+                                );
+                              }
+                              return <Upload className="w-6 h-6 text-muted-foreground" />;
+                            })()}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className="text-sm font-medium truncate block">{uploadedImage.file.name}</span>
-                            <p className="text-xs text-muted-foreground">
-                              {(uploadedImage.file.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
+                            <span className="text-sm font-medium truncate block">{getMediaName(uploadedImage)}</span>
+                            {getMediaSizeMB(uploadedImage) ? (
+                              <p className="text-xs text-muted-foreground">{getMediaSizeMB(uploadedImage)} MB</p>
+                            ) : (
+                              <p className="text-xs text-muted-foreground">Saved</p>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -770,15 +1006,21 @@ const ListProperty = () => {
                   />
                   <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
                 </div>
-                {floorPlanFile && (
+                {(floorPlanFile || persistedFloorPlan) && (
                   <div className="mt-3 flex items-center justify-between p-3 bg-muted rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-16 bg-background rounded overflow-hidden">
-                        <img src={URL.createObjectURL(floorPlanFile)} alt="Floor plan preview" className="w-full h-full object-cover" />
+                        <img
+                          src={floorPlanFile ? URL.createObjectURL(floorPlanFile) : persistedFloorPlan!.url}
+                          alt="Floor plan preview"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <span className="text-sm font-medium truncate">{floorPlanFile.name}</span>
+                      <span className="text-sm font-medium truncate">
+                        {floorPlanFile?.name || persistedFloorPlan?.name}
+                      </span>
                     </div>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setFloorPlanFile(null)} className="text-destructive">
+                    <Button type="button" variant="ghost" size="sm" onClick={removeFloorPlan} className="text-destructive">
                       Remove
                     </Button>
                   </div>
@@ -845,8 +1087,8 @@ const ListProperty = () => {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit" size="lg" className="px-8" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "List Property"}
+              <Button type="submit" size="lg" className="px-8" disabled={isSubmitting || isPreparingConfirm}>
+                {isPreparingConfirm ? "Preparing..." : isSubmitting ? "Submitting..." : "List Property"}
               </Button>
             </div>
           </form>
@@ -855,10 +1097,19 @@ const ListProperty = () => {
         <AlertDialog
           open={showClientConfirm}
           onOpenChange={(open) => {
+            // Block closing while a submission is in flight
+            if (!open && isSubmitting) return;
             setShowClientConfirm(open);
             if (!open) {
+              // Treat any close as a cancellation: purge persisted media
+              const imgs = uploadedImages
+                .filter((i) => i.persisted)
+                .map((i) => ({ path: i.persisted!.path }));
+              purgePersistedMedia(imgs, persistedFloorPlan);
+              setUploadedImages((prev) => prev.filter((i) => !i.persisted));
+              setPersistedFloorPlan(null);
               setPendingData(null);
-              localStorage.removeItem('rumi:pendingListing');
+              clearPendingPersistence();
             }
           }}
         >
@@ -885,24 +1136,18 @@ const ListProperty = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel
-                disabled={isSubmitting}
-                onClick={() => {
-                  setPendingData(null);
-                  localStorage.removeItem('rumi:pendingListing');
-                }}
-              >
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 disabled={isSubmitting}
                 onClick={(e) => {
                   e.preventDefault();
                   if (pendingData) {
                     const data = pendingData;
-                    setShowClientConfirm(false);
                     setPendingData(null);
-                    localStorage.removeItem('rumi:pendingListing');
+                    // Note: we don't clear localStorage here — onSubmit will
+                    // do it on success. This way a mid-submit refresh can
+                    // still recover the pending listing.
+                    setShowClientConfirm(false);
                     onSubmit(data);
                   }
                 }}
