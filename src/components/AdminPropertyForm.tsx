@@ -98,7 +98,7 @@ const convertToJpeg = (file: File): Promise<File> => {
 export const AdminPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [floorPlanFiles, setFloorPlanFiles] = useState<File[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -191,13 +191,13 @@ export const AdminPropertyForm = () => {
     
     try {
       let imageUrls: string[] = [];
-      let floorPlanUrl: string | null = null;
+      let floorPlanUrls: string[] = [];
 
-      // Upload floor plan
-      if (floorPlanFile) {
-        const convertedFp = await convertToJpeg(floorPlanFile);
+      // Upload floor plans (multiple)
+      for (let i = 0; i < floorPlanFiles.length; i++) {
+        const convertedFp = await convertToJpeg(floorPlanFiles[i]);
         const fileExt = convertedFp.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}_floor-plan.${fileExt}`;
+        const fileName = `${user.id}/${Date.now()}_${i}_floor-plan.${fileExt}`;
         const { error: fpError } = await supabase.storage
           .from('property-images')
           .upload(fileName, convertedFp);
@@ -205,7 +205,7 @@ export const AdminPropertyForm = () => {
         const { data: { publicUrl } } = supabase.storage
           .from('property-images')
           .getPublicUrl(fileName);
-        floorPlanUrl = publicUrl;
+        floorPlanUrls.push(publicUrl);
       }
 
       if (uploadedImages.length > 0) {
@@ -249,7 +249,8 @@ export const AdminPropertyForm = () => {
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
         images: imageUrls,
-        floor_plan_url: floorPlanUrl,
+        floor_plan_url: floorPlanUrls[0] ?? null,
+        floor_plan_urls: floorPlanUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
@@ -267,7 +268,7 @@ export const AdminPropertyForm = () => {
       form.reset();
       setSelectedAmenities([]);
       setUploadedImages([]);
-      setFloorPlanFile(null);
+      setFloorPlanFiles([]);
       setSelectedAgency(null);
       setSelectedAgency(null);
     } catch (error) {
