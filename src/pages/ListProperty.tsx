@@ -803,9 +803,11 @@ const ListProperty = () => {
                           I agree to the broker terms
                         </FormLabel>
                         <p className="text-sm text-muted-foreground">
-                          By listing this property, I agree that Summit will act as my exclusive real estate broker. 
-                          This includes providing professional agents, marketing services, property viewings, 
-                          and facilitating the rental or sale process on my behalf.{" "}
+                          By listing this property, I agree that Rumi will act as my exclusive real estate broker
+                          and provide the full service of managing the property — including marketing,
+                          conducting viewings, and meeting with prospective buyers and renters on my behalf.
+                          Upon a successful sale, Rumi receives a commission of <strong>2.5% from the seller</strong>;
+                          in the case of a rental agreement, the commission is <strong>one month's rent</strong>.{" "}
                           <Link to="/terms-of-service" className="text-primary hover:underline" target="_blank">
                             Read full Terms of Service
                           </Link>
