@@ -51,6 +51,14 @@ const roomTypes = [
 interface UploadedImage {
   file: File | null;
   roomType: string;
+  // Per-file upload state shown in the UI.
+  // 'idle'      -> selected, not yet uploaded
+  // 'uploading' -> upload in progress (progress bar shown)
+  // 'uploaded'  -> already in storage (persisted) or just succeeded
+  // 'failed'    -> last upload attempt failed; user can retry or remove
+  status?: 'idle' | 'uploading' | 'uploaded' | 'failed';
+  progress?: number; // 0-100
+  error?: string;
   // For files already uploaded to storage (e.g. restored after refresh)
   persisted?: {
     url: string;
@@ -58,6 +66,13 @@ interface UploadedImage {
     name: string;
     type: string;
   };
+}
+
+interface RejectedFile {
+  id: string;
+  name: string;
+  sizeMB: string;
+  reason: string;
 }
 
 interface PersistedFloorPlan {
