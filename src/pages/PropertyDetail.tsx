@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers, Share2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getCityCenter } from "@/utils/cityCenter";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 interface Property {
   id: string;
@@ -318,6 +319,43 @@ const PropertyDetail = () => {
     property.images && property.images.length > 0
       ? property.images[currentImageIndex]
       : null;
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!property) return;
+    const url = `${window.location.origin}/property/${property.id}`;
+    const title = `${property.property_type} in ${property.city}`;
+    const text = `${title} — $${property.price?.toLocaleString?.() ?? property.price}`;
+    const imageUrl = property.images?.[0];
+    if (imageUrl && (navigator as any).share && (navigator as any).canShare) {
+      try {
+        const res = await fetch(imageUrl, { mode: 'cors' });
+        if (res.ok) {
+          const blob = await res.blob();
+          const ext = (blob.type.split('/')[1] || 'jpg').split('+')[0];
+          const file = new File([blob], `property-${property.id}.${ext}`, { type: blob.type });
+          const shareData: any = { title, text, url, files: [file] };
+          if ((navigator as any).canShare(shareData)) {
+            await (navigator as any).share(shareData);
+            return;
+          }
+        }
+      } catch {}
+    }
+    try {
+      if ((navigator as any).share) {
+        await (navigator as any).share({ title, text, url });
+        return;
+      }
+    } catch {}
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied", description: "Property link copied to clipboard." });
+    } catch {
+      toast({ title: "Couldn't copy link", description: url, variant: "destructive" });
+    }
+  };
+
   const photoCount = property.images?.length || 0;
 
   const formatPrice = (price: number, listingType: string) => {
@@ -356,6 +394,18 @@ const PropertyDetail = () => {
             }
           }}
         >
+          {/* Mobile share button: top-right over image */}
+          <button
+            type="button"
+            onClick={handleShare}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            aria-label="Share property"
+            className="md:hidden absolute top-3 right-3 z-20 flex items-center justify-center w-9 h-9 rounded-full bg-background/85 backdrop-blur-sm shadow-md hover:bg-background transition-colors"
+          >
+            <Share2 className="w-4 h-4 text-foreground" />
+          </button>
           {showGallery ? (
             <div className="p-3 pb-16 grid grid-cols-2 gap-2 bg-muted">
               {(property.images || []).map((img, i) => (
@@ -485,6 +535,14 @@ const PropertyDetail = () => {
               </button>
             )}
           </div>
+        </div>
+
+        {/* Desktop share button: below image, left aligned */}
+        <div className="hidden md:flex mt-3">
+          <Button variant="outline" size="sm" onClick={handleShare}>
+            <Share2 className="w-4 h-4 mr-2" />
+            Share
+          </Button>
         </div>
 
         {/* Property info */}
