@@ -1041,7 +1041,28 @@ const ListProperty = () => {
                     accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) setFloorPlanFile(file);
+                      if (!file) return;
+                      const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
+                      const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+                      if (!ALLOWED.includes(file.type)) {
+                        toast({
+                          title: 'Unsupported floor plan format',
+                          description: 'Please upload a PNG, JPG or WEBP image.',
+                          variant: 'destructive',
+                        });
+                        e.target.value = '';
+                        return;
+                      }
+                      if (file.size > MAX_BYTES) {
+                        toast({
+                          title: 'Floor plan too large',
+                          description: 'Maximum size is 10MB.',
+                          variant: 'destructive',
+                        });
+                        e.target.value = '';
+                        return;
+                      }
+                      setFloorPlanFile(file);
                     }}
                     className="hidden"
                   />
