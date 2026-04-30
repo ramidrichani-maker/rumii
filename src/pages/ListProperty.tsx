@@ -85,7 +85,7 @@ interface PersistedFloorPlan {
 interface PendingListingPayload {
   data: any; // FormData (looser typing for storage)
   images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>;
-  floorPlan: PersistedFloorPlan | null;
+  floorPlans: PersistedFloorPlan[];
 }
 
 const PENDING_STORAGE_KEY = 'rumi:pendingListing';
@@ -128,9 +128,9 @@ const ListProperty = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [floorPlanFiles, setFloorPlanFiles] = useState<File[]>([]);
   const [rejectedFiles, setRejectedFiles] = useState<RejectedFile[]>([]);
-  const [persistedFloorPlan, setPersistedFloorPlan] = useState<PersistedFloorPlan | null>(null);
+  const [persistedFloorPlans, setPersistedFloorPlans] = useState<PersistedFloorPlan[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -173,8 +173,10 @@ const ListProperty = () => {
           persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
         })));
       }
-      if (saved.floorPlan) {
-        setPersistedFloorPlan(saved.floorPlan);
+      const restoredFloorPlans = (saved as any).floorPlans
+        ?? ((saved as any).floorPlan ? [(saved as any).floorPlan] : []);
+      if (Array.isArray(restoredFloorPlans) && restoredFloorPlans.length > 0) {
+        setPersistedFloorPlans(restoredFloorPlans);
       }
       setPendingData(saved.data as FormData);
       setShowClientConfirm(true);
@@ -208,11 +210,11 @@ const ListProperty = () => {
   // Delete previously persisted temp media from storage (used on cancel)
   const purgePersistedMedia = async (
     images: Array<{ path: string }>,
-    floorPlan: PersistedFloorPlan | null
+    floorPlans: PersistedFloorPlan[]
   ) => {
     const paths = [
       ...images.map((i) => i.path),
-      ...(floorPlan ? [floorPlan.path] : []),
+      ...floorPlans.map((fp) => fp.path),
     ].filter(Boolean);
     if (paths.length === 0) return;
     try {
@@ -232,7 +234,7 @@ const ListProperty = () => {
   // confirmation dialog.
   const savePendingSnapshot = (
     images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>,
-    floorPlan: PersistedFloorPlan | null,
+    floorPlans: PersistedFloorPlan[],
     data?: FormData,
   ) => {
     try {
@@ -241,7 +243,7 @@ const ListProperty = () => {
       const merged: PendingListingPayload = {
         data: (data ?? existing.data ?? form.getValues()) as any,
         images,
-        floorPlan,
+        floorPlans,
       };
       localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(merged));
     } catch (err) {
