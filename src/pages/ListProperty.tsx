@@ -346,7 +346,19 @@ const ListProperty = () => {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit((data) => {
+              const role = profile?.role;
+              const isClient = !role || role === "user";
+              if (isClient) {
+                setPendingData(data);
+                setShowClientConfirm(true);
+                return;
+              }
+              onSubmit(data);
+            })}
+            className="space-y-8"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Basic Information */}
               <Card className="relative z-10">
