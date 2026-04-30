@@ -516,15 +516,21 @@ const PropertyDetail = () => {
             )}
 
             {/* Floor plan button */}
-            {property.floor_plan_url && (
+            {(() => {
+              const floorPlans = (property.floor_plan_urls && property.floor_plan_urls.length > 0)
+                ? property.floor_plan_urls
+                : (property.floor_plan_url ? [property.floor_plan_url] : []);
+              if (floorPlans.length === 0) return null;
+              return (
               <button
-                onClick={() => setShowFloorPlan(true)}
+                onClick={() => { setFloorPlanIndex(0); setShowFloorPlan(true); }}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
               >
                 <Layers className="w-4 h-4" />
-                Floor plan
+                {floorPlans.length > 1 ? `Floor plans (${floorPlans.length})` : "Floor plan"}
               </button>
-            )}
+              );
+            })()}
 
             {/* Map button */}
             {cityCoords && (
