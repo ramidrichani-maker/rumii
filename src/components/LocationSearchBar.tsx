@@ -179,7 +179,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
       <div className="flex flex-col md:flex-row gap-3">
         <div className="flex gap-2 items-stretch md:flex-1 md:min-w-0">
-          <div className="relative flex-1 min-w-0">
+          <div className="relative flex-1 min-w-0 group">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={location}
@@ -192,7 +192,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 type="button"
                 onClick={() => onLocationChange('')}
                 aria-label="Clear location"
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
               >
                 <X className="w-4 h-4" />
               </button>
