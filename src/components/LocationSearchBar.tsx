@@ -216,7 +216,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Row 1: Radius */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
-          <Popover>
+          <Popover open={radiusOpen} onOpenChange={setRadiusOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
                 <span className="text-sm font-medium">Radius: {selectedLabel}</span>
@@ -228,7 +228,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 {radiusOptions.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => onRadiusChange(option.value)}
+                    onClick={() => {
+                      onRadiusChange(option.value);
+                      setRadiusOpen(false);
+                    }}
                     className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
                       radius === option.value
                         ? 'border-primary bg-primary text-primary-foreground'
