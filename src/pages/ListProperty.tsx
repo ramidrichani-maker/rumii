@@ -98,7 +98,15 @@ const formSchema = z.object({
   propertyType: z.string().min(1, "Property type is required"),
   metersSquared: z.string().min(1, "Meters squared is required"),
   bedrooms: z.string().min(1, "Number of bedrooms is required"),
-  bathrooms: z.string().min(1, "Number of bathrooms is required"),
+  bathrooms: z
+    .string()
+    .min(1, "Number of bathrooms is required")
+    .refine((v) => /^\d+$/.test(v.trim()), {
+      message: "Bathrooms must be a whole number (no decimals)",
+    })
+    .refine((v) => parseInt(v, 10) >= 1, {
+      message: "Bathrooms must be at least 1",
+    }),
   listingType: z.enum(["rent", "sale", "both"], {
     required_error: "Please select a listing type"
   }),
