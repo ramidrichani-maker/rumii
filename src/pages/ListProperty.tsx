@@ -176,6 +176,8 @@ const ListProperty = () => {
   // Restore a pending listing (form values, uploaded media, dialog state) if
   // the user refreshed or navigated away while the confirmation dialog was open.
   useEffect(() => {
+    // Skip restore when editing an existing listing — we load from DB instead.
+    if (isEditMode) return;
     try {
       const raw = localStorage.getItem(PENDING_STORAGE_KEY);
       if (!raw) return;
@@ -206,6 +208,92 @@ const ListProperty = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Load existing pending property into the form when in edit mode.
+  useEffect(() => {
+    if (!isEditMode || !editId || !user) return;
+    let cancelled = false;
+    (async () => {
+      setEditLoading(true);
+      setEditError(null);
+      try {
+        const { data: prop, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('id', editId)
+          .single();
+        if (error) throw error;
+        if (!prop) throw new Error('Listing not found');
+        if (prop.user_id !== user.id) {
+          throw new Error("You don't have permission to edit this listing.");
+        }
+        if (prop.status !== 'pending') {
+          throw new Error('Only pending listings can be edited.');
+        }
+        if (cancelled) return;
+
+        // Prefill the form
+        form.reset({
+          municipality: prop.municipality || '',
+          description: prop.description || '',
+          city: prop.city || '',
+          address: prop.address || '',
+          propertyType:
+            (prop.property_type || '').charAt(0).toUpperCase() +
+            (prop.property_type || '').slice(1),
+          metersSquared: prop.square_meters != null ? String(prop.square_meters) : '',
+          bedrooms: prop.bedrooms != null ? String(prop.bedrooms) : '',
+          bathrooms: prop.bathrooms != null ? String(prop.bathrooms) : '',
+          listingType: (prop.listing_type as any) || 'sale',
+          price: prop.price != null ? String(prop.price) : '',
+          rentalPrice: prop.rental_price != null ? String(prop.rental_price) : '',
+          priceNegotiable: !!prop.price_negotiable,
+          unfurnished: !!prop.unfurnished,
+          yearBuilt: prop.year_built != null ? String(prop.year_built) : '',
+          lastRenovated: prop.last_renovated != null ? String(prop.last_renovated) : '',
+          floors: prop.floors != null ? String(prop.floors) : '',
+          apartmentsCount: prop.apartments_count != null ? String(prop.apartments_count) : '',
+          amenities: prop.amenities || [],
+          // Already agreed at original submission — pre-check so user isn't blocked.
+          brokerAgreement: true,
+        });
+        setSelectedAmenities(prop.amenities || []);
+        if (prop.latitude != null && prop.longitude != null) {
+          setCoordinates({ lat: Number(prop.latitude), lng: Number(prop.longitude) });
+        }
+
+        // Prefill existing images as persisted entries.
+        const existingImages: UploadedImage[] = (prop.images || []).map((url: string) => ({
+          file: null,
+          // 'Existing' satisfies the "room type required" validation for previously-saved images.
+          roomType: 'Existing',
+          status: 'uploaded' as const,
+          progress: 100,
+          persisted: { url, path: '', name: url.split('/').pop() || 'image', type: '' },
+        }));
+        setUploadedImages(existingImages);
+
+        // Prefill floor plans
+        const fps: PersistedFloorPlan[] = (prop.floor_plan_urls || []).map((url: string) => ({
+          url,
+          path: '',
+          name: url.split('/').pop() || 'floor-plan',
+          type: '',
+        }));
+        setPersistedFloorPlans(fps);
+      } catch (err: any) {
+        if (cancelled) return;
+        console.error('Failed to load listing for edit:', err);
+        setEditError(err?.message || 'Failed to load listing for editing.');
+      } finally {
+        if (!cancelled) setEditLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditMode, editId, user?.id]);
 
   // Helper: get a preview URL for either a freshly picked file or a persisted one
   const getPreviewUrl = (img: UploadedImage): string | null => {
