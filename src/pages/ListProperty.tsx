@@ -1807,12 +1807,14 @@ const ListProperty = () => {
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
-                Listing submitted successfully
+                {isEditMode ? 'Listing updated successfully' : 'Listing submitted successfully'}
               </AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <p>
-                    Thank you! Your property has been submitted
+                    {isEditMode
+                      ? 'Your changes have been saved and your listing has been resubmitted for admin review'
+                      : 'Thank you! Your property has been submitted'}
                     {submittedListing && submittedListing.imageCount > 0
                       ? ` with ${submittedListing.imageCount} image${submittedListing.imageCount > 1 ? 's' : ''}`
                       : ''}.
