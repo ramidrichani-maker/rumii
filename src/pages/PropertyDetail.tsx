@@ -79,7 +79,7 @@ const PropertyDetail = () => {
     const fetchProperty = async () => {
       if (!id) return;
       const { data, error } = await supabase
-        .from("properties")
+        .from("properties_public" as any)
         .select("*")
         .eq("id", id)
         .single();
