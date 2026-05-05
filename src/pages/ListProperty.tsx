@@ -88,7 +88,7 @@ interface PendingListingPayload {
   floorPlans: PersistedFloorPlan[];
 }
 
-const PENDING_STORAGE_KEY = 'beiti:pendingListing';
+const PENDING_STORAGE_KEY = 'rumi:pendingListing';
 
 const formSchema = z.object({
   municipality: z.string().min(1, "Governorate is required"),
@@ -817,7 +817,7 @@ const ListProperty = () => {
 
       // Record broker agreement for legal purposes (only on initial submission)
       if (!isEditMode) {
-      const agreementText = "By listing this property, I agree that Beiti will act as my exclusive real estate broker, providing the full service of managing the property — including marketing, conducting viewings, and meeting with prospective buyers and renters on my behalf. I agree that upon a successful sale Beiti will receive a commission of 2.5% from the seller, and in the case of a rental agreement, a commission equal to one month's rent. I have read and agree to the full Terms of Service.";
+      const agreementText = "By listing this property, I agree that Rumi will act as my exclusive real estate broker, providing the full service of managing the property — including marketing, conducting viewings, and meeting with prospective buyers and renters on my behalf. I agree that upon a successful sale Rumi will receive a commission of 2.5% from the seller, and in the case of a rental agreement, a commission equal to one month's rent. I have read and agree to the full Terms of Service.";
       
       const { error: agreementError } = await supabase.functions.invoke(
         'record-broker-agreement',
@@ -1628,10 +1628,10 @@ const ListProperty = () => {
                           I agree to the broker terms
                         </FormLabel>
                         <p className="text-sm text-muted-foreground">
-                          By listing this property, I agree that Beiti will act as my exclusive real estate broker
+                          By listing this property, I agree that Rumi will act as my exclusive real estate broker
                           and provide the full service of managing the property — including marketing,
                           conducting viewings, and meeting with prospective buyers and renters on my behalf.
-                          Upon a successful sale, Beiti receives a commission of <strong>2.5% from the seller</strong>;
+                          Upon a successful sale, Rumi receives a commission of <strong>2.5% from the seller</strong>;
                           in the case of a rental agreement, the commission is <strong>one month's rent</strong>.{" "}
                           <Link to="/terms-of-service" className="text-primary hover:underline" target="_blank">
                             Read full Terms of Service
@@ -1651,7 +1651,7 @@ const ListProperty = () => {
                 Commission summary
               </p>
               <p className="text-sm text-muted-foreground mb-2">
-                If your property is sold or rented through Beiti, the following commission applies:
+                If your property is sold or rented through Rumi, the following commission applies:
               </p>
               <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
                 <li><strong className="text-foreground">2.5%</strong> of the sale price (paid by the seller) on a successful sale.</li>
@@ -1737,21 +1737,21 @@ const ListProperty = () => {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure you accept Beiti as your broker?</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure you accept Rumi as your broker?</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <p>
-                    By submitting, you confirm that you accept <strong>Beiti</strong> as your
-                    real estate broker for this property and that you will pay Beiti a
-                    commission if the sale or rental is completed through Beiti.
+                    By submitting, you confirm that you accept <strong>Rumi</strong> as your
+                    real estate broker for this property and that you will pay Rumi a
+                    commission if the sale or rental is completed through Rumi.
                   </p>
                   <p>
-                    Beiti will provide the full service of managing your property — marketing the
+                    Rumi will provide the full service of managing your property — marketing the
                     listing, <strong>conducting all viewings</strong>, and meeting with prospective buyers
                     and renters on your behalf.
                   </p>
                   <p>
-                    Commission due if the transaction is concluded through Beiti:
+                    Commission due if the transaction is concluded through Rumi:
                   </p>
                   <ul className="list-disc pl-5 space-y-1">
                     <li><strong>2.5%</strong> from the seller in the event of a sale.</li>
@@ -1770,7 +1770,7 @@ const ListProperty = () => {
                 className="mt-0.5"
               />
               <span className="text-sm text-foreground leading-snug">
-                I accept Beiti as my broker and agree to the commission terms above.
+                I accept Rumi as my broker and agree to the commission terms above.
               </span>
             </label>
             <AlertDialogFooter>
