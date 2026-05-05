@@ -886,9 +886,26 @@ const ListProperty = () => {
           </Link>
           <div className="flex items-center gap-3">
             <Home className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">List Your Property</h1>
+            <h1 className="text-3xl font-bold">
+              {isEditMode ? 'Edit Your Listing' : 'List Your Property'}
+            </h1>
           </div>
-          <p className="text-muted-foreground mt-2">Fill out the details below to list your property</p>
+          <p className="text-muted-foreground mt-2">
+            {isEditMode
+              ? 'Update your pending listing. Saving will resubmit it for admin review.'
+              : 'Fill out the details below to list your property'}
+          </p>
+          {isEditMode && editError && (
+            <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+              {editError}
+            </div>
+          )}
+          {isEditMode && editLoading && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading your listing…
+            </div>
+          )}
         </div>
 
         <Form {...form}>
