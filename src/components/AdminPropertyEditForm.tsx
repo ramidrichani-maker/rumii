@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import PropertyMap from "@/components/PropertyMap";
 
 const formSchema = z.object({
   address: z.string().min(1, "Address is required"),
@@ -61,6 +62,8 @@ interface Property {
   price_negotiable: boolean | null;
   unfurnished: boolean;
   description?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 interface AdminPropertyEditFormProps {
@@ -84,6 +87,10 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [selectedAgency, setSelectedAgency] = useState<string | null>(property.agency_id);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(property.amenities || []);
+  const [coords, setCoords] = useState<{ lat: number | null; lng: number | null }>({
+    lat: property.latitude ?? null,
+    lng: property.longitude ?? null,
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -153,6 +160,8 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         amenities: selectedAmenities,
         description: data.description || null,
         agency_id: selectedAgency,
+        latitude: coords.lat,
+        longitude: coords.lng,
         updated_at: new Date().toISOString(),
       };
 
@@ -492,6 +501,44 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
             </FormItem>
           )}
         />
+
+        {/* Map Location */}
+        <div className="space-y-2">
+          <Label>Pinned Map Location</Label>
+          <p className="text-xs text-muted-foreground">
+            Drag the pin or click the map to set the exact property coordinates. Public users see a privacy-jittered location.
+          </p>
+          <PropertyMap
+            latitude={coords.lat ?? undefined}
+            longitude={coords.lng ?? undefined}
+            onLocationSelect={(lat, lng) => setCoords({ lat, lng })}
+            height="320px"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label className="text-xs">Latitude</Label>
+              <Input
+                type="number"
+                step="any"
+                value={coords.lat ?? ""}
+                onChange={(e) =>
+                  setCoords((c) => ({ ...c, lat: e.target.value === "" ? null : parseFloat(e.target.value) }))
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Longitude</Label>
+              <Input
+                type="number"
+                step="any"
+                value={coords.lng ?? ""}
+                onChange={(e) =>
+                  setCoords((c) => ({ ...c, lng: e.target.value === "" ? null : parseFloat(e.target.value) }))
+                }
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Actions */}
         <div className="flex justify-end gap-2 pt-4 border-t">
