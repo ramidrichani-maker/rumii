@@ -224,17 +224,20 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           </div>
         `;
 
-        marker.addListener('click', () => {
+        const openInfo = () => {
           if (!infoWindowRef.current || !mapInstance.current) return;
           infoWindowRef.current.setContent(html);
           infoWindowRef.current.open({ map: mapInstance.current, anchor: marker });
-          // Wire navigation after DOM is ready
           google.maps.event.addListenerOnce(infoWindowRef.current, 'domready', () => {
             const el = document.querySelector(`[data-property-id="${property.id}"]`);
             el?.addEventListener('click', () => {
               window.location.href = `/property/${property.id}`;
             });
           });
+        };
+        marker.addListener('mouseover', openInfo);
+        marker.addListener('click', () => {
+          openInfo();
           if (onPropertySelect) onPropertySelect(property);
         });
 
