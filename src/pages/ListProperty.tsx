@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, Upload, Home, Camera, AlertTriangle, RotateCw, X, CheckCircle2, Loader2, Copy } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -156,6 +156,11 @@ const ListProperty = () => {
   const auth = useAuth();
   const { user, profile } = auth;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
+  const isEditMode = !!editId;
+  const [editLoading, setEditLoading] = useState<boolean>(isEditMode);
+  const [editError, setEditError] = useState<string | null>(null);
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -171,6 +176,8 @@ const ListProperty = () => {
   // Restore a pending listing (form values, uploaded media, dialog state) if
   // the user refreshed or navigated away while the confirmation dialog was open.
   useEffect(() => {
+    // Skip restore when editing an existing listing — we load from DB instead.
+    if (isEditMode) return;
     try {
       const raw = localStorage.getItem(PENDING_STORAGE_KEY);
       if (!raw) return;
@@ -201,6 +208,92 @@ const ListProperty = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Load existing pending property into the form when in edit mode.
+  useEffect(() => {
+    if (!isEditMode || !editId || !user) return;
+    let cancelled = false;
+    (async () => {
+      setEditLoading(true);
+      setEditError(null);
+      try {
+        const { data: prop, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('id', editId)
+          .single();
+        if (error) throw error;
+        if (!prop) throw new Error('Listing not found');
+        if (prop.user_id !== user.id) {
+          throw new Error("You don't have permission to edit this listing.");
+        }
+        if (prop.status !== 'pending') {
+          throw new Error('Only pending listings can be edited.');
+        }
+        if (cancelled) return;
+
+        // Prefill the form
+        form.reset({
+          municipality: prop.municipality || '',
+          description: prop.description || '',
+          city: prop.city || '',
+          address: prop.address || '',
+          propertyType:
+            (prop.property_type || '').charAt(0).toUpperCase() +
+            (prop.property_type || '').slice(1),
+          metersSquared: prop.square_meters != null ? String(prop.square_meters) : '',
+          bedrooms: prop.bedrooms != null ? String(prop.bedrooms) : '',
+          bathrooms: prop.bathrooms != null ? String(prop.bathrooms) : '',
+          listingType: (prop.listing_type as any) || 'sale',
+          price: prop.price != null ? String(prop.price) : '',
+          rentalPrice: prop.rental_price != null ? String(prop.rental_price) : '',
+          priceNegotiable: !!prop.price_negotiable,
+          unfurnished: !!prop.unfurnished,
+          yearBuilt: prop.year_built != null ? String(prop.year_built) : '',
+          lastRenovated: prop.last_renovated != null ? String(prop.last_renovated) : '',
+          floors: prop.floors != null ? String(prop.floors) : '',
+          apartmentsCount: prop.apartments_count != null ? String(prop.apartments_count) : '',
+          amenities: prop.amenities || [],
+          // Already agreed at original submission — pre-check so user isn't blocked.
+          brokerAgreement: true,
+        });
+        setSelectedAmenities(prop.amenities || []);
+        if (prop.latitude != null && prop.longitude != null) {
+          setCoordinates({ lat: Number(prop.latitude), lng: Number(prop.longitude) });
+        }
+
+        // Prefill existing images as persisted entries.
+        const existingImages: UploadedImage[] = (prop.images || []).map((url: string) => ({
+          file: null,
+          // 'Existing' satisfies the "room type required" validation for previously-saved images.
+          roomType: 'Existing',
+          status: 'uploaded' as const,
+          progress: 100,
+          persisted: { url, path: '', name: url.split('/').pop() || 'image', type: '' },
+        }));
+        setUploadedImages(existingImages);
+
+        // Prefill floor plans
+        const fps: PersistedFloorPlan[] = (prop.floor_plan_urls || []).map((url: string) => ({
+          url,
+          path: '',
+          name: url.split('/').pop() || 'floor-plan',
+          type: '',
+        }));
+        setPersistedFloorPlans(fps);
+      } catch (err: any) {
+        if (cancelled) return;
+        console.error('Failed to load listing for edit:', err);
+        setEditError(err?.message || 'Failed to load listing for editing.');
+      } finally {
+        if (!cancelled) setEditLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditMode, editId, user?.id]);
 
   // Helper: get a preview URL for either a freshly picked file or a persisted one
   const getPreviewUrl = (img: UploadedImage): string | null => {
@@ -673,9 +766,7 @@ const ListProperty = () => {
         imageUrls = results.filter((u): u is string => !!u);
       }
 
-      // Insert property data with image URLs
-      const { data: propertyData, error } = await supabase.from('properties').insert({
-        user_id: user.id,
+      const propertyPayload = {
         municipality: data.municipality,
         city: data.city,
         address: data.address,
@@ -699,12 +790,33 @@ const ListProperty = () => {
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
-        status: 'pending'
-      }).select('id, property_code').single();
+        status: 'pending' as const,
+      };
 
-      if (error) throw error;
+      let propertyData: { id: string; property_code: number | null } | null = null;
 
-      // Record broker agreement for legal purposes
+      if (isEditMode && editId) {
+        const { data: updated, error: updErr } = await supabase
+          .from('properties')
+          .update(propertyPayload)
+          .eq('id', editId)
+          .eq('user_id', user.id)
+          .select('id, property_code')
+          .single();
+        if (updErr) throw updErr;
+        propertyData = updated as any;
+      } else {
+        const { data: inserted, error: insErr } = await supabase
+          .from('properties')
+          .insert({ ...propertyPayload, user_id: user.id })
+          .select('id, property_code')
+          .single();
+        if (insErr) throw insErr;
+        propertyData = inserted as any;
+      }
+
+      // Record broker agreement for legal purposes (only on initial submission)
+      if (!isEditMode) {
       const agreementText = "By listing this property, I agree that Rumi will act as my exclusive real estate broker, providing the full service of managing the property — including marketing, conducting viewings, and meeting with prospective buyers and renters on my behalf. I agree that upon a successful sale Rumi will receive a commission of 2.5% from the seller, and in the case of a rental agreement, a commission equal to one month's rent. I have read and agree to the full Terms of Service.";
       
       const { error: agreementError } = await supabase.functions.invoke(
@@ -723,6 +835,7 @@ const ListProperty = () => {
       if (agreementError) {
         console.error('Error recording agreement:', agreementError);
         // Don't fail the whole submission if agreement logging fails
+      }
       }
 
       setSubmittedListing({
@@ -773,9 +886,26 @@ const ListProperty = () => {
           </Link>
           <div className="flex items-center gap-3">
             <Home className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">List Your Property</h1>
+            <h1 className="text-3xl font-bold">
+              {isEditMode ? 'Edit Your Listing' : 'List Your Property'}
+            </h1>
           </div>
-          <p className="text-muted-foreground mt-2">Fill out the details below to list your property</p>
+          <p className="text-muted-foreground mt-2">
+            {isEditMode
+              ? 'Update your pending listing. Saving will resubmit it for admin review.'
+              : 'Fill out the details below to list your property'}
+          </p>
+          {isEditMode && editError && (
+            <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+              {editError}
+            </div>
+          )}
+          {isEditMode && editLoading && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading your listing…
+            </div>
+          )}
         </div>
 
         <Form {...form}>
@@ -1677,12 +1807,14 @@ const ListProperty = () => {
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
-                Listing submitted successfully
+                {isEditMode ? 'Listing updated successfully' : 'Listing submitted successfully'}
               </AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <p>
-                    Thank you! Your property has been submitted
+                    {isEditMode
+                      ? 'Your changes have been saved and your listing has been resubmitted for admin review'
+                      : 'Thank you! Your property has been submitted'}
                     {submittedListing && submittedListing.imageCount > 0
                       ? ` with ${submittedListing.imageCount} image${submittedListing.imageCount > 1 ? 's' : ''}`
                       : ''}.
