@@ -1542,7 +1542,7 @@ const ListProperty = () => {
                   ? "Submitting..."
                   : uploadedImages.some(img => img.status === 'uploading')
                   ? "Uploading media..."
-                  : "List Property"}
+                  : "Submit Listing"}
               </Button>
             </div>
           </form>
