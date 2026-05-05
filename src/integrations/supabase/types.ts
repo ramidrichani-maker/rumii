@@ -1371,6 +1371,13 @@ export type Database = {
           period: string
         }[]
       }
+      get_property_coords: {
+        Args: { _property_id: string }
+        Returns: {
+          latitude: number
+          longitude: number
+        }[]
+      }
       get_session_analytics: {
         Args: { days_back?: number; period_type?: string }
         Returns: {
