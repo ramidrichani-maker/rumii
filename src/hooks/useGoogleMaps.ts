@@ -60,7 +60,7 @@ const loadGoogleMaps = async (): Promise<typeof google> => {
       const libs = LIBRARIES.join(',');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
         apiKey
-      )}&libraries=${libs}&language=en&region=LB&callback=${callbackName}`;
+      )}&libraries=${libs}&language=en&region=LB&loading=async&callback=${callbackName}`;
       script.async = true;
       script.defer = true;
       script.onerror = () => {
