@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import AgentContactBox from "@/components/AgentContactBox";
 import CommuteTimes from "@/components/CommuteTimes";
 import { getCityCenter } from "@/utils/cityCenter";
-import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import { useGoogleMaps, MAP_STYLES_NO_POI } from "@/hooks/useGoogleMaps";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
@@ -172,6 +172,7 @@ const PropertyDetail = () => {
         gestureHandling: 'none',
         keyboardShortcuts: false,
         clickableIcons: false,
+        styles: MAP_STYLES_NO_POI,
       });
       miniMarker.current = new google.maps.Marker({
         position: center,
@@ -201,6 +202,8 @@ const PropertyDetail = () => {
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
+        clickableIcons: false,
+        styles: MAP_STYLES_NO_POI,
       });
       expandedMarker.current = new google.maps.Marker({ position: center, map });
       expandedMapInstance.current = map;
@@ -226,6 +229,8 @@ const PropertyDetail = () => {
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
+        clickableIcons: false,
+        styles: MAP_STYLES_NO_POI,
       });
       overlayMarker.current = new google.maps.Marker({ position: center, map });
       overlayMapInstance.current = map;

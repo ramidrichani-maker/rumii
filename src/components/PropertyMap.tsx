@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Locate, Search, Maximize2, Minimize2, Loader2 } from 'lucide-react';
-import { useGoogleMaps } from '@/hooks/useGoogleMaps';
+import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 
 interface PropertyMapProps {
   latitude?: number;
@@ -40,6 +40,8 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
+      clickableIcons: false,
+      styles: MAP_STYLES_NO_POI,
     });
 
     const marker = new google.maps.Marker({

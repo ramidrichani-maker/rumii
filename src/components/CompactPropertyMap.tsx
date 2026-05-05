@@ -7,7 +7,7 @@ import { MapPin, Locate, Search, Maximize2, PenTool, Trash2, Save } from 'lucide
 import { getCityCenter } from '@/utils/cityCenter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useGoogleMaps } from '@/hooks/useGoogleMaps';
+import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 
 interface Property {
   id: string;
@@ -107,6 +107,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
+      clickableIcons: false,
+      styles: MAP_STYLES_NO_POI,
     });
     infoWindowRef.current = new google.maps.InfoWindow({ maxWidth: 280 });
     return () => {
