@@ -148,8 +148,14 @@ const ListProperty = () => {
   const [popupBrokerAccepted, setPopupBrokerAccepted] = useState(false);
   const [pendingData, setPendingData] = useState<FormData | null>(null);
   const [isPreparingConfirm, setIsPreparingConfirm] = useState(false);
+  const [submittedListing, setSubmittedListing] = useState<{
+    id: string;
+    propertyCode: number | null;
+    imageCount: number;
+  } | null>(null);
   const auth = useAuth();
   const { user, profile } = auth;
+  const navigate = useNavigate();
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
