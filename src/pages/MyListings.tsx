@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Loader2, Trash2, Eye, MapPin, Bell, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, Trash2, Eye, MapPin, Bell, Clock, CheckCircle2, XCircle, Pencil } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { PropertyDeleteDialog } from '@/components/PropertyDeleteDialog';
 import { useNavigate } from 'react-router-dom';
@@ -275,6 +275,16 @@ export default function MyListings() {
                       <Eye className="w-4 h-4 mr-1" />
                       View
                     </Button>
+                    {property.status === 'pending' && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => navigate(`/list-property?edit=${property.id}`)}
+                      >
+                        <Pencil className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="destructive"
@@ -284,6 +294,11 @@ export default function MyListings() {
                       Delete
                     </Button>
                   </div>
+                  {property.status === 'pending' && (
+                    <p className="text-xs text-muted-foreground">
+                      You can edit this listing while it's awaiting admin review.
+                    </p>
+                  )}
                   <div className="text-xs text-muted-foreground space-y-0.5">
                     <p>Listed on {new Date(property.created_at).toLocaleDateString()}</p>
                     {property.updated_at && property.updated_at !== property.created_at && (
