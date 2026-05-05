@@ -18,6 +18,21 @@ let loaderPromise: Promise<typeof google> | null = null;
 
 const LIBRARIES = ['places', 'drawing', 'geometry'] as const;
 
+/**
+ * Map style hiding all points of interest (restaurants, cafes, shops, etc.)
+ * and transit labels. Use via `styles: MAP_STYLES_NO_POI` on every Map.
+ */
+export const MAP_STYLES_NO_POI: google.maps.MapTypeStyle[] = [
+  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.attraction', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.medical', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.place_of_worship', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.school', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.sports_complex', stylers: [{ visibility: 'off' }] },
+  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+];
+
 const fetchKey = async (): Promise<string> => {
   if (cachedKey) return cachedKey;
   const { data, error } = await supabase.functions.invoke('get-maps-config');
