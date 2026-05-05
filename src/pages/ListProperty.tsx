@@ -1509,6 +1509,22 @@ const ListProperty = () => {
             </Card>
 
             {/* Submit Button */}
+            <div className="rounded-lg border border-border bg-muted/30 p-4">
+              <p className="text-sm font-semibold text-foreground mb-2">
+                Commission summary
+              </p>
+              <p className="text-sm text-muted-foreground mb-2">
+                If your property is sold or rented through Rumi, the following commission applies:
+              </p>
+              <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+                <li><strong className="text-foreground">2.5%</strong> of the sale price (paid by the seller) on a successful sale.</li>
+                <li><strong className="text-foreground">One month's rent</strong> on a successful rental agreement.</li>
+              </ul>
+              <p className="text-xs text-muted-foreground mt-2">
+                You'll be asked to confirm these terms in the next step.
+              </p>
+            </div>
+
             <div className="flex justify-end">
               <Button
                 type="submit"
