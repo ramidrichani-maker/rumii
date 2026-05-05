@@ -104,8 +104,8 @@ const formSchema = z.object({
     .refine((v) => /^\d+$/.test(v.trim()), {
       message: "Bathrooms must be a whole number (no decimals)",
     })
-    .refine((v) => parseInt(v, 10) >= 1, {
-      message: "Bathrooms must be at least 1",
+    .refine((v) => parseInt(v, 10) >= 0, {
+      message: "Bathrooms cannot be negative",
     }),
   listingType: z.enum(["rent", "sale", "both"], {
     required_error: "Please select a listing type"
@@ -1031,7 +1031,7 @@ const ListProperty = () => {
                     <FormItem>
                       <FormLabel>Bathrooms</FormLabel>
                       <FormControl>
-                        <Input type="number" step="1" min="1" placeholder="e.g. 2" {...field} />
+                        <Input type="number" step="1" min="0" placeholder="e.g. 2 (use 0 if none)" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
