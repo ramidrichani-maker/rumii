@@ -93,9 +93,9 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
     );
   }
 
-  const displayAgencyName = agencyName || "Rumi";
+  const displayAgencyName = agencyName || "Beiti";
   const displayPhone = agent?.phone_number || "+96170612686";
-  const displayAgentName = agent?.full_name || "Rumi Agent";
+  const displayAgentName = agent?.full_name || "Beiti Agent";
 
   const cleanPhone = displayPhone.replace(/[^+\d]/g, '');
   const whatsappUrl = `https://wa.me/${cleanPhone.replace('+', '')}`;

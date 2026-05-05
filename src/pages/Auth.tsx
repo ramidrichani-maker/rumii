@@ -226,7 +226,7 @@ const Auth = () => {
         }
       }
 
-      toast({ title: 'Account created!', description: 'Welcome to Rumi.' });
+      toast({ title: 'Account created!', description: 'Welcome to Beiti.' });
       // Ensure the auth state is refreshed so the app recognizes the user
       // immediately without requiring a manual page refresh.
       try {
