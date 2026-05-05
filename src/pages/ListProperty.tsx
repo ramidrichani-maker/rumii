@@ -1552,23 +1552,27 @@ const ListProperty = () => {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Confirm Rumi Full-Service Listing</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure you accept Rumi as your broker?</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <p>
-                    By confirming this listing, you agree that <strong>Rumi</strong> will provide the
-                    full service of managing your property. This includes marketing the listing,
-                    <strong> conducting all viewings</strong>, and meeting with prospective buyers and renters
-                    on your behalf.
+                    By submitting, you confirm that you accept <strong>Rumi</strong> as your
+                    real estate broker for this property and that you will pay Rumi a
+                    commission if the sale or rental is completed through Rumi.
                   </p>
                   <p>
-                    Upon a successful transaction, Rumi will receive:
+                    Rumi will provide the full service of managing your property — marketing the
+                    listing, <strong>conducting all viewings</strong>, and meeting with prospective buyers
+                    and renters on your behalf.
+                  </p>
+                  <p>
+                    Commission due if the transaction is concluded through Rumi:
                   </p>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>2.5% commission</strong> from the seller in the event of a sale.</li>
-                    <li><strong>One month's rent</strong> in the event of a rental agreement.</li>
+                    <li><strong>2.5%</strong> from the seller in the event of a sale.</li>
+                    <li><strong>One month's rent</strong> in the event of a rental.</li>
                   </ul>
-                  <p>Do you agree to these terms and wish to submit your listing?</p>
+                  <p>Do you agree and wish to submit your listing?</p>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
