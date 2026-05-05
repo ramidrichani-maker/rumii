@@ -124,18 +124,70 @@ export const NotificationBell = () => {
     
     // Close popover
     setIsOpen(false);
-    
-    // Navigate based on notification type
-    const type = notification.type.toLowerCase();
-    if (type.includes('viewing') || type.includes('appointment')) {
-      navigate('/client-dashboard');
-    } else if (type.includes('property') || type.includes('listing')) {
-      navigate('/my-listings');
-    } else if (type.includes('agent')) {
-      navigate('/agent-portal');
-    } else if (type.includes('media')) {
-      navigate('/my-listings');
+
+    // Try to resolve a related property and open its detail page directly.
+    const propertyId = await resolveRelatedPropertyId(notification);
+    if (propertyId) {
+      navigate(`/property/${propertyId}`);
+      return;
     }
+
+    // Fallback: route by notification topic.
+    const type = notification.type.toLowerCase();
+    const haystack = `${notification.title} ${notification.message}`.toLowerCase();
+    if (type.includes('viewing') || haystack.includes('viewing') || haystack.includes('appointment')) {
+      navigate('/client-dashboard');
+    } else if (haystack.includes('property') || haystack.includes('listing') || haystack.includes('media')) {
+      navigate('/my-listings');
+    } else if (haystack.includes('agent')) {
+      navigate('/agent-portal');
+    }
+  };
+
+  // Attempt to find the property referenced by a notification.
+  // Strategy:
+  //  1. Look for a "#<property_code>" in the title/message and match by property_code.
+  //  2. Otherwise, try to extract an address after "at " from the message and
+  //     match it against the current user's properties (case-insensitive).
+  const resolveRelatedPropertyId = async (
+    notification: Notification
+  ): Promise<string | null> => {
+    if (!user) return null;
+    const text = `${notification.title} ${notification.message}`;
+
+    try {
+      // 1) Property code like "#1234"
+      const codeMatch = text.match(/#(\d{1,10})\b/);
+      if (codeMatch) {
+        const code = parseInt(codeMatch[1], 10);
+        const { data } = await supabase
+          .from('properties')
+          .select('id')
+          .eq('property_code', code)
+          .maybeSingle();
+        if (data?.id) return data.id;
+      }
+
+      // 2) Address after "at " up to a period or "has".
+      // Examples:
+      //  "Your property listing at 123 Main St has been approved"
+      //  "A viewing has been requested for 123 Main St on 2024-01-01..."
+      const addressMatch =
+        text.match(/\b(?:at|for)\s+(.+?)\s+(?:has|on|is|was|will)\b/i) ||
+        text.match(/\b(?:at|for)\s+(.+?)[.!?]/i);
+      const addressGuess = addressMatch?.[1]?.trim();
+      if (addressGuess) {
+        const { data } = await supabase
+          .from('properties')
+          .select('id, address')
+          .ilike('address', addressGuess)
+          .limit(1);
+        if (data && data.length > 0) return data[0].id;
+      }
+    } catch (err) {
+      console.error('Failed to resolve notification property:', err);
+    }
+    return null;
   };
 
   const getNotificationCategory = (notification: Notification): string => {
