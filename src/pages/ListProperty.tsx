@@ -700,7 +700,7 @@ const ListProperty = () => {
         longitude: coordinates.lng,
         description: data.description || null,
         status: 'pending'
-      }).select('id').single();
+      }).select('id, property_code').single();
 
       if (error) throw error;
 
@@ -725,9 +725,10 @@ const ListProperty = () => {
         // Don't fail the whole submission if agreement logging fails
       }
 
-      toast({
-        title: "Property Listed Successfully!",
-        description: `Your property has been submitted for admin approval${imageUrls.length > 0 ? ` with ${imageUrls.length} image${imageUrls.length > 1 ? 's' : ''}` : ''}.`
+      setSubmittedListing({
+        id: propertyData?.id ?? '',
+        propertyCode: (propertyData as any)?.property_code ?? null,
+        imageCount: imageUrls.length,
       });
 
       // Reset form
