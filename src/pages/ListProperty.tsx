@@ -667,7 +667,7 @@ const ListProperty = () => {
         property_type: data.propertyType.toLowerCase() as any,
         square_meters: parseInt(data.metersSquared),
         bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseFloat(data.bathrooms),
+        bathrooms: parseInt(data.bathrooms, 10),
         listing_type: data.listingType as any,
         price: data.price ? parseFloat(data.price) : null,
         rental_price: data.rentalPrice ? parseFloat(data.rentalPrice) : null,
