@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, Loader2 } from 'lucide-react';
-import { useGoogleMaps } from '@/hooks/useGoogleMaps';
+import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 
 interface Coordinate {
   latitude: number;
@@ -35,6 +35,8 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       streetViewControl: false,
       fullscreenControl: false,
       gestureHandling: 'greedy',
+      clickableIcons: false,
+      styles: MAP_STYLES_NO_POI,
     });
     return () => {
       polygonRef.current?.setMap(null);

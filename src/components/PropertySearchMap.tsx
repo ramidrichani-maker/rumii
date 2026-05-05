@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Loader2 } from 'lucide-react';
 import { getCityCenter } from '@/utils/cityCenter';
 import { useAuth } from '@/contexts/AuthContext';
-import { useGoogleMaps } from '@/hooks/useGoogleMaps';
+import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 
 interface Property {
   id: string;
@@ -58,6 +58,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
+      clickableIcons: false,
+      styles: MAP_STYLES_NO_POI,
     });
     infoWindowRef.current = new google.maps.InfoWindow();
     return () => {
