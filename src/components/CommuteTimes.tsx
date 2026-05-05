@@ -128,8 +128,8 @@ export default function CommuteTimes({ originLat, originLng }: CommuteTimesProps
 
   const persist = (dests: Destination[]) => {
     try {
-      const slim = dests.map(({ id, name, lat, lng, type, driving, walking, cycling }) => ({
-        id, name, lat, lng, type, driving, walking, cycling,
+      const slim = dests.map(({ id, name, lat, lng, type, driving }) => ({
+        id, name, lat, lng, type, driving,
       }));
       localStorage.setItem(storageKey, JSON.stringify(slim));
     } catch {
