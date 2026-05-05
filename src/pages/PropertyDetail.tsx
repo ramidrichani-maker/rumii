@@ -160,138 +160,84 @@ const PropertyDetail = () => {
     });
   }, [property?.city, property?.latitude, property?.longitude, isAdmin]);
 
+  // Mini (preview) map
   useEffect(() => {
-    if (!miniMapRef.current || !cityCoords) return;
-    if (miniMapInstance.current) {
-      miniMapInstance.current.remove();
-      miniMapInstance.current = null;
+    if (!gmLoaded || !google || !miniMapRef.current || !cityCoords) return;
+    const center = { lat: cityCoords.lat, lng: cityCoords.lng };
+    if (!miniMapInstance.current) {
+      miniMapInstance.current = new google.maps.Map(miniMapRef.current, {
+        center,
+        zoom: isAdmin ? 15 : 13,
+        disableDefaultUI: true,
+        gestureHandling: 'none',
+        keyboardShortcuts: false,
+        clickableIcons: false,
+      });
+      miniMarker.current = new google.maps.Marker({
+        position: center,
+        map: miniMapInstance.current,
+      });
+    } else {
+      miniMapInstance.current.setCenter(center);
+      miniMarker.current?.setPosition(center);
     }
-
-    const map = L.map(miniMapRef.current, {
-      zoomControl: false,
-      dragging: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      touchZoom: false,
-      attributionControl: false,
-    }).setView([cityCoords.lat, cityCoords.lng], isAdmin ? 15 : 13);
-
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-      { subdomains: 'abcd', maxZoom: 20 }
-    ).addTo(map);
-
-    const icon = L.icon({
-      iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-      iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-      shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-    });
-
-    L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
-    miniMapInstance.current = map;
-
     return () => {
-      if (miniMapInstance.current) {
-        miniMapInstance.current.remove();
-        miniMapInstance.current = null;
-      }
+      miniMarker.current?.setMap(null);
+      miniMarker.current = null;
+      miniMapInstance.current = null;
     };
-  }, [cityCoords]);
+  }, [gmLoaded, google, cityCoords, isAdmin]);
 
+  // Expanded map with street/satellite toggle
   useEffect(() => {
-    if (!mapExpanded || !expandedMapRef.current || !cityCoords) return;
+    if (!mapExpanded || !gmLoaded || !google || !expandedMapRef.current || !cityCoords) return;
 
     const timer = setTimeout(() => {
-      if (expandedMapInstance.current) {
-        expandedMapInstance.current.remove();
-        expandedMapInstance.current = null;
-      }
-
-      const map = L.map(expandedMapRef.current!, { attributionControl: false }).setView(
-        [cityCoords.lat, cityCoords.lng],
-        isAdmin ? 15 : 13
-      );
-
-      const streetLayer = L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        { subdomains: 'abcd', maxZoom: 20 }
-      );
-      const satelliteLayer = L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 19 }
-      );
-
-      if (satelliteView) {
-        satelliteLayer.addTo(map);
-      } else {
-        streetLayer.addTo(map);
-      }
-
-      const icon = L.icon({
-        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
+      const center = { lat: cityCoords.lat, lng: cityCoords.lng };
+      const map = new google.maps.Map(expandedMapRef.current!, {
+        center,
+        zoom: isAdmin ? 15 : 13,
+        mapTypeId: satelliteView ? 'hybrid' : 'roadmap',
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
       });
-
-      L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
+      expandedMarker.current = new google.maps.Marker({ position: center, map });
       expandedMapInstance.current = map;
-
-      (map as any)._streetLayer = streetLayer;
-      (map as any)._satelliteLayer = satelliteLayer;
     }, 50);
 
     return () => {
       clearTimeout(timer);
-      if (expandedMapInstance.current) {
-        expandedMapInstance.current.remove();
-        expandedMapInstance.current = null;
-      }
+      expandedMarker.current?.setMap(null);
+      expandedMarker.current = null;
+      expandedMapInstance.current = null;
     };
-  }, [mapExpanded, cityCoords, satelliteView]);
+  }, [mapExpanded, gmLoaded, google, cityCoords, satelliteView, isAdmin]);
 
+  // Overlay map
   useEffect(() => {
-    if (!showMapOverlay || !overlayMapRef.current || !cityCoords) return;
+    if (!showMapOverlay || !gmLoaded || !google || !overlayMapRef.current || !cityCoords) return;
 
     const timer = setTimeout(() => {
-      if (overlayMapInstance.current) {
-        overlayMapInstance.current.remove();
-        overlayMapInstance.current = null;
-      }
-
-      const map = L.map(overlayMapRef.current!, { attributionControl: false }).setView(
-        [cityCoords.lat, cityCoords.lng],
-        isAdmin ? 15 : 13
-      );
-
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        { subdomains: 'abcd', maxZoom: 20 }
-      ).addTo(map);
-
-      const icon = L.icon({
-        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
+      const center = { lat: cityCoords.lat, lng: cityCoords.lng };
+      const map = new google.maps.Map(overlayMapRef.current!, {
+        center,
+        zoom: isAdmin ? 15 : 13,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
       });
-
-      L.marker([cityCoords.lat, cityCoords.lng], { icon }).addTo(map);
+      overlayMarker.current = new google.maps.Marker({ position: center, map });
       overlayMapInstance.current = map;
     }, 50);
 
     return () => {
       clearTimeout(timer);
-      if (overlayMapInstance.current) {
-        overlayMapInstance.current.remove();
-        overlayMapInstance.current = null;
-      }
+      overlayMarker.current?.setMap(null);
+      overlayMarker.current = null;
+      overlayMapInstance.current = null;
     };
-  }, [showMapOverlay, cityCoords]);
+  }, [showMapOverlay, gmLoaded, google, cityCoords, isAdmin]);
 
   const imageCount = property?.images?.length || 0;
   const carousel = useSwipeCarousel(imageCount);
