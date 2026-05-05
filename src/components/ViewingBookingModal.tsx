@@ -406,7 +406,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
                 disabled={!selectedDate || !selectedTime || !hasConfirmation || loading}
                 className="min-w-[120px]"
               >
-                {loading ? "Booking..." : "Confirm Viewing"}
+                {loading ? "Requesting..." : "Request Viewing"}
               </Button>
             </div>
           </>
