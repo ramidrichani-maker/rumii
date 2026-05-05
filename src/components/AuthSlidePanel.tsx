@@ -254,7 +254,7 @@ export const AuthSlidePanel = ({ open, onClose }: AuthSlidePanelProps) => {
         }
       }
 
-      toast({ title: 'Account created!', description: 'Welcome to Beiti.' });
+      toast({ title: 'Account created!', description: 'Welcome to Rumi.' });
       handleClose();
     } catch {
       toast({ title: 'Error', description: 'An unexpected error occurred.', variant: 'destructive' });
