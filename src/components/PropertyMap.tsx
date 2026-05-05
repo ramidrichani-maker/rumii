@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Locate, Search, Maximize2, Minimize2, Loader2 } from 'lucide-react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 
 interface PropertyMapProps {
   latitude?: number;
@@ -21,138 +20,80 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   height = "300px",
   className = ""
 }) => {
+  const { google, loaded } = useGoogleMaps();
   const mapRef = useRef<HTMLDivElement>(null);
-  const leafletMapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-  const pinPointMarkerRef = useRef<L.Marker | null>(null);
-  
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [position, setPosition] = useState<[number, number]>([latitude, longitude]);
+  const [position, setPosition] = useState<{ lat: number; lng: number }>({ lat: latitude, lng: longitude });
   const [searchAddress, setSearchAddress] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const [mapInitialized, setMapInitialized] = useState(false);
-  const [tilesLoading, setTilesLoading] = useState(true);
 
-  // Initialize map
+  // Initialize map once Google is loaded
   useEffect(() => {
-    if (!mapRef.current || mapInitialized) return;
+    if (!loaded || !google || !mapRef.current || mapInstanceRef.current) return;
 
-    try {
-      // Create custom icon
-      const customIcon = L.icon({
-        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
+    const map = new google.maps.Map(mapRef.current, {
+      center: position,
+      zoom: 13,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
 
-      // Initialize map
-      const map = L.map(mapRef.current).setView(position, 13);
-      
-      // Add tile layer with English labels
-      const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-      }).addTo(map);
+    const marker = new google.maps.Marker({
+      position,
+      map,
+      draggable: true,
+      title: 'Drag to adjust location',
+    });
 
-      tileLayer.on('loading', () => setTilesLoading(true));
-      tileLayer.on('load', () => setTilesLoading(false));
+    marker.addListener('dragend', () => {
+      const pos = marker.getPosition();
+      if (!pos) return;
+      const newPos = { lat: pos.lat(), lng: pos.lng() };
+      setPosition(newPos);
+      onLocationSelect(newPos.lat, newPos.lng);
+    });
 
-      // Add marker with draggable option
-      const marker = L.marker(position, { 
-        icon: customIcon,
-        draggable: true 
-      }).addTo(map);
-      
-      // Add drag event listener to marker
-      marker.on('dragend', () => {
-        const newPos = marker.getLatLng();
-        setPosition([newPos.lat, newPos.lng]);
-        onLocationSelect(newPos.lat, newPos.lng);
-      });
-      
-      // Add click handler
-      map.on('click', (e: L.LeafletMouseEvent) => {
-        {
-          const { lat, lng } = e.latlng;
-          setPosition([lat, lng]);
-          onLocationSelect(lat, lng);
-          
-          // Remove existing pinpoint marker
-          if (pinPointMarkerRef.current) {
-            pinPointMarkerRef.current.remove();
-          }
-          
-          // Create new pinpoint marker with custom pin icon
-          const pinIcon = L.icon({
-            iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#ef4444" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-            `),
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-            popupAnchor: [0, -32],
-          });
-          
-          pinPointMarkerRef.current = L.marker([lat, lng], { 
-            icon: pinIcon,
-            draggable: true 
-          }).addTo(map);
-          
-          // Add drag event listener
-          pinPointMarkerRef.current.on('dragend', () => {
-            if (pinPointMarkerRef.current) {
-              const newPos = pinPointMarkerRef.current.getLatLng();
-              setPosition([newPos.lat, newPos.lng]);
-              onLocationSelect(newPos.lat, newPos.lng);
-            }
-          });
-          
-          pinPointMarkerRef.current.bindPopup('Drag me to adjust location').openPopup();
-        }
-      });
+    map.addListener('click', (e: google.maps.MapMouseEvent) => {
+      if (!e.latLng) return;
+      const newPos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+      setPosition(newPos);
+      marker.setPosition(newPos);
+      onLocationSelect(newPos.lat, newPos.lng);
+    });
 
-      leafletMapRef.current = map;
-      markerRef.current = marker;
-      setMapInitialized(true);
+    mapInstanceRef.current = map;
+    markerRef.current = marker;
 
-    } catch (error) {
-      console.error('Error initializing map:', error);
-    }
-
-    // Cleanup
     return () => {
-      if (leafletMapRef.current) {
-        leafletMapRef.current.remove();
-        leafletMapRef.current = null;
-        markerRef.current = null;
-        pinPointMarkerRef.current = null;
-        setMapInitialized(false);
-      }
+      markerRef.current?.setMap(null);
+      markerRef.current = null;
+      mapInstanceRef.current = null;
     };
-  }, []);
+  }, [loaded, google]);
 
-  // Update marker position when position changes
+  // Sync external lat/lng changes
   useEffect(() => {
-    if (markerRef.current && leafletMapRef.current) {
-      markerRef.current.setLatLng(position);
-      leafletMapRef.current.setView(position, leafletMapRef.current.getZoom());
-    }
-  }, [position]);
+    if (!markerRef.current || !mapInstanceRef.current) return;
+    const newPos = { lat: latitude, lng: longitude };
+    markerRef.current.setPosition(newPos);
+    mapInstanceRef.current.setCenter(newPos);
+    setPosition(newPos);
+  }, [latitude, longitude]);
 
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-          const newPosition: [number, number] = [latitude, longitude];
-          setPosition(newPosition);
+          const newPos = { lat: latitude, lng: longitude };
+          setPosition(newPos);
+          markerRef.current?.setPosition(newPos);
+          mapInstanceRef.current?.setCenter(newPos);
+          mapInstanceRef.current?.setZoom(15);
           onLocationSelect(latitude, longitude);
         },
         (error) => {
@@ -166,21 +107,20 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   };
 
   const searchLocation = async () => {
-    if (!searchAddress.trim()) return;
-    
+    if (!searchAddress.trim() || !google) return;
     setIsSearching(true);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&q=${encodeURIComponent(searchAddress)}&limit=1`,
-        { headers: { 'Accept': 'application/json' } }
-      );
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        const { lat, lon, display_name } = data[0];
-        const newPosition: [number, number] = [parseFloat(lat), parseFloat(lon)];
-        setPosition(newPosition);
-        onLocationSelect(parseFloat(lat), parseFloat(lon), display_name);
+      const geocoder = new google.maps.Geocoder();
+      const result = await geocoder.geocode({ address: searchAddress, region: 'LB' });
+      if (result.results.length > 0) {
+        const r = result.results[0];
+        const loc = r.geometry.location;
+        const newPos = { lat: loc.lat(), lng: loc.lng() };
+        setPosition(newPos);
+        markerRef.current?.setPosition(newPos);
+        mapInstanceRef.current?.setCenter(newPos);
+        mapInstanceRef.current?.setZoom(15);
+        onLocationSelect(newPos.lat, newPos.lng, r.formatted_address);
       } else {
         alert('Location not found. Please try a different search term.');
       }
@@ -196,8 +136,9 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     e?.preventDefault();
     setIsFullscreen(!isFullscreen);
     setTimeout(() => {
-      if (leafletMapRef.current) {
-        leafletMapRef.current.invalidateSize();
+      if (mapInstanceRef.current && google) {
+        google.maps.event.trigger(mapInstanceRef.current, 'resize');
+        mapInstanceRef.current.setCenter(position);
       }
     }, 100);
   };
@@ -259,7 +200,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
               ref={mapRef}
               className="rounded-lg overflow-hidden border absolute inset-0"
             />
-            {tilesLoading && (
+            {!loaded && (
               <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
