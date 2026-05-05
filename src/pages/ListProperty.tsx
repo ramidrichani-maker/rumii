@@ -1637,6 +1637,111 @@ const ListProperty = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        <AlertDialog
+          open={!!submittedListing}
+          onOpenChange={(open) => {
+            if (!open) setSubmittedListing(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                Listing submitted successfully
+              </AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-4 text-sm text-muted-foreground">
+                  <p>
+                    Thank you! Your property has been submitted
+                    {submittedListing && submittedListing.imageCount > 0
+                      ? ` with ${submittedListing.imageCount} image${submittedListing.imageCount > 1 ? 's' : ''}`
+                      : ''}.
+                  </p>
+
+                  <div className="rounded-md border border-border bg-muted/40 p-3 space-y-2">
+                    {submittedListing?.propertyCode != null && (
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Property code
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm font-semibold text-foreground">
+                            #{submittedListing.propertyCode}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => {
+                              if (submittedListing?.propertyCode != null) {
+                                navigator.clipboard.writeText(String(submittedListing.propertyCode));
+                                toast({ title: "Copied", description: "Property code copied to clipboard." });
+                              }
+                            }}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    {submittedListing?.id && (
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Listing ID
+                        </span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-mono text-xs text-foreground truncate max-w-[200px]">
+                            {submittedListing.id}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => {
+                              if (submittedListing?.id) {
+                                navigator.clipboard.writeText(submittedListing.id);
+                                toast({ title: "Copied", description: "Listing ID copied to clipboard." });
+                              }
+                            }}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-medium text-foreground">What happens next?</p>
+                    <ol className="list-decimal pl-5 space-y-1">
+                      <li>An Oracle Estates admin will review your listing (typically within 24–48 hours).</li>
+                      <li>You'll receive a notification once it's approved or if any changes are needed.</li>
+                      <li>An assigned agent will reach out to coordinate viewings and enquiries.</li>
+                    </ol>
+                    <p className="text-xs">
+                      You can track the status of your listing any time from <strong>My Listings</strong>.
+                    </p>
+                  </div>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setSubmittedListing(null)}>Close</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSubmittedListing(null);
+                  navigate('/my-listings');
+                }}
+              >
+                View my listings
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>;
 };
