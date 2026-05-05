@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.record-broker-agreement]
 verify_jwt = false
+
+[functions.get-maps-config]
+verify_jwt = false

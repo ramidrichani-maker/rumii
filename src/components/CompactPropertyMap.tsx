@@ -4,13 +4,10 @@ import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Locate, Search, Maximize2, PenTool, Trash2, Save } from 'lucide-react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw';
-import 'leaflet-draw/dist/leaflet.draw.css';
 import { getCityCenter } from '@/utils/cityCenter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 
 interface Property {
   id: string;
@@ -47,23 +44,27 @@ interface CompactPropertyMapProps {
   defaultExpanded?: boolean;
   onDrawnAreaChange?: (polygon: DrawnPolygonCoordinate[] | null) => void;
   enableDrawing?: boolean;
-  /** Pre-fill location from search bar — when set, map pans there and draws a radius circle */
   initialSearchLocation?: string;
-  /** Radius in km to draw around the searched location */
   searchRadius?: number;
-  /** When true, hides the internal header/controls (parent manages chrome) */
   embedded?: boolean;
-  /** Callback when user wants to save the drawn area */
   onSaveArea?: (coordinates: DrawnPolygonCoordinate[]) => void;
-  /** Pre-drawn polygon to render on mount (e.g. from homepage draw) */
   initialPolygon?: DrawnPolygonCoordinate[] | null;
 }
 
+const PROPERTY_ICON_URL =
+  'data:image/svg+xml;base64,' +
+  btoa(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+  `);
+
 const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   properties = [],
-  className = "",
+  className = '',
   onPropertySelect,
-  height = "250px",
+  height = '250px',
   defaultExpanded = false,
   onDrawnAreaChange,
   enableDrawing = true,
@@ -76,732 +77,523 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const { profile } = useAuth();
   const isMobile = useIsMobile();
   const isAdmin = profile?.role === 'admin';
+  const { google, loaded } = useGoogleMaps();
+
   const mapRef = useRef<HTMLDivElement>(null);
-  const leafletMapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.Marker[]>([]);
-  const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
-  const drawControlRef = useRef<L.Control.Draw | null>(null);
-  const searchCircleRef = useRef<L.Circle | null>(null);
-  const [mapInitialized, setMapInitialized] = useState(false);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+
+  const drawnPolygonRef = useRef<google.maps.Polygon | null>(null);
+  const searchBoundaryRef = useRef<google.maps.Polygon | null>(null);
+  const searchCircleRef = useRef<google.maps.Circle | null>(null);
+
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [searchAddress, setSearchAddress] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [hasDrawnArea, setHasDrawnArea] = useState(false);
-  const [tilesLoading, setTilesLoading] = useState(true);
-  const drawHandlerRef = useRef<L.Draw.Polygon | null>(null);
+
+  const drawingPointsRef = useRef<google.maps.LatLngLiteral[]>([]);
+  const drawingPolylineRef = useRef<google.maps.Polyline | null>(null);
+  const drawCleanupRef = useRef<(() => void) | null>(null);
 
   // Initialize map
   useEffect(() => {
-    if (!mapRef.current || mapInitialized) return;
-
-    try {
-      // Initialize map with Beirut, Lebanon as default center
-      const map = L.map(mapRef.current).setView([33.8938, 35.5018], 12);
-      
-      // Add tile layer with English labels
-      const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-      }).addTo(map);
-
-      tileLayer.on('loading', () => setTilesLoading(true));
-      tileLayer.on('load', () => setTilesLoading(false));
-
-      // Initialize feature group for drawn items
-      const drawnItems = new L.FeatureGroup();
-      map.addLayer(drawnItems);
-      drawnItemsRef.current = drawnItems;
-
-      // Style the first vertex purple when drawing polygon
-      map.on(L.Draw.Event.DRAWVERTEX, (event: any) => {
-        const layers = event.layers?.getLayers?.() ?? [];
-        if (layers.length >= 1) {
-          const firstEl = layers[0]?.getElement?.();
-          if (firstEl) {
-            firstEl.classList.add('leaflet-draw-vertex-first');
-          }
-        }
-      });
-
-      // Clear partial filter if drawing is stopped/cancelled
-      map.on(L.Draw.Event.DRAWSTOP, () => {
-        // Only clear if no completed area exists
-        if (!drawnItemsRef.current?.getLayers().length) {
-          onDrawnAreaChange?.(null);
-        }
-      });
-
-      // Handle draw created event
-      map.on(L.Draw.Event.CREATED, (event: any) => {
-        const layer = event.layer;
-
-        
-        // Clear previous drawings
-        drawnItems.clearLayers();
-        
-        // Add new layer
-        drawnItems.addLayer(layer);
-        
-        // Extract polygon coordinates
-        if (layer instanceof L.Polygon) {
-          const latLngs = layer.getLatLngs()[0] as L.LatLng[];
-          const coordinates: DrawnPolygonCoordinate[] = latLngs.map(latLng => ({
-            latitude: latLng.lat,
-            longitude: latLng.lng
-          }));
-          
-          setHasDrawnArea(true);
-          onDrawnAreaChange?.(coordinates);
-        }
-        
-        setIsDrawingMode(false);
-      });
-
-      // Handle draw deleted event
-      map.on(L.Draw.Event.DELETED, () => {
-        setHasDrawnArea(false);
-        onDrawnAreaChange?.(null);
-      });
-
-      leafletMapRef.current = map;
-      setMapInitialized(true);
-
-
-    } catch (error) {
-      console.error('Error initializing compact property search map:', error);
-    }
-
+    if (!loaded || !google || !mapRef.current || mapInstance.current) return;
+    mapInstance.current = new google.maps.Map(mapRef.current, {
+      center: { lat: 33.8938, lng: 35.5018 },
+      zoom: 12,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+    infoWindowRef.current = new google.maps.InfoWindow({ maxWidth: 280 });
     return () => {
-      if (leafletMapRef.current) {
-        leafletMapRef.current.remove();
-        leafletMapRef.current = null;
-        markersRef.current = [];
-        drawnItemsRef.current = null;
-        searchCircleRef.current = null;
-        setMapInitialized(false);
-      }
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+      drawnPolygonRef.current?.setMap(null);
+      searchBoundaryRef.current?.setMap(null);
+      searchCircleRef.current?.setMap(null);
+      drawingPolylineRef.current?.setMap(null);
+      mapInstance.current = null;
     };
-  }, []);
+  }, [loaded, google]);
 
-  // Render initial polygon when map is ready and initialPolygon is provided
+  // Render initial polygon
   useEffect(() => {
-    const map = leafletMapRef.current;
-    const drawnItems = drawnItemsRef.current;
-    if (!map || !mapInitialized || !drawnItems || !initialPolygon || initialPolygon.length < 3) return;
+    if (!loaded || !google || !mapInstance.current) return;
+    if (!initialPolygon || initialPolygon.length < 3) return;
 
-    // Clear any existing drawn items first
-    drawnItems.clearLayers();
-
-    const latLngs: L.LatLngExpression[] = initialPolygon.map(c => [c.latitude, c.longitude]);
-    const polygon = L.polygon(latLngs, {
-      color: 'hsl(262, 83%, 58%)',
+    drawnPolygonRef.current?.setMap(null);
+    const path = initialPolygon.map((c) => ({ lat: c.latitude, lng: c.longitude }));
+    drawnPolygonRef.current = new google.maps.Polygon({
+      paths: path,
+      strokeColor: 'hsl(262, 83%, 58%)',
+      strokeWeight: 2,
       fillColor: 'hsl(262, 83%, 58%)',
       fillOpacity: 0.15,
-      weight: 2,
+      map: mapInstance.current,
     });
-    drawnItems.addLayer(polygon);
     setHasDrawnArea(true);
-    map.fitBounds(polygon.getBounds(), { padding: [30, 30] });
+    const bounds = new google.maps.LatLngBounds();
+    path.forEach((p) => bounds.extend(p));
+    mapInstance.current.fitBounds(bounds, 30);
+    onDrawnAreaChange?.(initialPolygon);
+  }, [loaded, google, initialPolygon, onDrawnAreaChange]);
 
-    if (onDrawnAreaChange) {
-      onDrawnAreaChange(initialPolygon);
-    }
-  }, [mapInitialized, initialPolygon, onDrawnAreaChange]);
-
-
+  // Markers
   useEffect(() => {
-    if (!leafletMapRef.current || !mapInitialized) return;
-
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
+    if (!loaded || !google || !mapInstance.current) return;
+    markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
-
     if (properties.length === 0) return;
 
+    let cancelled = false;
+
     const addMarkers = async () => {
-      try {
-        const propertyIcon = L.icon({
-          iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-          `),
-          iconSize: [20, 20],
-          iconAnchor: [10, 20],
-          popupAnchor: [0, -20],
-        });
+      let cityCenters: Record<string, { lat: number; lng: number }> = {};
+      if (!isAdmin) {
+        const uniqueCities = [...new Set(properties.map((p) => p.city).filter(Boolean))];
+        await Promise.all(
+          uniqueCities.map(async (city) => {
+            const c = await getCityCenter(city);
+            if (c) cityCenters[city] = c;
+          })
+        );
+      }
+      if (cancelled) return;
 
-        const bounds = L.latLngBounds([]);
+      const bounds = new google.maps.LatLngBounds();
 
-        // Admins see exact location; regular users see city center
-        let cityCenters: Record<string, { lat: number; lng: number }> = {};
-        if (!isAdmin) {
-          const uniqueCities = [...new Set(properties.map(p => p.city).filter(Boolean))];
-          await Promise.all(uniqueCities.map(async (city) => {
-            const center = await getCityCenter(city);
-            if (center) cityCenters[city] = center;
-          }));
+      properties.forEach((property) => {
+        let pos: google.maps.LatLngLiteral;
+        if (isAdmin && property.latitude && property.longitude) {
+          pos = { lat: property.latitude, lng: property.longitude };
+        } else {
+          const c = cityCenters[property.city];
+          if (!c) return;
+          pos = {
+            lat: c.lat + (Math.random() - 0.5) * 0.008,
+            lng: c.lng + (Math.random() - 0.5) * 0.008,
+          };
         }
 
-        properties.forEach(property => {
-          let markerLat: number, markerLng: number;
+        const marker = new google.maps.Marker({
+          position: pos,
+          map: mapInstance.current!,
+          icon: {
+            url: PROPERTY_ICON_URL,
+            scaledSize: new google.maps.Size(20, 20),
+            anchor: new google.maps.Point(10, 20),
+          },
+        });
 
-          if (isAdmin && property.latitude && property.longitude) {
-            // Admin: show exact location
-            markerLat = property.latitude;
-            markerLng = property.longitude;
-          } else {
-            const center = cityCenters[property.city];
-            if (!center) return;
-            // Add small random offset so markers for same city don't stack exactly
-            markerLat = center.lat + (Math.random() - 0.5) * 0.008;
-            markerLng = center.lng + (Math.random() - 0.5) * 0.008;
-          }
-
-          const marker = L.marker([markerLat, markerLng], { icon: propertyIcon })
-            .addTo(leafletMapRef.current!);
-
-          // Create rich popup content
-          const images = property.images?.length ? property.images : ['/placeholder.svg'];
-          const priceFormatted = property.listing_type === 'rent' 
-            ? `$${property.price.toLocaleString()}/mo` 
+        const images = property.images?.length ? property.images : ['/placeholder.svg'];
+        const priceFormatted =
+          property.listing_type === 'rent'
+            ? `$${property.price.toLocaleString()}/mo`
             : `$${property.price.toLocaleString()}`;
-          const propType = property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1);
-          const listingLabel = property.listing_type === 'rent' ? 'For Rent' : property.listing_type === 'both' ? 'Rent & Sale' : 'For Sale';
+        const propType =
+          property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1);
+        const listingLabel =
+          property.listing_type === 'rent'
+            ? 'For Rent'
+            : property.listing_type === 'both'
+              ? 'Rent & Sale'
+              : 'For Sale';
 
-          const popupContent = document.createElement('div');
-          let currentImgIndex = 0;
-          const hasMultiple = images.length > 1;
-
-          const arrowStyle = `position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.85);border:none;border-radius:50%;width:24px;height:24px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;`;
-
-          popupContent.innerHTML = `
-            <div data-action="navigate" style="width:260px;font-family:system-ui,sans-serif;cursor:pointer;">
-              <div style="position:relative;width:100%;height:140px;overflow:hidden;border-radius:8px 8px 0 0;">
-                <img data-popup-img style="width:100%;height:100%;object-fit:cover;" src="${images[0]}" alt="${propType}" />
-                ${hasMultiple ? `<button data-action="prev-img" style="${arrowStyle}left:4px;">‹</button><button data-action="next-img" style="${arrowStyle}right:4px;">›</button>` : ''}
-                <span style="position:absolute;top:6px;left:6px;background:hsl(30,20%,45%);color:white;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;">${listingLabel}</span>
-                ${hasMultiple ? `<div data-dots style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;"></div>` : ''}
-              </div>
-              <div style="padding:10px;">
-                <div style="font-weight:700;font-size:16px;color:#1a1a1a;margin-bottom:2px;">${priceFormatted}</div>
-                <div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px;">${propType} in ${property.city}</div>
-                <div style="font-size:11px;color:#666;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${property.address}</div>
-                <div style="display:flex;gap:12px;font-size:11px;color:#555;">
-                  <span>🛏 ${property.bedrooms}</span>
-                  <span>🛁 ${property.bathrooms}</span>
-                  <span>📐 ${property.square_meters}m²</span>
-                </div>
+        const html = `
+          <div data-action="navigate" data-property-id="${property.id}" style="width:260px;font-family:system-ui,sans-serif;cursor:pointer;">
+            <div style="position:relative;width:100%;height:140px;overflow:hidden;border-radius:8px 8px 0 0;">
+              <img style="width:100%;height:100%;object-fit:cover;" src="${images[0]}" alt="${propType}" />
+              <span style="position:absolute;top:6px;left:6px;background:hsl(30,20%,45%);color:white;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;">${listingLabel}</span>
+            </div>
+            <div style="padding:10px;">
+              <div style="font-weight:700;font-size:16px;color:#1a1a1a;margin-bottom:2px;">${priceFormatted}</div>
+              <div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px;">${propType} in ${property.city}</div>
+              <div style="font-size:11px;color:#666;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${property.address}</div>
+              <div style="display:flex;gap:12px;font-size:11px;color:#555;">
+                <span>🛏 ${property.bedrooms}</span>
+                <span>🛁 ${property.bathrooms}</span>
+                <span>📐 ${property.square_meters}m²</span>
               </div>
             </div>
-          `;
+          </div>
+        `;
 
-          // Image carousel dots
-          const updateDots = () => {
-            const dotsEl = popupContent.querySelector('[data-dots]') as HTMLElement;
-            if (!dotsEl) return;
-            dotsEl.innerHTML = images.map((_, i) =>
-              `<div style="width:${i === currentImgIndex ? '12px' : '5px'};height:5px;border-radius:3px;background:${i === currentImgIndex ? 'white' : 'rgba(255,255,255,0.5)'};transition:width 0.2s;"></div>`
-            ).join('');
-          };
-          updateDots();
-
-          const setImg = (idx: number) => {
-            currentImgIndex = idx;
-            const img = popupContent.querySelector('[data-popup-img]') as HTMLImageElement;
-            if (img) img.src = images[idx];
-            updateDots();
-          };
-
-          popupContent.querySelector('[data-action="prev-img"]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            setImg(currentImgIndex === 0 ? images.length - 1 : currentImgIndex - 1);
+        marker.addListener('click', () => {
+          if (!infoWindowRef.current || !mapInstance.current) return;
+          infoWindowRef.current.setContent(html);
+          infoWindowRef.current.open({ map: mapInstance.current, anchor: marker });
+          // Wire navigation after DOM is ready
+          google.maps.event.addListenerOnce(infoWindowRef.current, 'domready', () => {
+            const el = document.querySelector(`[data-property-id="${property.id}"]`);
+            el?.addEventListener('click', () => {
+              window.location.href = `/property/${property.id}`;
+            });
           });
-
-          popupContent.querySelector('[data-action="next-img"]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            setImg(currentImgIndex === images.length - 1 ? 0 : currentImgIndex + 1);
-          });
-
-          // Clicking the popup navigates to property detail
-          popupContent.querySelector('[data-action="navigate"]')?.addEventListener('click', () => {
-            window.location.href = `/property/${property.id}`;
-          });
-
-          marker.bindPopup(popupContent, {
-            maxWidth: 280,
-            minWidth: 260,
-            className: 'property-rich-popup',
-            autoPan: true,
-            autoPanPadding: [20, 20],
-            keepInView: true,
-          });
-          
-          // Open popup on click
-          marker.on('click', () => {
-            marker.openPopup();
-          });
-
-          // Hover logic: show after 1s, close when mouse leaves both pin and popup
-          let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
-          let closeTimeout: ReturnType<typeof setTimeout> | null = null;
-          let isOverPopup = false;
-
-          const clearCloseTimeout = () => {
-            if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
-          };
-
-          const scheduleClose = () => {
-            clearCloseTimeout();
-            closeTimeout = setTimeout(() => {
-              if (!isOverPopup) {
-                marker.closePopup();
-              }
-            }, 100);
-          };
-
-          marker.on('mouseover', () => {
-            clearCloseTimeout();
-            hoverTimeout = setTimeout(() => {
-              marker.openPopup();
-              // Attach popup hover listeners after opening
-              setTimeout(() => {
-                const popupEl = marker.getPopup()?.getElement();
-                if (popupEl) {
-                  popupEl.addEventListener('mouseenter', () => {
-                    isOverPopup = true;
-                    clearCloseTimeout();
-                  });
-                  popupEl.addEventListener('mouseleave', () => {
-                    isOverPopup = false;
-                    scheduleClose();
-                  });
-                }
-              }, 50);
-            }, 1000);
-          });
-
-          marker.on('mouseout', () => {
-            if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
-            scheduleClose();
-          });
-
-          markersRef.current.push(marker);
-          bounds.extend([markerLat, markerLng]);
+          if (onPropertySelect) onPropertySelect(property);
         });
 
-        // Fit map to show all properties — but NOT while user is actively drawing
-        if (bounds.isValid() && !isDrawingMode && !hasDrawnArea) {
-          leafletMapRef.current!.fitBounds(bounds, { padding: [10, 10] });
-        }
+        markersRef.current.push(marker);
+        bounds.extend(pos);
+      });
 
-      } catch (error) {
-        console.error('Error updating property markers:', error);
+      if (!bounds.isEmpty() && mapInstance.current && !isDrawingMode && !hasDrawnArea) {
+        mapInstance.current.fitBounds(bounds, 20);
       }
     };
 
     addMarkers();
-  }, [properties, mapInitialized, onPropertySelect, isDrawingMode, hasDrawnArea]);
+    return () => {
+      cancelled = true;
+    };
+  }, [properties, loaded, google, isAdmin, onPropertySelect, isDrawingMode, hasDrawnArea]);
 
-  // Handle map resize when expanded or container size changes
+  // Resize on expand
   useEffect(() => {
-    if (leafletMapRef.current) {
-      setTimeout(() => {
-        leafletMapRef.current?.invalidateSize();
-      }, 100);
-      setTimeout(() => {
-        leafletMapRef.current?.invalidateSize();
-      }, 300);
-    }
-  }, [isExpanded]);
+    if (!google || !mapInstance.current) return;
+    setTimeout(() => {
+      google.maps.event.trigger(mapInstance.current!, 'resize');
+    }, 100);
+    setTimeout(() => {
+      google.maps.event.trigger(mapInstance.current!, 'resize');
+    }, 300);
+  }, [isExpanded, google]);
 
-  // ResizeObserver to catch any container size changes (e.g. toggling map view)
+  // Search location boundary using Nominatim (kept for polygon geometry — Google Geocoder does not return boundaries)
   useEffect(() => {
-    if (!mapRef.current || !leafletMapRef.current) return;
-    const map = leafletMapRef.current;
-    const observer = new ResizeObserver(() => {
-      map.invalidateSize();
-    });
-    observer.observe(mapRef.current);
-    return () => observer.disconnect();
-  }, [mapInitialized]);
+    if (!loaded || !google || !mapInstance.current) return;
 
-  // Draw the actual boundary polygon for the searched location
-  const searchBoundaryRef = useRef<L.GeoJSON | null>(null);
-
-  useEffect(() => {
-    if (!mapInitialized || !leafletMapRef.current) return;
-
-    // If location is cleared, remove boundary/circle and clear polygon filter
-    // But preserve drawn area if an initialPolygon was provided (e.g. from homepage draw)
     if (!initialSearchLocation?.trim()) {
-      if (searchBoundaryRef.current) {
-        searchBoundaryRef.current.remove();
-        searchBoundaryRef.current = null;
-      }
-      if (searchCircleRef.current) {
-        searchCircleRef.current.remove();
-        searchCircleRef.current = null;
-      }
-      // Only clear drawn area if there's no initialPolygon
+      searchBoundaryRef.current?.setMap(null);
+      searchBoundaryRef.current = null;
+      searchCircleRef.current?.setMap(null);
+      searchCircleRef.current = null;
       if (!initialPolygon || initialPolygon.length < 3) {
-        if (drawnItemsRef.current) {
-          drawnItemsRef.current.clearLayers();
-        }
+        drawnPolygonRef.current?.setMap(null);
+        drawnPolygonRef.current = null;
         setHasDrawnArea(false);
         onDrawnAreaChange?.(null);
       }
       return;
     }
 
-    // Debounce Nominatim requests to avoid rate-limiting
-    const timeoutId = setTimeout(() => {
-      const drawLocationBoundary = async () => {
-        try {
-          // Request polygon geometry from Nominatim
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&polygon_geojson=1&q=${encodeURIComponent(initialSearchLocation + ', Lebanon')}&limit=1`,
-            { headers: { 'Accept': 'application/json' } }
-          );
-          const data = await response.json();
-          if (!data || data.length === 0) return;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&polygon_geojson=1&q=${encodeURIComponent(
+            initialSearchLocation + ', Lebanon'
+          )}&limit=1`,
+          { headers: { Accept: 'application/json' } }
+        );
+        const data = await res.json();
+        if (!data || data.length === 0) return;
+        const result = data[0];
 
-          const result = data[0];
+        searchBoundaryRef.current?.setMap(null);
+        searchBoundaryRef.current = null;
+        searchCircleRef.current?.setMap(null);
+        searchCircleRef.current = null;
+        drawnPolygonRef.current?.setMap(null);
+        drawnPolygonRef.current = null;
 
-          // Remove previous boundary & circle
-          if (searchBoundaryRef.current) {
-            searchBoundaryRef.current.remove();
-            searchBoundaryRef.current = null;
-          }
-          if (searchCircleRef.current) {
-            searchCircleRef.current.remove();
-            searchCircleRef.current = null;
-          }
+        const geojson = result.geojson;
+        const map = mapInstance.current!;
 
-          // Clear previous drawn items so auto-boundary takes effect
-          if (drawnItemsRef.current) {
-            drawnItemsRef.current.clearLayers();
-          }
+        let coords: DrawnPolygonCoordinate[] = [];
+        let polygonPath: google.maps.LatLngLiteral[] = [];
 
-          const geojson = result.geojson;
-
-          if (geojson && (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon')) {
-            // Draw the actual boundary
-            const boundaryLayer = L.geoJSON(geojson, {
-              style: {
-                color: 'hsl(30, 20%, 55%)',
-                fillColor: 'hsl(30, 20%, 65%)',
-                fillOpacity: 0.15,
-                weight: 2,
-                dashArray: '6 4',
-              }
-            }).addTo(leafletMapRef.current!);
-
-            searchBoundaryRef.current = boundaryLayer;
-
-            // Extract polygon coordinates for filtering
-            const coords: DrawnPolygonCoordinate[] = [];
-            if (geojson.type === 'Polygon') {
-              geojson.coordinates[0].forEach((c: number[]) => {
-                coords.push({ latitude: c[1], longitude: c[0] });
-              });
-            } else if (geojson.type === 'MultiPolygon') {
-              // Use the largest polygon ring
-              let largest = geojson.coordinates[0][0];
-              for (const poly of geojson.coordinates) {
-                if (poly[0].length > largest.length) largest = poly[0];
-              }
-              largest.forEach((c: number[]) => {
-                coords.push({ latitude: c[1], longitude: c[0] });
-              });
-            }
-
-            if (coords.length >= 3) {
-              setHasDrawnArea(true);
-              onDrawnAreaChange?.(coords);
-            }
-
-            // If radius is set, also draw a dashed circle around the centroid to visualize the extra radius
-            if (searchRadius > 0) {
-              const bounds = boundaryLayer.getBounds();
-              const center = bounds.getCenter();
-              // Approximate the polygon's max extent from center + add user radius
-              const cornerDist = center.distanceTo(bounds.getNorthEast());
-              const totalRadius = cornerDist + searchRadius * 1000;
-
-              const radiusCircle = L.circle([center.lat, center.lng], {
-                radius: totalRadius,
-                color: 'hsl(30, 20%, 55%)',
-                fillColor: 'hsl(30, 20%, 65%)',
-                fillOpacity: 0.05,
-                weight: 1,
-                dashArray: '4 6',
-              }).addTo(leafletMapRef.current!);
-
-              searchCircleRef.current = radiusCircle;
-              leafletMapRef.current!.fitBounds(radiusCircle.getBounds(), { padding: [10, 10], maxZoom: 16 });
-            } else {
-              // Fit map to boundary only
-              leafletMapRef.current!.fitBounds(boundaryLayer.getBounds(), { padding: [10, 10], maxZoom: 16 });
-            }
+        if (geojson && (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon')) {
+          let ring: number[][] = [];
+          if (geojson.type === 'Polygon') {
+            ring = geojson.coordinates[0];
           } else {
-            // Fallback: draw a circle if no polygon geometry available
-            const lat = parseFloat(result.lat);
-            const lon = parseFloat(result.lon);
-            const radiusMeters = searchRadius > 0 ? searchRadius * 1000 : 2000;
-
-            const circle = L.circle([lat, lon], {
-              radius: radiusMeters,
-              color: 'hsl(30, 20%, 55%)',
-              fillColor: 'hsl(30, 20%, 65%)',
-              fillOpacity: 0.15,
-              weight: 2,
-              dashArray: '6 4',
-            }).addTo(leafletMapRef.current!);
-
-            searchCircleRef.current = circle;
-            leafletMapRef.current!.fitBounds(circle.getBounds(), { padding: [5, 5], maxZoom: 16 });
+            let largest = geojson.coordinates[0][0];
+            for (const poly of geojson.coordinates) {
+              if (poly[0].length > largest.length) largest = poly[0];
+            }
+            ring = largest;
           }
-        } catch (err) {
-          console.error('Error drawing location boundary:', err);
-        }
-      };
+          polygonPath = ring.map((c) => ({ lat: c[1], lng: c[0] }));
+          coords = ring.map((c) => ({ latitude: c[1], longitude: c[0] }));
 
-      drawLocationBoundary();
+          searchBoundaryRef.current = new google.maps.Polygon({
+            paths: polygonPath,
+            strokeColor: 'hsl(30, 20%, 55%)',
+            strokeWeight: 2,
+            fillColor: 'hsl(30, 20%, 65%)',
+            fillOpacity: 0.15,
+            map,
+          });
+
+          if (coords.length >= 3) {
+            setHasDrawnArea(true);
+            onDrawnAreaChange?.(coords);
+          }
+
+          const bounds = new google.maps.LatLngBounds();
+          polygonPath.forEach((p) => bounds.extend(p));
+
+          if (searchRadius > 0) {
+            const center = bounds.getCenter();
+            const cornerDist = google.maps.geometry.spherical.computeDistanceBetween(
+              center,
+              bounds.getNorthEast()
+            );
+            const totalRadius = cornerDist + searchRadius * 1000;
+            searchCircleRef.current = new google.maps.Circle({
+              center,
+              radius: totalRadius,
+              strokeColor: 'hsl(30, 20%, 55%)',
+              strokeWeight: 1,
+              fillColor: 'hsl(30, 20%, 65%)',
+              fillOpacity: 0.05,
+              map,
+            });
+            map.fitBounds(searchCircleRef.current.getBounds()!, 10);
+          } else {
+            map.fitBounds(bounds, 10);
+          }
+        } else {
+          // Fallback: circle
+          const lat = parseFloat(result.lat);
+          const lon = parseFloat(result.lon);
+          const radiusMeters = searchRadius > 0 ? searchRadius * 1000 : 2000;
+          searchCircleRef.current = new google.maps.Circle({
+            center: { lat, lng: lon },
+            radius: radiusMeters,
+            strokeColor: 'hsl(30, 20%, 55%)',
+            strokeWeight: 2,
+            fillColor: 'hsl(30, 20%, 65%)',
+            fillOpacity: 0.15,
+            map,
+          });
+          map.fitBounds(searchCircleRef.current.getBounds()!, 5);
+        }
+      } catch (err) {
+        console.error('Error drawing location boundary:', err);
+      }
     }, 1000);
 
-    return () => clearTimeout(timeoutId);
-  }, [mapInitialized, initialSearchLocation, searchRadius]);
+    return () => clearTimeout(timer);
+  }, [loaded, google, initialSearchLocation, searchRadius, initialPolygon, onDrawnAreaChange]);
 
   const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          if (leafletMapRef.current) {
-            leafletMapRef.current.setView([latitude, longitude], 13);
-          }
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        }
-      );
-    }
+    if (!navigator.geolocation || !mapInstance.current) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        mapInstance.current?.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        mapInstance.current?.setZoom(13);
+      },
+      (err) => console.error('Geolocation error:', err)
+    );
   };
 
   const searchLocation = async () => {
-    if (!searchAddress.trim() || !leafletMapRef.current) return;
-    
+    if (!searchAddress.trim() || !google || !mapInstance.current) return;
     setIsSearching(true);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&q=${encodeURIComponent(searchAddress + ', Lebanon')}&limit=1`,
-        { headers: { 'Accept': 'application/json' } }
-      );
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        leafletMapRef.current.setView([parseFloat(lat), parseFloat(lon)], 15);
+      const geocoder = new google.maps.Geocoder();
+      const r = await geocoder.geocode({ address: searchAddress + ', Lebanon' });
+      if (r.results.length > 0) {
+        const loc = r.results[0].geometry.location;
+        mapInstance.current.setCenter({ lat: loc.lat(), lng: loc.lng() });
+        mapInstance.current.setZoom(15);
       } else {
         alert('Location not found. Please try a different search term.');
       }
-    } catch (error) {
-      console.error('Error searching location:', error);
+    } catch (e) {
+      console.error('Search error:', e);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
+  // Drawing
+  const finalizeDrawing = useCallback(() => {
+    if (!google || !mapInstance.current) return;
+    const map = mapInstance.current;
+    map.setOptions({ draggable: true, gestureHandling: 'auto' });
+    map.getDiv().style.cursor = '';
 
-  const freehandCleanupRef = useRef<(() => void) | null>(null);
+    drawingPolylineRef.current?.setMap(null);
+    drawingPolylineRef.current = null;
+
+    const points = drawingPointsRef.current;
+    setIsDrawingMode(false);
+
+    if (points.length < 3) {
+      drawingPointsRef.current = [];
+      drawCleanupRef.current?.();
+      drawCleanupRef.current = null;
+      return;
+    }
+
+    const step = Math.max(1, Math.floor(points.length / 50));
+    const simplified = points.filter((_, i) => i % step === 0);
+    if (simplified.length < 3) {
+      drawingPointsRef.current = [];
+      drawCleanupRef.current?.();
+      drawCleanupRef.current = null;
+      return;
+    }
+
+    drawnPolygonRef.current?.setMap(null);
+    drawnPolygonRef.current = new google.maps.Polygon({
+      paths: simplified,
+      strokeColor: 'hsl(262, 83%, 58%)',
+      strokeWeight: 2,
+      fillColor: 'hsl(262, 83%, 58%)',
+      fillOpacity: 0.2,
+      map,
+    });
+
+    const coords: DrawnPolygonCoordinate[] = simplified.map((p) => ({
+      latitude: p.lat,
+      longitude: p.lng,
+    }));
+    drawingPointsRef.current = [];
+    setHasDrawnArea(true);
+    onDrawnAreaChange?.(coords);
+    drawCleanupRef.current?.();
+    drawCleanupRef.current = null;
+  }, [google, onDrawnAreaChange]);
 
   const startDrawing = useCallback(() => {
-    if (!leafletMapRef.current || !mapInitialized) return;
-    
+    if (!loaded || !google || !mapInstance.current) return;
+    const map = mapInstance.current;
     setIsDrawingMode(true);
 
-    if (isMobile) {
-      // Freehand drawing for mobile (same approach as homepage DrawSearchArea)
-      const map = leafletMapRef.current;
-      const drawingPoints: L.LatLng[] = [];
-      let polyline: L.Polyline | null = null;
-      let isActive = false;
+    drawnPolygonRef.current?.setMap(null);
+    drawnPolygonRef.current = null;
+    drawingPointsRef.current = [];
 
-      map.dragging.disable();
-      map.getContainer().style.cursor = 'crosshair';
+    map.setOptions({ draggable: false, gestureHandling: 'none' });
+    map.getDiv().style.cursor = 'crosshair';
 
-      const addPoint = (latlng: L.LatLng) => {
-        drawingPoints.push(latlng);
-        if (polyline) polyline.remove();
-        polyline = L.polyline(drawingPoints, {
-          color: 'hsl(262, 83%, 58%)',
-          weight: 3,
-          dashArray: '6, 8',
-        }).addTo(map);
-      };
-
-      const onTouchMove = (e: TouchEvent) => {
-        if (!isActive) return;
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = map.getContainer().getBoundingClientRect();
-        const point = map.containerPointToLatLng(
-          L.point(touch.clientX - rect.left, touch.clientY - rect.top)
-        );
-        addPoint(point);
-      };
-
-      const onMouseMove = (e: L.LeafletMouseEvent) => {
-        if (isActive) addPoint(e.latlng);
-      };
-
-      const finishDrawing = () => {
-        if (!isActive) return;
-        isActive = false;
-        map.dragging.enable();
-        map.getContainer().style.cursor = '';
-        map.off('mousemove', onMouseMove);
-        map.getContainer().removeEventListener('touchmove', onTouchMove);
-        map.off('mouseup', finishDrawing);
-        map.off('mousedown', onMouseDown);
-        map.getContainer().removeEventListener('touchstart', onTouchStart);
-        map.getContainer().removeEventListener('touchend', finishDrawing);
-
-        if (polyline) { polyline.remove(); polyline = null; }
-
-        if (drawingPoints.length < 3) {
-          setIsDrawingMode(false);
-          return;
-        }
-
-        // Simplify points
-        const step = Math.max(1, Math.floor(drawingPoints.length / 50));
-        const simplified = drawingPoints.filter((_, i) => i % step === 0);
-        if (simplified.length < 3) { setIsDrawingMode(false); return; }
-
-        // Clear previous and add polygon
-        if (drawnItemsRef.current) drawnItemsRef.current.clearLayers();
-        const polygon = L.polygon(simplified, {
-          color: 'hsl(262, 83%, 58%)',
-          fillColor: 'hsl(262, 83%, 58%)',
-          fillOpacity: 0.15,
-          weight: 2,
-        });
-        drawnItemsRef.current?.addLayer(polygon);
-
-        const coordinates: DrawnPolygonCoordinate[] = simplified.map(ll => ({
-          latitude: ll.lat, longitude: ll.lng,
-        }));
-        setHasDrawnArea(true);
-        setIsDrawingMode(false);
-        onDrawnAreaChange?.(coordinates);
-        // Clear cleanup ref since we've already torn down listeners
-        freehandCleanupRef.current = null;
-      };
-
-      const onTouchStart = () => {
-        isActive = true;
-        map.getContainer().addEventListener('touchmove', onTouchMove, { passive: false });
-      };
-      const onMouseDown = () => {
-        isActive = true;
-        map.on('mousemove', onMouseMove);
-      };
-
-      map.on('mousedown', onMouseDown);
-      map.on('mouseup', finishDrawing);
-      map.getContainer().addEventListener('touchstart', onTouchStart, { passive: true });
-      map.getContainer().addEventListener('touchend', finishDrawing);
-
-      // Store cleanup so cancelDrawing / clearDrawnArea can tear down listeners
-      freehandCleanupRef.current = () => {
-        isActive = false;
-        map.dragging.enable();
-        map.getContainer().style.cursor = '';
-        map.off('mousedown', onMouseDown);
-        map.off('mousemove', onMouseMove);
-        map.off('mouseup', finishDrawing);
-        map.getContainer().removeEventListener('touchstart', onTouchStart);
-        map.getContainer().removeEventListener('touchmove', onTouchMove);
-        map.getContainer().removeEventListener('touchend', finishDrawing);
-        if (polyline) { polyline.remove(); }
-      };
-    } else {
-      // Desktop: use Leaflet Draw polygon handler (click-to-place vertices)
-      const vertexIcon = new L.DivIcon({
-        className: 'leaflet-draw-vertex-icon',
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
+    const addPoint = (latLng: google.maps.LatLng | null) => {
+      if (!latLng) return;
+      drawingPointsRef.current.push({ lat: latLng.lat(), lng: latLng.lng() });
+      drawingPolylineRef.current?.setMap(null);
+      drawingPolylineRef.current = new google.maps.Polyline({
+        path: drawingPointsRef.current,
+        strokeColor: 'hsl(262, 83%, 58%)',
+        strokeWeight: 3,
+        map,
       });
+    };
 
-      const drawHandler = new (L.Draw as any).Polygon(leafletMapRef.current, {
-        shapeOptions: {
-          color: 'hsl(var(--primary))',
-          fillColor: 'hsl(var(--primary))',
-          fillOpacity: 0.2,
-          weight: 2
-        },
-        icon: vertexIcon,
-        touchIcon: vertexIcon,
-        showArea: true,
-        metric: true
-      });
+    let active = false;
+    const mdL = map.addListener('mousedown', (e: google.maps.MapMouseEvent) => {
+      active = true;
+      addPoint(e.latLng);
+    });
+    const mmL = map.addListener('mousemove', (e: google.maps.MapMouseEvent) => {
+      if (active) addPoint(e.latLng);
+    });
+    const muL = map.addListener('mouseup', () => {
+      active = false;
+      finalizeDrawing();
+    });
 
-      drawHandlerRef.current = drawHandler;
-      drawHandler.enable();
-    }
-  }, [mapInitialized, isMobile, onDrawnAreaChange]);
+    // Touch support for mobile
+    const container = map.getDiv();
+    const pixelToLatLng = (x: number, y: number): google.maps.LatLng | null => {
+      const rect = container.getBoundingClientRect();
+      const bounds = map.getBounds();
+      if (!bounds) return null;
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
+      const lng = sw.lng() + (ne.lng() - sw.lng()) * ((x - rect.left) / rect.width);
+      const lat = ne.lat() - (ne.lat() - sw.lat()) * ((y - rect.top) / rect.height);
+      return new google.maps.LatLng(lat, lng);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      active = true;
+      const t = e.touches[0];
+      addPoint(pixelToLatLng(t.clientX, t.clientY));
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!active) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      addPoint(pixelToLatLng(t.clientX, t.clientY));
+    };
+    const onTouchEnd = () => {
+      active = false;
+      finalizeDrawing();
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
+
+    drawCleanupRef.current = () => {
+      google.maps.event.removeListener(mdL);
+      google.maps.event.removeListener(mmL);
+      google.maps.event.removeListener(muL);
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [loaded, google, finalizeDrawing]);
 
   const clearDrawnArea = useCallback(() => {
-    if (drawnItemsRef.current) {
-      drawnItemsRef.current.clearLayers();
-    }
+    drawnPolygonRef.current?.setMap(null);
+    drawnPolygonRef.current = null;
+    drawingPolylineRef.current?.setMap(null);
+    drawingPolylineRef.current = null;
+    drawingPointsRef.current = [];
     setHasDrawnArea(false);
     setIsDrawingMode(false);
+    if (mapInstance.current) {
+      mapInstance.current.setOptions({ draggable: true, gestureHandling: 'auto' });
+      mapInstance.current.getDiv().style.cursor = '';
+    }
+    drawCleanupRef.current?.();
+    drawCleanupRef.current = null;
     onDrawnAreaChange?.(null);
-    
-    if (drawHandlerRef.current) {
-      drawHandlerRef.current.disable();
-      drawHandlerRef.current = null;
-    }
-    if (freehandCleanupRef.current) {
-      freehandCleanupRef.current();
-      freehandCleanupRef.current = null;
-    }
   }, [onDrawnAreaChange]);
 
   const cancelDrawing = useCallback(() => {
     setIsDrawingMode(false);
-    if (drawHandlerRef.current) {
-      drawHandlerRef.current.disable();
-      drawHandlerRef.current = null;
+    drawingPolylineRef.current?.setMap(null);
+    drawingPolylineRef.current = null;
+    drawingPointsRef.current = [];
+    if (mapInstance.current) {
+      mapInstance.current.setOptions({ draggable: true, gestureHandling: 'auto' });
+      mapInstance.current.getDiv().style.cursor = '';
     }
-    if (freehandCleanupRef.current) {
-      freehandCleanupRef.current();
-      freehandCleanupRef.current = null;
-    }
+    drawCleanupRef.current?.();
+    drawCleanupRef.current = null;
   }, []);
 
-  const mapHeight = embedded ? height : (isExpanded ? "calc(100vh - 220px)" : height);
+  const handleSaveArea = () => {
+    if (!drawnPolygonRef.current || !onSaveArea) return;
+    const path = drawnPolygonRef.current.getPath();
+    const coords: DrawnPolygonCoordinate[] = [];
+    for (let i = 0; i < path.getLength(); i++) {
+      const ll = path.getAt(i);
+      coords.push({ latitude: ll.lat(), longitude: ll.lng() });
+    }
+    onSaveArea(coords);
+  };
+
+  const toggleExpanded = () => setIsExpanded(!isExpanded);
+
+  const mapHeight = embedded ? height : isExpanded ? 'calc(100vh - 220px)' : height;
   const mapClass = embedded
-    ? (className || "h-full")
+    ? className || 'h-full'
     : isExpanded
-      ? "fixed inset-0 z-40 bg-background/95 backdrop-blur-sm p-4 animate-fade-in"
+      ? 'fixed inset-0 z-40 bg-background/95 backdrop-blur-sm p-4 animate-fade-in'
       : `${className} animate-fade-in`;
 
   if (embedded) {
     return (
       <div className={`${mapClass} flex flex-col relative`} style={{ height }}>
-        {/* Draw controls overlay */}
         {enableDrawing && (
           <div className="absolute top-2 right-20 z-[1000] flex gap-1">
             {isDrawingMode ? (
@@ -815,15 +607,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
               <div className="flex gap-1">
                 {onSaveArea && (
                   <button
-                    onClick={() => {
-                      const layers = drawnItemsRef.current?.getLayers();
-                      if (layers && layers.length > 0) {
-                        const layer = layers[0] as L.Polygon;
-                        const latLngs = layer.getLatLngs()[0] as L.LatLng[];
-                        const coords: DrawnPolygonCoordinate[] = latLngs.map(ll => ({ latitude: ll.lat, longitude: ll.lng }));
-                        onSaveArea(coords);
-                      }
-                    }}
+                    onClick={handleSaveArea}
                     className="px-3 py-1.5 rounded-md bg-primary/90 text-primary-foreground shadow-sm hover:bg-primary transition-colors text-xs font-medium flex items-center gap-1"
                   >
                     <Save className="w-3 h-3" />
@@ -852,16 +636,15 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         {isDrawingMode && (
           <div className="absolute top-3 left-3 right-3 z-[1000]">
             <p className="text-xs text-foreground bg-background/90 border border-border rounded-md px-3 py-1.5 shadow-sm">
-              {isMobile ? 'Draw on the map with your finger' : 'Click on the map to draw a polygon. Click the first point to close the shape.'}
+              {isMobile
+                ? 'Draw on the map with your finger'
+                : 'Press and drag on the map to draw your search area.'}
             </p>
           </div>
         )}
         <div className="flex-1 relative">
-          <div 
-            ref={mapRef}
-            className="absolute inset-0 rounded-lg"
-          />
-          {tilesLoading && (
+          <div ref={mapRef} className="absolute inset-0 rounded-lg" />
+          {!loaded && (
             <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
@@ -888,30 +671,13 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
               {enableDrawing && (
                 <>
                   {isDrawingMode ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={cancelDrawing}
-                      className="text-xs"
-                    >
+                    <Button size="sm" variant="outline" onClick={cancelDrawing} className="text-xs">
                       Cancel
                     </Button>
                   ) : hasDrawnArea ? (
                     <div className="flex gap-1">
                       {onSaveArea && (
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={() => {
-                            const layers = drawnItemsRef.current?.getLayers();
-                            if (layers && layers.length > 0) {
-                              const layer = layers[0] as L.Polygon;
-                              const latLngs = layer.getLatLngs()[0] as L.LatLng[];
-                              const coords: DrawnPolygonCoordinate[] = latLngs.map(ll => ({ latitude: ll.lat, longitude: ll.lng }));
-                              onSaveArea(coords);
-                            }
-                          }}
-                        >
+                        <Button size="sm" variant="default" onClick={handleSaveArea}>
                           <Save className="h-4 w-4 mr-1" />
                           Save Area
                         </Button>
@@ -927,11 +693,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
                       </Button>
                     </div>
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={startDrawing}
-                    >
+                    <Button size="sm" variant="outline" onClick={startDrawing}>
                       <PenTool className="h-4 w-4 mr-1" />
                       Draw Area
                     </Button>
@@ -952,7 +714,9 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           </div>
           {isDrawingMode && (
             <p className="text-xs text-muted-foreground mt-2">
-              {isMobile ? 'Draw on the map with your finger' : 'Click on the map to draw a polygon around your desired search area. Click the first point to close the shape.'}
+              {isMobile
+                ? 'Draw on the map with your finger'
+                : 'Press and drag on the map to draw your search area.'}
             </p>
           )}
           {isExpanded && (
@@ -970,7 +734,6 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           )}
         </CardHeader>
         <CardContent className="pb-2">
-          {/* Search Controls */}
           <div className="flex gap-2 mb-3">
             <Input
               placeholder="Search district..."
@@ -979,8 +742,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
               onKeyPress={(e) => e.key === 'Enter' && searchLocation()}
               className="flex-1 h-8 text-sm"
             />
-            <Button 
-              onClick={searchLocation} 
+            <Button
+              onClick={searchLocation}
               disabled={isSearching}
               size="sm"
               variant="outline"
@@ -988,23 +751,14 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             >
               <Search className="h-3 w-3" />
             </Button>
-            <Button 
-              onClick={getCurrentLocation} 
-              size="sm" 
-              variant="outline"
-              className="h-8"
-            >
+            <Button onClick={getCurrentLocation} size="sm" variant="outline" className="h-8">
               <Locate className="h-3 w-3" />
             </Button>
           </div>
-          
-          {/* Map Container */}
+
           <div className="relative" style={{ height: mapHeight }}>
-            <div 
-              ref={mapRef}
-              className="absolute inset-0 rounded-lg"
-            />
-            {tilesLoading && (
+            <div ref={mapRef} className="absolute inset-0 rounded-lg" />
+            {!loaded && (
               <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>

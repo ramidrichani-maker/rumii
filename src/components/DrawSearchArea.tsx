@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, Loader2 } from 'lucide-react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 
 interface Coordinate {
   latitude: number;
@@ -14,169 +13,177 @@ interface DrawSearchAreaProps {
 }
 
 const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
+  const { google, loaded } = useGoogleMaps();
   const mapRef = useRef<HTMLDivElement>(null);
-  const leafletMapRef = useRef<L.Map | null>(null);
-  const polygonLayerRef = useRef<L.Polygon | null>(null);
-  const drawingPointsRef = useRef<L.LatLng[]>([]);
-  const polylineRef = useRef<L.Polyline | null>(null);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const polygonRef = useRef<google.maps.Polygon | null>(null);
+  const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const drawingPointsRef = useRef<google.maps.LatLngLiteral[]>([]);
+  const isDrawingRef = useRef(false);
+  const cleanupRef = useRef<(() => void) | null>(null);
+
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasPolygon, setHasPolygon] = useState(false);
-  const [tilesLoading, setTilesLoading] = useState(true);
-  const isDrawingRef = useRef(false);
 
+  // Init map
   useEffect(() => {
-    if (!mapRef.current) return;
-
-    const map = L.map(mapRef.current, {
-      center: [33.8938, 35.5018],
+    if (!loaded || !google || !mapRef.current || mapInstance.current) return;
+    mapInstance.current = new google.maps.Map(mapRef.current, {
+      center: { lat: 33.8938, lng: 35.5018 },
       zoom: 10,
-      zoomControl: false,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      gestureHandling: 'greedy',
     });
-
-    L.control.zoom({ position: 'topright' }).addTo(map);
-
-    const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }).addTo(map);
-
-    tileLayer.on('loading', () => setTilesLoading(true));
-    tileLayer.on('load', () => setTilesLoading(false));
-
-    leafletMapRef.current = map;
-
     return () => {
-      map.remove();
-      leafletMapRef.current = null;
+      polygonRef.current?.setMap(null);
+      polylineRef.current?.setMap(null);
+      mapInstance.current = null;
     };
+  }, [loaded, google]);
+
+  const clearDrawing = useCallback(() => {
+    polygonRef.current?.setMap(null);
+    polygonRef.current = null;
+    polylineRef.current?.setMap(null);
+    polylineRef.current = null;
+    drawingPointsRef.current = [];
+    setHasPolygon(false);
+    setIsDrawing(false);
+    isDrawingRef.current = false;
+    if (mapInstance.current) {
+      mapInstance.current.setOptions({ draggable: true, gestureHandling: 'greedy' });
+    }
+    if (cleanupRef.current) {
+      cleanupRef.current();
+      cleanupRef.current = null;
+    }
   }, []);
 
   const startDrawing = useCallback(() => {
-    const map = leafletMapRef.current;
-    if (!map) return;
+    if (!loaded || !google || !mapInstance.current) return;
+    const map = mapInstance.current;
 
-    // Clear previous
-    if (polygonLayerRef.current) {
-      polygonLayerRef.current.remove();
-      polygonLayerRef.current = null;
-    }
-    if (polylineRef.current) {
-      polylineRef.current.remove();
-      polylineRef.current = null;
-    }
-
+    polygonRef.current?.setMap(null);
+    polygonRef.current = null;
+    polylineRef.current?.setMap(null);
+    polylineRef.current = null;
     drawingPointsRef.current = [];
     setHasPolygon(false);
     setIsDrawing(true);
     isDrawingRef.current = true;
-    map.dragging.disable();
-    map.getContainer().style.cursor = 'crosshair';
 
-    const addPoint = (latlng: L.LatLng) => {
-      if (!isDrawingRef.current) return;
-      drawingPointsRef.current.push(latlng);
+    map.setOptions({ draggable: false, gestureHandling: 'none' });
+    map.getDiv().style.cursor = 'crosshair';
 
-      if (polylineRef.current) polylineRef.current.remove();
-      polylineRef.current = L.polyline(drawingPointsRef.current, {
-        color: 'hsl(262, 83%, 58%)',
-        weight: 3,
-        dashArray: '6, 8',
-      }).addTo(map);
-    };
-
-    const onMouseMove = (e: L.LeafletMouseEvent) => {
-      if (isDrawingRef.current) addPoint(e.latlng);
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (!isDrawingRef.current) return;
-      e.preventDefault();
-      const touch = e.touches[0];
-      const point = map.containerPointToLatLng(L.point(
-        touch.clientX - map.getContainer().getBoundingClientRect().left,
-        touch.clientY - map.getContainer().getBoundingClientRect().top
-      ));
-      addPoint(point);
-    };
-
-    const onMouseDown = () => {
-      map.on('mousemove', onMouseMove);
-    };
-    const onTouchStart = () => {
-      map.getContainer().addEventListener('touchmove', onTouchMove, { passive: false });
+    const addPoint = (latLng: google.maps.LatLng | null) => {
+      if (!latLng || !isDrawingRef.current) return;
+      drawingPointsRef.current.push({ lat: latLng.lat(), lng: latLng.lng() });
+      if (polylineRef.current) polylineRef.current.setMap(null);
+      polylineRef.current = new google.maps.Polyline({
+        path: drawingPointsRef.current,
+        strokeColor: 'hsl(262, 83%, 58%)',
+        strokeWeight: 3,
+        strokeOpacity: 1,
+        map,
+      });
     };
 
     const finishDrawing = () => {
       if (!isDrawingRef.current) return;
       isDrawingRef.current = false;
       setIsDrawing(false);
-      map.dragging.enable();
-      map.getContainer().style.cursor = '';
-      map.off('mousedown', onMouseDown);
-      map.off('mousemove', onMouseMove);
-      map.getContainer().removeEventListener('touchmove', onTouchMove);
-      map.off('mouseup', finishDrawing);
-      map.getContainer().removeEventListener('touchstart', onTouchStart);
-      map.getContainer().removeEventListener('touchend', finishDrawing);
+      map.setOptions({ draggable: true, gestureHandling: 'greedy' });
+      map.getDiv().style.cursor = '';
 
-      if (polylineRef.current) {
-        polylineRef.current.remove();
-        polylineRef.current = null;
-      }
+      polylineRef.current?.setMap(null);
+      polylineRef.current = null;
 
       const points = drawingPointsRef.current;
-      if (points.length < 3) return;
+      if (points.length < 3) {
+        cleanupRef.current?.();
+        cleanupRef.current = null;
+        return;
+      }
 
-      // Simplify: take every Nth point to reduce noise
       const step = Math.max(1, Math.floor(points.length / 50));
       const simplified = points.filter((_, i) => i % step === 0);
-      if (simplified.length < 3) return;
+      if (simplified.length < 3) {
+        cleanupRef.current?.();
+        cleanupRef.current = null;
+        return;
+      }
 
-      polygonLayerRef.current = L.polygon(simplified, {
-        color: 'hsl(262, 83%, 58%)',
+      polygonRef.current = new google.maps.Polygon({
+        paths: simplified,
+        strokeColor: 'hsl(262, 83%, 58%)',
+        strokeWeight: 2,
         fillColor: 'hsl(262, 83%, 58%)',
         fillOpacity: 0.15,
-        weight: 2,
-      }).addTo(map);
-
+        map,
+      });
       setHasPolygon(true);
+      cleanupRef.current?.();
+      cleanupRef.current = null;
     };
 
-    map.on('mousedown', onMouseDown);
-    map.on('mouseup', finishDrawing);
+    const mouseDownListener = map.addListener('mousedown', (e: google.maps.MapMouseEvent) => {
+      if (!isDrawingRef.current) return;
+      addPoint(e.latLng);
+    });
+    const mouseMoveListener = map.addListener('mousemove', (e: google.maps.MapMouseEvent) => {
+      if (!isDrawingRef.current) return;
+      addPoint(e.latLng);
+    });
+    const mouseUpListener = map.addListener('mouseup', () => finishDrawing());
 
-    map.getContainer().addEventListener('touchstart', onTouchStart, { passive: true });
-    map.getContainer().addEventListener('touchend', finishDrawing);
-  }, []);
+    // Touch support
+    const container = map.getDiv();
+    const containerRect = () => container.getBoundingClientRect();
+    const projection = () => map.getProjection();
 
-  const clearDrawing = useCallback(() => {
-    if (polygonLayerRef.current) {
-      polygonLayerRef.current.remove();
-      polygonLayerRef.current = null;
-    }
-    if (polylineRef.current) {
-      polylineRef.current.remove();
-      polylineRef.current = null;
-    }
-    drawingPointsRef.current = [];
-    setHasPolygon(false);
-    setIsDrawing(false);
-    isDrawingRef.current = false;
-    const map = leafletMapRef.current;
-    if (map) {
-      map.dragging.enable();
-      map.getContainer().style.cursor = '';
-    }
-  }, []);
+    const pixelToLatLng = (x: number, y: number): google.maps.LatLng | null => {
+      const rect = containerRect();
+      const proj = projection();
+      if (!proj) return null;
+      const bounds = map.getBounds();
+      if (!bounds) return null;
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
+      const lng = sw.lng() + (ne.lng() - sw.lng()) * ((x - rect.left) / rect.width);
+      const lat = ne.lat() - (ne.lat() - sw.lat()) * ((y - rect.top) / rect.height);
+      return new google.maps.LatLng(lat, lng);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDrawingRef.current) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      addPoint(pixelToLatLng(t.clientX, t.clientY));
+    };
+    const onTouchEnd = () => finishDrawing();
+
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
+
+    cleanupRef.current = () => {
+      google.maps.event.removeListener(mouseDownListener);
+      google.maps.event.removeListener(mouseMoveListener);
+      google.maps.event.removeListener(mouseUpListener);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [loaded, google]);
 
   const confirmArea = useCallback(() => {
-    if (!polygonLayerRef.current) return;
-    const latlngs = polygonLayerRef.current.getLatLngs()[0] as L.LatLng[];
-    const coords: Coordinate[] = latlngs.map(ll => ({
-      latitude: ll.lat,
-      longitude: ll.lng,
-    }));
+    if (!polygonRef.current) return;
+    const path = polygonRef.current.getPath();
+    const coords: Coordinate[] = [];
+    for (let i = 0; i < path.getLength(); i++) {
+      const ll = path.getAt(i);
+      coords.push({ latitude: ll.lat(), longitude: ll.lng() });
+    }
     onDrawComplete(coords);
   }, [onDrawComplete]);
 
@@ -192,7 +199,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
             </Button>
           )}
           {!isDrawing && !hasPolygon && (
-            <Button size="sm" variant="outline" onClick={startDrawing} className="h-8">
+            <Button size="sm" variant="outline" onClick={startDrawing} className="h-8" disabled={!loaded}>
               <Pencil className="h-4 w-4 mr-1" />
               Draw
             </Button>
@@ -207,14 +214,14 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
 
       <div className="relative" style={{ height: '280px' }}>
         <div ref={mapRef} className="absolute inset-0" />
-        {tilesLoading && (
+        {!loaded && (
           <div className="absolute inset-0 bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         )}
         {isDrawing && (
           <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[500] bg-background/90 backdrop-blur-sm text-foreground text-xs font-medium px-3 py-1.5 rounded-full border border-border shadow-sm">
-            Draw on the map with your finger
+            Press and drag to draw
           </div>
         )}
       </div>

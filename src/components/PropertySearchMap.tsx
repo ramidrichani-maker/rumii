@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Loader2 } from 'lucide-react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { getCityCenter } from '@/utils/cityCenter';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 
 interface Property {
   id: string;
@@ -27,159 +26,134 @@ interface PropertySearchMapProps {
   onPropertySelect?: (property: Property) => void;
 }
 
+const MARKER_ICON_URL =
+  'data:image/svg+xml;base64,' +
+  btoa(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+  `);
+
 const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
   properties = [],
-  height = "400px",
-  className = "",
-  onPropertySelect
+  height = '400px',
+  className = '',
+  onPropertySelect,
 }) => {
   const { profile } = useAuth();
+  const { google, loaded } = useGoogleMaps();
   const isAdmin = profile?.role === 'admin';
   const mapRef = useRef<HTMLDivElement>(null);
-  const leafletMapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.Marker[]>([]);
-  const [mapInitialized, setMapInitialized] = useState(false);
-  const [tilesLoading, setTilesLoading] = useState(true);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
   // Initialize map
   useEffect(() => {
-    if (!mapRef.current || mapInitialized) return;
-
-    try {
-      // Create custom icon for property markers
-      const propertyIcon = L.icon({
-        iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-        `),
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32],
-      });
-
-      // Initialize map with Beirut, Lebanon as default center
-      const map = L.map(mapRef.current).setView([33.8938, 35.5018], 12);
-      
-      // Add tile layer with English labels
-      const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-      }).addTo(map);
-
-      tileLayer.on('loading', () => setTilesLoading(true));
-      tileLayer.on('load', () => setTilesLoading(false));
-
-      leafletMapRef.current = map;
-      setMapInitialized(true);
-
-    } catch (error) {
-      console.error('Error initializing property search map:', error);
-    }
-
+    if (!loaded || !google || !mapRef.current || mapInstance.current) return;
+    mapInstance.current = new google.maps.Map(mapRef.current, {
+      center: { lat: 33.8938, lng: 35.5018 },
+      zoom: 12,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+    infoWindowRef.current = new google.maps.InfoWindow();
     return () => {
-      if (leafletMapRef.current) {
-        leafletMapRef.current.remove();
-        leafletMapRef.current = null;
-        markersRef.current = [];
-        setMapInitialized(false);
-      }
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+      mapInstance.current = null;
     };
-  }, []);
+  }, [loaded, google]);
 
-  // Update markers when properties change — use city center for privacy
+  // Update markers when properties change
   useEffect(() => {
-    if (!leafletMapRef.current || !mapInitialized) return;
+    if (!loaded || !google || !mapInstance.current) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
 
     if (properties.length === 0) return;
 
-    const addMarkers = async () => {
-      try {
-        const propertyIcon = L.icon({
-          iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-          `),
-          iconSize: [24, 24],
-          iconAnchor: [12, 24],
-          popupAnchor: [0, -24],
-        });
+    let cancelled = false;
 
-        // Admins see exact location; regular users see city center
-        let cityCenters: Record<string, { lat: number; lng: number }> = {};
-        if (!isAdmin) {
-          const uniqueCities = [...new Set(properties.map(p => p.city).filter(Boolean))];
-          await Promise.all(uniqueCities.map(async (city) => {
+    const addMarkers = async () => {
+      let cityCenters: Record<string, { lat: number; lng: number }> = {};
+      if (!isAdmin) {
+        const uniqueCities = [...new Set(properties.map((p) => p.city).filter(Boolean))];
+        await Promise.all(
+          uniqueCities.map(async (city) => {
             const center = await getCityCenter(city);
             if (center) cityCenters[city] = center;
-          }));
+          })
+        );
+      }
+      if (cancelled) return;
+
+      const bounds = new google.maps.LatLngBounds();
+
+      properties.forEach((property) => {
+        let pos: { lat: number; lng: number };
+        if (isAdmin && property.latitude && property.longitude) {
+          pos = { lat: property.latitude, lng: property.longitude };
+        } else {
+          const c = cityCenters[property.city];
+          if (!c) return;
+          pos = {
+            lat: c.lat + (Math.random() - 0.5) * 0.008,
+            lng: c.lng + (Math.random() - 0.5) * 0.008,
+          };
         }
 
-        const bounds = L.latLngBounds([]);
-
-        properties.forEach(property => {
-          let markerLat: number, markerLng: number;
-
-          if (isAdmin && property.latitude && property.longitude) {
-            markerLat = property.latitude;
-            markerLng = property.longitude;
-          } else {
-            const center = cityCenters[property.city];
-            if (!center) return;
-            markerLat = center.lat + (Math.random() - 0.5) * 0.008;
-            markerLng = center.lng + (Math.random() - 0.5) * 0.008;
-          }
-
-          const marker = L.marker([markerLat, markerLng], { icon: propertyIcon })
-            .addTo(leafletMapRef.current!);
-
-          // Create popup content
-          const popupContent = `
-            <div class="p-2 min-w-[200px]">
-              <h3 class="font-semibold text-sm mb-1">${property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1)} in ${property.city}</h3>
-              <p class="text-xs text-gray-600 mb-2">${property.address}</p>
-              <div class="text-xs space-y-1">
-                <div><strong>Price:</strong> $${property.price.toLocaleString()}</div>
-                <div><strong>Size:</strong> ${property.square_meters}m²</div>
-                <div><strong>Bedrooms:</strong> ${property.bedrooms} | <strong>Bathrooms:</strong> ${property.bathrooms}</div>
-                <div><strong>Type:</strong> For ${property.listing_type}</div>
-              </div>
-            </div>
-          `;
-
-          marker.bindPopup(popupContent);
-          
-          // Add click handler
-          marker.on('click', () => {
-            if (onPropertySelect) {
-              onPropertySelect(property);
-            }
-          });
-
-          markersRef.current.push(marker);
-          bounds.extend([markerLat, markerLng]);
+        const marker = new google.maps.Marker({
+          position: pos,
+          map: mapInstance.current!,
+          icon: {
+            url: MARKER_ICON_URL,
+            scaledSize: new google.maps.Size(24, 24),
+            anchor: new google.maps.Point(12, 24),
+          },
         });
 
-        // Fit map to show all properties
-        if (bounds.isValid()) {
-          leafletMapRef.current!.fitBounds(bounds, { padding: [20, 20] });
-        }
+        const propTypeCap =
+          property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1);
 
-      } catch (error) {
-        console.error('Error updating property markers:', error);
+        const popupHtml = `
+          <div style="padding:8px;min-width:200px;">
+            <h3 style="font-weight:600;font-size:14px;margin:0 0 4px 0;">${propTypeCap} in ${property.city}</h3>
+            <p style="font-size:12px;color:#666;margin:0 0 8px 0;">${property.address}</p>
+            <div style="font-size:12px;line-height:1.5;">
+              <div><strong>Price:</strong> $${property.price.toLocaleString()}</div>
+              <div><strong>Size:</strong> ${property.square_meters}m²</div>
+              <div><strong>Bedrooms:</strong> ${property.bedrooms} | <strong>Bathrooms:</strong> ${property.bathrooms}</div>
+              <div><strong>Type:</strong> For ${property.listing_type}</div>
+            </div>
+          </div>
+        `;
+
+        marker.addListener('click', () => {
+          if (infoWindowRef.current && mapInstance.current) {
+            infoWindowRef.current.setContent(popupHtml);
+            infoWindowRef.current.open({ map: mapInstance.current, anchor: marker });
+          }
+          if (onPropertySelect) onPropertySelect(property);
+        });
+
+        markersRef.current.push(marker);
+        bounds.extend(pos);
+      });
+
+      if (!bounds.isEmpty() && mapInstance.current) {
+        mapInstance.current.fitBounds(bounds, 40);
       }
     };
 
     addMarkers();
-  }, [properties, mapInitialized, onPropertySelect]);
+    return () => {
+      cancelled = true;
+    };
+  }, [properties, loaded, google, isAdmin, onPropertySelect]);
 
   return (
     <Card className={className}>
@@ -191,11 +165,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
       </CardHeader>
       <CardContent>
         <div className="relative" style={{ height }}>
-          <div 
-            ref={mapRef}
-            className="rounded-lg overflow-hidden border absolute inset-0"
-          />
-          {tilesLoading && (
+          <div ref={mapRef} className="rounded-lg overflow-hidden border absolute inset-0" />
+          {!loaded && (
             <div className="absolute inset-0 rounded-lg bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
