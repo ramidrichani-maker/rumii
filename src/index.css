@@ -5,6 +5,26 @@
 /* Leaflet CSS imports */
 @import 'leaflet/dist/leaflet.css';
 
+/* Google Maps InfoWindow overrides — make property card display fully without clipping */
+.gm-style .gm-style-iw-c {
+  padding: 0 !important;
+  border-radius: 10px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+}
+.gm-style .gm-style-iw-d {
+  overflow: visible !important;
+  max-height: none !important;
+  padding: 0 !important;
+}
+.gm-style .gm-style-iw-c button.gm-ui-hover-effect {
+  display: none !important;
+}
+.gm-style .gm-style-iw-tc::after {
+  background: white;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

@@ -110,7 +110,10 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       clickableIcons: false,
       styles: MAP_STYLES_NO_POI,
     });
-    infoWindowRef.current = new google.maps.InfoWindow({ maxWidth: 280 });
+    infoWindowRef.current = new google.maps.InfoWindow({
+      maxWidth: 300,
+      disableAutoPan: false,
+    });
     return () => {
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
