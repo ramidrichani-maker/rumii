@@ -667,7 +667,7 @@ const ListProperty = () => {
         property_type: data.propertyType.toLowerCase() as any,
         square_meters: parseInt(data.metersSquared),
         bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseFloat(data.bathrooms),
+        bathrooms: parseInt(data.bathrooms, 10),
         listing_type: data.listingType as any,
         price: data.price ? parseFloat(data.price) : null,
         rental_price: data.rentalPrice ? parseFloat(data.rentalPrice) : null,
@@ -1023,11 +1023,8 @@ const ListProperty = () => {
                     <FormItem>
                       <FormLabel>Bathrooms</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.5" min="0.5" placeholder="e.g. 2 or 1.5" {...field} />
+                        <Input type="number" step="1" min="1" placeholder="e.g. 2" {...field} />
                       </FormControl>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Use .5 for half baths (toilet only, no shower)
-                      </p>
                       <FormMessage />
                     </FormItem>
                   )} />
