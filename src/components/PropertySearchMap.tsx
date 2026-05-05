@@ -134,11 +134,15 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
           </div>
         `;
 
-        marker.addListener('click', () => {
+        const openInfo = () => {
           if (infoWindowRef.current && mapInstance.current) {
             infoWindowRef.current.setContent(popupHtml);
             infoWindowRef.current.open({ map: mapInstance.current, anchor: marker });
           }
+        };
+        marker.addListener('mouseover', openInfo);
+        marker.addListener('click', () => {
+          openInfo();
           if (onPropertySelect) onPropertySelect(property);
         });
 
