@@ -1533,24 +1533,53 @@ const ListProperty = () => {
             </div>
 
             <div className="flex justify-end">
-              <Button
-                type="submit"
-                size="lg"
-                className="px-8"
-                disabled={
+              {(() => {
+                const uploadingCount = uploadedImages.filter(i => i.status === 'uploading').length;
+                const failedCount = uploadedImages.filter(i => i.status === 'failed').length;
+                const idleCount = uploadedImages.filter(i => i.status === 'idle').length;
+                const missingRoomCount = uploadedImages.filter(i => !i.roomType).length;
+                const blocked =
                   isSubmitting ||
                   isPreparingConfirm ||
-                  uploadedImages.some(img => img.status === 'uploading')
-                }
-              >
-                {isPreparingConfirm
-                  ? "Preparing..."
-                  : isSubmitting
-                  ? "Submitting..."
-                  : uploadedImages.some(img => img.status === 'uploading')
-                  ? "Uploading media..."
-                  : "Submit Listing"}
-              </Button>
+                  uploadingCount > 0 ||
+                  failedCount > 0 ||
+                  idleCount > 0;
+
+                let label = "Submit Listing";
+                if (isPreparingConfirm) label = "Preparing...";
+                else if (isSubmitting) label = "Submitting...";
+                else if (uploadingCount > 0)
+                  label = `Uploading ${uploadingCount} file${uploadingCount > 1 ? 's' : ''}...`;
+                else if (failedCount > 0)
+                  label = `Fix ${failedCount} failed upload${failedCount > 1 ? 's' : ''}`;
+                else if (idleCount > 0)
+                  label = `Waiting on ${idleCount} file${idleCount > 1 ? 's' : ''}`;
+
+                return (
+                  <div className="flex flex-col items-end gap-2">
+                    {(uploadingCount > 0 || failedCount > 0 || idleCount > 0 || missingRoomCount > 0) && (
+                      <p className="text-xs text-muted-foreground">
+                        {uploadingCount > 0 && (
+                          <span>{uploadingCount} file{uploadingCount > 1 ? 's' : ''} uploading. </span>
+                        )}
+                        {failedCount > 0 && (
+                          <span className="text-destructive">
+                            {failedCount} failed — retry or remove. {' '}
+                          </span>
+                        )}
+                        {missingRoomCount > 0 && (
+                          <span className="text-destructive">
+                            {missingRoomCount} missing room type. {' '}
+                          </span>
+                        )}
+                      </p>
+                    )}
+                    <Button type="submit" size="lg" className="px-8" disabled={blocked}>
+                      {label}
+                    </Button>
+                  </div>
+                );
+              })()}
             </div>
           </form>
         </Form>
