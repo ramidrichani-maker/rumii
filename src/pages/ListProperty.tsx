@@ -145,6 +145,7 @@ const ListProperty = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showClientConfirm, setShowClientConfirm] = useState(false);
+  const [popupBrokerAccepted, setPopupBrokerAccepted] = useState(false);
   const [pendingData, setPendingData] = useState<FormData | null>(null);
   const [isPreparingConfirm, setIsPreparingConfirm] = useState(false);
   const auth = useAuth();
