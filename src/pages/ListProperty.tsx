@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Upload, Home, Camera, AlertTriangle, RotateCw, X, CheckCircle2, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Upload, Home, Camera, AlertTriangle, RotateCw, X, CheckCircle2, Loader2, Copy } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -148,8 +148,14 @@ const ListProperty = () => {
   const [popupBrokerAccepted, setPopupBrokerAccepted] = useState(false);
   const [pendingData, setPendingData] = useState<FormData | null>(null);
   const [isPreparingConfirm, setIsPreparingConfirm] = useState(false);
+  const [submittedListing, setSubmittedListing] = useState<{
+    id: string;
+    propertyCode: number | null;
+    imageCount: number;
+  } | null>(null);
   const auth = useAuth();
   const { user, profile } = auth;
+  const navigate = useNavigate();
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -694,7 +700,7 @@ const ListProperty = () => {
         longitude: coordinates.lng,
         description: data.description || null,
         status: 'pending'
-      }).select('id').single();
+      }).select('id, property_code').single();
 
       if (error) throw error;
 
@@ -719,9 +725,10 @@ const ListProperty = () => {
         // Don't fail the whole submission if agreement logging fails
       }
 
-      toast({
-        title: "Property Listed Successfully!",
-        description: `Your property has been submitted for admin approval${imageUrls.length > 0 ? ` with ${imageUrls.length} image${imageUrls.length > 1 ? 's' : ''}` : ''}.`
+      setSubmittedListing({
+        id: propertyData?.id ?? '',
+        propertyCode: (propertyData as any)?.property_code ?? null,
+        imageCount: imageUrls.length,
       });
 
       // Reset form
@@ -1626,6 +1633,111 @@ const ListProperty = () => {
                 }}
               >
                 Agree & Submit
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog
+          open={!!submittedListing}
+          onOpenChange={(open) => {
+            if (!open) setSubmittedListing(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                Listing submitted successfully
+              </AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-4 text-sm text-muted-foreground">
+                  <p>
+                    Thank you! Your property has been submitted
+                    {submittedListing && submittedListing.imageCount > 0
+                      ? ` with ${submittedListing.imageCount} image${submittedListing.imageCount > 1 ? 's' : ''}`
+                      : ''}.
+                  </p>
+
+                  <div className="rounded-md border border-border bg-muted/40 p-3 space-y-2">
+                    {submittedListing?.propertyCode != null && (
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Property code
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm font-semibold text-foreground">
+                            #{submittedListing.propertyCode}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => {
+                              if (submittedListing?.propertyCode != null) {
+                                navigator.clipboard.writeText(String(submittedListing.propertyCode));
+                                toast({ title: "Copied", description: "Property code copied to clipboard." });
+                              }
+                            }}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    {submittedListing?.id && (
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Listing ID
+                        </span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-mono text-xs text-foreground truncate max-w-[200px]">
+                            {submittedListing.id}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => {
+                              if (submittedListing?.id) {
+                                navigator.clipboard.writeText(submittedListing.id);
+                                toast({ title: "Copied", description: "Listing ID copied to clipboard." });
+                              }
+                            }}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-medium text-foreground">What happens next?</p>
+                    <ol className="list-decimal pl-5 space-y-1">
+                      <li>An Oracle Estates admin will review your listing (typically within 24–48 hours).</li>
+                      <li>You'll receive a notification once it's approved or if any changes are needed.</li>
+                      <li>An assigned agent will reach out to coordinate viewings and enquiries.</li>
+                    </ol>
+                    <p className="text-xs">
+                      You can track the status of your listing any time from <strong>My Listings</strong>.
+                    </p>
+                  </div>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setSubmittedListing(null)}>Close</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSubmittedListing(null);
+                  navigate('/my-listings');
+                }}
+              >
+                View my listings
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
