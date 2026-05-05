@@ -4,6 +4,17 @@ import { Phone, Mail, Building2, CalendarCheck, MessageCircle } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Popover,
   PopoverContent,
@@ -27,11 +38,13 @@ interface AgentContactBoxProps {
 
 const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, propertyPrice, listingType }: AgentContactBoxProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [agencyName, setAgencyName] = useState<string | null>(null);
   const [agent, setAgent] = useState<AgentInfo | null>(null);
   const [showPhone, setShowPhone] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showViewingModal, setShowViewingModal] = useState(false);
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +114,13 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
       <Button
         variant="outline"
         className="w-full gap-2"
-        onClick={() => setShowViewingModal(true)}
+        onClick={() => {
+          if (!user) {
+            setShowSignInPrompt(true);
+            return;
+          }
+          setShowViewingModal(true);
+        }}
       >
         <CalendarCheck className="w-4 h-4" />
         Request Viewing
@@ -160,6 +179,24 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
           agencyId={agencyId}
         />
       )}
+
+      <AlertDialog open={showSignInPrompt} onOpenChange={setShowSignInPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign in to request a viewing</AlertDialogTitle>
+            <AlertDialogDescription>
+              You need an account to book a property viewing. Please sign in or create
+              an account to continue.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => navigate("/auth")}>
+              Sign in / Sign up
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
