@@ -224,17 +224,20 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           </div>
         `;
 
-        marker.addListener('click', () => {
+        const openInfo = () => {
           if (!infoWindowRef.current || !mapInstance.current) return;
           infoWindowRef.current.setContent(html);
           infoWindowRef.current.open({ map: mapInstance.current, anchor: marker });
-          // Wire navigation after DOM is ready
           google.maps.event.addListenerOnce(infoWindowRef.current, 'domready', () => {
             const el = document.querySelector(`[data-property-id="${property.id}"]`);
             el?.addEventListener('click', () => {
               window.location.href = `/property/${property.id}`;
             });
           });
+        };
+        marker.addListener('mouseover', openInfo);
+        marker.addListener('click', () => {
+          openInfo();
           if (onPropertySelect) onPropertySelect(property);
         });
 
@@ -472,74 +475,76 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     drawnPolygonRef.current = null;
     drawingPointsRef.current = [];
 
-    map.setOptions({ draggable: false, gestureHandling: 'none' });
-    map.getDiv().style.cursor = 'crosshair';
-
-    const addPoint = (latLng: google.maps.LatLng | null) => {
-      if (!latLng) return;
-      drawingPointsRef.current.push({ lat: latLng.lat(), lng: latLng.lng() });
-      drawingPolylineRef.current?.setMap(null);
-      drawingPolylineRef.current = new google.maps.Polyline({
-        path: drawingPointsRef.current,
-        strokeColor: 'hsl(262, 83%, 58%)',
-        strokeWeight: 3,
-        map,
-      });
-    };
-
-    let active = false;
-    const mdL = map.addListener('mousedown', (e: google.maps.MapMouseEvent) => {
-      active = true;
-      addPoint(e.latLng);
-    });
-    const mmL = map.addListener('mousemove', (e: google.maps.MapMouseEvent) => {
-      if (active) addPoint(e.latLng);
-    });
-    const muL = map.addListener('mouseup', () => {
-      active = false;
-      finalizeDrawing();
-    });
-
-    // Touch support for mobile
+    map.setOptions({ draggable: false, gestureHandling: 'none', disableDoubleClickZoom: true });
     const container = map.getDiv();
-    const pixelToLatLng = (x: number, y: number): google.maps.LatLng | null => {
+    container.style.cursor = 'crosshair';
+
+    // Convert pixel (relative to container) to LatLng using the map's projection.
+    const pixelToLatLng = (clientX: number, clientY: number): google.maps.LatLng | null => {
       const rect = container.getBoundingClientRect();
       const bounds = map.getBounds();
       if (!bounds) return null;
       const ne = bounds.getNorthEast();
       const sw = bounds.getSouthWest();
-      const lng = sw.lng() + (ne.lng() - sw.lng()) * ((x - rect.left) / rect.width);
-      const lat = ne.lat() - (ne.lat() - sw.lat()) * ((y - rect.top) / rect.height);
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      const lng = sw.lng() + (ne.lng() - sw.lng()) * (x / rect.width);
+      const lat = ne.lat() - (ne.lat() - sw.lat()) * (y / rect.height);
       return new google.maps.LatLng(lat, lng);
     };
 
-    const onTouchStart = (e: TouchEvent) => {
-      active = true;
-      const t = e.touches[0];
-      addPoint(pixelToLatLng(t.clientX, t.clientY));
+    const addPoint = (latLng: google.maps.LatLng | null) => {
+      if (!latLng) return;
+      drawingPointsRef.current.push({ lat: latLng.lat(), lng: latLng.lng() });
+      if (!drawingPolylineRef.current) {
+        drawingPolylineRef.current = new google.maps.Polyline({
+          path: drawingPointsRef.current,
+          strokeColor: 'hsl(262, 83%, 58%)',
+          strokeWeight: 3,
+          strokeOpacity: 1,
+          map,
+          clickable: false,
+        });
+      } else {
+        drawingPolylineRef.current.setPath(drawingPointsRef.current);
+      }
     };
-    const onTouchMove = (e: TouchEvent) => {
+
+    let active = false;
+
+    const onPointerDown = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      active = true;
+      try {
+        (e.target as Element)?.setPointerCapture?.(e.pointerId);
+      } catch {}
+      addPoint(pixelToLatLng(e.clientX, e.clientY));
+    };
+    const onPointerMove = (e: PointerEvent) => {
       if (!active) return;
       e.preventDefault();
-      const t = e.touches[0];
-      addPoint(pixelToLatLng(t.clientX, t.clientY));
+      addPoint(pixelToLatLng(e.clientX, e.clientY));
     };
-    const onTouchEnd = () => {
+    const onPointerUp = (e: PointerEvent) => {
+      if (!active) return;
       active = false;
+      e.preventDefault();
       finalizeDrawing();
     };
 
-    container.addEventListener('touchstart', onTouchStart, { passive: true });
-    container.addEventListener('touchmove', onTouchMove, { passive: false });
-    container.addEventListener('touchend', onTouchEnd);
+    // Use capture phase to intercept before Google Maps' own listeners.
+    container.addEventListener('pointerdown', onPointerDown, true);
+    window.addEventListener('pointermove', onPointerMove, true);
+    window.addEventListener('pointerup', onPointerUp, true);
+    window.addEventListener('pointercancel', onPointerUp, true);
 
     drawCleanupRef.current = () => {
-      google.maps.event.removeListener(mdL);
-      google.maps.event.removeListener(mmL);
-      google.maps.event.removeListener(muL);
-      container.removeEventListener('touchstart', onTouchStart);
-      container.removeEventListener('touchmove', onTouchMove);
-      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('pointerdown', onPointerDown, true);
+      window.removeEventListener('pointermove', onPointerMove, true);
+      window.removeEventListener('pointerup', onPointerUp, true);
+      window.removeEventListener('pointercancel', onPointerUp, true);
+      container.style.cursor = '';
     };
   }, [loaded, google, finalizeDrawing]);
 

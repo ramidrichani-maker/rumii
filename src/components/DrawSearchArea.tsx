@@ -76,20 +76,38 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
     setIsDrawing(true);
     isDrawingRef.current = true;
 
-    map.setOptions({ draggable: false, gestureHandling: 'none' });
-    map.getDiv().style.cursor = 'crosshair';
+    const container = map.getDiv();
+    map.setOptions({ draggable: false, gestureHandling: 'none', disableDoubleClickZoom: true });
+    container.style.cursor = 'crosshair';
+
+    const pixelToLatLng = (clientX: number, clientY: number): google.maps.LatLng | null => {
+      const rect = container.getBoundingClientRect();
+      const bounds = map.getBounds();
+      if (!bounds) return null;
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      const lng = sw.lng() + (ne.lng() - sw.lng()) * (x / rect.width);
+      const lat = ne.lat() - (ne.lat() - sw.lat()) * (y / rect.height);
+      return new google.maps.LatLng(lat, lng);
+    };
 
     const addPoint = (latLng: google.maps.LatLng | null) => {
       if (!latLng || !isDrawingRef.current) return;
       drawingPointsRef.current.push({ lat: latLng.lat(), lng: latLng.lng() });
-      if (polylineRef.current) polylineRef.current.setMap(null);
-      polylineRef.current = new google.maps.Polyline({
-        path: drawingPointsRef.current,
-        strokeColor: 'hsl(262, 83%, 58%)',
-        strokeWeight: 3,
-        strokeOpacity: 1,
-        map,
-      });
+      if (!polylineRef.current) {
+        polylineRef.current = new google.maps.Polyline({
+          path: drawingPointsRef.current,
+          strokeColor: 'hsl(262, 83%, 58%)',
+          strokeWeight: 3,
+          strokeOpacity: 1,
+          map,
+          clickable: false,
+        });
+      } else {
+        polylineRef.current.setPath(drawingPointsRef.current);
+      }
     };
 
     const finishDrawing = () => {
@@ -97,7 +115,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       isDrawingRef.current = false;
       setIsDrawing(false);
       map.setOptions({ draggable: true, gestureHandling: 'greedy' });
-      map.getDiv().style.cursor = '';
+      container.style.cursor = '';
 
       polylineRef.current?.setMap(null);
       polylineRef.current = null;
@@ -130,51 +148,36 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       cleanupRef.current = null;
     };
 
-    const mouseDownListener = map.addListener('mousedown', (e: google.maps.MapMouseEvent) => {
-      if (!isDrawingRef.current) return;
-      addPoint(e.latLng);
-    });
-    const mouseMoveListener = map.addListener('mousemove', (e: google.maps.MapMouseEvent) => {
-      if (!isDrawingRef.current) return;
-      addPoint(e.latLng);
-    });
-    const mouseUpListener = map.addListener('mouseup', () => finishDrawing());
-
-    // Touch support
-    const container = map.getDiv();
-    const containerRect = () => container.getBoundingClientRect();
-    const projection = () => map.getProjection();
-
-    const pixelToLatLng = (x: number, y: number): google.maps.LatLng | null => {
-      const rect = containerRect();
-      const proj = projection();
-      if (!proj) return null;
-      const bounds = map.getBounds();
-      if (!bounds) return null;
-      const ne = bounds.getNorthEast();
-      const sw = bounds.getSouthWest();
-      const lng = sw.lng() + (ne.lng() - sw.lng()) * ((x - rect.left) / rect.width);
-      const lat = ne.lat() - (ne.lat() - sw.lat()) * ((y - rect.top) / rect.height);
-      return new google.maps.LatLng(lat, lng);
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
+    const onPointerDown = (e: PointerEvent) => {
       if (!isDrawingRef.current) return;
       e.preventDefault();
-      const t = e.touches[0];
-      addPoint(pixelToLatLng(t.clientX, t.clientY));
+      e.stopPropagation();
+      try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch {}
+      addPoint(pixelToLatLng(e.clientX, e.clientY));
     };
-    const onTouchEnd = () => finishDrawing();
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDrawingRef.current) return;
+      if (drawingPointsRef.current.length === 0) return;
+      e.preventDefault();
+      addPoint(pixelToLatLng(e.clientX, e.clientY));
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      if (!isDrawingRef.current) return;
+      e.preventDefault();
+      finishDrawing();
+    };
 
-    container.addEventListener('touchmove', onTouchMove, { passive: false });
-    container.addEventListener('touchend', onTouchEnd);
+    container.addEventListener('pointerdown', onPointerDown, true);
+    window.addEventListener('pointermove', onPointerMove, true);
+    window.addEventListener('pointerup', onPointerUp, true);
+    window.addEventListener('pointercancel', onPointerUp, true);
 
     cleanupRef.current = () => {
-      google.maps.event.removeListener(mouseDownListener);
-      google.maps.event.removeListener(mouseMoveListener);
-      google.maps.event.removeListener(mouseUpListener);
-      container.removeEventListener('touchmove', onTouchMove);
-      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('pointerdown', onPointerDown, true);
+      window.removeEventListener('pointermove', onPointerMove, true);
+      window.removeEventListener('pointerup', onPointerUp, true);
+      window.removeEventListener('pointercancel', onPointerUp, true);
+      container.style.cursor = '';
     };
   }, [loaded, google]);
 
