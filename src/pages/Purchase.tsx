@@ -118,7 +118,7 @@ const Purchase = () => {
     setIsLoading(true);
     try {
       let query = supabase
-        .from('properties')
+        .from('properties_public' as any)
         .select('*')
         .in('listing_type', ['sale', 'both'])
         .eq('status', 'approved');
