@@ -8,9 +8,8 @@ import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import { Button } from "@/components/ui/button";
 import AgentContactBox from "@/components/AgentContactBox";
 import CommuteTimes from "@/components/CommuteTimes";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import { getCityCenter } from "@/utils/cityCenter";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
@@ -63,12 +62,16 @@ const PropertyDetail = () => {
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const isMobile = useIsMobile();
 
+  const { google, loaded: gmLoaded } = useGoogleMaps();
   const miniMapRef = useRef<HTMLDivElement>(null);
-  const miniMapInstance = useRef<L.Map | null>(null);
+  const miniMapInstance = useRef<google.maps.Map | null>(null);
+  const miniMarker = useRef<google.maps.Marker | null>(null);
   const expandedMapRef = useRef<HTMLDivElement>(null);
-  const expandedMapInstance = useRef<L.Map | null>(null);
+  const expandedMapInstance = useRef<google.maps.Map | null>(null);
+  const expandedMarker = useRef<google.maps.Marker | null>(null);
   const overlayMapRef = useRef<HTMLDivElement>(null);
-  const overlayMapInstance = useRef<L.Map | null>(null);
+  const overlayMapInstance = useRef<google.maps.Map | null>(null);
+  const overlayMarker = useRef<google.maps.Marker | null>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [descriptionClamped, setDescriptionClamped] = useState(false);
 
