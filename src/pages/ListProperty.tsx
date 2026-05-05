@@ -766,9 +766,7 @@ const ListProperty = () => {
         imageUrls = results.filter((u): u is string => !!u);
       }
 
-      // Insert property data with image URLs
-      const { data: propertyData, error } = await supabase.from('properties').insert({
-        user_id: user.id,
+      const propertyPayload = {
         municipality: data.municipality,
         city: data.city,
         address: data.address,
@@ -792,12 +790,33 @@ const ListProperty = () => {
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
-        status: 'pending'
-      }).select('id, property_code').single();
+        status: 'pending' as const,
+      };
 
-      if (error) throw error;
+      let propertyData: { id: string; property_code: number | null } | null = null;
 
-      // Record broker agreement for legal purposes
+      if (isEditMode && editId) {
+        const { data: updated, error: updErr } = await supabase
+          .from('properties')
+          .update(propertyPayload)
+          .eq('id', editId)
+          .eq('user_id', user.id)
+          .select('id, property_code')
+          .single();
+        if (updErr) throw updErr;
+        propertyData = updated as any;
+      } else {
+        const { data: inserted, error: insErr } = await supabase
+          .from('properties')
+          .insert({ ...propertyPayload, user_id: user.id })
+          .select('id, property_code')
+          .single();
+        if (insErr) throw insErr;
+        propertyData = inserted as any;
+      }
+
+      // Record broker agreement for legal purposes (only on initial submission)
+      if (!isEditMode) {
       const agreementText = "By listing this property, I agree that Rumi will act as my exclusive real estate broker, providing the full service of managing the property — including marketing, conducting viewings, and meeting with prospective buyers and renters on my behalf. I agree that upon a successful sale Rumi will receive a commission of 2.5% from the seller, and in the case of a rental agreement, a commission equal to one month's rent. I have read and agree to the full Terms of Service.";
       
       const { error: agreementError } = await supabase.functions.invoke(
@@ -816,6 +835,7 @@ const ListProperty = () => {
       if (agreementError) {
         console.error('Error recording agreement:', agreementError);
         // Don't fail the whole submission if agreement logging fails
+      }
       }
 
       setSubmittedListing({
