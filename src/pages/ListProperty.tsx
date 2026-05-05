@@ -156,6 +156,11 @@ const ListProperty = () => {
   const auth = useAuth();
   const { user, profile } = auth;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
+  const isEditMode = !!editId;
+  const [editLoading, setEditLoading] = useState<boolean>(isEditMode);
+  const [editError, setEditError] = useState<string | null>(null);
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
