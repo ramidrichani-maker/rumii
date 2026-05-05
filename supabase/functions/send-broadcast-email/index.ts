@@ -129,13 +129,13 @@ Deno.serve(async (req) => {
       <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
         <div style="background: #ffffff; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
           <div style="text-align: center; margin-bottom: 24px;">
-            <h2 style="color: #1a1a1a; font-size: 20px; margin: 0;">Rumi</h2>
+            <h2 style="color: #1a1a1a; font-size: 20px; margin: 0;">Beiti</h2>
           </div>
           <h1 style="color: #1a1a1a; font-size: 18px; margin-bottom: 16px;">${subject}</h1>
           <div style="color: #444; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${message}</div>
           <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
           <p style="color: #999; font-size: 12px; text-align: center;">
-            This is an automated message from Rumi. Please do not reply directly to this email.
+            This is an automated message from Beiti. Please do not reply directly to this email.
           </p>
         </div>
       </body>
@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "Rumi <onboarding@resend.dev>",
+            from: "Beiti <onboarding@resend.dev>",
             to: [email],
             subject: subject,
             html: htmlBody,
