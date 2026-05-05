@@ -1538,6 +1538,8 @@ const ListProperty = () => {
             // Block closing while a submission is in flight
             if (!open && isSubmitting) return;
             setShowClientConfirm(open);
+            // Reset the in-popup acceptance whenever the dialog opens or closes
+            setPopupBrokerAccepted(false);
             if (!open) {
               // Treat any close as a cancellation: purge persisted media
               const imgs = uploadedImages
@@ -1577,12 +1579,25 @@ const ListProperty = () => {
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
+            <label className="flex items-start gap-3 rounded-md border border-border bg-muted/40 p-3 cursor-pointer">
+              <Checkbox
+                id="popup-broker-accept"
+                checked={popupBrokerAccepted}
+                onCheckedChange={(checked) => setPopupBrokerAccepted(checked === true)}
+                disabled={isSubmitting}
+                className="mt-0.5"
+              />
+              <span className="text-sm text-foreground leading-snug">
+                I accept Rumi as my broker and agree to the commission terms above.
+              </span>
+            </label>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                disabled={isSubmitting}
+                disabled={isSubmitting || !popupBrokerAccepted}
                 onClick={(e) => {
                   e.preventDefault();
+                  if (!popupBrokerAccepted) return;
                   if (pendingData) {
                     const data = pendingData;
                     setPendingData(null);
