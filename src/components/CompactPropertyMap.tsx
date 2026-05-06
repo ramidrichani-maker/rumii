@@ -248,7 +248,19 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         bounds.extend(pos);
       });
 
-      if (!bounds.isEmpty() && mapInstance.current && !isDrawingMode && !hasDrawnArea) {
+      // Only auto-fit to property markers when a search/area is active.
+      // Otherwise keep the default Beirut view so the user starts from a
+      // consistent location.
+      const hasActiveSearch =
+        !!initialSearchLocation?.trim() ||
+        (!!initialPolygon && initialPolygon.length >= 3);
+      if (
+        !bounds.isEmpty() &&
+        mapInstance.current &&
+        !isDrawingMode &&
+        !hasDrawnArea &&
+        hasActiveSearch
+      ) {
         mapInstance.current.fitBounds(bounds, 20);
       }
     };
@@ -257,7 +269,17 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [properties, loaded, google, isAdmin, onPropertySelect, isDrawingMode, hasDrawnArea]);
+  }, [
+    properties,
+    loaded,
+    google,
+    isAdmin,
+    onPropertySelect,
+    isDrawingMode,
+    hasDrawnArea,
+    initialSearchLocation,
+    initialPolygon,
+  ]);
 
   // Resize on expand
   useEffect(() => {
