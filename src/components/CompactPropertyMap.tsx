@@ -88,6 +88,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const searchBoundaryRef = useRef<google.maps.Polygon | null>(null);
   const searchCircleRef = useRef<google.maps.Circle | null>(null);
 
+  const infoCloseTimerRef = useRef<number | null>(null);
+
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [searchAddress, setSearchAddress] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -229,6 +231,10 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
 
         const openInfo = () => {
           if (!infoWindowRef.current || !mapInstance.current) return;
+          if (infoCloseTimerRef.current !== null) {
+            window.clearTimeout(infoCloseTimerRef.current);
+            infoCloseTimerRef.current = null;
+          }
           infoWindowRef.current.setContent(html);
           infoWindowRef.current.open({ map: mapInstance.current, anchor: marker });
           google.maps.event.addListenerOnce(infoWindowRef.current, 'domready', () => {
@@ -236,9 +242,32 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             el?.addEventListener('click', () => {
               window.location.href = `/property/${property.id}`;
             });
+            // Keep open while hovering the card; close when leaving it.
+            const card = el as HTMLElement | null;
+            if (card) {
+              card.addEventListener('mouseenter', () => {
+                if (infoCloseTimerRef.current !== null) {
+                  window.clearTimeout(infoCloseTimerRef.current);
+                  infoCloseTimerRef.current = null;
+                }
+              });
+              card.addEventListener('mouseleave', () => {
+                scheduleClose();
+              });
+            }
           });
         };
+        const scheduleClose = () => {
+          if (infoCloseTimerRef.current !== null) {
+            window.clearTimeout(infoCloseTimerRef.current);
+          }
+          infoCloseTimerRef.current = window.setTimeout(() => {
+            infoWindowRef.current?.close();
+            infoCloseTimerRef.current = null;
+          }, 150);
+        };
         marker.addListener('mouseover', openInfo);
+        marker.addListener('mouseout', scheduleClose);
         marker.addListener('click', () => {
           openInfo();
           if (onPropertySelect) onPropertySelect(property);
