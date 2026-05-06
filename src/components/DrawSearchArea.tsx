@@ -218,7 +218,11 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       </div>
 
       <div className="relative" style={{ height: '280px' }}>
-        <div ref={mapRef} className="absolute inset-0" />
+        <div
+          ref={mapRef}
+          className="absolute inset-0"
+          style={{ touchAction: isDrawing ? 'none' : 'auto' }}
+        />
         {!loaded && (
           <div className="absolute inset-0 bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
