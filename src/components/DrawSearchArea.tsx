@@ -152,7 +152,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       if (!isDrawingRef.current) return;
       e.preventDefault();
       e.stopPropagation();
-      try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch {}
+      try { container.setPointerCapture?.(e.pointerId); } catch {}
       addPoint(pixelToLatLng(e.clientX, e.clientY));
     };
     const onPointerMove = (e: PointerEvent) => {
@@ -164,6 +164,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
     const onPointerUp = (e: PointerEvent) => {
       if (!isDrawingRef.current) return;
       e.preventDefault();
+      try { container.releasePointerCapture?.(e.pointerId); } catch {}
       finishDrawing();
     };
 
