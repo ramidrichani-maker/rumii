@@ -116,6 +116,10 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       maxWidth: 300,
       disableAutoPan: false,
     });
+    // Close any open info window when tapping the map background (mobile UX).
+    mapInstance.current.addListener('click', () => {
+      infoWindowRef.current?.close();
+    });
     return () => {
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
@@ -266,9 +270,17 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             infoCloseTimerRef.current = null;
           }, 150);
         };
-        marker.addListener('mouseover', openInfo);
-        marker.addListener('mouseout', scheduleClose);
+        if (!isMobile) {
+          marker.addListener('mouseover', openInfo);
+          marker.addListener('mouseout', scheduleClose);
+        }
         marker.addListener('click', () => {
+          // On mobile: tap opens the card and keeps it open until user taps
+          // elsewhere on the map. On desktop: click also opens (same as hover).
+          if (infoCloseTimerRef.current !== null) {
+            window.clearTimeout(infoCloseTimerRef.current);
+            infoCloseTimerRef.current = null;
+          }
           openInfo();
           if (onPropertySelect) onPropertySelect(property);
         });
