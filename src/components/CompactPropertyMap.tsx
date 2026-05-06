@@ -116,6 +116,10 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       maxWidth: 300,
       disableAutoPan: false,
     });
+    // Close any open info window when tapping the map background (mobile UX).
+    mapInstance.current.addListener('click', () => {
+      infoWindowRef.current?.close();
+    });
     return () => {
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
