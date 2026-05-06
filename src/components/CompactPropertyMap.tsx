@@ -275,14 +275,16 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           marker.addListener('mouseout', scheduleClose);
         }
         marker.addListener('click', () => {
-          // On mobile: tap opens the card and keeps it open until user taps
-          // elsewhere on the map. On desktop: click also opens (same as hover).
+          // On mobile: first tap shows the card (preview only). The user must
+          // then tap the card itself to navigate to the property detail.
+          // On desktop: click opens the card (same as hover) and also fires
+          // onPropertySelect for any external handlers.
           if (infoCloseTimerRef.current !== null) {
             window.clearTimeout(infoCloseTimerRef.current);
             infoCloseTimerRef.current = null;
           }
           openInfo();
-          if (onPropertySelect) onPropertySelect(property);
+          if (!isMobile && onPropertySelect) onPropertySelect(property);
         });
 
         markersRef.current.push(marker);
