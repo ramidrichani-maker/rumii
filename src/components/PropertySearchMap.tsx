@@ -150,9 +150,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
         bounds.extend(pos);
       });
 
-      if (!bounds.isEmpty() && mapInstance.current) {
-        mapInstance.current.fitBounds(bounds, 40);
-      }
+      // Keep the default Beirut center; do not auto-fit to all property
+      // markers when no search has been performed.
     };
 
     addMarkers();
