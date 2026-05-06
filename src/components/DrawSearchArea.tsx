@@ -152,7 +152,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       if (!isDrawingRef.current) return;
       e.preventDefault();
       e.stopPropagation();
-      try { (e.target as Element)?.setPointerCapture?.(e.pointerId); } catch {}
+      try { container.setPointerCapture?.(e.pointerId); } catch {}
       addPoint(pixelToLatLng(e.clientX, e.clientY));
     };
     const onPointerMove = (e: PointerEvent) => {
@@ -164,6 +164,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
     const onPointerUp = (e: PointerEvent) => {
       if (!isDrawingRef.current) return;
       e.preventDefault();
+      try { container.releasePointerCapture?.(e.pointerId); } catch {}
       finishDrawing();
     };
 
@@ -218,7 +219,11 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       </div>
 
       <div className="relative" style={{ height: '280px' }}>
-        <div ref={mapRef} className="absolute inset-0" />
+        <div
+          ref={mapRef}
+          className="absolute inset-0"
+          style={{ touchAction: isDrawing ? 'none' : 'auto' }}
+        />
         {!loaded && (
           <div className="absolute inset-0 bg-muted/60 flex items-center justify-center z-[400] pointer-events-none">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
