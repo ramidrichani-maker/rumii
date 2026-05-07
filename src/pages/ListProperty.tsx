@@ -344,7 +344,7 @@ const ListProperty = () => {
   // files — survives a page reload, even before the user opens the
   // confirmation dialog.
   const savePendingSnapshot = (
-    images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>,
+    images: Array<{ url: string; path: string; name: string; type: string; roomType: string; customRoomType?: string }>,
     floorPlans: PersistedFloorPlan[],
     data?: FormData,
   ) => {
@@ -372,6 +372,7 @@ const ListProperty = () => {
         name: i.persisted!.name,
         type: i.persisted!.type,
         roomType: i.roomType,
+        customRoomType: i.customRoomType,
       }));
 
   // Update a single image's status fields immutably.
