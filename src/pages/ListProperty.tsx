@@ -86,7 +86,7 @@ interface PersistedFloorPlan {
 
 interface PendingListingPayload {
   data: any; // FormData (looser typing for storage)
-  images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>;
+  images: Array<{ url: string; path: string; name: string; type: string; roomType: string; customRoomType?: string }>;
   floorPlans: PersistedFloorPlan[];
 }
 
@@ -192,6 +192,7 @@ const ListProperty = () => {
         setUploadedImages(saved.images.map((m) => ({
           file: null,
           roomType: m.roomType || '',
+          customRoomType: m.customRoomType || '',
           status: 'uploaded',
           progress: 100,
           persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
