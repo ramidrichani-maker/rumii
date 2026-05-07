@@ -45,12 +45,14 @@ const roomTypes = [
   "Maid's Room",
   "Maid's Bathroom",
   "Storage Room",
-  "Corridor"
+  "Corridor",
+  "Other"
 ];
 
 interface UploadedImage {
   file: File | null;
   roomType: string;
+  customRoomType?: string;
   // Per-file upload state shown in the UI.
   // 'idle'      -> selected, not yet uploaded
   // 'uploading' -> upload in progress (progress bar shown)
@@ -84,7 +86,7 @@ interface PersistedFloorPlan {
 
 interface PendingListingPayload {
   data: any; // FormData (looser typing for storage)
-  images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>;
+  images: Array<{ url: string; path: string; name: string; type: string; roomType: string; customRoomType?: string }>;
   floorPlans: PersistedFloorPlan[];
 }
 
@@ -190,6 +192,7 @@ const ListProperty = () => {
         setUploadedImages(saved.images.map((m) => ({
           file: null,
           roomType: m.roomType || '',
+          customRoomType: m.customRoomType || '',
           status: 'uploaded',
           progress: 100,
           persisted: { url: m.url, path: m.path, name: m.name, type: m.type },
@@ -341,7 +344,7 @@ const ListProperty = () => {
   // files — survives a page reload, even before the user opens the
   // confirmation dialog.
   const savePendingSnapshot = (
-    images: Array<{ url: string; path: string; name: string; type: string; roomType: string }>,
+    images: Array<{ url: string; path: string; name: string; type: string; roomType: string; customRoomType?: string }>,
     floorPlans: PersistedFloorPlan[],
     data?: FormData,
   ) => {
@@ -369,6 +372,7 @@ const ListProperty = () => {
         name: i.persisted!.name,
         type: i.persisted!.type,
         roomType: i.roomType,
+        customRoomType: i.customRoomType,
       }));
 
   // Update a single image's status fields immutably.
@@ -627,7 +631,20 @@ const ListProperty = () => {
 
   const updateImageRoomType = (index: number, roomType: string) => {
     setUploadedImages(prev => {
-      const next = prev.map((img, i) => (i === index ? { ...img, roomType } : img));
+      const next = prev.map((img, i) =>
+        i === index ? { ...img, roomType, customRoomType: roomType === 'Other' ? (img.customRoomType || '') : '' } : img
+      );
+      if (next.some(i => i.persisted) && localStorage.getItem(PENDING_STORAGE_KEY)) {
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
+      }
+      return next;
+    });
+  };
+
+  const updateImageCustomRoomType = (index: number, customRoomType: string) => {
+    const trimmed = customRoomType.slice(0, 14);
+    setUploadedImages(prev => {
+      const next = prev.map((img, i) => (i === index ? { ...img, customRoomType: trimmed } : img));
       // If we have any persisted media + a saved pending payload, keep it in sync
       if (next.some(i => i.persisted) && localStorage.getItem(PENDING_STORAGE_KEY)) {
         savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
@@ -705,11 +722,13 @@ const ListProperty = () => {
     
     try {
       // Check if all images have room types assigned
-      const unassignedImages = uploadedImages.filter(img => !img.roomType);
+      const unassignedImages = uploadedImages.filter(
+        img => !img.roomType || (img.roomType === 'Other' && !img.customRoomType?.trim())
+      );
       if (unassignedImages.length > 0) {
         toast({
           title: "Room Types Required",
-          description: "Please select a room type for all uploaded images.",
+          description: "Please select a room type for all uploaded images (and name any 'Other' rooms).",
           variant: "destructive"
         });
         setIsSubmitting(false);
@@ -742,7 +761,10 @@ const ListProperty = () => {
           }
           const file = uploadedImage.file;
           if (!file) return null;
-          const roomType = uploadedImage.roomType.toLowerCase().replace(/['\s]/g, '-');
+          const rawRoom = uploadedImage.roomType === 'Other'
+            ? (uploadedImage.customRoomType || 'other')
+            : uploadedImage.roomType;
+          const roomType = rawRoom.toLowerCase().replace(/['\s]/g, '-');
           const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${roomType}_${index}.${fileExt}`;
           
@@ -915,11 +937,13 @@ const ListProperty = () => {
               const isClient = !role || role === "user";
               if (isClient) {
                 // Validate room types before uploading anything
-                const unassigned = uploadedImages.filter(img => !img.roomType);
+                const unassigned = uploadedImages.filter(
+                  img => !img.roomType || (img.roomType === 'Other' && !img.customRoomType?.trim())
+                );
                 if (unassigned.length > 0) {
                   toast({
                     title: "Room Types Required",
-                    description: "Please select a room type for all uploaded images.",
+                    description: "Please select a room type for all uploaded images (and name any 'Other' rooms).",
                     variant: "destructive"
                   });
                   return;
@@ -1453,6 +1477,16 @@ const ListProperty = () => {
                               ))}
                             </SelectContent>
                           </Select>
+                          {uploadedImage.roomType === 'Other' && (
+                            <Input
+                              type="text"
+                              maxLength={14}
+                              value={uploadedImage.customRoomType || ''}
+                              onChange={(e) => updateImageCustomRoomType(index, e.target.value)}
+                              placeholder="Room name"
+                              className={`w-[140px] h-9 ${!uploadedImage.customRoomType?.trim() ? 'border-destructive' : ''}`}
+                            />
+                          )}
                           {uploadedImage.status === 'failed' && (
                             <Button
                               type="button"
@@ -1667,7 +1701,9 @@ const ListProperty = () => {
                 const uploadingCount = uploadedImages.filter(i => i.status === 'uploading').length;
                 const failedCount = uploadedImages.filter(i => i.status === 'failed').length;
                 const idleCount = uploadedImages.filter(i => i.status === 'idle').length;
-                const missingRoomCount = uploadedImages.filter(i => !i.roomType).length;
+                const missingRoomCount = uploadedImages.filter(
+                  i => !i.roomType || (i.roomType === 'Other' && !i.customRoomType?.trim())
+                ).length;
                 const blocked =
                   isSubmitting ||
                   isPreparingConfirm ||
