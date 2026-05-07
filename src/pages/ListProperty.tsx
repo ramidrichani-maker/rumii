@@ -45,12 +45,14 @@ const roomTypes = [
   "Maid's Room",
   "Maid's Bathroom",
   "Storage Room",
-  "Corridor"
+  "Corridor",
+  "Other"
 ];
 
 interface UploadedImage {
   file: File | null;
   roomType: string;
+  customRoomType?: string;
   // Per-file upload state shown in the UI.
   // 'idle'      -> selected, not yet uploaded
   // 'uploading' -> upload in progress (progress bar shown)
