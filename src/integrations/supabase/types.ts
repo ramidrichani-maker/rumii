@@ -1356,6 +1356,7 @@ export type Database = {
         Returns: boolean
       }
       end_user_session: { Args: { _user_id: string }; Returns: boolean }
+      get_admin_user_ids: { Args: never; Returns: string[] }
       get_agent_by_email: {
         Args: { _email: string }
         Returns: {
