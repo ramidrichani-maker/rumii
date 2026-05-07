@@ -924,11 +924,13 @@ const ListProperty = () => {
               const isClient = !role || role === "user";
               if (isClient) {
                 // Validate room types before uploading anything
-                const unassigned = uploadedImages.filter(img => !img.roomType);
+                const unassigned = uploadedImages.filter(
+                  img => !img.roomType || (img.roomType === 'Other' && !img.customRoomType?.trim())
+                );
                 if (unassigned.length > 0) {
                   toast({
                     title: "Room Types Required",
-                    description: "Please select a room type for all uploaded images.",
+                    description: "Please select a room type for all uploaded images (and name any 'Other' rooms).",
                     variant: "destructive"
                   });
                   return;
@@ -1676,7 +1678,9 @@ const ListProperty = () => {
                 const uploadingCount = uploadedImages.filter(i => i.status === 'uploading').length;
                 const failedCount = uploadedImages.filter(i => i.status === 'failed').length;
                 const idleCount = uploadedImages.filter(i => i.status === 'idle').length;
-                const missingRoomCount = uploadedImages.filter(i => !i.roomType).length;
+                const missingRoomCount = uploadedImages.filter(
+                  i => !i.roomType || (i.roomType === 'Other' && !i.customRoomType?.trim())
+                ).length;
                 const blocked =
                   isSubmitting ||
                   isPreparingConfirm ||
