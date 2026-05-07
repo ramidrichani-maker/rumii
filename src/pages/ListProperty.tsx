@@ -631,7 +631,20 @@ const ListProperty = () => {
 
   const updateImageRoomType = (index: number, roomType: string) => {
     setUploadedImages(prev => {
-      const next = prev.map((img, i) => (i === index ? { ...img, roomType } : img));
+      const next = prev.map((img, i) =>
+        i === index ? { ...img, roomType, customRoomType: roomType === 'Other' ? (img.customRoomType || '') : '' } : img
+      );
+      if (next.some(i => i.persisted) && localStorage.getItem(PENDING_STORAGE_KEY)) {
+        savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
+      }
+      return next;
+    });
+  };
+
+  const updateImageCustomRoomType = (index: number, customRoomType: string) => {
+    const trimmed = customRoomType.slice(0, 14);
+    setUploadedImages(prev => {
+      const next = prev.map((img, i) => (i === index ? { ...img, customRoomType: trimmed } : img));
       // If we have any persisted media + a saved pending payload, keep it in sync
       if (next.some(i => i.persisted) && localStorage.getItem(PENDING_STORAGE_KEY)) {
         savePendingSnapshot(collectUploadedSnapshot(next), persistedFloorPlans);
