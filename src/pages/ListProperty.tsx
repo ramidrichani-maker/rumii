@@ -709,11 +709,13 @@ const ListProperty = () => {
     
     try {
       // Check if all images have room types assigned
-      const unassignedImages = uploadedImages.filter(img => !img.roomType);
+      const unassignedImages = uploadedImages.filter(
+        img => !img.roomType || (img.roomType === 'Other' && !img.customRoomType?.trim())
+      );
       if (unassignedImages.length > 0) {
         toast({
           title: "Room Types Required",
-          description: "Please select a room type for all uploaded images.",
+          description: "Please select a room type for all uploaded images (and name any 'Other' rooms).",
           variant: "destructive"
         });
         setIsSubmitting(false);
@@ -746,7 +748,10 @@ const ListProperty = () => {
           }
           const file = uploadedImage.file;
           if (!file) return null;
-          const roomType = uploadedImage.roomType.toLowerCase().replace(/['\s]/g, '-');
+          const rawRoom = uploadedImage.roomType === 'Other'
+            ? (uploadedImage.customRoomType || 'other')
+            : uploadedImage.roomType;
+          const roomType = rawRoom.toLowerCase().replace(/['\s]/g, '-');
           const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}_${roomType}_${index}.${fileExt}`;
           
