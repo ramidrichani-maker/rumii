@@ -1477,6 +1477,16 @@ const ListProperty = () => {
                               ))}
                             </SelectContent>
                           </Select>
+                          {uploadedImage.roomType === 'Other' && (
+                            <Input
+                              type="text"
+                              maxLength={14}
+                              value={uploadedImage.customRoomType || ''}
+                              onChange={(e) => updateImageCustomRoomType(index, e.target.value)}
+                              placeholder="Room name"
+                              className={`w-[140px] h-9 ${!uploadedImage.customRoomType?.trim() ? 'border-destructive' : ''}`}
+                            />
+                          )}
                           {uploadedImage.status === 'failed' && (
                             <Button
                               type="button"
