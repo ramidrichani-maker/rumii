@@ -1,11 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mail, MailOpen, ArrowLeft, MapPin, Calendar, Clock, Phone } from "lucide-react";
+import { Mail, MailOpen, ArrowLeft, MapPin, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { format } from "date-fns";
 
 interface Message {
@@ -26,6 +34,8 @@ const Messages = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "unread" | "read" | "enquiry" | "viewing">("all");
 
   useEffect(() => {
     if (!user) {
@@ -89,6 +99,21 @@ const Messages = () => {
   };
 
   const unreadCount = messages.filter((m) => !m.read).length;
+
+  const filteredMessages = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return messages.filter((m) => {
+      if (filter === "unread" && m.read) return false;
+      if (filter === "read" && !m.read) return false;
+      if (filter === "enquiry" && !/enquir/i.test(m.subject)) return false;
+      if (filter === "viewing" && !(m.related_viewing_id || /viewing/i.test(m.subject))) return false;
+      if (!q) return true;
+      return (
+        m.subject.toLowerCase().includes(q) ||
+        m.body.toLowerCase().includes(q)
+      );
+    });
+  }, [messages, searchQuery, filter]);
 
   if (loading) {
     return (
@@ -162,7 +187,47 @@ const Messages = () => {
         </Card>
       ) : (
         <div className="space-y-2">
-          {messages.map((message) => (
+          <div className="flex flex-col sm:flex-row gap-2 mb-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search messages by subject or content"
+                className="pl-9 pr-9"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All messages</SelectItem>
+                <SelectItem value="unread">Unread</SelectItem>
+                <SelectItem value="read">Read</SelectItem>
+                <SelectItem value="enquiry">Enquiries</SelectItem>
+                <SelectItem value="viewing">Viewings</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {filteredMessages.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                No messages match your search or filter.
+              </CardContent>
+            </Card>
+          ) : filteredMessages.map((message) => (
             <Card
               key={message.id}
               className={`cursor-pointer transition-colors hover:bg-muted/50 ${
