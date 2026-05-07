@@ -86,7 +86,7 @@ const AgentEnquiry = () => {
         const recipientIds = new Set<string>();
         if (agentId) recipientIds.add(agentId);
 
-        const { data: admins } = await supabase.rpc("get_admin_user_ids");
+        const { data: admins } = await (supabase as any).rpc("get_admin_user_ids");
         (admins as any[] | null)?.forEach((uid: any) => {
           if (typeof uid === "string") recipientIds.add(uid);
           else if (uid?.get_admin_user_ids) recipientIds.add(uid.get_admin_user_ids);
