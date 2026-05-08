@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Eye, Pencil, Trash2, Search, RefreshCw } from "lucide-react";
+import { Eye, Pencil, Trash2, Search, RefreshCw, UserPlus } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import { AdminPropertyEditForm } from "@/components/AdminPropertyEditForm";
@@ -70,8 +70,25 @@ export const AdminPropertyListingsManager = () => {
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
+  // Bulk assign state
+  const [bulkAssignOpen, setBulkAssignOpen] = useState(false);
+  const [assignableUsers, setAssignableUsers] = useState<{ user_id: string; full_name: string; role: string; agency_id: string | null }[]>([]);
+  const [bulkAssignee, setBulkAssignee] = useState<string>("");
+  const [isBulkAssigning, setIsBulkAssigning] = useState(false);
+
   useEffect(() => {
     loadProperties();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, role, agency_id')
+        .in('role', ['agent', 'admin', 'agency_manager'] as any)
+        .order('full_name');
+      if (data) setAssignableUsers(data as any);
+    })();
   }, []);
 
   useEffect(() => {
@@ -257,6 +274,46 @@ export const AdminPropertyListingsManager = () => {
     }
   };
 
+  const handleBulkAssign = async () => {
+    if (selectedIds.size === 0 || !bulkAssignee) return;
+    setIsBulkAssigning(true);
+    try {
+      const ids = Array.from(selectedIds);
+
+      // Remove existing assignments for these properties
+      const { error: delError } = await supabase
+        .from('property_agents')
+        .delete()
+        .in('property_id', ids);
+      if (delError) throw delError;
+
+      // Insert new assignments
+      const rows = ids.map((property_id) => ({ property_id, agent_id: bulkAssignee }));
+      const { error: insError } = await supabase
+        .from('property_agents')
+        .insert(rows);
+      if (insError) throw insError;
+
+      const assignee = assignableUsers.find((u) => u.user_id === bulkAssignee);
+      toast({
+        title: "Assigned",
+        description: `${ids.length} ${ids.length === 1 ? 'listing' : 'listings'} assigned to ${assignee?.full_name || 'selected user'}.`,
+      });
+      setSelectedIds(new Set());
+      setBulkAssignOpen(false);
+      setBulkAssignee("");
+    } catch (error) {
+      console.error('Error bulk assigning:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign selected properties",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBulkAssigning(false);
+    }
+  };
+
   const handlePropertyUpdated = () => {
     setIsEditModalOpen(false);
     setSelectedProperty(null);
@@ -334,6 +391,14 @@ export const AdminPropertyListingsManager = () => {
             >
               <Trash2 className="h-4 w-4 mr-1" />
               Delete Selected
+            </Button>
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => setBulkAssignOpen(true)}
+            >
+              <UserPlus className="h-4 w-4 mr-1" />
+              Assign Selected
             </Button>
             <Button
               size="sm"
@@ -494,6 +559,55 @@ export const AdminPropertyListingsManager = () => {
         onConfirm={handleBulkDelete}
         propertyAddress={`${selectedIds.size} selected ${selectedIds.size === 1 ? 'property' : 'properties'}`}
       />
+
+      {/* Bulk Assign Dialog */}
+      <Dialog open={bulkAssignOpen} onOpenChange={setBulkAssignOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Selected Listings</DialogTitle>
+            <DialogDescription>
+              Assign {selectedIds.size} {selectedIds.size === 1 ? 'listing' : 'listings'} to an agent, agency manager, or admin. Existing assignments on these listings will be replaced.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Select value={bulkAssignee} onValueChange={setBulkAssignee}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                {assignableUsers.filter(u => u.role === 'admin').length > 0 && (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Admins</div>
+                    {assignableUsers.filter(u => u.role === 'admin').map(u => (
+                      <SelectItem key={u.user_id} value={u.user_id}>
+                        {u.full_name || 'Admin'} (Admin)
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {assignableUsers.filter(u => u.role !== 'admin').length > 0 && (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Agents & Managers</div>
+                    {assignableUsers.filter(u => u.role !== 'admin').map(u => (
+                      <SelectItem key={u.user_id} value={u.user_id}>
+                        {u.full_name || 'User'} ({u.role.replace('_', ' ')})
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+              </SelectContent>
+            </Select>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setBulkAssignOpen(false)} disabled={isBulkAssigning}>
+                Cancel
+              </Button>
+              <Button onClick={handleBulkAssign} disabled={!bulkAssignee || isBulkAssigning}>
+                {isBulkAssigning ? 'Assigning...' : 'Assign'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
