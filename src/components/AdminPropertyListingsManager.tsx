@@ -559,6 +559,55 @@ export const AdminPropertyListingsManager = () => {
         onConfirm={handleBulkDelete}
         propertyAddress={`${selectedIds.size} selected ${selectedIds.size === 1 ? 'property' : 'properties'}`}
       />
+
+      {/* Bulk Assign Dialog */}
+      <Dialog open={bulkAssignOpen} onOpenChange={setBulkAssignOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Selected Listings</DialogTitle>
+            <DialogDescription>
+              Assign {selectedIds.size} {selectedIds.size === 1 ? 'listing' : 'listings'} to an agent, agency manager, or admin. Existing assignments on these listings will be replaced.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Select value={bulkAssignee} onValueChange={setBulkAssignee}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                {assignableUsers.filter(u => u.role === 'admin').length > 0 && (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Admins</div>
+                    {assignableUsers.filter(u => u.role === 'admin').map(u => (
+                      <SelectItem key={u.user_id} value={u.user_id}>
+                        {u.full_name || 'Admin'} (Admin)
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {assignableUsers.filter(u => u.role !== 'admin').length > 0 && (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Agents & Managers</div>
+                    {assignableUsers.filter(u => u.role !== 'admin').map(u => (
+                      <SelectItem key={u.user_id} value={u.user_id}>
+                        {u.full_name || 'User'} ({u.role.replace('_', ' ')})
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+              </SelectContent>
+            </Select>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setBulkAssignOpen(false)} disabled={isBulkAssigning}>
+                Cancel
+              </Button>
+              <Button onClick={handleBulkAssign} disabled={!bulkAssignee || isBulkAssigning}>
+                {isBulkAssigning ? 'Assigning...' : 'Assign'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
