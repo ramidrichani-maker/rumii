@@ -9,8 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Eye, Pencil, Trash2, Search, RefreshCw } from "lucide-react";
-import { Eye as _EyeUnused, UserPlus } from "lucide-react";
+import { Eye, Pencil, Trash2, Search, RefreshCw, UserPlus } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import { AdminPropertyEditForm } from "@/components/AdminPropertyEditForm";
