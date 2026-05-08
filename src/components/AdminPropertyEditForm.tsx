@@ -42,6 +42,13 @@ interface Agency {
   name: string;
 }
 
+interface AssignableUser {
+  user_id: string;
+  full_name: string;
+  role: string;
+  agency_id: string | null;
+}
+
 interface Property {
   id: string;
   address: string;
@@ -86,6 +93,8 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [selectedAgency, setSelectedAgency] = useState<string | null>(property.agency_id);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
+  const [selectedAssignee, setSelectedAssignee] = useState<string>("none");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(property.amenities || []);
   const [coords, setCoords] = useState<{ lat: number | null; lng: number | null }>({
     lat: property.latitude ?? null,
@@ -127,6 +136,31 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
     };
     fetchAgencies();
   }, []);
+
+  useEffect(() => {
+    const fetchAssignable = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, role, agency_id')
+        .in('role', ['agent', 'admin', 'agency_manager'] as any)
+        .order('full_name');
+      if (data) setAssignableUsers(data as any);
+    };
+    fetchAssignable();
+  }, []);
+
+  useEffect(() => {
+    const fetchCurrentAssignment = async () => {
+      const { data } = await supabase
+        .from('property_agents')
+        .select('agent_id')
+        .eq('property_id', property.id)
+        .limit(1)
+        .maybeSingle();
+      if (data?.agent_id) setSelectedAssignee(data.agent_id);
+    };
+    fetchCurrentAssignment();
+  }, [property.id]);
 
   const handleAmenityToggle = (amenity: string) => {
     setSelectedAmenities(prev => {
@@ -171,6 +205,15 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         .eq('id', property.id);
 
       if (error) throw error;
+
+      // Update agent assignment
+      await supabase.from('property_agents').delete().eq('property_id', property.id);
+      if (selectedAssignee && selectedAssignee !== "none") {
+        const { error: assignErr } = await supabase
+          .from('property_agents')
+          .insert({ property_id: property.id, agent_id: selectedAssignee });
+        if (assignErr) console.error('Assignment error:', assignErr);
+      }
 
       toast({
         title: "Success",
