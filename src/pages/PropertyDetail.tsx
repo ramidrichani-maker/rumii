@@ -463,7 +463,7 @@ const PropertyDetail = () => {
             {photoCount > 0 && (
               <button
                 onClick={() => setShowGallery((v) => !v)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors text-white text-sm font-medium ${showGallery ? "bg-white/35" : "bg-white/15 hover:bg-white/25"}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors text-white text-sm font-medium ${showGallery ? "bg-[rgb(120,107,95)]/25" : "bg-[rgb(120,107,95)]/10 hover:bg-[rgb(120,107,95)]/20"}`}
               >
                 <Image className="w-4 h-4" />
                 {photoCount} photo{photoCount !== 1 ? "s" : ""}
@@ -479,7 +479,7 @@ const PropertyDetail = () => {
               return (
               <button
                 onClick={() => { setFloorPlanIndex(0); setShowFloorPlan(true); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[rgb(120,107,95)]/10 hover:bg-[rgb(120,107,95)]/20 transition-colors text-white text-sm font-medium"
               >
                 <Layers className="w-4 h-4" />
                 {floorPlans.length > 1 ? `Floor plans (${floorPlans.length})` : "Floor plan"}
@@ -491,7 +491,7 @@ const PropertyDetail = () => {
             {cityCoords && (
               <button
                 onClick={() => setShowMapOverlay(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 transition-colors text-white text-sm font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[rgb(120,107,95)]/10 hover:bg-[rgb(120,107,95)]/20 transition-colors text-white text-sm font-medium"
               >
                 <MapPin className="w-4 h-4" />
                 Map
