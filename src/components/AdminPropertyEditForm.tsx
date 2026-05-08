@@ -279,6 +279,50 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
           </div>
         </div>
 
+        {/* Assigned Agent / Admin */}
+        <div className="space-y-2">
+          <Label>Assigned To</Label>
+          <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select assignee" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Unassigned</SelectItem>
+              {assignableUsers.filter(u => u.role === 'admin').length > 0 && (
+                <>
+                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Admins</div>
+                  {assignableUsers.filter(u => u.role === 'admin').map(u => (
+                    <SelectItem key={u.user_id} value={u.user_id}>
+                      {u.full_name || 'Admin'} (Admin)
+                    </SelectItem>
+                  ))}
+                </>
+              )}
+              {(() => {
+                const filtered = assignableUsers.filter(u =>
+                  u.role !== 'admin' && (!selectedAgency || u.agency_id === selectedAgency)
+                );
+                if (filtered.length === 0) return null;
+                return (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                      {selectedAgency ? 'Agents in selected agency' : 'All agents'}
+                    </div>
+                    {filtered.map(u => (
+                      <SelectItem key={u.user_id} value={u.user_id}>
+                        {u.full_name || 'Agent'} ({u.role.replace('_', ' ')})
+                      </SelectItem>
+                    ))}
+                  </>
+                );
+              })()}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Choose an agent, agency manager, or admin to handle this listing.
+          </p>
+        </div>
+
         {/* Basic Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
