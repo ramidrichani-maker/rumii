@@ -280,6 +280,30 @@ const Purchase = () => {
     clearStoredFilters('purchase');
   };
 
+  // Persist active filters across navigations and refreshes
+  useEffect(() => {
+    saveFilters('purchase', {
+      locationInput,
+      radius,
+      selectedPropertyTypes,
+      squareMetersRange,
+      priceRange,
+      minBedrooms,
+      minBathrooms,
+      barMinBedrooms,
+      barMaxBedrooms,
+      barMinPrice,
+      barMaxPrice,
+      selectedAmenities,
+      selectedMustHaves,
+      selectedFeatures,
+      addedToOracle,
+      keywords,
+      unfurnishedOnly,
+      newHomesOnly,
+    });
+  }, [locationInput, radius, selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedAmenities, selectedMustHaves, selectedFeatures, addedToOracle, keywords, unfurnishedOnly, newHomesOnly]);
+
   const handlePropertySelect = (property: any) => {
     setSelectedProperty(property);
     setIsDetailModalOpen(true);
