@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Eye, Pencil, Trash2, Search, RefreshCw } from "lucide-react";
+import { Eye as _EyeUnused, UserPlus } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import { AdminPropertyEditForm } from "@/components/AdminPropertyEditForm";
@@ -70,8 +71,25 @@ export const AdminPropertyListingsManager = () => {
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
+  // Bulk assign state
+  const [bulkAssignOpen, setBulkAssignOpen] = useState(false);
+  const [assignableUsers, setAssignableUsers] = useState<{ user_id: string; full_name: string; role: string; agency_id: string | null }[]>([]);
+  const [bulkAssignee, setBulkAssignee] = useState<string>("");
+  const [isBulkAssigning, setIsBulkAssigning] = useState(false);
+
   useEffect(() => {
     loadProperties();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, role, agency_id')
+        .in('role', ['agent', 'admin', 'agency_manager'] as any)
+        .order('full_name');
+      if (data) setAssignableUsers(data as any);
+    })();
   }, []);
 
   useEffect(() => {
@@ -257,6 +275,46 @@ export const AdminPropertyListingsManager = () => {
     }
   };
 
+  const handleBulkAssign = async () => {
+    if (selectedIds.size === 0 || !bulkAssignee) return;
+    setIsBulkAssigning(true);
+    try {
+      const ids = Array.from(selectedIds);
+
+      // Remove existing assignments for these properties
+      const { error: delError } = await supabase
+        .from('property_agents')
+        .delete()
+        .in('property_id', ids);
+      if (delError) throw delError;
+
+      // Insert new assignments
+      const rows = ids.map((property_id) => ({ property_id, agent_id: bulkAssignee }));
+      const { error: insError } = await supabase
+        .from('property_agents')
+        .insert(rows);
+      if (insError) throw insError;
+
+      const assignee = assignableUsers.find((u) => u.user_id === bulkAssignee);
+      toast({
+        title: "Assigned",
+        description: `${ids.length} ${ids.length === 1 ? 'listing' : 'listings'} assigned to ${assignee?.full_name || 'selected user'}.`,
+      });
+      setSelectedIds(new Set());
+      setBulkAssignOpen(false);
+      setBulkAssignee("");
+    } catch (error) {
+      console.error('Error bulk assigning:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign selected properties",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBulkAssigning(false);
+    }
+  };
+
   const handlePropertyUpdated = () => {
     setIsEditModalOpen(false);
     setSelectedProperty(null);
@@ -334,6 +392,14 @@ export const AdminPropertyListingsManager = () => {
             >
               <Trash2 className="h-4 w-4 mr-1" />
               Delete Selected
+            </Button>
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => setBulkAssignOpen(true)}
+            >
+              <UserPlus className="h-4 w-4 mr-1" />
+              Assign Selected
             </Button>
             <Button
               size="sm"
