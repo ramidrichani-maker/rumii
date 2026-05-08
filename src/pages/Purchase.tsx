@@ -395,7 +395,6 @@ const Purchase = () => {
         </div>
 
         <div className="text-center mb-6">
-          <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
           {isLoading ? (
             <p className="text-muted-foreground">Loading properties...</p>
           ) : filteredProperties.length > 0 ? (
@@ -409,6 +408,7 @@ const Purchase = () => {
             </p>
           )}
         </div>
+        <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
       </div>
 
       {/* Split Layout: full-width when map is shown */}
