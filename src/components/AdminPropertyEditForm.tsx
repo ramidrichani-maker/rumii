@@ -42,6 +42,13 @@ interface Agency {
   name: string;
 }
 
+interface AssignableUser {
+  user_id: string;
+  full_name: string;
+  role: string;
+  agency_id: string | null;
+}
+
 interface Property {
   id: string;
   address: string;
@@ -86,6 +93,8 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [selectedAgency, setSelectedAgency] = useState<string | null>(property.agency_id);
+  const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
+  const [selectedAssignee, setSelectedAssignee] = useState<string>("none");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(property.amenities || []);
   const [coords, setCoords] = useState<{ lat: number | null; lng: number | null }>({
     lat: property.latitude ?? null,
@@ -127,6 +136,31 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
     };
     fetchAgencies();
   }, []);
+
+  useEffect(() => {
+    const fetchAssignable = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, role, agency_id')
+        .in('role', ['agent', 'admin', 'agency_manager'] as any)
+        .order('full_name');
+      if (data) setAssignableUsers(data as any);
+    };
+    fetchAssignable();
+  }, []);
+
+  useEffect(() => {
+    const fetchCurrentAssignment = async () => {
+      const { data } = await supabase
+        .from('property_agents')
+        .select('agent_id')
+        .eq('property_id', property.id)
+        .limit(1)
+        .maybeSingle();
+      if (data?.agent_id) setSelectedAssignee(data.agent_id);
+    };
+    fetchCurrentAssignment();
+  }, [property.id]);
 
   const handleAmenityToggle = (amenity: string) => {
     setSelectedAmenities(prev => {
@@ -171,6 +205,15 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
         .eq('id', property.id);
 
       if (error) throw error;
+
+      // Update agent assignment
+      await supabase.from('property_agents').delete().eq('property_id', property.id);
+      if (selectedAssignee && selectedAssignee !== "none") {
+        const { error: assignErr } = await supabase
+          .from('property_agents')
+          .insert({ property_id: property.id, agent_id: selectedAssignee });
+        if (assignErr) console.error('Assignment error:', assignErr);
+      }
 
       toast({
         title: "Success",
@@ -234,6 +277,50 @@ export const AdminPropertyEditForm = ({ property, onSuccess, onCancel }: AdminPr
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        {/* Assigned Agent / Admin */}
+        <div className="space-y-2">
+          <Label>Assigned To</Label>
+          <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select assignee" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Unassigned</SelectItem>
+              {assignableUsers.filter(u => u.role === 'admin').length > 0 && (
+                <>
+                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Admins</div>
+                  {assignableUsers.filter(u => u.role === 'admin').map(u => (
+                    <SelectItem key={u.user_id} value={u.user_id}>
+                      {u.full_name || 'Admin'} (Admin)
+                    </SelectItem>
+                  ))}
+                </>
+              )}
+              {(() => {
+                const filtered = assignableUsers.filter(u =>
+                  u.role !== 'admin' && (!selectedAgency || u.agency_id === selectedAgency)
+                );
+                if (filtered.length === 0) return null;
+                return (
+                  <>
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                      {selectedAgency ? 'Agents in selected agency' : 'All agents'}
+                    </div>
+                    {filtered.map(u => (
+                      <SelectItem key={u.user_id} value={u.user_id}>
+                        {u.full_name || 'Agent'} ({u.role.replace('_', ' ')})
+                      </SelectItem>
+                    ))}
+                  </>
+                );
+              })()}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Choose an agent, agency manager, or admin to handle this listing.
+          </p>
         </div>
 
         {/* Basic Info */}
