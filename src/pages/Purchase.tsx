@@ -16,6 +16,7 @@ import LocationSearchBar from "@/components/LocationSearchBar";
 import { usePolygonFilter } from "@/hooks/usePolygonFilter";
 import ActiveFilterChips from "@/components/ActiveFilterChips";
 import { buildFilterChips } from "@/lib/buildFilterChips";
+import { loadFilters, saveFilters, clearStoredFilters } from "@/lib/persistFilters";
 
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
