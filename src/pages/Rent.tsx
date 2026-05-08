@@ -16,6 +16,7 @@ import LocationSearchBar from "@/components/LocationSearchBar";
 import { usePolygonFilter } from "@/hooks/usePolygonFilter";
 import ActiveFilterChips from "@/components/ActiveFilterChips";
 import { buildFilterChips } from "@/lib/buildFilterChips";
+import { loadFilters, saveFilters, clearStoredFilters } from "@/lib/persistFilters";
 
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
@@ -46,24 +47,26 @@ const Rent = () => {
   const location = useLocation();
   const searchQuery = searchParams.get('search') || '';
   const urlType = searchParams.get('type') || '';
-  const [locationInput, setLocationInput] = useState(searchQuery);
-  const [radius, setRadius] = useState(0);
-  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>(urlType ? [urlType] : []);
-  const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>([50, 1000]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
-  const [minBedrooms, setMinBedrooms] = useState(1);
-  const [minBathrooms, setMinBathrooms] = useState(1);
-  const [barMinBedrooms, setBarMinBedrooms] = useState('');
-  const [barMaxBedrooms, setBarMaxBedrooms] = useState('');
-  const [barMinPrice, setBarMinPrice] = useState('');
-  const [barMaxPrice, setBarMaxPrice] = useState('');
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [selectedMustHaves, setSelectedMustHaves] = useState<string[]>([]);
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
-  const [addedToOracle, setAddedToOracle] = useState('');
-  const [keywords, setKeywords] = useState('');
-  const [unfurnishedOnly, setUnfurnishedOnly] = useState(false);
-  const [newHomesOnly, setNewHomesOnly] = useState(false);
+  const stored = useMemo(() => loadFilters<any>('rent'), []);
+  const pick = <T,>(k: string, fallback: T): T => (stored[k] !== undefined ? stored[k] as T : fallback);
+  const [locationInput, setLocationInput] = useState<string>(searchQuery || pick('locationInput', ''));
+  const [radius, setRadius] = useState<number>(pick('radius', 0));
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>(urlType ? [urlType] : pick('selectedPropertyTypes', [] as string[]));
+  const [squareMetersRange, setSquareMetersRange] = useState<[number, number]>(pick('squareMetersRange', [50, 1000] as [number, number]));
+  const [priceRange, setPriceRange] = useState<[number, number]>(pick('priceRange', [0, 10000] as [number, number]));
+  const [minBedrooms, setMinBedrooms] = useState<number>(pick('minBedrooms', 1));
+  const [minBathrooms, setMinBathrooms] = useState<number>(pick('minBathrooms', 1));
+  const [barMinBedrooms, setBarMinBedrooms] = useState<string>(pick('barMinBedrooms', ''));
+  const [barMaxBedrooms, setBarMaxBedrooms] = useState<string>(pick('barMaxBedrooms', ''));
+  const [barMinPrice, setBarMinPrice] = useState<string>(pick('barMinPrice', ''));
+  const [barMaxPrice, setBarMaxPrice] = useState<string>(pick('barMaxPrice', ''));
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>(pick('selectedAmenities', [] as string[]));
+  const [selectedMustHaves, setSelectedMustHaves] = useState<string[]>(pick('selectedMustHaves', [] as string[]));
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(pick('selectedFeatures', [] as string[]));
+  const [addedToOracle, setAddedToOracle] = useState<string>(pick('addedToOracle', ''));
+  const [keywords, setKeywords] = useState<string>(pick('keywords', ''));
+  const [unfurnishedOnly, setUnfurnishedOnly] = useState<boolean>(pick('unfurnishedOnly', false));
+  const [newHomesOnly, setNewHomesOnly] = useState<boolean>(pick('newHomesOnly', false));
   const [properties, setProperties] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
@@ -257,7 +260,42 @@ const Rent = () => {
     setSelectedAmenities([]);
     setUnfurnishedOnly(false);
     clearPolygon();
+    setSelectedMustHaves([]);
+    setSelectedFeatures([]);
+    setAddedToOracle('');
+    setKeywords('');
+    setNewHomesOnly(false);
+    setBarMinBedrooms('');
+    setBarMaxBedrooms('');
+    setBarMinPrice('');
+    setBarMaxPrice('');
+    setRadius(0);
+    clearStoredFilters('rent');
   };
+
+  // Persist active filters across navigations and refreshes
+  useEffect(() => {
+    saveFilters('rent', {
+      locationInput,
+      radius,
+      selectedPropertyTypes,
+      squareMetersRange,
+      priceRange,
+      minBedrooms,
+      minBathrooms,
+      barMinBedrooms,
+      barMaxBedrooms,
+      barMinPrice,
+      barMaxPrice,
+      selectedAmenities,
+      selectedMustHaves,
+      selectedFeatures,
+      addedToOracle,
+      keywords,
+      unfurnishedOnly,
+      newHomesOnly,
+    });
+  }, [locationInput, radius, selectedPropertyTypes, squareMetersRange, priceRange, minBedrooms, minBathrooms, barMinBedrooms, barMaxBedrooms, barMinPrice, barMaxPrice, selectedAmenities, selectedMustHaves, selectedFeatures, addedToOracle, keywords, unfurnishedOnly, newHomesOnly]);
 
   const handlePropertySelect = (property: any) => {
     setSelectedProperty(property);
