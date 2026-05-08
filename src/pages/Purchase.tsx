@@ -14,6 +14,8 @@ import PropertyCard from "@/components/PropertyCard";
 import ScrollReveal from "@/components/ScrollReveal";
 import LocationSearchBar from "@/components/LocationSearchBar";
 import { usePolygonFilter } from "@/hooks/usePolygonFilter";
+import ActiveFilterChips from "@/components/ActiveFilterChips";
+import { buildFilterChips } from "@/lib/buildFilterChips";
 
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
@@ -302,6 +304,25 @@ const Purchase = () => {
 
   const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
+  const filterChips = buildFilterChips({
+    selectedPropertyTypes, setSelectedPropertyTypes,
+    squareMetersRange, setSquareMetersRange, sqmDefault: [50, 1000],
+    priceRange, setPriceRange, priceDefault: [0, 5000000],
+    minBedrooms, setMinBedrooms,
+    minBathrooms, setMinBathrooms,
+    barMinBedrooms, setBarMinBedrooms,
+    barMaxBedrooms, setBarMaxBedrooms,
+    barMinPrice, setBarMinPrice,
+    barMaxPrice, setBarMaxPrice,
+    selectedAmenities, setSelectedAmenities,
+    selectedMustHaves, setSelectedMustHaves,
+    selectedFeatures, setSelectedFeatures,
+    addedToOracle, setAddedToOracle,
+    keywords, setKeywords,
+    unfurnishedOnly, setUnfurnishedOnly,
+    newHomesOnly, setNewHomesOnly,
+  });
+
   return (
     <div className="min-h-screen bg-transparent">
       {/* Header & Filters - always in container */}
@@ -374,6 +395,7 @@ const Purchase = () => {
         </div>
 
         <div className="text-center mb-6">
+          <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
           {isLoading ? (
             <p className="text-muted-foreground">Loading properties...</p>
           ) : filteredProperties.length > 0 ? (
