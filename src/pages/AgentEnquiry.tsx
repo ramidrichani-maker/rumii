@@ -86,6 +86,21 @@ const AgentEnquiry = () => {
         const recipientIds = new Set<string>();
         if (agentId) recipientIds.add(agentId);
 
+        // Fallback: also include any agents assigned to this property (in case agentId wasn't passed)
+        const { data: assignments } = await supabase
+          .from("property_agents")
+          .select("agent_id")
+          .eq("property_id", id);
+        assignments?.forEach((a: any) => a?.agent_id && recipientIds.add(a.agent_id));
+
+        // Fallback: include the property lister (e.g. admin who created it) so it's never lost
+        const { data: prop } = await supabase
+          .from("properties")
+          .select("user_id")
+          .eq("id", id)
+          .single();
+        if (prop?.user_id) recipientIds.add(prop.user_id);
+
         const { data: admins } = await (supabase as any).rpc("get_admin_user_ids");
         (admins as any[] | null)?.forEach((uid: any) => {
           if (typeof uid === "string") recipientIds.add(uid);
