@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, Menu } from 'lucide-react';
+import rumiLogo from '@/assets/rumi-logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -129,7 +130,7 @@ export const Navbar = () => {
               <Menu className="w-6 h-6" />
             </button>
             <Link to="/" className="flex items-center space-x-2">
-              <Home className="w-6 h-6 text-primary" />
+              <img src={rumiLogo} alt="Rumi" className="w-7 h-7 object-contain" />
               <span className="text-xl font-bold text-muted-foreground">rumi</span>
             </Link>
           </div>
