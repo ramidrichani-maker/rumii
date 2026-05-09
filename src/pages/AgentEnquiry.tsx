@@ -79,61 +79,7 @@ const AgentEnquiry = () => {
       return;
     }
 
-    // Send a message to the assigned agent and all admins (only if user is authenticated;
-    // RLS requires sender_user_id = auth.uid()).
-    if (user?.id) {
-      try {
-        const recipientIds = new Set<string>();
-        if (agentId) recipientIds.add(agentId);
-
-        // Fallback: also include any agents assigned to this property (in case agentId wasn't passed)
-        const { data: assignments } = await supabase
-          .from("property_agents")
-          .select("agent_id")
-          .eq("property_id", id);
-        assignments?.forEach((a: any) => a?.agent_id && recipientIds.add(a.agent_id));
-
-        // Fallback: include the property lister (e.g. admin who created it) so it's never lost
-        const { data: prop } = await supabase
-          .from("properties")
-          .select("user_id")
-          .eq("id", id)
-          .single();
-        if (prop?.user_id) recipientIds.add(prop.user_id);
-
-        const { data: admins } = await (supabase as any).rpc("get_admin_user_ids");
-        (admins as any[] | null)?.forEach((uid: any) => {
-          if (typeof uid === "string") recipientIds.add(uid);
-          else if (uid?.get_admin_user_ids) recipientIds.add(uid.get_admin_user_ids);
-        });
-
-        // Don't message yourself
-        recipientIds.delete(user.id);
-
-        if (recipientIds.size > 0) {
-          const subject = `New property enquiry${propertyAddress ? ` - ${propertyAddress}` : ""}`;
-          const body =
-            `New enquiry from ${fullName.trim()}\n\n` +
-            (propertyAddress ? `Property: ${propertyAddress}\n` : "") +
-            `Email: ${email.trim()}\n` +
-            `Phone: ${phone.trim()}\n` +
-            `Wants viewing: ${wantsViewing ? "Yes" : "No"}\n\n` +
-            `Message:\n${message.trim() || "(no message provided)"}`;
-
-          const rows = Array.from(recipientIds).map((rid) => ({
-            sender_user_id: user.id,
-            recipient_user_id: rid,
-            subject,
-            body,
-            related_property_id: id,
-          }));
-
-          await supabase.from("messages").insert(rows);
-        }
-      } catch (err) {
-        console.error("Failed to send enquiry messages", err);
-      }
-    }
+    // Inbox routing is handled by the route_property_enquiry DB trigger.
 
     setSubmitting(false);
       toast({ title: "Enquiry sent!", description: "The agent will get back to you soon." });
