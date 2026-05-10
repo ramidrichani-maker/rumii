@@ -64,7 +64,7 @@ const Messages = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   const fetchMessages = async () => {
     if (!user) return;
