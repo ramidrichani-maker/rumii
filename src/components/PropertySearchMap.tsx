@@ -54,7 +54,7 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
     if (!loaded || !google || !mapRef.current || mapInstance.current) return;
     mapInstance.current = new google.maps.Map(mapRef.current, {
       center: { lat: 33.8938, lng: 35.5018 },
-      zoom: 12,
+      zoom: 14,
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
