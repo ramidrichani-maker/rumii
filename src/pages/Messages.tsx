@@ -29,7 +29,7 @@ interface Message {
 }
 
 const Messages = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +38,7 @@ const Messages = () => {
   const [filter, setFilter] = useState<"all" | "unread" | "read" | "enquiry" | "viewing">("all");
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate("/auth");
       return;
@@ -63,7 +64,7 @@ const Messages = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   const fetchMessages = async () => {
     if (!user) return;
