@@ -702,10 +702,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     {bedroomOptions.map((opt) => {
                       const currentVal = activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms;
                       const onChange = activeFilterBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                      const disabled = isBedroomOptionDisabled(opt, activeFilterBedroomTab);
                       return (
                         <button
                           key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
+                          disabled={disabled}
                           onClick={() => {
+                            if (disabled) return;
                             onChange(currentVal === opt ? '' : opt);
                             setActiveFilterBedroomTab(null);
                           }}
@@ -713,7 +716,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                             currentVal === opt
                               ? 'border-primary bg-primary text-primary-foreground'
                               : 'border-transparent bg-transparent hover:border-primary/50'
-                          }`}
+                          } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                         >
                           {opt}
                         </button>
@@ -770,10 +773,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         const val = String(price);
                         const currentVal = activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice;
                         const onChange = activeFilterPriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                        const disabled = isPriceOptionDisabled(price, activeFilterPriceTab);
                         return (
                           <button
                             key={`filter-price-${activeFilterPriceTab}-${price}`}
+                            disabled={disabled}
                             onClick={() => {
+                              if (disabled) return;
                               onChange(currentVal === val ? '' : val);
                               setActiveFilterPriceTab(null);
                             }}
@@ -781,7 +787,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                               currentVal === val
                                 ? 'border-primary bg-primary text-primary-foreground'
                                 : 'border-transparent bg-transparent hover:border-primary/50'
-                            }`}
+                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                           >
                             {formatPrice(price)}{price === 10000000 ? '+' : ''}
                           </button>
