@@ -331,10 +331,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   {bedroomOptions.map((opt) => {
                     const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
                     const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                    const disabled = isBedroomOptionDisabled(opt, activeBedroomTab);
                     return (
                       <button
                         key={`${activeBedroomTab}-${opt}`}
+                        disabled={disabled}
                         onClick={() => {
+                          if (disabled) return;
                           onChange(currentVal === opt ? '' : opt);
                           setActiveBedroomTab(null);
                         }}
@@ -342,7 +345,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           currentVal === opt
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-transparent bg-transparent hover:border-primary/50'
-                        }`}
+                        } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                       >
                         {opt}
                       </button>
@@ -404,10 +407,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       {bedroomOptions.map((opt) => {
                         const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
                         const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                        const disabled = isBedroomOptionDisabled(opt, activeBedroomTab);
                         return (
                           <button
                             key={`${activeBedroomTab}-${opt}`}
+                            disabled={disabled}
                             onClick={() => {
+                              if (disabled) return;
                               onChange(currentVal === opt ? '' : opt);
                               setActiveBedroomTab(null);
                             }}
@@ -415,7 +421,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                               currentVal === opt
                                 ? 'border-primary bg-primary text-primary-foreground'
                                 : 'border-transparent bg-transparent hover:border-primary/50'
-                            }`}
+                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                           >
                             {opt}
                           </button>
