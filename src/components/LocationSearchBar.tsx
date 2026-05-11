@@ -141,6 +141,27 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [radiusOpen, setRadiusOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
+  // Cross-validation helpers: prevent picking a max < min (or min > max).
+  const bedroomIdx = (v: string) => (v === '' ? -1 : bedroomOptions.indexOf(v));
+  const isBedroomOptionDisabled = (opt: string, tab: 'min' | 'max'): boolean => {
+    if (tab === 'min' && maxBedrooms) {
+      const maxI = bedroomIdx(maxBedrooms);
+      const optI = bedroomIdx(opt);
+      return maxI !== -1 && optI > maxI;
+    }
+    if (tab === 'max' && minBedrooms) {
+      const minI = bedroomIdx(minBedrooms);
+      const optI = bedroomIdx(opt);
+      return minI !== -1 && optI < minI;
+    }
+    return false;
+  };
+  const isPriceOptionDisabled = (price: number, tab: 'min' | 'max'): boolean => {
+    if (tab === 'min' && barMaxPrice) return price > Number(barMaxPrice);
+    if (tab === 'max' && barMinPrice) return price < Number(barMinPrice);
+    return false;
+  };
+
   // Count of active filters (excluding the location input itself), used for
   // the mobile collapsed "Filters" button badge.
   const activeFilterCount = [
