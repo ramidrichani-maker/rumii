@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, Locate } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { getCityCenter } from '@/utils/cityCenter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
@@ -48,6 +49,7 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
   const mapInstance = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const [locating, setLocating] = useState(false);
 
   // Initialize map
   useEffect(() => {
@@ -160,13 +162,41 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
     };
   }, [properties, loaded, google, isAdmin, onPropertySelect]);
 
+  const goToCurrentLocation = () => {
+    if (!mapInstance.current || !navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        mapInstance.current?.setCenter({ lat: latitude, lng: longitude });
+        mapInstance.current?.setZoom(15);
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        alert('Unable to get your location. Please ensure location services are enabled.');
+      }
+    );
+  };
+
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="h-5 w-5" />
-          Property Locations ({properties.length} properties)
-        </CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Property Locations ({properties.length} properties)
+          </CardTitle>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={goToCurrentLocation}
+            disabled={!loaded || locating}
+          >
+            {locating ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Locate className="h-4 w-4 mr-1" />}
+            Current location
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="relative" style={{ height }}>
