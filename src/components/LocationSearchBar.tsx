@@ -141,6 +141,27 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [radiusOpen, setRadiusOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
+  // Cross-validation helpers: prevent picking a max < min (or min > max).
+  const bedroomIdx = (v: string) => (v === '' ? -1 : bedroomOptions.indexOf(v));
+  const isBedroomOptionDisabled = (opt: string, tab: 'min' | 'max'): boolean => {
+    if (tab === 'min' && maxBedrooms) {
+      const maxI = bedroomIdx(maxBedrooms);
+      const optI = bedroomIdx(opt);
+      return maxI !== -1 && optI > maxI;
+    }
+    if (tab === 'max' && minBedrooms) {
+      const minI = bedroomIdx(minBedrooms);
+      const optI = bedroomIdx(opt);
+      return minI !== -1 && optI < minI;
+    }
+    return false;
+  };
+  const isPriceOptionDisabled = (price: number, tab: 'min' | 'max'): boolean => {
+    if (tab === 'min' && barMaxPrice) return price > Number(barMaxPrice);
+    if (tab === 'max' && barMinPrice) return price < Number(barMinPrice);
+    return false;
+  };
+
   // Count of active filters (excluding the location input itself), used for
   // the mobile collapsed "Filters" button badge.
   const activeFilterCount = [
@@ -310,10 +331,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   {bedroomOptions.map((opt) => {
                     const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
                     const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                    const disabled = isBedroomOptionDisabled(opt, activeBedroomTab);
                     return (
                       <button
                         key={`${activeBedroomTab}-${opt}`}
+                        disabled={disabled}
                         onClick={() => {
+                          if (disabled) return;
                           onChange(currentVal === opt ? '' : opt);
                           setActiveBedroomTab(null);
                         }}
@@ -321,7 +345,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           currentVal === opt
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-transparent bg-transparent hover:border-primary/50'
-                        }`}
+                        } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                       >
                         {opt}
                       </button>
@@ -383,10 +407,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       {bedroomOptions.map((opt) => {
                         const currentVal = activeBedroomTab === 'min' ? minBedrooms : maxBedrooms;
                         const onChange = activeBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                        const disabled = isBedroomOptionDisabled(opt, activeBedroomTab);
                         return (
                           <button
                             key={`${activeBedroomTab}-${opt}`}
+                            disabled={disabled}
                             onClick={() => {
+                              if (disabled) return;
                               onChange(currentVal === opt ? '' : opt);
                               setActiveBedroomTab(null);
                             }}
@@ -394,7 +421,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                               currentVal === opt
                                 ? 'border-primary bg-primary text-primary-foreground'
                                 : 'border-transparent bg-transparent hover:border-primary/50'
-                            }`}
+                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                           >
                             {opt}
                           </button>
@@ -455,10 +482,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     const val = String(price);
                     const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
                     const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                    const disabled = isPriceOptionDisabled(price, activePriceTab);
                     return (
                       <button
                         key={`${activePriceTab}-${price}`}
+                        disabled={disabled}
                         onClick={() => {
+                          if (disabled) return;
                           onChange(currentVal === val ? '' : val);
                           setActivePriceTab(null);
                         }}
@@ -466,7 +496,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           currentVal === val
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-transparent bg-transparent hover:border-primary/50'
-                        }`}
+                        } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                       >
                         {formatPrice(price)}{price === 10000000 ? '+' : ''}
                       </button>
@@ -528,10 +558,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         const val = String(price);
                         const currentVal = activePriceTab === 'min' ? barMinPrice : barMaxPrice;
                         const onChange = activePriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                        const disabled = isPriceOptionDisabled(price, activePriceTab);
                         return (
                           <button
                             key={`${activePriceTab}-${price}`}
+                            disabled={disabled}
                             onClick={() => {
+                              if (disabled) return;
                               onChange(currentVal === val ? '' : val);
                               setActivePriceTab(null);
                             }}
@@ -539,7 +572,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                               currentVal === val
                                 ? 'border-primary bg-primary text-primary-foreground'
                                 : 'border-transparent bg-transparent hover:border-primary/50'
-                            }`}
+                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                           >
                             {formatPrice(price)}{price === 10000000 ? '+' : ''}
                           </button>
@@ -669,10 +702,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     {bedroomOptions.map((opt) => {
                       const currentVal = activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms;
                       const onChange = activeFilterBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                      const disabled = isBedroomOptionDisabled(opt, activeFilterBedroomTab);
                       return (
                         <button
                           key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
+                          disabled={disabled}
                           onClick={() => {
+                            if (disabled) return;
                             onChange(currentVal === opt ? '' : opt);
                             setActiveFilterBedroomTab(null);
                           }}
@@ -680,7 +716,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                             currentVal === opt
                               ? 'border-primary bg-primary text-primary-foreground'
                               : 'border-transparent bg-transparent hover:border-primary/50'
-                          }`}
+                          } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                         >
                           {opt}
                         </button>
@@ -737,10 +773,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         const val = String(price);
                         const currentVal = activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice;
                         const onChange = activeFilterPriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                        const disabled = isPriceOptionDisabled(price, activeFilterPriceTab);
                         return (
                           <button
                             key={`filter-price-${activeFilterPriceTab}-${price}`}
+                            disabled={disabled}
                             onClick={() => {
+                              if (disabled) return;
                               onChange(currentVal === val ? '' : val);
                               setActiveFilterPriceTab(null);
                             }}
@@ -748,7 +787,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                               currentVal === val
                                 ? 'border-primary bg-primary text-primary-foreground'
                                 : 'border-transparent bg-transparent hover:border-primary/50'
-                            }`}
+                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                           >
                             {formatPrice(price)}{price === 10000000 ? '+' : ''}
                           </button>
