@@ -669,6 +669,16 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   if (embedded) {
     return (
       <div className={`${mapClass} flex flex-col relative`} style={{ height }}>
+        <div className="absolute top-2 left-2 z-[1000]">
+          <button
+            onClick={getCurrentLocation}
+            className="px-3 py-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors text-xs font-medium flex items-center gap-1"
+            title="Center map on your current location"
+          >
+            <Locate className="w-3 h-3" />
+            Current location
+          </button>
+        </div>
         {enableDrawing && (
           <div className="absolute top-2 right-20 z-[1000] flex gap-1">
             {isDrawingMode ? (
