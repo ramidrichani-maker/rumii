@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Pencil, Trash2, Loader2, Locate } from 'lucide-react';
 import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 
 interface Coordinate {
@@ -24,6 +24,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasPolygon, setHasPolygon] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   // Init map
   useEffect(() => {
@@ -193,11 +194,38 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
     onDrawComplete(coords);
   }, [onDrawComplete]);
 
+  const goToCurrentLocation = useCallback(() => {
+    if (!mapInstance.current || !navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        mapInstance.current?.setCenter({ lat: latitude, lng: longitude });
+        mapInstance.current?.setZoom(14);
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        alert('Unable to get your location. Please ensure location services are enabled.');
+      }
+    );
+  }, []);
+
   return (
     <div className="mt-4 rounded-xl overflow-hidden border border-border bg-card">
       <div className="p-3 flex items-center justify-between gap-2">
         <p className="text-sm font-medium text-foreground">Draw your search area</p>
         <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={goToCurrentLocation}
+            className="h-8"
+            disabled={!loaded || locating}
+          >
+            {locating ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Locate className="h-4 w-4 mr-1" />}
+            Current location
+          </Button>
           {hasPolygon && (
             <Button size="sm" variant="ghost" onClick={clearDrawing} className="h-8 px-2">
               <Trash2 className="h-4 w-4 mr-1" />
