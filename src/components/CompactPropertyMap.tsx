@@ -151,6 +151,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       map: mapInstance.current,
     });
     setHasDrawnArea(true);
+    setDrawnPath(path);
     const bounds = new google.maps.LatLngBounds();
     path.forEach((p) => bounds.extend(p));
     mapInstance.current.fitBounds(bounds, 30);
@@ -533,6 +534,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     }));
     drawingPointsRef.current = [];
     setHasDrawnArea(true);
+    setDrawnPath(simplified);
     onDrawnAreaChange?.(coords);
     drawCleanupRef.current?.();
     drawCleanupRef.current = null;
@@ -627,6 +629,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     drawingPolylineRef.current = null;
     drawingPointsRef.current = [];
     setHasDrawnArea(false);
+    setDrawnPath(null);
     setIsDrawingMode(false);
     if (mapInstance.current) {
       mapInstance.current.setOptions({ draggable: true, gestureHandling: 'auto' });
