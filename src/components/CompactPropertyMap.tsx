@@ -158,6 +158,31 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     onDrawnAreaChange?.(initialPolygon);
   }, [loaded, google, initialPolygon, onDrawnAreaChange]);
 
+  // Render buffer halo around drawn polygon when a search radius is selected.
+  // Uses a ring of circles (one per vertex) to visually expand the search area
+  // by `searchRadius` km — matching the radius-based filter in usePolygonFilter.
+  useEffect(() => {
+    if (!loaded || !google || !mapInstance.current) return;
+    bufferCirclesRef.current.forEach((c) => c.setMap(null));
+    bufferCirclesRef.current = [];
+    if (!drawnPath || drawnPath.length < 3 || !searchRadius || searchRadius <= 0) return;
+    const radiusMeters = searchRadius * 1000;
+    bufferCirclesRef.current = drawnPath.map(
+      (p) =>
+        new google.maps.Circle({
+          center: p,
+          radius: radiusMeters,
+          strokeColor: 'hsl(262, 83%, 58%)',
+          strokeOpacity: 0.5,
+          strokeWeight: 1,
+          fillColor: 'hsl(262, 83%, 58%)',
+          fillOpacity: 0.08,
+          clickable: false,
+          map: mapInstance.current!,
+        })
+    );
+  }, [loaded, google, drawnPath, searchRadius]);
+
   // Markers
   useEffect(() => {
     if (!loaded || !google || !mapInstance.current) return;
