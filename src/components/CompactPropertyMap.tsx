@@ -87,6 +87,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const drawnPolygonRef = useRef<google.maps.Polygon | null>(null);
   const searchBoundaryRef = useRef<google.maps.Polygon | null>(null);
   const searchCircleRef = useRef<google.maps.Circle | null>(null);
+  const bufferCirclesRef = useRef<google.maps.Circle[]>([]);
+  const [drawnPath, setDrawnPath] = useState<google.maps.LatLngLiteral[] | null>(null);
 
   const infoCloseTimerRef = useRef<number | null>(null);
 
@@ -126,6 +128,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       drawnPolygonRef.current?.setMap(null);
       searchBoundaryRef.current?.setMap(null);
       searchCircleRef.current?.setMap(null);
+      bufferCirclesRef.current.forEach((c) => c.setMap(null));
+      bufferCirclesRef.current = [];
       drawingPolylineRef.current?.setMap(null);
       mapInstance.current = null;
     };
@@ -147,11 +151,37 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       map: mapInstance.current,
     });
     setHasDrawnArea(true);
+    setDrawnPath(path);
     const bounds = new google.maps.LatLngBounds();
     path.forEach((p) => bounds.extend(p));
     mapInstance.current.fitBounds(bounds, 30);
     onDrawnAreaChange?.(initialPolygon);
   }, [loaded, google, initialPolygon, onDrawnAreaChange]);
+
+  // Render buffer halo around drawn polygon when a search radius is selected.
+  // Uses a ring of circles (one per vertex) to visually expand the search area
+  // by `searchRadius` km — matching the radius-based filter in usePolygonFilter.
+  useEffect(() => {
+    if (!loaded || !google || !mapInstance.current) return;
+    bufferCirclesRef.current.forEach((c) => c.setMap(null));
+    bufferCirclesRef.current = [];
+    if (!drawnPath || drawnPath.length < 3 || !searchRadius || searchRadius <= 0) return;
+    const radiusMeters = searchRadius * 1000;
+    bufferCirclesRef.current = drawnPath.map(
+      (p) =>
+        new google.maps.Circle({
+          center: p,
+          radius: radiusMeters,
+          strokeColor: 'hsl(262, 83%, 58%)',
+          strokeOpacity: 0.5,
+          strokeWeight: 1,
+          fillColor: 'hsl(262, 83%, 58%)',
+          fillOpacity: 0.08,
+          clickable: false,
+          map: mapInstance.current!,
+        })
+    );
+  }, [loaded, google, drawnPath, searchRadius]);
 
   // Markers
   useEffect(() => {
@@ -529,6 +559,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     }));
     drawingPointsRef.current = [];
     setHasDrawnArea(true);
+    setDrawnPath(simplified);
     onDrawnAreaChange?.(coords);
     drawCleanupRef.current?.();
     drawCleanupRef.current = null;
@@ -623,6 +654,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     drawingPolylineRef.current = null;
     drawingPointsRef.current = [];
     setHasDrawnArea(false);
+    setDrawnPath(null);
     setIsDrawingMode(false);
     if (mapInstance.current) {
       mapInstance.current.setOptions({ draggable: true, gestureHandling: 'auto' });
