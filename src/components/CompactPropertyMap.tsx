@@ -173,10 +173,9 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           center: p,
           radius: radiusMeters,
           strokeColor: 'hsl(262, 83%, 58%)',
-          strokeOpacity: 0.5,
+          strokeOpacity: 0.6,
           strokeWeight: 1,
-          fillColor: 'hsl(262, 83%, 58%)',
-          fillOpacity: 0.08,
+          fillOpacity: 0,
           clickable: false,
           map: mapInstance.current!,
         })
