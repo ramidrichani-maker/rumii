@@ -87,6 +87,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const drawnPolygonRef = useRef<google.maps.Polygon | null>(null);
   const searchBoundaryRef = useRef<google.maps.Polygon | null>(null);
   const searchCircleRef = useRef<google.maps.Circle | null>(null);
+  const bufferCirclesRef = useRef<google.maps.Circle[]>([]);
+  const [drawnPath, setDrawnPath] = useState<google.maps.LatLngLiteral[] | null>(null);
 
   const infoCloseTimerRef = useRef<number | null>(null);
 
@@ -126,6 +128,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       drawnPolygonRef.current?.setMap(null);
       searchBoundaryRef.current?.setMap(null);
       searchCircleRef.current?.setMap(null);
+      bufferCirclesRef.current.forEach((c) => c.setMap(null));
+      bufferCirclesRef.current = [];
       drawingPolylineRef.current?.setMap(null);
       mapInstance.current = null;
     };
