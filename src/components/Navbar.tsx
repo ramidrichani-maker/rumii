@@ -130,8 +130,8 @@ export const Navbar = () => {
               <Menu className="w-6 h-6" />
             </button>
             <Link to="/" className="flex items-center space-x-2">
-              <img src={rumiLogo} alt="Rumi" className="w-7 h-7 object-contain" />
-              <span className="text-xl font-bold text-muted-foreground">rumi</span>
+              <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
+              <span className="text-xl font-bold text-muted-foreground leading-none self-center">rumi</span>
             </Link>
           </div>
           {profile?.role !== 'customer_support' ? (
