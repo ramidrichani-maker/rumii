@@ -88,6 +88,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const searchBoundaryRef = useRef<google.maps.Polygon | null>(null);
   const searchCircleRef = useRef<google.maps.Circle | null>(null);
   const bufferCirclesRef = useRef<google.maps.Circle[]>([]);
+  const bufferPolygonRef = useRef<google.maps.Polygon | null>(null);
   const [drawnPath, setDrawnPath] = useState<google.maps.LatLngLiteral[] | null>(null);
 
   const infoCloseTimerRef = useRef<number | null>(null);
@@ -130,6 +131,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       searchCircleRef.current?.setMap(null);
       bufferCirclesRef.current.forEach((c) => c.setMap(null));
       bufferCirclesRef.current = [];
+      bufferPolygonRef.current?.setMap(null);
+      bufferPolygonRef.current = null;
       drawingPolylineRef.current?.setMap(null);
       mapInstance.current = null;
     };
@@ -158,28 +161,37 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     onDrawnAreaChange?.(initialPolygon);
   }, [loaded, google, initialPolygon, onDrawnAreaChange]);
 
-  // Render buffer halo around drawn polygon when a search radius is selected.
-  // Uses a ring of circles (one per vertex) to visually expand the search area
-  // by `searchRadius` km — matching the radius-based filter in usePolygonFilter.
+  // Render an expanded outline around the drawn polygon when a search radius is selected.
+  // Each vertex is pushed outward from the polygon centroid by `searchRadius` km,
+  // producing a single outline-only polygon (no circles).
   useEffect(() => {
     if (!loaded || !google || !mapInstance.current) return;
-    bufferCirclesRef.current.forEach((c) => c.setMap(null));
-    bufferCirclesRef.current = [];
+    bufferPolygonRef.current?.setMap(null);
+    bufferPolygonRef.current = null;
     if (!drawnPath || drawnPath.length < 3 || !searchRadius || searchRadius <= 0) return;
     const radiusMeters = searchRadius * 1000;
-    bufferCirclesRef.current = drawnPath.map(
-      (p) =>
-        new google.maps.Circle({
-          center: p,
-          radius: radiusMeters,
-          strokeColor: 'hsl(262, 83%, 58%)',
-          strokeOpacity: 0.6,
-          strokeWeight: 1,
-          fillOpacity: 0,
-          clickable: false,
-          map: mapInstance.current!,
-        })
-    );
+    const spherical = google.maps.geometry?.spherical;
+    if (!spherical) return;
+    const centroidLat =
+      drawnPath.reduce((s, p) => s + p.lat, 0) / drawnPath.length;
+    const centroidLng =
+      drawnPath.reduce((s, p) => s + p.lng, 0) / drawnPath.length;
+    const centroid = new google.maps.LatLng(centroidLat, centroidLng);
+    const expanded = drawnPath.map((p) => {
+      const point = new google.maps.LatLng(p.lat, p.lng);
+      const heading = spherical.computeHeading(centroid, point);
+      const offset = spherical.computeOffset(point, radiusMeters, heading);
+      return { lat: offset.lat(), lng: offset.lng() };
+    });
+    bufferPolygonRef.current = new google.maps.Polygon({
+      paths: expanded,
+      strokeColor: 'hsl(262, 83%, 58%)',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillOpacity: 0,
+      clickable: false,
+      map: mapInstance.current!,
+    });
   }, [loaded, google, drawnPath, searchRadius]);
 
   // Markers
