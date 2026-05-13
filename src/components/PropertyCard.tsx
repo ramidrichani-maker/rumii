@@ -3,12 +3,16 @@ import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2, Share2 } from "lucide-react";
+import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2, Share2, MessageCircle } from "lucide-react";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 interface Property {
   id: string;
   address: string;
@@ -41,7 +45,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const imageCarousel = useSwipeCarousel(property.images?.length || 0);
-  const [showPhone, setShowPhone] = useState(false);
   const [agentPhone, setAgentPhone] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [showViewingModal, setShowViewingModal] = useState(false);
@@ -146,16 +149,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const handleNextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     imageCarousel.goTo("right");
-  };
-
-  const handleCall = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const phone = agentPhone || '+96170612686';
-    if (showPhone) {
-      window.location.href = `tel:${phone}`;
-    } else {
-      setShowPhone(true);
-    }
   };
 
   const handleEmail = (e: React.MouseEvent) => {
@@ -382,15 +375,44 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
             <span className="hidden md:inline">Request Viewing</span>
             <span className="md:hidden">View</span>
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
-            onClick={handleCall}
-          >
-            <Phone className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="hidden md:inline">{showPhone ? (agentPhone || '+96170612686') : 'Call'}</span>
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Phone className="w-3 h-3 md:w-4 md:h-4" />
+                <span className="hidden md:inline">Call</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-2 space-y-1" onClick={(e) => e.stopPropagation()}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.location.href = `tel:${(agentPhone || '+96170612686').replace(/[^+\d]/g, '')}`;
+                }}
+              >
+                <Phone className="w-4 h-4" />
+                {agentPhone || '+96170612686'}
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-green-600 hover:text-green-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const clean = (agentPhone || '+96170612686').replace(/[^+\d]/g, '').replace('+', '');
+                  window.open(`https://wa.me/${clean}`, '_blank');
+                }}
+              >
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp
+              </Button>
+            </PopoverContent>
+          </Popover>
           <Button
             size="sm"
             className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
