@@ -500,12 +500,30 @@ const PropertyDetail = () => {
           </div>
         </div>
 
-        {/* Desktop share button: below image, left aligned */}
-        <div className="hidden md:flex mt-3">
+        {/* Mobile listing ref: directly under image */}
+        {property.property_code != null && (
+          <div className="md:hidden mt-3 text-sm text-muted-foreground">
+            Listing Ref:{" "}
+            <span className="font-medium text-foreground">
+              #{property.property_code}
+            </span>
+          </div>
+        )}
+
+        {/* Desktop share button + listing ref: below image, left aligned */}
+        <div className="hidden md:flex mt-3 items-center gap-3">
           <Button variant="outline" size="sm" onClick={handleShare}>
             <Share2 className="w-4 h-4 mr-2" />
             Share
           </Button>
+          {property.property_code != null && (
+            <span className="text-sm text-muted-foreground">
+              Listing Ref:{" "}
+              <span className="font-medium text-foreground">
+                #{property.property_code}
+              </span>
+            </span>
+          )}
         </div>
 
         {/* Property info */}
