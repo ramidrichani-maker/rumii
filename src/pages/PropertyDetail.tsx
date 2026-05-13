@@ -36,6 +36,7 @@ interface Property {
   longitude?: number;
   floor_plan_url?: string;
   floor_plan_urls?: string[];
+  property_code?: number;
 }
 
 const PropertyDetail = () => {
