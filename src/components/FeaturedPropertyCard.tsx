@@ -15,6 +15,7 @@ interface Property {
   bathrooms: number;
   square_meters: number;
   images: string[];
+  created_at?: string;
 }
 
 interface FeaturedPropertyCardProps {
@@ -27,6 +28,15 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   const images = property.images?.length ? property.images : [];
   const hasMultiple = images.length > 1;
   const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd, wasSwipe } = useSwipeCarousel(images.length);
+
+  const isJustListed = (createdAt?: string) => {
+    if (!createdAt) return false;
+    const created = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now.getTime() - created.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays <= 7;
+  };
 
   const formatPrice = (price: number, listingType: string) => {
     return listingType === 'rent' ? `$${price?.toLocaleString()}/mo` : `$${price?.toLocaleString()}`;
@@ -53,6 +63,11 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
+          {isJustListed(property.created_at) && (
+            <Badge className="absolute top-2 left-2 z-20 bg-primary text-primary-foreground hover:bg-primary/90">
+              Just Listed
+            </Badge>
+          )}
           {images.length > 0 ? (
             <div
               className="flex h-full"

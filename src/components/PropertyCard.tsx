@@ -3,6 +3,7 @@ import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2, Share2, MessageCircle } from "lucide-react";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
@@ -211,6 +212,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     return desc;
   };
 
+  const isJustListed = (createdAt: string) => {
+    const created = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now.getTime() - created.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays <= 7;
+  };
+
   const hasMultipleImages = property.images && property.images.length > 1;
 
   return (
@@ -232,6 +241,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           navigate(`/property/${property.id}`);
         }}
       >
+        {isJustListed(property.created_at) && (
+          <Badge className="absolute top-2 left-2 z-20 bg-primary text-primary-foreground hover:bg-primary/90">
+            Just Listed
+          </Badge>
+        )}
         {hasMultipleImages && (
           <>
             <Button
