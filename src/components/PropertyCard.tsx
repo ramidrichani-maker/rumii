@@ -241,6 +241,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           navigate(`/property/${property.id}`);
         }}
       >
+        {isJustListed(property.created_at) && (
+          <Badge className="absolute top-2 left-2 z-20 bg-primary text-primary-foreground hover:bg-primary/90">
+            Just Listed
+          </Badge>
+        )}
         {hasMultipleImages && (
           <>
             <Button
