@@ -212,6 +212,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     return desc;
   };
 
+  const isJustListed = (createdAt: string) => {
+    const created = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now.getTime() - created.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays <= 7;
+  };
+
   const hasMultipleImages = property.images && property.images.length > 1;
 
   return (
