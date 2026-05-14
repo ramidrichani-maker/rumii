@@ -15,6 +15,7 @@ interface Property {
   bathrooms: number;
   square_meters: number;
   images: string[];
+  created_at?: string;
 }
 
 interface FeaturedPropertyCardProps {
