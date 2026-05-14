@@ -161,13 +161,31 @@ const Purchase = () => {
         query = query.or(`city.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,municipality.ilike.%${searchQuery}%`);
       }
 
-      const parsedBarMinBed = barMinBedrooms ? parseInt(barMinBedrooms) : null;
-      const parsedBarMaxBed = barMaxBedrooms ? parseInt(barMaxBedrooms) : null;
-      if (parsedBarMinBed && parsedBarMinBed > 0) {
-        query = query.gte('bedrooms', parsedBarMinBed);
-      }
-      if (parsedBarMaxBed && parsedBarMaxBed > 0) {
-        query = query.lte('bedrooms', parsedBarMaxBed);
+      const isMinStudio = barMinBedrooms === 'Studio';
+      const isMaxStudio = barMaxBedrooms === 'Studio';
+      const parsedBarMinBed = barMinBedrooms ? (isMinStudio ? 0 : parseInt(barMinBedrooms)) : null;
+      const parsedBarMaxBed = barMaxBedrooms ? (isMaxStudio ? 0 : parseInt(barMaxBedrooms)) : null;
+
+      if (isMinStudio && isMaxStudio) {
+        // Only studio properties
+        query = query.or('property_type.eq.studio,bedrooms.eq.0');
+      } else if (isMinStudio) {
+        // Include studios alongside properties up to max bedrooms
+        if (parsedBarMaxBed !== null && parsedBarMaxBed > 0) {
+          query = query.or(`property_type.eq.studio,bedrooms.lte.${parsedBarMaxBed}`);
+        } else {
+          query = query.or('property_type.eq.studio,bedrooms.gte.0');
+        }
+      } else if (isMaxStudio) {
+        // Max = studio means only 0-bedroom / studio properties
+        query = query.or('property_type.eq.studio,bedrooms.eq.0');
+      } else {
+        if (parsedBarMinBed !== null && parsedBarMinBed > 0) {
+          query = query.gte('bedrooms', parsedBarMinBed);
+        }
+        if (parsedBarMaxBed !== null && parsedBarMaxBed > 0) {
+          query = query.lte('bedrooms', parsedBarMaxBed);
+        }
       }
 
       const parsedBarMinPrice = barMinPrice ? parseInt(barMinPrice.replace(/[^0-9]/g, '')) : null;
