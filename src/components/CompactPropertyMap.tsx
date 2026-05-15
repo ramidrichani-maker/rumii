@@ -256,10 +256,10 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
               : 'For Sale';
 
         const html = `
-          <div data-action="navigate" data-property-id="${property.id}" style="width:260px;font-family:system-ui,sans-serif;cursor:pointer;">
-            <div data-carousel="${property.id}" style="position:relative;width:100%;height:140px;overflow:hidden;border-radius:8px 8px 0 0;background:#eee;touch-action:pan-y;">
-              <div data-track="${property.id}" style="display:flex;height:100%;width:${images.length * 100}%;transform:translateX(0);transition:transform 0.3s ease;">
-                ${images.map((src) => `<img style="width:${100 / images.length}%;height:100%;object-fit:cover;flex-shrink:0;pointer-events:none;" src="${src}" alt="${propType}" />`).join('')}
+          <div data-action="navigate" data-property-id="${property.id}" style="width:240px;max-width:240px;box-sizing:border-box;font-family:system-ui,sans-serif;cursor:pointer;overflow:hidden;border-radius:8px;background:#fff;">
+            <div data-carousel="${property.id}" style="position:relative;width:240px;height:140px;overflow:hidden;border-radius:8px 8px 0 0;background:#eee;touch-action:pan-y;box-sizing:border-box;">
+              <div data-track="${property.id}" style="display:flex;height:100%;width:${images.length * 240}px;transform:translateX(0);transition:transform 0.3s ease;">
+                ${images.map((src) => `<img style="width:240px;height:140px;object-fit:cover;flex-shrink:0;display:block;pointer-events:none;" src="${src}" alt="${propType}" />`).join('')}
               </div>
               <span style="position:absolute;top:6px;left:6px;background:hsl(30,20%,45%);color:white;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;pointer-events:none;">${listingLabel}</span>
               ${images.length > 1 ? `
@@ -299,7 +299,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             const track = document.querySelector(`[data-track="${property.id}"]`) as HTMLElement | null;
             const dots = document.querySelectorAll(`[data-dots="${property.id}"] [data-dot]`);
             const update = () => {
-              if (track) track.style.transform = `translateX(-${currentIdx * (100 / totalImgs)}%)`;
+              if (track) track.style.transform = `translateX(-${currentIdx * 240}px)`;
               dots.forEach((d, i) => {
                 (d as HTMLElement).style.background = i === currentIdx ? '#fff' : 'rgba(255,255,255,0.5)';
               });
