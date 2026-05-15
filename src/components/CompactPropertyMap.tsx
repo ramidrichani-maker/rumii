@@ -257,9 +257,18 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
 
         const html = `
           <div data-action="navigate" data-property-id="${property.id}" style="width:260px;font-family:system-ui,sans-serif;cursor:pointer;">
-            <div style="position:relative;width:100%;height:140px;overflow:hidden;border-radius:8px 8px 0 0;">
-              <img style="width:100%;height:100%;object-fit:cover;" src="${images[0]}" alt="${propType}" />
-              <span style="position:absolute;top:6px;left:6px;background:hsl(30,20%,45%);color:white;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;">${listingLabel}</span>
+            <div data-carousel="${property.id}" style="position:relative;width:100%;height:140px;overflow:hidden;border-radius:8px 8px 0 0;background:#eee;touch-action:pan-y;">
+              <div data-track="${property.id}" style="display:flex;height:100%;width:${images.length * 100}%;transform:translateX(0);transition:transform 0.3s ease;">
+                ${images.map((src) => `<img style="width:${100 / images.length}%;height:100%;object-fit:cover;flex-shrink:0;pointer-events:none;" src="${src}" alt="${propType}" />`).join('')}
+              </div>
+              <span style="position:absolute;top:6px;left:6px;background:hsl(30,20%,45%);color:white;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;pointer-events:none;">${listingLabel}</span>
+              ${images.length > 1 ? `
+                <button data-arrow="prev" data-prop="${property.id}" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.85);border:none;border-radius:9999px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;padding:0;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,0.2);">&#8249;</button>
+                <button data-arrow="next" data-prop="${property.id}" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.85);border:none;border-radius:9999px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;line-height:1;padding:0;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,0.2);">&#8250;</button>
+                <div data-dots="${property.id}" style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px;pointer-events:none;">
+                  ${images.map((_, i) => `<span data-dot="${i}" style="width:5px;height:5px;border-radius:9999px;background:${i === 0 ? '#fff' : 'rgba(255,255,255,0.5)'};"></span>`).join('')}
+                </div>
+              ` : ''}
             </div>
             <div style="padding:10px;">
               <div style="font-weight:700;font-size:16px;color:#1a1a1a;margin-bottom:2px;">${priceFormatted}</div>
@@ -284,7 +293,51 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           infoWindowRef.current.open({ map: mapInstance.current, anchor: marker });
           google.maps.event.addListenerOnce(infoWindowRef.current, 'domready', () => {
             const el = document.querySelector(`[data-property-id="${property.id}"]`);
-            el?.addEventListener('click', () => {
+            const totalImgs = images.length;
+            let currentIdx = 0;
+            let swiped = false;
+            const track = document.querySelector(`[data-track="${property.id}"]`) as HTMLElement | null;
+            const dots = document.querySelectorAll(`[data-dots="${property.id}"] [data-dot]`);
+            const update = () => {
+              if (track) track.style.transform = `translateX(-${currentIdx * (100 / totalImgs)}%)`;
+              dots.forEach((d, i) => {
+                (d as HTMLElement).style.background = i === currentIdx ? '#fff' : 'rgba(255,255,255,0.5)';
+              });
+            };
+            const go = (dir: 1 | -1) => {
+              currentIdx = (currentIdx + dir + totalImgs) % totalImgs;
+              update();
+            };
+            document.querySelectorAll(`[data-arrow][data-prop="${property.id}"]`).forEach((btn) => {
+              btn.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                ev.preventDefault();
+                go((btn as HTMLElement).dataset.arrow === 'next' ? 1 : -1);
+              });
+            });
+            const carousel = document.querySelector(`[data-carousel="${property.id}"]`) as HTMLElement | null;
+            if (carousel && totalImgs > 1) {
+              let startX = 0;
+              let dx = 0;
+              carousel.addEventListener('touchstart', (ev) => {
+                startX = (ev as TouchEvent).touches[0].clientX;
+                dx = 0;
+              }, { passive: true });
+              carousel.addEventListener('touchmove', (ev) => {
+                dx = (ev as TouchEvent).touches[0].clientX - startX;
+              }, { passive: true });
+              carousel.addEventListener('touchend', () => {
+                if (Math.abs(dx) > 40) {
+                  swiped = true;
+                  go(dx < 0 ? 1 : -1);
+                  setTimeout(() => { swiped = false; }, 300);
+                }
+              });
+            }
+            el?.addEventListener('click', (ev) => {
+              const target = ev.target as HTMLElement;
+              if (swiped) return;
+              if (target.closest('[data-arrow]')) return;
               window.location.href = `/property/${property.id}`;
             });
             // Keep open while hovering the card; close when leaving it.
