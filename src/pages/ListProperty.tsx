@@ -617,7 +617,18 @@ const ListProperty = () => {
       setRejectedFiles(prev => [...prev, ...rejected]);
     }
     if (accepted.length) {
-      setUploadedImages(prev => [...prev, ...accepted]);
+      setUploadedImages(prev => {
+        const startIndex = prev.length;
+        const next = [...prev, ...accepted];
+        // Kick off uploads immediately for the newly added files so the
+        // user isn't stuck with "Waiting on N files" on the submit button.
+        accepted.forEach((img, i) => {
+          const idx = startIndex + i;
+          // Fire-and-forget; uploadSingleImage updates state with progress.
+          void uploadSingleImage(idx, img);
+        });
+        return next;
+      });
     }
     // Reset input so re-selecting same file works
     event.target.value = '';
