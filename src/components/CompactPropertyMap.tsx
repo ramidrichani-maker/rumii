@@ -299,7 +299,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             const track = document.querySelector(`[data-track="${property.id}"]`) as HTMLElement | null;
             const dots = document.querySelectorAll(`[data-dots="${property.id}"] [data-dot]`);
             const update = () => {
-              if (track) track.style.transform = `translateX(-${currentIdx * 260}px)`;
+              if (track) track.style.transform = `translateX(-${currentIdx * 240}px)`;
               dots.forEach((d, i) => {
                 (d as HTMLElement).style.background = i === currentIdx ? '#fff' : 'rgba(255,255,255,0.5)';
               });
