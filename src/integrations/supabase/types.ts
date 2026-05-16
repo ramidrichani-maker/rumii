@@ -247,6 +247,7 @@ export type Database = {
           id: string
           property_id: string
           requested_by: string
+          requested_days: number
           status: string
           updated_at: string
         }
@@ -257,6 +258,7 @@ export type Database = {
           id?: string
           property_id: string
           requested_by: string
+          requested_days?: number
           status?: string
           updated_at?: string
         }
@@ -267,6 +269,7 @@ export type Database = {
           id?: string
           property_id?: string
           requested_by?: string
+          requested_days?: number
           status?: string
           updated_at?: string
         }

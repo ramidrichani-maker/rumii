@@ -13,6 +13,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import AgentPropertyForm from "@/components/AgentPropertyForm";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Property {
   id: string;
@@ -62,6 +68,7 @@ interface FeaturedRequest {
   status: string;
   admin_notes: string | null;
   created_at: string;
+  requested_days?: number;
   property: {
     address: string;
     city: string;
@@ -256,7 +263,7 @@ const AgencyPortal = () => {
     toast({ title: "Success", description: "Property deleted successfully" });
   };
 
-  const handleRequestFeature = async (propertyId: string) => {
+  const handleRequestFeature = async (propertyId: string, days: number) => {
     if (!profile?.agency_id) return;
     
     setRequestingFeature(propertyId);
@@ -267,12 +274,13 @@ const AgencyPortal = () => {
         .insert({
           property_id: propertyId,
           agency_id: profile.agency_id,
-          requested_by: user!.id
-        });
+          requested_by: user!.id,
+          requested_days: days,
+        } as any);
       
       if (error) throw error;
       
-      toast({ title: "Success", description: "Feature request submitted" });
+      toast({ title: "Success", description: `Feature request for ${days} days submitted` });
       loadAgencyData();
     } catch (error) {
       toast({ title: "Error", description: "Failed to submit request", variant: "destructive" });
@@ -459,15 +467,25 @@ const AgencyPortal = () => {
                             <TableCell>
                               <div className="flex gap-2">
                                 {!property.featured_section && !hasPendingRequest && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleRequestFeature(property.id)}
-                                    disabled={requestingFeature === property.id}
-                                  >
-                                    <Star className="h-4 w-4 mr-1" />
-                                    Request Feature
-                                  </Button>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        disabled={requestingFeature === property.id}
+                                      >
+                                        <Star className="h-4 w-4 mr-1" />
+                                        Request Feature
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      {[7, 14, 21, 30].map((d) => (
+                                        <DropdownMenuItem key={d} onClick={() => handleRequestFeature(property.id, d)}>
+                                          {d} days
+                                        </DropdownMenuItem>
+                                      ))}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 )}
                                 {hasPendingRequest && (
                                   <Badge variant="secondary">Request Pending</Badge>
@@ -615,6 +633,7 @@ const AgencyPortal = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Property</TableHead>
+                        <TableHead>Duration</TableHead>
                         <TableHead>Requested On</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Admin Notes</TableHead>
@@ -629,6 +648,7 @@ const AgencyPortal = () => {
                               <p className="text-sm text-muted-foreground">{request.property?.city}</p>
                             </div>
                           </TableCell>
+                          <TableCell>{request.requested_days ?? 7} days</TableCell>
                           <TableCell>{new Date(request.created_at).toLocaleDateString()}</TableCell>
                           <TableCell>{getStatusBadge(request.status)}</TableCell>
                           <TableCell>

@@ -15,6 +15,7 @@ interface FeatureRequest {
   requested_by: string;
   status: string;
   admin_notes: string | null;
+  requested_days?: number;
   created_at: string;
   updated_at: string;
   property?: {
@@ -233,6 +234,9 @@ const FeatureRequestsManager = () => {
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Requested by: {request.requester?.full_name || 'Unknown'} • {format(new Date(request.created_at), 'MMM dd, yyyy')}
+                      </p>
+                      <p className="text-xs font-medium">
+                        Requested duration: {request.requested_days ?? 7} days
                       </p>
                     </div>
                   </div>

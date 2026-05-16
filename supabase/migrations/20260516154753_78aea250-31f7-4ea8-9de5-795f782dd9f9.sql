@@ -1,0 +1,1 @@
+ALTER TABLE public.featured_requests ADD COLUMN IF NOT EXISTS requested_days integer NOT NULL DEFAULT 7;

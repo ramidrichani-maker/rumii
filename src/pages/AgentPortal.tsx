@@ -13,6 +13,12 @@ import { Navigate } from "react-router-dom";
 import { format } from "date-fns";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import AgentPropertyForm from "@/components/AgentPropertyForm";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface PropertyViewing {
   id: string;
@@ -122,7 +128,7 @@ const AgentPortal = () => {
     }
   };
 
-  const handleRequestFeature = async (propertyId: string) => {
+  const handleRequestFeature = async (propertyId: string, days: number) => {
     if (!user || !profile?.agency_id) {
       toast({
         title: "Error",
@@ -140,14 +146,15 @@ const AgentPortal = () => {
         .insert({
           property_id: propertyId,
           agency_id: profile.agency_id,
-          requested_by: user.id
-        });
+          requested_by: user.id,
+          requested_days: days,
+        } as any);
       
       if (error) throw error;
       
       toast({
         title: "Success",
-        description: "Feature request submitted for admin approval"
+        description: `Feature request for ${days} days submitted for admin approval`
       });
       
       fetchFeaturedRequests();
@@ -629,16 +636,26 @@ const AgentPortal = () => {
                           </div>
                           <div className="flex gap-2">
                             {!property.featured_section && !hasPendingRequest && !isApproved && profile?.agency_id && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex-1"
-                                onClick={() => handleRequestFeature(property.id)}
-                                disabled={requestingFeature === property.id}
-                              >
-                                <Star className="w-4 h-4 mr-1" />
-                                {requestingFeature === property.id ? 'Requesting...' : 'Request Feature'}
-                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex-1"
+                                    disabled={requestingFeature === property.id}
+                                  >
+                                    <Star className="w-4 h-4 mr-1" />
+                                    {requestingFeature === property.id ? 'Requesting...' : 'Request Feature'}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {[7, 14, 21, 30].map((d) => (
+                                    <DropdownMenuItem key={d} onClick={() => handleRequestFeature(property.id, d)}>
+                                      {d} days
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
                             {hasPendingRequest && (
                               <Badge variant="secondary" className="flex-1 justify-center py-2">
