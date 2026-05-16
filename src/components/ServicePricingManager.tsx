@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { DollarSign, Save, Loader2 } from "lucide-react";
+import { DollarSign, Save, Loader2, CalendarDays } from "lucide-react";
 
 interface ServiceSetting {
   id: string;
@@ -20,6 +20,7 @@ export const ServicePricingManager = () => {
   const [saving, setSaving] = useState(false);
   const [salePrice, setSalePrice] = useState<string>("");
   const [rentPrice, setRentPrice] = useState<string>("");
+  const [durationDays, setDurationDays] = useState<string>("");
 
   useEffect(() => {
     loadSettings();
@@ -30,7 +31,11 @@ export const ServicePricingManager = () => {
       const { data, error } = await supabase
         .from("service_settings")
         .select("*")
-        .in("key", ["featured_listing_sale_price", "featured_listing_rent_price"]);
+        .in("key", [
+          "featured_listing_sale_price",
+          "featured_listing_rent_price",
+          "featured_listing_duration_days",
+        ]);
 
       if (error) throw error;
 
@@ -38,9 +43,11 @@ export const ServicePricingManager = () => {
       
       const saleSetting = data?.find(s => s.key === "featured_listing_sale_price");
       const rentSetting = data?.find(s => s.key === "featured_listing_rent_price");
+      const durationSetting = data?.find(s => s.key === "featured_listing_duration_days");
       
       setSalePrice(saleSetting?.value?.toString() || "0");
       setRentPrice(rentSetting?.value?.toString() || "0");
+      setDurationDays(durationSetting?.value?.toString() || "7");
     } catch (error) {
       console.error("Error loading settings:", error);
       toast.error("Failed to load pricing settings");
@@ -61,13 +68,19 @@ export const ServicePricingManager = () => {
           key: "featured_listing_rent_price",
           value: parseFloat(rentPrice) || 0,
         },
+        {
+          key: "featured_listing_duration_days",
+          value: parseInt(durationDays, 10) || 7,
+        },
       ];
 
       for (const update of updates) {
         const { error } = await supabase
           .from("service_settings")
-          .update({ value: update.value })
-          .eq("key", update.key);
+          .upsert(
+            { key: update.key, value: update.value },
+            { onConflict: "key" }
+          );
 
         if (error) throw error;
       }
@@ -101,7 +114,7 @@ export const ServicePricingManager = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="sale-price">Featured Listing Price (For Sale)</Label>
             <div className="relative">
@@ -139,6 +152,26 @@ export const ServicePricingManager = () => {
             </div>
             <p className="text-xs text-muted-foreground">
               Price charged to feature a rental property
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="duration-days">Duration (Days)</Label>
+            <div className="relative">
+              <CalendarDays className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="duration-days"
+                type="number"
+                min="1"
+                step="1"
+                value={durationDays}
+                onChange={(e) => setDurationDays(e.target.value)}
+                className="pl-9"
+                placeholder="7"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              How many days a featured listing stays highlighted
             </p>
           </div>
         </div>
