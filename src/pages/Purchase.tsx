@@ -508,13 +508,13 @@ const Purchase = () => {
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto' : 'w-full'} transition-all duration-300`}
             style={showMap ? { maxHeight: 'calc(100vh - 120px)' } : undefined}
           >
-            {!isLoading && filteredProperties.length > 0 && (
+            {!isLoading && sortedProperties.length > 0 && (
               <div className="mb-8">
                 <ScrollReveal animation="fade-up">
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Sale</h3>
                 </ScrollReveal>
                 <div className={`grid grid-cols-1 gap-6`}>
-                  {filteredProperties.map((property, index) => (
+                  {sortedProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
                         property={property}
