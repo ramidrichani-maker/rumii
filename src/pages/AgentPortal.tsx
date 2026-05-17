@@ -292,7 +292,9 @@ const AgentPortal = () => {
 
   // Auth guard - after all hooks
   if (authLoading) return null;
-  if (!user || (profile?.role !== 'agent' && profile?.role !== 'admin')) {
+  if (!user) return <Navigate to="/auth" replace />;
+  if (user && !profile) return null;
+  if (profile?.role !== 'agent' && profile?.role !== 'admin') {
     return <Navigate to="/auth" replace />;
   }
 

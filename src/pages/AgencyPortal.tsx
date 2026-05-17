@@ -91,7 +91,11 @@ const AgencyPortal = () => {
   const [requestingFeature, setRequestingFeature] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'agency_manager')) {
+    if (!loading && !user) {
+      navigate('/auth');
+      return;
+    }
+    if (!loading && user && profile && profile.role !== 'agency_manager') {
       navigate('/auth');
       return;
     }

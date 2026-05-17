@@ -66,7 +66,9 @@ const AdminDashboard = () => {
   }, [user]);
 
   if (authLoading) return null;
-  if (!user || profile?.role !== 'admin') {
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!profile) return null;
+  if (profile.role !== 'admin') {
     return <Navigate to="/auth" replace />;
   }
 
