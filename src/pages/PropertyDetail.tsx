@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers, Share2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers, Share2, Shield } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import { Button } from "@/components/ui/button";
@@ -613,6 +613,13 @@ const PropertyDetail = () => {
                 Expand
               </Button>
             </div>
+
+            {!isAdmin && (
+              <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Shield className="w-3.5 h-3.5" />
+                Approximate location shown to protect privacy. Exact address shared after enquiry.
+              </p>
+            )}
 
             {mapExpanded && (
               <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
