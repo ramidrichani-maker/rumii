@@ -9,6 +9,8 @@ import { Loader2, Trash2, Eye, MapPin, Bell, Clock, CheckCircle2, XCircle, Penci
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { PropertyDeleteDialog } from '@/components/PropertyDeleteDialog';
 import { useNavigate } from 'react-router-dom';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Sparkles } from 'lucide-react';
 
 interface Property {
   id: string;
@@ -25,6 +27,8 @@ interface Property {
   created_at: string;
   updated_at: string;
   property_code: number | null;
+  featured_section?: string | null;
+  agency_id?: string | null;
 }
 
 interface ListingUpdate {
@@ -45,11 +49,67 @@ export default function MyListings() {
   const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
   const [updates, setUpdates] = useState<ListingUpdate[]>([]);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [pricing, setPricing] = useState<{ sale: number; rent: number; duration: number }>({ sale: 0, rent: 0, duration: 7 });
+  const [featuredRequests, setFeaturedRequests] = useState<Record<string, string>>({});
+  const [requestingId, setRequestingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProperties();
     fetchUpdates();
+    fetchPricing();
+    fetchFeaturedRequests();
   }, [user]);
+
+  const fetchPricing = async () => {
+    const { data } = await supabase
+      .from('service_settings')
+      .select('key, value')
+      .in('key', ['featured_listing_sale_price', 'featured_listing_rent_price', 'featured_listing_duration_days']);
+    const sale = Number(data?.find(d => d.key === 'featured_listing_sale_price')?.value ?? 0);
+    const rent = Number(data?.find(d => d.key === 'featured_listing_rent_price')?.value ?? 0);
+    const duration = Number(data?.find(d => d.key === 'featured_listing_duration_days')?.value ?? 7);
+    setPricing({ sale, rent, duration });
+  };
+
+  const fetchFeaturedRequests = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('featured_requests')
+      .select('property_id, status')
+      .eq('requested_by', user.id);
+    const map: Record<string, string> = {};
+    (data || []).forEach((r: any) => {
+      if (r.status === 'pending' || r.status === 'approved') map[r.property_id] = r.status;
+    });
+    setFeaturedRequests(map);
+  };
+
+  const handleRequestFeature = async (property: Property, days: number) => {
+    if (!user) return;
+    setRequestingId(property.id);
+    try {
+      const { error } = await supabase.from('featured_requests').insert({
+        property_id: property.id,
+        agency_id: property.agency_id ?? null,
+        requested_by: user.id,
+        requested_days: days,
+      } as any);
+      if (error) throw error;
+      toast.success(`Feature request for ${days} days submitted for admin approval`);
+      fetchFeaturedRequests();
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to submit feature request');
+    } finally {
+      setRequestingId(null);
+    }
+  };
+
+  const priceFor = (property: Property, days: number) => {
+    const base = property.listing_type === 'rent' ? pricing.rent : pricing.sale;
+    const dur = pricing.duration || 7;
+    return base * (days / dur);
+  };
 
   const fetchProperties = async () => {
     if (!user) return;
@@ -226,7 +286,11 @@ export default function MyListings() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((property) => (
-            <Card key={property.id} className="overflow-hidden">
+            <Card
+              key={property.id}
+              className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate(`/property/${property.id}`)}
+            >
               <div className="aspect-video relative bg-muted">
                 {property.images && property.images.length > 0 ? (
                   <img
@@ -265,16 +329,42 @@ export default function MyListings() {
                       {property.listing_type === 'rent' && '/mo'}
                     </span>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => navigate(`/property/${property.id}`)}
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      View
-                    </Button>
+                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                    {property.status === 'approved' && !property.featured_section && (
+                      featuredRequests[property.id] ? (
+                        <Button size="sm" variant="outline" className="flex-1" disabled>
+                          <Sparkles className="w-4 h-4 mr-1" />
+                          {featuredRequests[property.id] === 'approved' ? 'Featured' : 'Request pending'}
+                        </Button>
+                      ) : (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" className="flex-1" disabled={requestingId === property.id}>
+                              <Sparkles className="w-4 h-4 mr-1" />
+                              {requestingId === property.id ? 'Submitting...' : 'Request Feature'}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="bg-popover z-[9999]">
+                            {[7, 14, 21, 30].map((d) => (
+                              <DropdownMenuItem key={d} onClick={() => handleRequestFeature(property, d)}>
+                                {d} days — ${priceFor(property, d).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )
+                    )}
+                    {property.status !== 'approved' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => navigate(`/property/${property.id}`)}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
+                      </Button>
+                    )}
                     {property.status === 'pending' && (
                       <Button
                         size="sm"
