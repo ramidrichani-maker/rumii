@@ -75,6 +75,7 @@ const Rent = () => {
   const [showMap, setShowMap] = useState(!!searchQuery);
   const [mapClosing, setMapClosing] = useState(false);
   const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("newest");
 
   const closeMap = useCallback(() => {
     setMapClosing(true);
