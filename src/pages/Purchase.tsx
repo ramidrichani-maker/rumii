@@ -547,7 +547,7 @@ const Purchase = () => {
                 </button>
               </div>
               <CompactPropertyMap
-                properties={filteredProperties}
+                properties={sortedProperties}
                 height="100%"
                 defaultExpanded={false}
                 onPropertySelect={handlePropertySelect}
