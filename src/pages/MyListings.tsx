@@ -49,7 +49,10 @@ export default function MyListings() {
   const [propertyToDelete, setPropertyToDelete] = useState<{ id: string; address: string } | null>(null);
   const [updates, setUpdates] = useState<ListingUpdate[]>([]);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
-  const [pricing, setPricing] = useState<{ sale: number; rent: number; duration: number }>({ sale: 0, rent: 0, duration: 7 });
+  const [pricing, setPricing] = useState<{ sale: Record<number, number>; rent: Record<number, number> }>({
+    sale: { 7: 0, 14: 0, 21: 0, 30: 0 },
+    rent: { 7: 0, 14: 0, 21: 0, 30: 0 },
+  });
   const [featuredRequests, setFeaturedRequests] = useState<Record<string, string>>({});
   const [requestingId, setRequestingId] = useState<string | null>(null);
 
@@ -61,14 +64,20 @@ export default function MyListings() {
   }, [user]);
 
   const fetchPricing = async () => {
+    const days = [7, 14, 21, 30];
+    const keys = days.flatMap(d => [`featured_listing_sale_price_${d}d`, `featured_listing_rent_price_${d}d`]);
     const { data } = await supabase
       .from('service_settings')
       .select('key, value')
-      .in('key', ['featured_listing_sale_price', 'featured_listing_rent_price', 'featured_listing_duration_days']);
-    const sale = Number(data?.find(d => d.key === 'featured_listing_sale_price')?.value ?? 0);
-    const rent = Number(data?.find(d => d.key === 'featured_listing_rent_price')?.value ?? 0);
-    const duration = Number(data?.find(d => d.key === 'featured_listing_duration_days')?.value ?? 7);
-    setPricing({ sale, rent, duration });
+      .in('key', keys);
+    const map = new Map((data || []).map((d: any) => [d.key, Number(d.value)]));
+    const sale: Record<number, number> = {};
+    const rent: Record<number, number> = {};
+    days.forEach(d => {
+      sale[d] = map.get(`featured_listing_sale_price_${d}d`) ?? 0;
+      rent[d] = map.get(`featured_listing_rent_price_${d}d`) ?? 0;
+    });
+    setPricing({ sale, rent });
   };
 
   const fetchFeaturedRequests = async () => {
@@ -106,9 +115,8 @@ export default function MyListings() {
   };
 
   const priceFor = (property: Property, days: number) => {
-    const base = property.listing_type === 'rent' ? pricing.rent : pricing.sale;
-    const dur = pricing.duration || 7;
-    return base * (days / dur);
+    const table = property.listing_type === 'rent' ? pricing.rent : pricing.sale;
+    return table[days] ?? 0;
   };
 
   const fetchProperties = async () => {
