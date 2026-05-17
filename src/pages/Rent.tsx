@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House, Map, Maximize2, Minimize2, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House, Map, Maximize2, Minimize2, X, ArrowUpDown } from "lucide-react";
 import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -74,6 +75,7 @@ const Rent = () => {
   const [showMap, setShowMap] = useState(!!searchQuery);
   const [mapClosing, setMapClosing] = useState(false);
   const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("newest");
 
   const closeMap = useCallback(() => {
     setMapClosing(true);
@@ -353,6 +355,21 @@ const Rent = () => {
 
   const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
+  const sortedProperties = useMemo(() => {
+    const arr = [...filteredProperties];
+    switch (sortBy) {
+      case "price-asc":
+        return arr.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      case "price-desc":
+        return arr.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+      case "size-desc":
+        return arr.sort((a, b) => (b.square_meters ?? 0) - (a.square_meters ?? 0));
+      case "newest":
+      default:
+        return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+  }, [filteredProperties, sortBy]);
+
   const filterChips = buildFilterChips({
     selectedPropertyTypes, setSelectedPropertyTypes,
     squareMetersRange, setSquareMetersRange, sqmDefault: [50, 1000],
@@ -443,18 +460,34 @@ const Rent = () => {
           </button>
         </div>
 
-        <div className="text-center mb-6">
-          {isLoading ? (
-            <p className="text-muted-foreground">Loading properties...</p>
-          ) : filteredProperties.length > 0 ? (
-            <p className="text-muted-foreground">
-              Found {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} for rent
-              {hasDrawnArea && ` in selected area`}
-            </p>
-          ) : (
-            <p className="text-muted-foreground">
-              No properties match your current filters. Try adjusting your search criteria.
-            </p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
+          <div className="text-center sm:text-left">
+            {isLoading ? (
+              <p className="text-muted-foreground">Loading properties...</p>
+            ) : sortedProperties.length > 0 ? (
+              <p className="text-muted-foreground">
+                Found {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for rent
+                {hasDrawnArea && ` in selected area`}
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                No properties match your current filters. Try adjusting your search criteria.
+              </p>
+            )}
+          </div>
+          {!isLoading && sortedProperties.length > 0 && (
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[200px] text-sm">
+                <ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="price-asc">Price: low to high</SelectItem>
+                <SelectItem value="price-desc">Price: high to low</SelectItem>
+                <SelectItem value="size-desc">Largest first</SelectItem>
+              </SelectContent>
+            </Select>
           )}
         </div>
         <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
@@ -468,13 +501,13 @@ const Rent = () => {
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto' : 'w-full'} transition-all duration-300`}
             style={showMap ? { maxHeight: 'calc(100vh - 120px)' } : undefined}
           >
-            {!isLoading && filteredProperties.length > 0 && (
+            {!isLoading && sortedProperties.length > 0 && (
               <div className="mb-8">
                 <ScrollReveal animation="fade-up">
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
                 </ScrollReveal>
                 <div className={`grid grid-cols-1 gap-6`}>
-                  {filteredProperties.map((property, index) => (
+                  {sortedProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
                         property={property}
@@ -507,7 +540,7 @@ const Rent = () => {
                 </button>
               </div>
               <CompactPropertyMap
-                properties={filteredProperties}
+                properties={sortedProperties}
                 height="100%"
                 defaultExpanded={false}
                 onPropertySelect={handlePropertySelect}
@@ -551,7 +584,7 @@ const Rent = () => {
         </div>
         {showMap && mapFullscreen && (
           <CompactPropertyMap
-            properties={filteredProperties}
+            properties={sortedProperties}
             height="100vh"
             defaultExpanded={false}
             onPropertySelect={handlePropertySelect}
