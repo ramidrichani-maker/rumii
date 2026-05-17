@@ -5,22 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { DollarSign, Save, Loader2, CalendarDays } from "lucide-react";
+import { DollarSign, Save, Loader2 } from "lucide-react";
 
-interface ServiceSetting {
-  id: string;
-  key: string;
-  value: number;
-  description: string | null;
-}
+const DURATIONS = [7, 14, 21, 30] as const;
+type Duration = (typeof DURATIONS)[number];
+const keyFor = (kind: "sale" | "rent", days: Duration) =>
+  `featured_listing_${kind}_price_${days}d`;
 
 export const ServicePricingManager = () => {
-  const [settings, setSettings] = useState<ServiceSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [salePrice, setSalePrice] = useState<string>("");
-  const [rentPrice, setRentPrice] = useState<string>("");
-  const [durationDays, setDurationDays] = useState<string>("");
+  const [sale, setSale] = useState<Record<Duration, string>>({ 7: "", 14: "", 21: "", 30: "" });
+  const [rent, setRent] = useState<Record<Duration, string>>({ 7: "", 14: "", 21: "", 30: "" });
 
   useEffect(() => {
     loadSettings();
@@ -28,26 +24,23 @@ export const ServicePricingManager = () => {
 
   const loadSettings = async () => {
     try {
+      const allKeys = DURATIONS.flatMap((d) => [keyFor("sale", d), keyFor("rent", d)]);
       const { data, error } = await supabase
         .from("service_settings")
-        .select("*")
-        .in("key", [
-          "featured_listing_sale_price",
-          "featured_listing_rent_price",
-          "featured_listing_duration_days",
-        ]);
+        .select("key, value")
+        .in("key", allKeys);
 
       if (error) throw error;
 
-      setSettings(data || []);
-      
-      const saleSetting = data?.find(s => s.key === "featured_listing_sale_price");
-      const rentSetting = data?.find(s => s.key === "featured_listing_rent_price");
-      const durationSetting = data?.find(s => s.key === "featured_listing_duration_days");
-      
-      setSalePrice(saleSetting?.value?.toString() || "0");
-      setRentPrice(rentSetting?.value?.toString() || "0");
-      setDurationDays(durationSetting?.value?.toString() || "7");
+      const map = new Map((data || []).map((d: any) => [d.key, d.value]));
+      const nextSale = { ...sale };
+      const nextRent = { ...rent };
+      DURATIONS.forEach((d) => {
+        nextSale[d] = (map.get(keyFor("sale", d)) ?? 0).toString();
+        nextRent[d] = (map.get(keyFor("rent", d)) ?? 0).toString();
+      });
+      setSale(nextSale);
+      setRent(nextRent);
     } catch (error) {
       console.error("Error loading settings:", error);
       toast.error("Failed to load pricing settings");
@@ -59,20 +52,10 @@ export const ServicePricingManager = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updates = [
-        {
-          key: "featured_listing_sale_price",
-          value: parseFloat(salePrice) || 0,
-        },
-        {
-          key: "featured_listing_rent_price",
-          value: parseFloat(rentPrice) || 0,
-        },
-        {
-          key: "featured_listing_duration_days",
-          value: parseInt(durationDays, 10) || 7,
-        },
-      ];
+      const updates = DURATIONS.flatMap((d) => [
+        { key: keyFor("sale", d), value: parseFloat(sale[d]) || 0 },
+        { key: keyFor("rent", d), value: parseFloat(rent[d]) || 0 },
+      ]);
 
       for (const update of updates) {
         const { error } = await supabase
@@ -105,6 +88,35 @@ export const ServicePricingManager = () => {
     );
   }
 
+  const renderRow = (
+    label: string,
+    state: Record<Duration, string>,
+    setState: (next: Record<Duration, string>) => void
+  ) => (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className="grid gap-3 sm:grid-cols-4">
+        {DURATIONS.map((d) => (
+          <div key={d} className="space-y-1">
+            <p className="text-xs text-muted-foreground">{d} days</p>
+            <div className="relative">
+              <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={state[d]}
+                onChange={(e) => setState({ ...state, [d]: e.target.value })}
+                className="pl-9"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -114,67 +126,8 @@ export const ServicePricingManager = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="sale-price">Featured Listing Price (For Sale)</Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="sale-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={salePrice}
-                onChange={(e) => setSalePrice(e.target.value)}
-                className="pl-9"
-                placeholder="0.00"
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Price charged to feature a property for sale
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="rent-price">Featured Listing Price (For Rent)</Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="rent-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={rentPrice}
-                onChange={(e) => setRentPrice(e.target.value)}
-                className="pl-9"
-                placeholder="0.00"
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Price charged to feature a rental property
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="duration-days">Duration (Days)</Label>
-            <div className="relative">
-              <CalendarDays className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="duration-days"
-                type="number"
-                min="1"
-                step="1"
-                value={durationDays}
-                onChange={(e) => setDurationDays(e.target.value)}
-                className="pl-9"
-                placeholder="7"
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              How many days a featured listing stays highlighted
-            </p>
-          </div>
-        </div>
+        {renderRow("For Sale — price per duration", sale, setSale)}
+        {renderRow("For Rent — price per duration", rent, setRent)}
 
         <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
           {saving ? (
