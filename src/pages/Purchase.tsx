@@ -467,18 +467,34 @@ const Purchase = () => {
           </button>
         </div>
 
-        <div className="text-center mb-6">
-          {isLoading ? (
-            <p className="text-muted-foreground">Loading properties...</p>
-          ) : filteredProperties.length > 0 ? (
-            <p className="text-muted-foreground">
-              Found {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} for sale
-              {hasDrawnArea && ` in selected area`}
-            </p>
-          ) : (
-            <p className="text-muted-foreground">
-              No properties match your current filters. Try adjusting your search criteria.
-            </p>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
+          <div className="text-center sm:text-left">
+            {isLoading ? (
+              <p className="text-muted-foreground">Loading properties...</p>
+            ) : sortedProperties.length > 0 ? (
+              <p className="text-muted-foreground">
+                Found {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for sale
+                {hasDrawnArea && ` in selected area`}
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                No properties match your current filters. Try adjusting your search criteria.
+              </p>
+            )}
+          </div>
+          {!isLoading && sortedProperties.length > 0 && (
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[200px] text-sm">
+                <ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="price-asc">Price: low to high</SelectItem>
+                <SelectItem value="price-desc">Price: high to low</SelectItem>
+                <SelectItem value="size-desc">Largest first</SelectItem>
+              </SelectContent>
+            </Select>
           )}
         </div>
         <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
