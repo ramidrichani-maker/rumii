@@ -355,6 +355,21 @@ const Rent = () => {
 
   const filteredProperties = filterPropertiesByPolygon(properties, radius);
 
+  const sortedProperties = useMemo(() => {
+    const arr = [...filteredProperties];
+    switch (sortBy) {
+      case "price-asc":
+        return arr.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      case "price-desc":
+        return arr.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+      case "size-desc":
+        return arr.sort((a, b) => (b.square_meters ?? 0) - (a.square_meters ?? 0));
+      case "newest":
+      default:
+        return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+  }, [filteredProperties, sortBy]);
+
   const filterChips = buildFilterChips({
     selectedPropertyTypes, setSelectedPropertyTypes,
     squareMetersRange, setSquareMetersRange, sqmDefault: [50, 1000],
