@@ -584,7 +584,7 @@ const Rent = () => {
         </div>
         {showMap && mapFullscreen && (
           <CompactPropertyMap
-            properties={filteredProperties}
+            properties={sortedProperties}
             height="100vh"
             defaultExpanded={false}
             onPropertySelect={handlePropertySelect}
