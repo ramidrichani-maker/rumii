@@ -242,7 +242,7 @@ export type Database = {
       featured_requests: {
         Row: {
           admin_notes: string | null
-          agency_id: string
+          agency_id: string | null
           created_at: string
           id: string
           property_id: string
@@ -253,7 +253,7 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
-          agency_id: string
+          agency_id?: string | null
           created_at?: string
           id?: string
           property_id: string
@@ -264,7 +264,7 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
-          agency_id?: string
+          agency_id?: string | null
           created_at?: string
           id?: string
           property_id?: string
