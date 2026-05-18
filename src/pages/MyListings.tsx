@@ -87,8 +87,11 @@ export default function MyListings() {
       .select('property_id, status')
       .eq('requested_by', user.id);
     const map: Record<string, string> = {};
+    // Only treat pending requests as blocking. Approved requests don't block re-requesting
+    // because the outer UI already gates on property.featured_section — if the admin
+    // removes the feature, the user should be able to request it again.
     (data || []).forEach((r: any) => {
-      if (r.status === 'pending' || r.status === 'approved') map[r.property_id] = r.status;
+      if (r.status === 'pending') map[r.property_id] = r.status;
     });
     setFeaturedRequests(map);
   };
