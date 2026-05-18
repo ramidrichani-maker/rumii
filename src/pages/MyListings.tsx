@@ -119,7 +119,9 @@ export default function MyListings() {
       .from('service_settings')
       .select('key, value')
       .in('key', keys);
-    const map = new Map((data || []).map((d: any) => [d.key, Number(d.value)]));
+    const map = new Map(
+      ((data || []) as ServiceSettingPrice[]).map((setting) => [setting.key, Number(setting.value)])
+    );
     const sale: Record<number, number> = {};
     const rent: Record<number, number> = {};
     days.forEach(d => {
@@ -139,8 +141,8 @@ export default function MyListings() {
     // Only treat pending requests as blocking. Approved requests don't block re-requesting
     // because the outer UI already gates on property.featured_section — if the admin
     // removes the feature, the user should be able to request it again.
-    (data || []).forEach((r: any) => {
-      if (r.status === 'pending') map[r.property_id] = r.status;
+    ((data || []) as FeaturedRequestStatus[]).forEach((request) => {
+      if (request.status === 'pending') map[request.property_id] = request.status;
     });
     setFeaturedRequests(map);
   };
@@ -149,12 +151,14 @@ export default function MyListings() {
     if (!user) return;
     setRequestingId(property.id);
     try {
-      const { error } = await supabase.from('featured_requests').insert({
+      const request: TablesInsert<'featured_requests'> = {
         property_id: property.id,
         agency_id: property.agency_id ?? null,
         requested_by: user.id,
         requested_days: days,
-      } as any);
+      };
+
+      const { error } = await supabase.from('featured_requests').insert(request);
       if (error) throw error;
       toast.success(`Feature request for ${days} days submitted for admin approval`);
       fetchFeaturedRequests();
