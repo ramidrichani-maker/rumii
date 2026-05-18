@@ -11,6 +11,7 @@ import { PropertyDeleteDialog } from '@/components/PropertyDeleteDialog';
 import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sparkles } from 'lucide-react';
+import type { TablesInsert } from '@/integrations/supabase/types';
 
 interface Property {
   id: string;
@@ -39,6 +40,9 @@ interface ListingUpdate {
   read: boolean;
   created_at: string;
 }
+
+type ServiceSettingPrice = { key: string; value: number };
+type FeaturedRequestStatus = { property_id: string; status: string };
 
 export default function MyListings() {
   const { user } = useAuth();
