@@ -995,6 +995,19 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </PopoverContent>
         </Popover>
         </div>
+          {isMobile && mobileFiltersOpen && (
+            <div className="sticky bottom-0 left-0 right-0 -mx-4 -mb-4 mt-4 px-4 py-3 bg-background border-t border-border md:hidden">
+              <Button
+                className="w-full h-12 text-base"
+                onClick={() => {
+                  setMobileFiltersOpen(false);
+                  onApplyMobileFilters?.();
+                }}
+              >
+                Apply{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       {activeFilterCount > 0 && (
