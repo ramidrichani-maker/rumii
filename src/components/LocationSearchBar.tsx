@@ -265,7 +265,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           id="mobile-filters-panel"
           className={`${mobileFiltersOpen ? 'flex' : 'hidden'} md:flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0 ${
             isMobile && mobileFiltersOpen
-              ? 'fixed inset-x-0 top-[5vh] bottom-0 z-50 overflow-y-auto overscroll-contain bg-background rounded-t-2xl p-4 pb-24 shadow-2xl animate-in slide-in-from-bottom duration-300 md:static md:top-auto md:bottom-auto md:overflow-visible md:bg-transparent md:rounded-none md:p-0 md:shadow-none'
+              ? 'fixed inset-x-0 top-0 max-h-[90vh] z-50 overflow-y-auto overscroll-contain bg-background rounded-b-2xl p-4 pb-4 shadow-2xl animate-in slide-in-from-top duration-300 md:static md:max-h-none md:overflow-visible md:bg-transparent md:rounded-none md:p-0 md:shadow-none'
               : ''
           }`}
         >
