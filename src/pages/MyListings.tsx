@@ -83,7 +83,21 @@ export default function MyListings() {
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'properties', filter: `user_id=eq.${user.id}` },
-        () => refetch()
+        (payload) => {
+          const updatedProperty = payload.new as Partial<Property> & { id?: string };
+
+          if (updatedProperty.id) {
+            setProperties((current) =>
+              current.map((property) =>
+                property.id === updatedProperty.id
+                  ? { ...property, ...updatedProperty }
+                  : property
+              )
+            );
+          }
+
+          fetchFeaturedRequests();
+        }
       )
       .subscribe();
 
