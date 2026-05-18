@@ -36,8 +36,8 @@ const Index = () => {
 
       if (error) throw error;
 
-      setFeaturedRentals((data || []).filter(p => p.featured_section === 'featured_rentals'));
-      setFeaturedSales((data || []).filter(p => p.featured_section === 'properties_for_sale'));
+      setFeaturedRentals((data || []).filter(p => p.featured_section === 'featured_rentals' && p.listing_type === 'rent'));
+      setFeaturedSales((data || []).filter(p => p.featured_section === 'properties_for_sale' && p.listing_type === 'sale'));
     } catch (error) {
       console.error('Error loading featured properties:', error);
     } finally {
