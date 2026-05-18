@@ -438,6 +438,9 @@ const Purchase = () => {
           onUnfurnishedChange={setUnfurnishedOnly}
           newHomesOnly={newHomesOnly}
           onNewHomesOnlyChange={setNewHomesOnly}
+          onApplyMobileFilters={() => {
+            document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
           trailingContent={
             <button
               onClick={() => showMap ? closeMap() : setShowMap(true)}
@@ -467,7 +470,7 @@ const Purchase = () => {
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
+        <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
           <div className="text-center sm:text-left">
             {isLoading ? (
               <p className="text-muted-foreground">Loading properties...</p>

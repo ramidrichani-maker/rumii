@@ -100,6 +100,7 @@ interface LocationSearchBarProps {
   newHomesOnly?: boolean;
   onNewHomesOnlyChange?: (value: boolean) => void;
   trailingContent?: React.ReactNode;
+  onApplyMobileFilters?: () => void;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -131,6 +132,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     newHomesOnly,
     onNewHomesOnlyChange,
     trailingContent,
+    onApplyMobileFilters,
   } = props;
   const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
@@ -247,10 +249,35 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </button>
         </div>
 
+        {/* Mobile backdrop for bottom-sheet filters */}
+        {isMobile && mobileFiltersOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 md:hidden animate-in fade-in"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+        )}
+
         <div
           id="mobile-filters-panel"
-          className={`${mobileFiltersOpen ? 'flex' : 'hidden'} md:flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0`}
+          className={`${mobileFiltersOpen ? 'flex' : 'hidden'} md:flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0 ${
+            isMobile && mobileFiltersOpen
+              ? 'fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto bg-background rounded-t-2xl p-4 pb-24 shadow-2xl animate-in slide-in-from-bottom duration-300 md:static md:max-h-none md:overflow-visible md:bg-transparent md:rounded-none md:p-0 md:shadow-none'
+              : ''
+          }`}
         >
+          {isMobile && mobileFiltersOpen && (
+            <div className="flex items-center justify-between pb-2 mb-1 border-b border-border md:hidden">
+              <span className="text-base font-semibold">Filters</span>
+              <button
+                type="button"
+                onClick={() => setMobileFiltersOpen(false)}
+                aria-label="Close filters"
+                className="p-1.5 rounded-md hover:bg-muted"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         {/* Row 1: Radius */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
@@ -968,6 +995,19 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </PopoverContent>
         </Popover>
         </div>
+          {isMobile && mobileFiltersOpen && (
+            <div className="sticky bottom-0 left-0 right-0 -mx-4 -mb-4 mt-4 px-4 py-3 bg-background border-t border-border md:hidden">
+              <Button
+                className="w-full h-12 text-base"
+                onClick={() => {
+                  setMobileFiltersOpen(false);
+                  onApplyMobileFilters?.();
+                }}
+              >
+                Apply{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       {activeFilterCount > 0 && (
