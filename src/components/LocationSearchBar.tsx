@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
 import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal, X } from 'lucide-react';
@@ -249,6 +250,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </button>
         </div>
 
+        {(() => {
+        const __panel = (
+        <>
         {/* Mobile backdrop for bottom-sheet filters */}
         {isMobile && mobileFiltersOpen && (
           <div
@@ -1009,6 +1013,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             </div>
           )}
         </div>
+        </>
+        );
+        return (isMobile && mobileFiltersOpen) ? createPortal(__panel, document.body) : __panel;
+        })()}
       </div>
       {activeFilterCount > 0 && (
         <div className="mt-3 flex flex-wrap justify-end items-center gap-2">
