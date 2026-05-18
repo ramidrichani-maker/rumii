@@ -1187,7 +1187,12 @@ const ListProperty = () => {
                   <FormField control={form.control} name="bedrooms" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Bedrooms</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        if (value === '0') {
+                          form.setValue('propertyType', 'studio');
+                        }
+                      }} defaultValue={field.value} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select bedrooms" />
