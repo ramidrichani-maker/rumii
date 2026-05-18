@@ -63,6 +63,37 @@ export default function MyListings() {
     fetchFeaturedRequests();
   }, [user]);
 
+  // Refetch when the page regains focus or tab becomes visible,
+  // so admin actions (e.g. removing a featured listing) are reflected.
+  useEffect(() => {
+    if (!user) return;
+    const refetch = () => {
+      fetchProperties();
+      fetchFeaturedRequests();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refetch();
+    };
+    window.addEventListener('focus', refetch);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    // Realtime: listen for changes to this user's properties
+    const channel = supabase
+      .channel(`my-listings-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'properties', filter: `user_id=eq.${user.id}` },
+        () => refetch()
+      )
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('focus', refetch);
+      document.removeEventListener('visibilitychange', onVisibility);
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const fetchPricing = async () => {
     const days = [7, 14, 21, 30];
     const keys = days.flatMap(d => [`featured_listing_sale_price_${d}d`, `featured_listing_rent_price_${d}d`]);

@@ -589,9 +589,9 @@ const AgentPortal = () => {
                   const hasPendingRequest = featuredRequests.some(
                     r => r.property_id === property.id && r.status === 'pending'
                   );
-                  const isApproved = featuredRequests.some(
-                    r => r.property_id === property.id && r.status === 'approved'
-                  );
+                  // Only block re-requesting on currently-featured listings (property.featured_section).
+                  // A past 'approved' request shouldn't block re-requests if admin later removed the feature.
+                  const isApproved = false;
                   
                   return (
                     <Card key={property.id} className="overflow-hidden">
