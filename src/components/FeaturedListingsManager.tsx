@@ -57,6 +57,20 @@ const FeaturedListingsManager = () => {
   };
 
   const handleSetFeatured = async (propertyId: string, section: string | null) => {
+    const previousProperties = properties;
+
+    setProperties(current => current.map(property =>
+      property.id === propertyId ? { ...property, featured_section: section } : property
+    ));
+    setFeaturedRentals(current => current
+      .map(property => property.id === propertyId ? { ...property, featured_section: section } : property)
+      .filter(property => property.featured_section === 'featured_rentals')
+    );
+    setFeaturedSales(current => current
+      .map(property => property.id === propertyId ? { ...property, featured_section: section } : property)
+      .filter(property => property.featured_section === 'properties_for_sale')
+    );
+
     try {
       const { error } = await supabase
         .from('properties')
@@ -70,9 +84,12 @@ const FeaturedListingsManager = () => {
         description: section ? "Property added to featured listings" : "Property removed from featured listings",
       });
 
-      loadProperties();
+      await loadProperties();
     } catch (error) {
       console.error('Error updating featured status:', error);
+      setProperties(previousProperties);
+      setFeaturedRentals(previousProperties.filter(p => p.featured_section === 'featured_rentals'));
+      setFeaturedSales(previousProperties.filter(p => p.featured_section === 'properties_for_sale'));
       toast({
         title: "Error",
         description: "Failed to update featured status",

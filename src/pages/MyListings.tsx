@@ -11,6 +11,7 @@ import { PropertyDeleteDialog } from '@/components/PropertyDeleteDialog';
 import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sparkles } from 'lucide-react';
+import type { TablesInsert } from '@/integrations/supabase/types';
 
 interface Property {
   id: string;
@@ -39,6 +40,9 @@ interface ListingUpdate {
   read: boolean;
   created_at: string;
 }
+
+type ServiceSettingPrice = { key: string; value: number };
+type FeaturedRequestStatus = { property_id: string; status: string };
 
 export default function MyListings() {
   const { user } = useAuth();
@@ -83,7 +87,21 @@ export default function MyListings() {
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'properties', filter: `user_id=eq.${user.id}` },
-        () => refetch()
+        (payload) => {
+          const updatedProperty = payload.new as Partial<Property> & { id?: string };
+
+          if (updatedProperty.id) {
+            setProperties((current) =>
+              current.map((property) =>
+                property.id === updatedProperty.id
+                  ? { ...property, ...updatedProperty }
+                  : property
+              )
+            );
+          }
+
+          fetchFeaturedRequests();
+        }
       )
       .subscribe();
 
@@ -101,7 +119,9 @@ export default function MyListings() {
       .from('service_settings')
       .select('key, value')
       .in('key', keys);
-    const map = new Map((data || []).map((d: any) => [d.key, Number(d.value)]));
+    const map = new Map(
+      ((data || []) as ServiceSettingPrice[]).map((setting) => [setting.key, Number(setting.value)])
+    );
     const sale: Record<number, number> = {};
     const rent: Record<number, number> = {};
     days.forEach(d => {
@@ -121,8 +141,8 @@ export default function MyListings() {
     // Only treat pending requests as blocking. Approved requests don't block re-requesting
     // because the outer UI already gates on property.featured_section — if the admin
     // removes the feature, the user should be able to request it again.
-    (data || []).forEach((r: any) => {
-      if (r.status === 'pending') map[r.property_id] = r.status;
+    ((data || []) as FeaturedRequestStatus[]).forEach((request) => {
+      if (request.status === 'pending') map[request.property_id] = request.status;
     });
     setFeaturedRequests(map);
   };
@@ -131,12 +151,14 @@ export default function MyListings() {
     if (!user) return;
     setRequestingId(property.id);
     try {
-      const { error } = await supabase.from('featured_requests').insert({
+      const request: TablesInsert<'featured_requests'> = {
         property_id: property.id,
         agency_id: property.agency_id ?? null,
         requested_by: user.id,
         requested_days: days,
-      } as any);
+      };
+
+      const { error } = await supabase.from('featured_requests').insert(request);
       if (error) throw error;
       toast.success(`Feature request for ${days} days submitted for admin approval`);
       fetchFeaturedRequests();
