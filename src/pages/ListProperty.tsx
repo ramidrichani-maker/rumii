@@ -1054,7 +1054,12 @@ const ListProperty = () => {
                   field
                 }) => <FormItem>
                         <FormLabel></FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={(value) => {
+                          field.onChange(value);
+                          if (value === 'studio') {
+                            form.setValue('bedrooms', '0');
+                          }
+                        }} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select property type" />
@@ -1189,6 +1194,7 @@ const ListProperty = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="0">Studio</SelectItem>
                           {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
                             <SelectItem key={num} value={num.toString()}>
                               {num} {num === 1 ? 'Bedroom' : 'Bedrooms'}
