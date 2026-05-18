@@ -250,6 +250,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           </button>
         </div>
 
+        {(() => {
+        const __panel = (
+        <>
         {/* Mobile backdrop for bottom-sheet filters */}
         {isMobile && mobileFiltersOpen && (
           <div
@@ -1010,6 +1013,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             </div>
           )}
         </div>
+        </>
+        );
+        return (isMobile && mobileFiltersOpen) ? createPortal(__panel, document.body) : __panel;
+        })()}
       </div>
       {activeFilterCount > 0 && (
         <div className="mt-3 flex flex-wrap justify-end items-center gap-2">
