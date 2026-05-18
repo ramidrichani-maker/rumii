@@ -122,10 +122,11 @@ const FeaturedListingsManager = () => {
                     </div>
                     <Button
                       size="sm"
-                      variant="ghost"
+                      variant="destructive"
                       onClick={() => handleSetFeatured(property.id, null)}
                     >
                       <X className="w-4 h-4" />
+                      Remove
                     </Button>
                   </div>
                 ))}
@@ -190,10 +191,11 @@ const FeaturedListingsManager = () => {
                     </div>
                     <Button
                       size="sm"
-                      variant="ghost"
+                      variant="destructive"
                       onClick={() => handleSetFeatured(property.id, null)}
                     >
                       <X className="w-4 h-4" />
+                      Remove
                     </Button>
                   </div>
                 ))}
