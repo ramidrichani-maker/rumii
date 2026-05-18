@@ -93,7 +93,7 @@ const FeatureRequestsManager = () => {
     }
   };
 
-  const handleApprove = async (requestId: string, propertyId: string) => {
+  const handleApprove = async (requestId: string, propertyId: string, listingType?: string) => {
     try {
       // Update the request status
       const { error: requestError } = await supabase
@@ -106,10 +106,11 @@ const FeatureRequestsManager = () => {
 
       if (requestError) throw requestError;
 
-      // Set the property as featured
+      // Set the property as featured in the correct section based on listing type
+      const section = listingType === 'sale' ? 'properties_for_sale' : 'featured_rentals';
       const { error: propertyError } = await supabase
         .from('properties')
-        .update({ featured_section: 'featured_rentals' })
+        .update({ featured_section: section })
         .eq('id', propertyId);
 
       if (propertyError) throw propertyError;
@@ -252,7 +253,7 @@ const FeatureRequestsManager = () => {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleApprove(request.id, request.property_id)}
+                        onClick={() => handleApprove(request.id, request.property_id, request.property?.listing_type)}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         <CheckCircle className="w-4 h-4 mr-1" />
