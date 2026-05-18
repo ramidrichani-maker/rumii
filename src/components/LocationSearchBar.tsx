@@ -205,6 +205,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     };
   }, [isMobile, activeBedroomTab, activePriceTab]);
 
+  useEffect(() => {
+    if (!isMobile || !mobileFiltersOpen) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [isMobile, mobileFiltersOpen]);
+
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
