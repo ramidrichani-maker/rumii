@@ -17,8 +17,9 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PropertyMap from "@/components/PropertyMap";
+import { StackedUnitsEditor, UnitDraft, validateUnits, insertUnitsForParent, makeEmptyUnit } from "@/components/StackedUnitsEditor";
 
-const propertyTypes = ["Apartment", "Villa", "Beach House", "Chalet", "Duplex", "Triplex", "Penthouse", "Commercial", "Farm House", "Building", "Venue", "Studio", "Rooftop", "Land"];
+const propertyTypes = ["Apartment", "Villa", "Beach House", "Chalet", "Duplex", "Triplex", "Penthouse", "Commercial", "Farm House", "Building", "Venue", "Studio", "Rooftop", "Land", "Stacked Unit"];
 const amenities = ["Garden", "Parking/Garage", "Balcony/Terrace", "Swimming Pool", "Gym", "Elevator", "Storage Room", "Security", "Concierge", "EV Charging", "Patio", "Basement", "Sea View", "Mountain View", "Fireplace", "Smart-home"];
 const roomTypes = [
   "Entrance", "Bedroom", "Salon", "Living Room", "Dining Room", "Kitchen",
@@ -38,9 +39,9 @@ const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Full address is required"),
   propertyType: z.string().min(1, "Property type is required"),
-  metersSquared: z.string().min(1, "Meters squared is required"),
-  bedrooms: z.string().min(1, "Number of bedrooms is required"),
-  bathrooms: z.string().min(1, "Number of bathrooms is required"),
+  metersSquared: z.string().optional(),
+  bedrooms: z.string().optional(),
+  bathrooms: z.string().optional(),
   listingType: z.enum(["rent", "sale", "both"], {
     required_error: "Please select a listing type"
   }),
@@ -50,15 +51,20 @@ const formSchema = z.object({
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
   amenities: z.array(z.string()).default([])
-}).refine((data) => {
-  if (data.listingType === 'sale' && (!data.price || data.price === '')) return false;
-  if (data.listingType === 'rent' && (!data.rentalPrice || data.rentalPrice === '')) return false;
-  if (data.listingType === 'both') {
-    if (!data.price || data.price === '') return false;
-    if (!data.rentalPrice || data.rentalPrice === '') return false;
+}).superRefine((data, ctx) => {
+  const isStacked = data.propertyType?.toLowerCase().replace(/\s+/g, '_') === 'stacked_unit';
+  if (!isStacked) {
+    if (!data.metersSquared) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['metersSquared'], message: 'Meters squared is required' });
+    if (!data.bedrooms) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['bedrooms'], message: 'Number of bedrooms is required' });
+    if (!data.bathrooms) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['bathrooms'], message: 'Number of bathrooms is required' });
+    if (data.listingType === 'sale' && !data.price) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['price'], message: 'Sale price required' });
+    if (data.listingType === 'rent' && !data.rentalPrice) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rentalPrice'], message: 'Rental price required' });
+    if (data.listingType === 'both') {
+      if (!data.price) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['price'], message: 'Sale price required' });
+      if (!data.rentalPrice) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rentalPrice'], message: 'Rental price required' });
+    }
   }
-  return true;
-}, { message: "Please fill in the required price fields", path: ["price"] });
+});
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -99,6 +105,7 @@ export const AdminPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [floorPlanFiles, setFloorPlanFiles] = useState<File[]>([]);
+  const [units, setUnits] = useState<UnitDraft[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -118,6 +125,8 @@ export const AdminPropertyForm = () => {
   });
 
   const listingType = form.watch('listingType');
+  const propertyType = form.watch('propertyType');
+  const isStacked = propertyType === 'stacked unit' || propertyType === 'stacked_unit';
 
   useEffect(() => {
     const fetchAgencies = async () => {
@@ -187,6 +196,17 @@ export const AdminPropertyForm = () => {
       return;
     }
 
+    const normalizedType = data.propertyType.toLowerCase().replace(/\s+/g, '_');
+    const isStackedSubmit = normalizedType === 'stacked_unit';
+
+    if (isStackedSubmit) {
+      const unitErr = validateUnits(units, data.listingType);
+      if (unitErr) {
+        toast({ title: "Units required", description: unitErr, variant: "destructive" });
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -231,37 +251,47 @@ export const AdminPropertyForm = () => {
       }
 
       // Insert property - admin listings are auto-approved
-      const { error } = await supabase.from('properties').insert({
+      const parentInsert = {
         user_id: user.id,
         agency_id: data.agencyId || null,
         municipality: data.municipality,
         city: data.city,
         address: data.address,
-        property_type: data.propertyType.toLowerCase() as any,
-        square_meters: parseInt(data.metersSquared),
-        bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseFloat(data.bathrooms),
+        property_type: normalizedType as any,
+        square_meters: isStackedSubmit ? 0 : parseInt(data.metersSquared),
+        bedrooms: isStackedSubmit ? 0 : parseInt(data.bedrooms),
+        bathrooms: isStackedSubmit ? 0 : parseFloat(data.bathrooms),
         listing_type: data.listingType as any,
-        price: data.price ? parseFloat(data.price) : null,
-        rental_price: data.rentalPrice ? parseFloat(data.rentalPrice) : null,
+        price: !isStackedSubmit && data.price ? parseFloat(data.price) : null,
+        rental_price: !isStackedSubmit && data.rentalPrice ? parseFloat(data.rentalPrice) : null,
         price_negotiable: data.priceNegotiable,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
-        images: imageUrls,
+        images: isStackedSubmit ? [] : imageUrls,
         floor_plan_url: floorPlanUrls[0] ?? null,
         floor_plan_urls: floorPlanUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
         status: 'approved' // Admin listings are pre-approved
-      });
+      };
+
+      const { data: parentRow, error } = await supabase
+        .from('properties')
+        .insert(parentInsert as any)
+        .select('id')
+        .single();
 
       if (error) throw error;
 
+      if (isStackedSubmit && parentRow) {
+        await insertUnitsForParent(parentRow.id, user.id, units);
+      }
+
       toast({
         title: "Property Listed Successfully!",
-        description: `Property has been listed${selectedAgency ? ` under ${selectedAgency.name}` : ''} and is now live.`
+        description: `Property has been listed${selectedAgency ? ` under ${selectedAgency.name}` : ''}${isStackedSubmit ? ` with ${units.length} unit${units.length === 1 ? '' : 's'}` : ''} and is now live.`
       });
 
       // Reset form
@@ -270,7 +300,7 @@ export const AdminPropertyForm = () => {
       setUploadedImages([]);
       setFloorPlanFiles([]);
       setSelectedAgency(null);
-      setSelectedAgency(null);
+      setUnits([]);
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
@@ -464,7 +494,12 @@ export const AdminPropertyForm = () => {
             </CardContent>
           </Card>
 
-          {/* Property Details */}
+          {isStacked && (
+            <StackedUnitsEditor units={units} onChange={setUnits} listingType={listingType} />
+          )}
+
+          {/* Property Details (hidden for stacked units — each unit has its own) */}
+          {!isStacked && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Property Details</CardTitle>
@@ -565,8 +600,10 @@ export const AdminPropertyForm = () => {
               )} />
             </CardContent>
           </Card>
+          )}
 
-          {/* Media Upload */}
+          {/* Media Upload (hidden for stacked units — per-unit images) */}
+          {!isStacked && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Images & Videos</CardTitle>
@@ -644,6 +681,7 @@ export const AdminPropertyForm = () => {
               )}
             </CardContent>
           </Card>
+          )}
 
           {/* Floor Plan Upload */}
           <Card>
