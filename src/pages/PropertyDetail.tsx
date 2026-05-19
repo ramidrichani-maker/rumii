@@ -64,6 +64,15 @@ const PropertyDetail = () => {
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const isMobile = useIsMobile();
 
+  const handleBack = useCallback(() => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      const fallback = property?.listing_type === 'rent' ? '/rent' : '/purchase';
+      navigate(fallback);
+    }
+  }, [navigate, property?.listing_type]);
+
   const { google, loaded: gmLoaded } = useGoogleMaps();
   const miniMapRef = useRef<HTMLDivElement>(null);
   const miniMapInstance = useRef<google.maps.Map | null>(null);
