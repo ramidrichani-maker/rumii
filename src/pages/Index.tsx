@@ -55,7 +55,7 @@ const Index = () => {
               Find your place with <span className="font-bold text-primary">Rumi</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed">
-              with the MENA's credible choice of homes
+              Lebanon's most trusted platform for renting and buying property
             </p>
           </div>
         </ScrollReveal>
