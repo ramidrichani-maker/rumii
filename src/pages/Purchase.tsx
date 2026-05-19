@@ -513,7 +513,13 @@ const Purchase = () => {
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto' : 'w-full'} transition-all duration-300`}
             style={showMap ? { maxHeight: 'calc(100vh - 120px)' } : undefined}
           >
-            {!isLoading && sortedProperties.length > 0 && (
+            {isLoading ? (
+              <div className="mb-8 grid grid-cols-1 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <PropertyCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : sortedProperties.length > 0 ? (
               <div className="mb-8">
                 <ScrollReveal animation="fade-up">
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Sale</h3>
@@ -529,7 +535,7 @@ const Purchase = () => {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Map Panel - right half of viewport */}
