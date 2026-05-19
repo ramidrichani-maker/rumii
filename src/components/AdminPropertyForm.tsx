@@ -39,9 +39,9 @@ const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Full address is required"),
   propertyType: z.string().min(1, "Property type is required"),
-  metersSquared: z.string().min(1, "Meters squared is required"),
-  bedrooms: z.string().min(1, "Number of bedrooms is required"),
-  bathrooms: z.string().min(1, "Number of bathrooms is required"),
+  metersSquared: z.string().optional(),
+  bedrooms: z.string().optional(),
+  bathrooms: z.string().optional(),
   listingType: z.enum(["rent", "sale", "both"], {
     required_error: "Please select a listing type"
   }),
@@ -51,15 +51,20 @@ const formSchema = z.object({
   yearBuilt: z.string().optional(),
   lastRenovated: z.string().optional(),
   amenities: z.array(z.string()).default([])
-}).refine((data) => {
-  if (data.listingType === 'sale' && (!data.price || data.price === '')) return false;
-  if (data.listingType === 'rent' && (!data.rentalPrice || data.rentalPrice === '')) return false;
-  if (data.listingType === 'both') {
-    if (!data.price || data.price === '') return false;
-    if (!data.rentalPrice || data.rentalPrice === '') return false;
+}).superRefine((data, ctx) => {
+  const isStacked = data.propertyType?.toLowerCase().replace(/\s+/g, '_') === 'stacked_unit';
+  if (!isStacked) {
+    if (!data.metersSquared) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['metersSquared'], message: 'Meters squared is required' });
+    if (!data.bedrooms) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['bedrooms'], message: 'Number of bedrooms is required' });
+    if (!data.bathrooms) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['bathrooms'], message: 'Number of bathrooms is required' });
+    if (data.listingType === 'sale' && !data.price) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['price'], message: 'Sale price required' });
+    if (data.listingType === 'rent' && !data.rentalPrice) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rentalPrice'], message: 'Rental price required' });
+    if (data.listingType === 'both') {
+      if (!data.price) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['price'], message: 'Sale price required' });
+      if (!data.rentalPrice) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rentalPrice'], message: 'Rental price required' });
+    }
   }
-  return true;
-}, { message: "Please fill in the required price fields", path: ["price"] });
+});
 
 type FormData = z.infer<typeof formSchema>;
 
