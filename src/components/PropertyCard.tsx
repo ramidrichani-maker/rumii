@@ -51,11 +51,40 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [showViewingModal, setShowViewingModal] = useState(false);
   const [agencyName, setAgencyName] = useState<string | null>(null);
   const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isAssignedAgent, setIsAssignedAgent] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
     if (user) checkFavoriteStatus();
+  }, [user, property.id]);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!user) { setUserRole(null); return; }
+      const { data } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      setUserRole(data?.role ?? null);
+    };
+    fetchRole();
+  }, [user]);
+
+  useEffect(() => {
+    const checkAssignment = async () => {
+      if (!user) { setIsAssignedAgent(false); return; }
+      const { data } = await supabase
+        .from('property_agents')
+        .select('id')
+        .eq('property_id', property.id)
+        .eq('agent_id', user.id)
+        .maybeSingle();
+      setIsAssignedAgent(!!data);
+    };
+    checkAssignment();
   }, [user, property.id]);
 
   useEffect(() => {
@@ -363,7 +392,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
         {/* Location */}
         <p className="text-xs md:text-sm text-foreground mt-1 md:mt-2 truncate">
-          {property.city}, {property.address}
+          {userRole === 'admin' || isAssignedAgent
+            ? `${property.city}, ${property.address}`
+            : property.city}
         </p>
 
         {/* Description (max 2 lines) */}
