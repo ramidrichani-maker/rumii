@@ -46,6 +46,7 @@ const PropertyDetail = () => {
   const isAdmin = profile?.role === 'admin';
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subUnits, setSubUnits] = useState<Property[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -92,6 +93,19 @@ const PropertyDetail = () => {
     };
     fetchProperty();
   }, [id]);
+
+  useEffect(() => {
+    const fetchSubUnits = async () => {
+      if (!property || property.property_type !== 'stacked_unit') { setSubUnits([]); return; }
+      const { data } = await supabase
+        .from('properties_public' as any)
+        .select('*')
+        .eq('parent_property_id', property.id)
+        .order('price', { ascending: true });
+      setSubUnits((data || []) as unknown as Property[]);
+    };
+    fetchSubUnits();
+  }, [property?.id, property?.property_type]);
 
   // Set Open Graph / Twitter meta tags so shared links unfurl with the property photo
   useEffect(() => {
