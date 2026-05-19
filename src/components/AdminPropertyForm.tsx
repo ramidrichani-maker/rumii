@@ -489,7 +489,12 @@ export const AdminPropertyForm = () => {
             </CardContent>
           </Card>
 
-          {/* Property Details */}
+          {isStacked && (
+            <StackedUnitsEditor units={units} onChange={setUnits} listingType={listingType} />
+          )}
+
+          {/* Property Details (hidden for stacked units — each unit has its own) */}
+          {!isStacked && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Property Details</CardTitle>
@@ -590,8 +595,10 @@ export const AdminPropertyForm = () => {
               )} />
             </CardContent>
           </Card>
+          )}
 
-          {/* Media Upload */}
+          {/* Media Upload (hidden for stacked units — per-unit images) */}
+          {!isStacked && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Images & Videos</CardTitle>
@@ -669,6 +676,7 @@ export const AdminPropertyForm = () => {
               )}
             </CardContent>
           </Card>
+          )}
 
           {/* Floor Plan Upload */}
           <Card>
