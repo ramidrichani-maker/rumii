@@ -1862,8 +1862,6 @@ const ListProperty = () => {
             // Block closing while a submission is in flight
             if (!open && isSubmitting) return;
             setShowClientConfirm(open);
-            // Reset the in-popup acceptance whenever the dialog opens or closes
-            setPopupBrokerAccepted(false);
             if (!open) {
               // Treat any close as a cancellation: purge persisted media
               const imgs = uploadedImages
@@ -1879,49 +1877,28 @@ const ListProperty = () => {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure you accept Rumi as your broker?</AlertDialogTitle>
+              <AlertDialogTitle>Confirm your listing submission</AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <p>
-                    By submitting, you confirm that you accept <strong>Rumi</strong> as your
-                    real estate broker for this property and that you will pay Rumi a
-                    commission if the sale or rental is completed through Rumi.
-                  </p>
-                  <p>
-                    Rumi will provide the full service of managing your property — marketing the
-                    listing, <strong>conducting all viewings</strong>, and meeting with prospective buyers
-                    and renters on your behalf.
-                  </p>
-                  <p>
-                    Commission due if the transaction is concluded through Rumi:
+                    You've agreed to engage <strong>Rumi</strong> as your real estate broker for
+                    this property. Here's a quick summary of the terms you've accepted:
                   </p>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>2.5%</strong> from the seller in the event of a sale.</li>
-                    <li><strong>One month's rent</strong> in the event of a rental.</li>
+                    <li>Rumi will market the listing and <strong>conduct all viewings</strong> on your behalf.</li>
+                    <li>Commission of <strong>2.5%</strong> from the seller if sold through Rumi.</li>
+                    <li>Commission of <strong>one month's rent</strong> if rented through Rumi.</li>
+                    <li>Commission is only due if the transaction is concluded through Rumi.</li>
                   </ul>
-                  <p>Do you agree and wish to submit your listing?</p>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <label className="flex items-start gap-3 rounded-md border border-border bg-muted/40 p-3 cursor-pointer">
-              <Checkbox
-                id="popup-broker-accept"
-                checked={popupBrokerAccepted}
-                onCheckedChange={(checked) => setPopupBrokerAccepted(checked === true)}
-                disabled={isSubmitting}
-                className="mt-0.5"
-              />
-              <span className="text-sm text-foreground leading-snug">
-                I accept Rumi as my broker and agree to the commission terms above.
-              </span>
-            </label>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                disabled={isSubmitting || !popupBrokerAccepted}
+                disabled={isSubmitting}
                 onClick={(e) => {
                   e.preventDefault();
-                  if (!popupBrokerAccepted) return;
                   if (pendingData) {
                     const data = pendingData;
                     setPendingData(null);
@@ -1933,7 +1910,7 @@ const ListProperty = () => {
                   }
                 }}
               >
-                Agree & Submit
+                Confirm & Submit Listing
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
