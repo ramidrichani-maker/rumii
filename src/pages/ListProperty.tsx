@@ -1729,7 +1729,7 @@ const ListProperty = () => {
             </Card>
 
             {/* Amenities */}
-            <Card>
+            <Card id="section-amenities" className="scroll-mt-32">
               <CardHeader>
                 <CardTitle>Amenities</CardTitle>
                 <p className="text-sm text-muted-foreground">Select all amenities included with the property</p>
@@ -1747,7 +1747,7 @@ const ListProperty = () => {
             </Card>
 
             {/* Broker Agreement */}
-            <Card className="border-primary/20">
+            <Card id="section-broker" className="border-primary/20 scroll-mt-32">
               <CardHeader>
                 <CardTitle>Broker Agreement</CardTitle>
               </CardHeader>
