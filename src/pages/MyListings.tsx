@@ -44,6 +44,8 @@ interface ListingUpdate {
 type ServiceSettingPrice = { key: string; value: number };
 type FeaturedRequestStatus = { property_id: string; status: string };
 
+const REFRESH_MY_LISTINGS_MS = 2500;
+
 export default function MyListings() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -81,6 +83,10 @@ export default function MyListings() {
     window.addEventListener('focus', refetch);
     document.addEventListener('visibilitychange', onVisibility);
 
+    const refreshInterval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') refetch();
+    }, REFRESH_MY_LISTINGS_MS);
+
     // Realtime: listen for changes to this user's properties
     const channel = supabase
       .channel(`my-listings-${user.id}`)
@@ -108,6 +114,7 @@ export default function MyListings() {
     return () => {
       window.removeEventListener('focus', refetch);
       document.removeEventListener('visibilitychange', onVisibility);
+      window.clearInterval(refreshInterval);
       supabase.removeChannel(channel);
     };
   }, [user]);
