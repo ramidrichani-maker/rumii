@@ -443,8 +443,13 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-muted-foreground" />
                   <span className="font-semibold text-lg">
-                    ${property.price.toLocaleString()}
-                    {property.listing_type === 'rent' && '/month'}
+                    {property.listing_type === 'rent'
+                      ? property.rental_price != null
+                        ? `€${property.rental_price.toLocaleString()}/month`
+                        : 'Price on request'
+                      : property.price != null
+                        ? `€${property.price.toLocaleString()}`
+                        : 'Price on request'}
                   </span>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
