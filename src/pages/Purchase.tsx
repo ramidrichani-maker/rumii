@@ -128,7 +128,8 @@ const Purchase = () => {
         .from('properties_public' as any)
         .select('*')
         .in('listing_type', ['sale', 'both'])
-        .eq('status', 'approved');
+        .eq('status', 'approved')
+        .is('parent_property_id', null);
 
       if (selectedPropertyTypes.length > 0) {
         query = query.in('property_type', selectedPropertyTypes as any);
