@@ -21,7 +21,8 @@ interface FeatureRequest {
   property?: {
     address: string;
     city: string;
-    price: number;
+    price: number | null;
+    rental_price?: number | null;
     listing_type: string;
   };
   agency?: {
@@ -55,7 +56,7 @@ const FeatureRequestsManager = () => {
         (data || []).map(async (request) => {
           const { data: property } = await supabase
             .from('properties')
-            .select('address, city, price, listing_type')
+            .select('address, city, price, rental_price, listing_type')
             .eq('id', request.property_id)
             .single();
 
@@ -240,7 +241,15 @@ const FeatureRequestsManager = () => {
                       </div>
                       <h3 className="font-semibold">{request.property?.address}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {request.property?.city} • ${request.property?.price?.toLocaleString()} • {request.property?.listing_type}
+                        {request.property?.city} • {
+                          request.property?.listing_type === 'rent'
+                            ? (request.property?.rental_price ?? request.property?.price) != null
+                              ? `$${(request.property?.rental_price ?? request.property?.price)!.toLocaleString()}/mo`
+                              : 'Price on request'
+                            : request.property?.price != null
+                              ? `$${request.property.price.toLocaleString()}`
+                              : 'Price on request'
+                        } • {request.property?.listing_type}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Requested by: {request.requester?.full_name || 'Unknown'} • {format(new Date(request.created_at), 'MMM dd, yyyy')}
