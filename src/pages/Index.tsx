@@ -75,23 +75,8 @@ const Index = () => {
               </div>
             </ScrollReveal>
             
-            {featuredRentals.length > 0 && (
-              <div className="mb-16">
-                <ScrollReveal animation="fade-right">
-                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Rentals</h3>
-                </ScrollReveal>
-                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {featuredRentals.map((property, index) => (
-                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
-                      <FeaturedPropertyCard property={property} badgeLabel="For Rent" badgeVariant="secondary" />
-                    </ScrollReveal>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {featuredSales.length > 0 && (
-              <div>
+              <div className="mb-16">
                 <ScrollReveal animation="fade-left">
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Listings</h3>
                 </ScrollReveal>
@@ -99,6 +84,21 @@ const Index = () => {
                   {featuredSales.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
                       <FeaturedPropertyCard property={property} badgeLabel="For Sale" />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {featuredRentals.length > 0 && (
+              <div>
+                <ScrollReveal animation="fade-right">
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Rentals</h3>
+                </ScrollReveal>
+                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {featuredRentals.map((property, index) => (
+                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
+                      <FeaturedPropertyCard property={property} badgeLabel="For Rent" badgeVariant="secondary" />
                     </ScrollReveal>
                   ))}
                 </div>
