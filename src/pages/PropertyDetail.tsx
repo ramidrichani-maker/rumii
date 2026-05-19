@@ -644,6 +644,38 @@ const PropertyDetail = () => {
             </p>
           </div>
 
+          {/* Listed time */}
+          {(() => {
+            const created = new Date(property.created_at).getTime();
+            const diffMs = Date.now() - created;
+            const dayMs = 1000 * 60 * 60 * 24;
+            const days = Math.floor(diffMs / dayMs);
+            let label = "";
+            const isNew = diffMs < dayMs;
+            if (isNew) label = "Listed today";
+            else if (days < 7) label = `Listed ${days} day${days === 1 ? "" : "s"} ago`;
+            else if (days < 30) {
+              const w = Math.floor(days / 7);
+              label = `Listed ${w} week${w === 1 ? "" : "s"} ago`;
+            } else if (days < 365) {
+              const m = Math.floor(days / 30);
+              label = `Listed ${m} month${m === 1 ? "" : "s"} ago`;
+            } else {
+              const y = Math.floor(days / 365);
+              label = `Listed ${y} year${y === 1 ? "" : "s"} ago`;
+            }
+            return (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{label}</span>
+                {isNew && (
+                  <span className="inline-flex items-center rounded-full bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400 px-2 py-0.5 text-xs font-semibold">
+                    New
+                  </span>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Bed & Bath icons */}
           <div className="flex items-center gap-5 pt-1">
             <div className="flex items-center gap-1.5 text-muted-foreground">
