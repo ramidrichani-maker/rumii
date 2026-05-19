@@ -335,6 +335,83 @@ const PropertyDetail = () => {
     return listingType === "rent" ? `${formatted}/mo` : formatted;
   };
 
+  if (property.property_type === 'stacked_unit') {
+    const heroImage = property.images?.[0] || subUnits.find(u => u.images?.[0])?.images?.[0] || null;
+    return (
+      <div className="min-h-screen bg-background pt-4 pb-16">
+        <div className="max-w-5xl mx-auto px-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+          </Button>
+
+          {heroImage && (
+            <div className="w-full h-48 md:h-72 rounded-xl overflow-hidden bg-muted mb-4">
+              <img src={heroImage} alt={property.address} className="w-full h-full object-cover" />
+            </div>
+          )}
+
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            {property.address}
+          </h1>
+          <p className="text-muted-foreground mb-2 flex items-center gap-1">
+            <MapPin className="w-4 h-4" /> {property.city}
+            {property.municipality ? `, ${property.municipality}` : ''}
+          </p>
+          <p className="text-sm text-muted-foreground mb-6">
+            Building with {subUnits.length} {subUnits.length === 1 ? 'unit' : 'units'} · For {property.listing_type}
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground mb-3">Units in this building</h2>
+
+          {subUnits.length === 0 ? (
+            <p className="text-muted-foreground">No units listed in this building yet.</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4">
+              {subUnits.map((unit) => {
+                const thumb = unit.images?.[0];
+                const price = property.listing_type === 'rent'
+                  ? ((unit as any).rental_price ?? unit.price)
+                  : unit.price;
+                return (
+                  <button
+                    key={unit.id}
+                    onClick={() => navigate(`/property/${unit.id}`)}
+                    className="text-left bg-muted/30 hover:bg-muted/50 transition-colors rounded-xl overflow-hidden border"
+                  >
+                    <div className="w-full h-40 bg-muted">
+                      {thumb ? (
+                        <img src={thumb} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <Image className="w-8 h-8" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold capitalize">{unit.property_type}</span>
+                        <span className="text-primary font-bold">
+                          {price != null
+                            ? `$${Number(price).toLocaleString()}${property.listing_type === 'rent' ? '/mo' : ''}`
+                            : 'Price on request'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1"><BedDouble className="w-3 h-3" /> {unit.bedrooms}</span>
+                        <span className="flex items-center gap-1"><Bath className="w-3 h-3" /> {unit.bathrooms}</span>
+                        <span className="flex items-center gap-1"><Maximize2 className="w-3 h-3" /> {unit.square_meters}m²</span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pt-4 pb-16">
       <div className="max-w-5xl mx-auto px-4">
