@@ -20,6 +20,7 @@ import PhotographyRequestsManager from "@/components/PhotographyRequestsManager"
 import { AgencyManager } from "@/components/AgencyManager";
 import FeatureRequestsManager from "@/components/FeatureRequestsManager";
 import { ServicePricingManager } from "@/components/ServicePricingManager";
+import { FeaturedBundlesManager } from "@/components/FeaturedBundlesManager";
 import { AdminPropertyForm } from "@/components/AdminPropertyForm";
 import { BulkPropertyImport } from "@/components/BulkPropertyImport";
 import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
@@ -566,6 +567,7 @@ const AdminDashboard = () => {
               <TabsContent value="featured">
                 <div className="space-y-4 max-h-[500px] overflow-y-auto">
                   <ServicePricingManager />
+                  <FeaturedBundlesManager />
                   <Card>
                     <CardHeader>
                       <CardTitle>Featured Listings</CardTitle>
