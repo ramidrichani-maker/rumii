@@ -1279,6 +1279,7 @@ export type Database = {
           listing_type: Database["public"]["Enums"]["listing_type"] | null
           longitude: number | null
           municipality: string | null
+          parent_property_id: string | null
           price: number | null
           price_negotiable: boolean | null
           property_code: number | null
@@ -1312,6 +1313,7 @@ export type Database = {
           listing_type?: Database["public"]["Enums"]["listing_type"] | null
           longitude?: never
           municipality?: string | null
+          parent_property_id?: string | null
           price?: number | null
           price_negotiable?: boolean | null
           property_code?: number | null
@@ -1345,6 +1347,7 @@ export type Database = {
           listing_type?: Database["public"]["Enums"]["listing_type"] | null
           longitude?: never
           municipality?: string | null
+          parent_property_id?: string | null
           price?: number | null
           price_negotiable?: boolean | null
           property_code?: number | null
@@ -1363,6 +1366,20 @@ export type Database = {
             columns: ["agency_id"]
             isOneToOne: false
             referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "properties_parent_property_id_fkey"
+            columns: ["parent_property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "properties_parent_property_id_fkey"
+            columns: ["parent_property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public"
             referencedColumns: ["id"]
           },
         ]
