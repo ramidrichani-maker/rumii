@@ -84,22 +84,21 @@ const AdminDashboard = () => {
 
       if (propsError) throw propsError;
 
-      // Fetch profile data separately and merge
-      const propertiesWithProfiles = await Promise.all(
-        (properties || []).map(async (property) => {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name, phone_number')
-            .eq('user_id', property.user_id)
-            .single();
-          
-          return {
-            ...property,
-            profiles: profile
-          };
-        })
-      );
-      setPendingProperties(propertiesWithProfiles || []);
+      // Batch-fetch profiles in a single query to avoid N+1 latency
+      const userIds = Array.from(new Set((properties || []).map((p: any) => p.user_id).filter(Boolean)));
+      let profilesMap: Record<string, any> = {};
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, phone_number')
+          .in('user_id', userIds);
+        profilesMap = Object.fromEntries((profilesData || []).map((p: any) => [p.user_id, p]));
+      }
+      const propertiesWithProfiles = (properties || []).map((property: any) => ({
+        ...property,
+        profiles: profilesMap[property.user_id] || null,
+      }));
+      setPendingProperties(propertiesWithProfiles);
       
       // Get stats
       const { data: allProps } = await supabase
@@ -373,14 +372,7 @@ const AdminDashboard = () => {
     return viewingDateTime < new Date();
   };
 
-  if (isLoading) {
-    return <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">Loading Admin Dashboard...</h2>
-        <p className="text-muted-foreground">Please wait while we load your data</p>
-      </div>
-    </div>;
-  }
+  // Render immediately; individual sections show their own loading state.
 
   return (
     <div className="min-h-screen bg-transparent">
