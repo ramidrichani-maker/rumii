@@ -17,8 +17,9 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PropertyMap from "@/components/PropertyMap";
+import { StackedUnitsEditor, UnitDraft, validateUnits, insertUnitsForParent, makeEmptyUnit } from "@/components/StackedUnitsEditor";
 
-const propertyTypes = ["Apartment", "Villa", "Beach House", "Chalet", "Duplex", "Triplex", "Penthouse", "Commercial", "Farm House", "Building", "Venue", "Studio", "Rooftop", "Land"];
+const propertyTypes = ["Apartment", "Villa", "Beach House", "Chalet", "Duplex", "Triplex", "Penthouse", "Commercial", "Farm House", "Building", "Venue", "Studio", "Rooftop", "Land", "Stacked Unit"];
 const amenities = ["Garden", "Parking/Garage", "Balcony/Terrace", "Swimming Pool", "Gym", "Elevator", "Storage Room", "Security", "Concierge", "EV Charging", "Patio", "Basement", "Sea View", "Mountain View", "Fireplace", "Smart-home"];
 const roomTypes = [
   "Entrance", "Bedroom", "Salon", "Living Room", "Dining Room", "Kitchen",
@@ -99,6 +100,7 @@ export const AdminPropertyForm = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [floorPlanFiles, setFloorPlanFiles] = useState<File[]>([]);
+  const [units, setUnits] = useState<UnitDraft[]>([]);
   const [coordinates, setCoordinates] = useState({
     lat: 33.8938,
     lng: 35.5018
@@ -118,6 +120,8 @@ export const AdminPropertyForm = () => {
   });
 
   const listingType = form.watch('listingType');
+  const propertyType = form.watch('propertyType');
+  const isStacked = propertyType === 'stacked unit' || propertyType === 'stacked_unit';
 
   useEffect(() => {
     const fetchAgencies = async () => {
@@ -187,6 +191,17 @@ export const AdminPropertyForm = () => {
       return;
     }
 
+    const normalizedType = data.propertyType.toLowerCase().replace(/\s+/g, '_');
+    const isStackedSubmit = normalizedType === 'stacked_unit';
+
+    if (isStackedSubmit) {
+      const unitErr = validateUnits(units, data.listingType);
+      if (unitErr) {
+        toast({ title: "Units required", description: unitErr, variant: "destructive" });
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -231,37 +246,47 @@ export const AdminPropertyForm = () => {
       }
 
       // Insert property - admin listings are auto-approved
-      const { error } = await supabase.from('properties').insert({
+      const parentInsert = {
         user_id: user.id,
         agency_id: data.agencyId || null,
         municipality: data.municipality,
         city: data.city,
         address: data.address,
-        property_type: data.propertyType.toLowerCase() as any,
-        square_meters: parseInt(data.metersSquared),
-        bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseFloat(data.bathrooms),
+        property_type: normalizedType as any,
+        square_meters: isStackedSubmit ? 0 : parseInt(data.metersSquared),
+        bedrooms: isStackedSubmit ? 0 : parseInt(data.bedrooms),
+        bathrooms: isStackedSubmit ? 0 : parseFloat(data.bathrooms),
         listing_type: data.listingType as any,
-        price: data.price ? parseFloat(data.price) : null,
-        rental_price: data.rentalPrice ? parseFloat(data.rentalPrice) : null,
+        price: !isStackedSubmit && data.price ? parseFloat(data.price) : null,
+        rental_price: !isStackedSubmit && data.rentalPrice ? parseFloat(data.rentalPrice) : null,
         price_negotiable: data.priceNegotiable,
         year_built: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         last_renovated: data.lastRenovated ? parseInt(data.lastRenovated) : null,
         amenities: selectedAmenities,
-        images: imageUrls,
+        images: isStackedSubmit ? [] : imageUrls,
         floor_plan_url: floorPlanUrls[0] ?? null,
         floor_plan_urls: floorPlanUrls,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         description: data.description || null,
         status: 'approved' // Admin listings are pre-approved
-      });
+      };
+
+      const { data: parentRow, error } = await supabase
+        .from('properties')
+        .insert(parentInsert)
+        .select('id')
+        .single();
 
       if (error) throw error;
 
+      if (isStackedSubmit && parentRow) {
+        await insertUnitsForParent(parentRow.id, user.id, units);
+      }
+
       toast({
         title: "Property Listed Successfully!",
-        description: `Property has been listed${selectedAgency ? ` under ${selectedAgency.name}` : ''} and is now live.`
+        description: `Property has been listed${selectedAgency ? ` under ${selectedAgency.name}` : ''}${isStackedSubmit ? ` with ${units.length} unit${units.length === 1 ? '' : 's'}` : ''} and is now live.`
       });
 
       // Reset form
@@ -270,7 +295,7 @@ export const AdminPropertyForm = () => {
       setUploadedImages([]);
       setFloorPlanFiles([]);
       setSelectedAgency(null);
-      setSelectedAgency(null);
+      setUnits([]);
     } catch (error) {
       console.error('Error listing property:', error);
       toast({
