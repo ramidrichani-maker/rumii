@@ -53,6 +53,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isAssignedAgent, setIsAssignedAgent] = useState(false);
+  const [stackedRange, setStackedRange] = useState<{
+    minPrice: number | null; maxPrice: number | null;
+    minRent: number | null; maxRent: number | null;
+    minSqm: number | null; maxSqm: number | null;
+    unitCount: number;
+  } | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -125,6 +131,30 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     fetchAgency();
   }, [property.agency_id]);
 
+  useEffect(() => {
+    const fetchStackedUnits = async () => {
+      if (property.property_type !== 'stacked_unit') { setStackedRange(null); return; }
+      const { data } = await supabase
+        .from('properties_public' as any)
+        .select('price, rental_price, square_meters')
+        .eq('parent_property_id', property.id);
+      if (!data || data.length === 0) { setStackedRange(null); return; }
+      const prices = data.map((d: any) => d.price).filter((v: any) => v != null) as number[];
+      const rents = data.map((d: any) => d.rental_price).filter((v: any) => v != null) as number[];
+      const sqms = data.map((d: any) => d.square_meters).filter((v: any) => v != null && v > 0) as number[];
+      setStackedRange({
+        minPrice: prices.length ? Math.min(...prices) : null,
+        maxPrice: prices.length ? Math.max(...prices) : null,
+        minRent: rents.length ? Math.min(...rents) : null,
+        maxRent: rents.length ? Math.max(...rents) : null,
+        minSqm: sqms.length ? Math.min(...sqms) : null,
+        maxSqm: sqms.length ? Math.max(...sqms) : null,
+        unitCount: data.length,
+      });
+    };
+    fetchStackedUnits();
+  }, [property.id, property.property_type]);
+
   const checkFavoriteStatus = async () => {
     if (!user) return;
     const { data } = await supabase
@@ -161,6 +191,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   };
 
   const formatPrice = (price: number | null, listingType: string, rentalPrice?: number | null) => {
+    if (property.property_type === 'stacked_unit' && stackedRange) {
+      const fmtRange = (lo: number | null, hi: number | null, suffix = '') => {
+        if (lo == null && hi == null) return null;
+        if (lo == null) return `$${hi!.toLocaleString()}${suffix}`;
+        if (hi == null || lo === hi) return `$${lo.toLocaleString()}${suffix}`;
+        return `$${lo.toLocaleString()} - $${hi.toLocaleString()}${suffix}`;
+      };
+      if (listingType === 'rent') {
+        return fmtRange(stackedRange.minRent, stackedRange.maxRent, '/mo') ?? 'Price on request';
+      }
+      return fmtRange(stackedRange.minPrice, stackedRange.maxPrice) ?? 'Price on request';
+    }
     if (listingType === 'both' && rentalPrice != null && price != null) {
       return `$${price.toLocaleString()} / $${rentalPrice.toLocaleString()}/mo`;
     }
@@ -386,7 +428,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           </span>
           <span className="flex items-center gap-1">
             <Square className="w-3 h-3 md:w-4 md:h-4" />
-            {property.square_meters}m²
+            {property.property_type === 'stacked_unit' && stackedRange && stackedRange.minSqm != null && stackedRange.maxSqm != null && stackedRange.minSqm !== stackedRange.maxSqm
+              ? `${stackedRange.minSqm} - ${stackedRange.maxSqm}m²`
+              : `${property.square_meters}m²`}
           </span>
         </div>
 
