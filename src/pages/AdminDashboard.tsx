@@ -372,14 +372,7 @@ const AdminDashboard = () => {
     return viewingDateTime < new Date();
   };
 
-  if (isLoading) {
-    return <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold mb-2">Loading Admin Dashboard...</h2>
-        <p className="text-muted-foreground">Please wait while we load your data</p>
-      </div>
-    </div>;
-  }
+  // Render immediately; individual sections show their own loading state.
 
   return (
     <div className="min-h-screen bg-transparent">
