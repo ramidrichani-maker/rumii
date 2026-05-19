@@ -30,7 +30,7 @@ const Index = () => {
     try {
       const { data, error } = await supabase
         .from('properties')
-        .select('id, address, city, price, listing_type, property_type, bedrooms, bathrooms, square_meters, images, featured_section')
+        .select('id, address, city, price, rental_price, listing_type, property_type, bedrooms, bathrooms, square_meters, images, featured_section')
         .eq('status', 'approved')
         .not('featured_section', 'is', null);
 
