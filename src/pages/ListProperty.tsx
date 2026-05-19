@@ -28,6 +28,7 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PropertyMap from "@/components/PropertyMap";
+import { Check } from "lucide-react";
 const propertyTypes = ["Apartment", "Villa", "Beach House", "Chalet", "Duplex", "Triplex", "Penthouse", "Commercial", "Farm House", "Building", "Venue", "Studio", "Rooftop", "Land"];
 const amenities = ["Garden", "Parking/Garage", "Balcony/Terrace", "Swimming Pool", "Gym", "Elevator", "Storage Room", "Security", "Concierge", "EV Charging", "Patio", "Basement", "Sea View", "Mountain View", "Fireplace", "Smart-home"];
 const roomTypes = [
@@ -174,6 +175,47 @@ const ListProperty = () => {
   });
 
   const listingType = form.watch('listingType');
+
+  // Watch fields used for section progress checklist
+  const watchedMunicipality = form.watch('municipality');
+  const watchedCity = form.watch('city');
+  const watchedAddress = form.watch('address');
+  const watchedPropertyType = form.watch('propertyType');
+  const watchedPrice = form.watch('price');
+  const watchedRentalPrice = form.watch('rentalPrice');
+  const watchedMeters = form.watch('metersSquared');
+  const watchedBedrooms = form.watch('bedrooms');
+  const watchedBathrooms = form.watch('bathrooms');
+  const watchedBrokerAgreement = form.watch('brokerAgreement');
+
+  const DEFAULT_COORDS = { lat: 33.8938, lng: 35.5018 };
+  const sectionStatus = {
+    basic: !!(watchedMunicipality && watchedCity && watchedAddress && watchedPropertyType),
+    location:
+      coordinates.lat !== DEFAULT_COORDS.lat || coordinates.lng !== DEFAULT_COORDS.lng,
+    listingType:
+      !!listingType &&
+      ((listingType === 'sale' && !!watchedPrice) ||
+        (listingType === 'rent' && !!watchedRentalPrice) ||
+        (listingType === 'both' && !!watchedPrice && !!watchedRentalPrice)),
+    details: !!(watchedMeters && watchedBedrooms && watchedBathrooms !== ''),
+    media:
+      uploadedImages.length > 0 &&
+      uploadedImages.every((i) => i.status !== 'failed' && i.status !== 'uploading'),
+    amenities: selectedAmenities.length > 0,
+    broker: watchedBrokerAgreement === true,
+  };
+  const sectionList = [
+    { id: 'section-basic', label: 'Basic Info', done: sectionStatus.basic },
+    { id: 'section-location', label: 'Location', done: sectionStatus.location },
+    { id: 'section-listing-type', label: 'Listing Type', done: sectionStatus.listingType },
+    { id: 'section-details', label: 'Property Details', done: sectionStatus.details },
+    { id: 'section-media', label: 'Media', done: sectionStatus.media },
+    { id: 'section-amenities', label: 'Amenities', done: sectionStatus.amenities },
+    { id: 'section-broker', label: 'Broker Agreement', done: sectionStatus.broker },
+  ];
+  const completedCount = sectionList.filter((s) => s.done).length;
+  const progressPercent = Math.round((completedCount / sectionList.length) * 100);
 
   // Restore a pending listing (form values, uploaded media, dialog state) if
   // the user refreshed or navigated away while the confirmation dialog was open.
@@ -989,9 +1031,51 @@ const ListProperty = () => {
             })}
             className="space-y-8"
           >
+            {/* Sticky section progress checklist */}
+            <div className="sticky top-0 z-20 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <p className="text-sm font-medium text-foreground">
+                  Listing progress
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {completedCount} of {sectionList.length} sections complete
+                </p>
+              </div>
+              <Progress value={progressPercent} className="h-1.5 mb-3" />
+              <div className="flex flex-wrap gap-2">
+                {sectionList.map((s) => (
+                  <a
+                    key={s.id}
+                    href={`#${s.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const el = document.getElementById(s.id);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      s.done
+                        ? 'bg-primary/10 border-primary/40 text-primary'
+                        : 'bg-muted/40 border-border text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex h-4 w-4 items-center justify-center rounded-full border ${
+                        s.done
+                          ? 'bg-primary border-primary text-primary-foreground'
+                          : 'border-muted-foreground/40 text-transparent'
+                      }`}
+                    >
+                      <Check className="h-3 w-3" />
+                    </span>
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Basic Information */}
-              <Card className="relative z-10">
+              <Card id="section-basic" className="relative z-10 scroll-mt-32">
                 <CardHeader>
                   <CardTitle>Basic Information</CardTitle>
                 </CardHeader>
@@ -1077,7 +1161,7 @@ const ListProperty = () => {
               </Card>
 
               {/* Location Map */}
-              <Card className="relative z-0">
+              <Card id="section-location" className="relative z-0 scroll-mt-32">
                 <CardHeader>
                   <CardTitle>Property Location</CardTitle>
                   <p className="text-sm text-muted-foreground">Click on the map to pinpoint exact location</p>
@@ -1089,7 +1173,7 @@ const ListProperty = () => {
             </div>
 
             {/* Listing Type - shown before property details */}
-            <Card>
+            <Card id="section-listing-type" className="scroll-mt-32">
               <CardHeader>
                 <CardTitle>Listing Type</CardTitle>
               </CardHeader>
@@ -1120,7 +1204,7 @@ const ListProperty = () => {
 
             <div className="space-y-8">
               {/* Property Details */}
-              <Card>
+              <Card id="section-details" className="scroll-mt-32">
                 <CardHeader>
                   <CardTitle>Property Details</CardTitle>
                 </CardHeader>
@@ -1269,7 +1353,7 @@ const ListProperty = () => {
             </div>
 
             {/* Media Upload */}
-            <Card>
+            <Card id="section-media" className="scroll-mt-32">
               <CardHeader>
                 <CardTitle>Images & Videos</CardTitle>
               </CardHeader>
@@ -1645,7 +1729,7 @@ const ListProperty = () => {
             </Card>
 
             {/* Amenities */}
-            <Card>
+            <Card id="section-amenities" className="scroll-mt-32">
               <CardHeader>
                 <CardTitle>Amenities</CardTitle>
                 <p className="text-sm text-muted-foreground">Select all amenities included with the property</p>
@@ -1663,7 +1747,7 @@ const ListProperty = () => {
             </Card>
 
             {/* Broker Agreement */}
-            <Card className="border-primary/20">
+            <Card id="section-broker" className="border-primary/20 scroll-mt-32">
               <CardHeader>
                 <CardTitle>Broker Agreement</CardTitle>
               </CardHeader>
