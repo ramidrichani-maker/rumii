@@ -428,7 +428,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           </span>
           <span className="flex items-center gap-1">
             <Square className="w-3 h-3 md:w-4 md:h-4" />
-            {property.square_meters}m²
+            {property.property_type === 'stacked_unit' && stackedRange && stackedRange.minSqm != null && stackedRange.maxSqm != null && stackedRange.minSqm !== stackedRange.maxSqm
+              ? `${stackedRange.minSqm} - ${stackedRange.maxSqm}m²`
+              : `${property.square_meters}m²`}
           </span>
         </div>
 
