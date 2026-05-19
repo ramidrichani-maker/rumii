@@ -159,8 +159,17 @@ const FeatureRequestsManager = () => {
     }
   };
 
-  const handleDelete = async (requestId: string) => {
+  const handleDelete = async (requestId: string, propertyId: string, status: string) => {
     try {
+      if (status === 'approved') {
+        const { error: propertyError } = await supabase
+          .from('properties')
+          .update({ featured_section: null })
+          .eq('id', propertyId);
+
+        if (propertyError) throw propertyError;
+      }
+
       const { error } = await supabase
         .from('featured_requests')
         .delete()
@@ -170,7 +179,7 @@ const FeatureRequestsManager = () => {
 
       toast({
         title: "Success",
-        description: "Feature request deleted",
+        description: status === 'approved' ? "Feature removed from listing" : "Feature request deleted",
       });
 
       loadRequests();
@@ -301,7 +310,7 @@ const FeatureRequestsManager = () => {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => handleDelete(request.id)}
+                    onClick={() => handleDelete(request.id, request.property_id, request.status)}
                   >
                     <XCircle className="w-4 h-4" />
                   </Button>
