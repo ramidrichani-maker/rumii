@@ -418,6 +418,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
 
         {/* Beds, Baths, Size */}
         <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap">
+          {property.property_type === 'stacked_unit' && stackedRange && stackedRange.unitCount > 0 && (
+            <span className="flex items-center gap-1">
+              <Building2 className="w-3 h-3 md:w-4 md:h-4" />
+              {stackedRange.unitCount} {stackedRange.unitCount === 1 ? 'unit' : 'units'}
+            </span>
+          )}
           <span className="flex items-center gap-1">
             <Bed className="w-3 h-3 md:w-4 md:h-4" />
             {property.bedrooms}
