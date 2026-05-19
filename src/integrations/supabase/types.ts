@@ -1446,6 +1446,7 @@ export type Database = {
         | "venue"
         | "rooftop"
         | "land"
+        | "stacked_unit"
       user_role:
         | "user"
         | "agent"
@@ -1608,6 +1609,7 @@ export const Constants = {
         "venue",
         "rooftop",
         "land",
+        "stacked_unit",
       ],
       user_role: [
         "user",
