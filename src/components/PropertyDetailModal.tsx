@@ -63,7 +63,8 @@ interface Property {
   address: string;
   city: string;
   municipality?: string;
-  price: number;
+  price: number | null;
+  rental_price?: number | null;
   property_type: string;
   bedrooms: number;
   bathrooms: number;
