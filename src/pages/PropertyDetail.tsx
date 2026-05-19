@@ -279,7 +279,7 @@ const PropertyDetail = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Property not found</p>
-        <Button variant="outline" onClick={() => navigate(-1)}>
+        <Button variant="outline" onClick={() => navigate('/purchase')}>
           Go back
         </Button>
       </div>
