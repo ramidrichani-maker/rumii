@@ -1386,6 +1386,10 @@ export type Database = {
       }
     }
     Functions: {
+      aggregate_stacked_unit_parent: {
+        Args: { _parent_id: string }
+        Returns: undefined
+      }
       approve_property_media: { Args: { media_id: string }; Returns: boolean }
       cleanup_old_support_conversations: { Args: never; Returns: number }
       delete_user_account: {
