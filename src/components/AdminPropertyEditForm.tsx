@@ -80,7 +80,8 @@ interface AdminPropertyEditFormProps {
 }
 
 const PROPERTY_TYPES = [
-  "apartment", "house", "studio", "villa", "penthouse", "townhouse", "duplex", "loft"
+  "apartment", "villa", "beach house", "chalet", "duplex", "triplex", "penthouse",
+  "commercial", "farm house", "building", "venue", "studio", "rooftop", "land"
 ];
 
 const AMENITIES = [
