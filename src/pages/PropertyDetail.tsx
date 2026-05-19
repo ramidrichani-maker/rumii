@@ -64,6 +64,15 @@ const PropertyDetail = () => {
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
   const isMobile = useIsMobile();
 
+  const handleBack = useCallback(() => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      const fallback = property?.listing_type === 'rent' ? '/rent' : '/purchase';
+      navigate(fallback);
+    }
+  }, [navigate, property?.listing_type]);
+
   const { google, loaded: gmLoaded } = useGoogleMaps();
   const miniMapRef = useRef<HTMLDivElement>(null);
   const miniMapInstance = useRef<google.maps.Map | null>(null);
@@ -279,7 +288,7 @@ const PropertyDetail = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Property not found</p>
-        <Button variant="outline" onClick={() => navigate(-1)}>
+        <Button variant="outline" onClick={() => navigate('/purchase')}>
           Go back
         </Button>
       </div>
@@ -340,7 +349,7 @@ const PropertyDetail = () => {
     return (
       <div className="min-h-screen bg-background pt-4 pb-16">
         <div className="max-w-5xl mx-auto px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4">
+          <Button variant="ghost" size="sm" onClick={handleBack} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
 
@@ -423,7 +432,7 @@ const PropertyDetail = () => {
           variant="ghost"
           size="sm"
           className="mb-4 gap-1"
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
         >
           <ArrowLeft className="w-4 h-4" />
           Back
