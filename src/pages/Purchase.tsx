@@ -9,6 +9,7 @@ import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import CompactPropertyMap from "@/components/CompactPropertyMap";
+import PropertyDetailModal from "@/components/PropertyDetailModal";
 import PropertyCard from "@/components/PropertyCard";
 import PropertyCardSkeleton from "@/components/PropertyCardSkeleton";
 import RangeSlider from "@/components/RangeSlider";
