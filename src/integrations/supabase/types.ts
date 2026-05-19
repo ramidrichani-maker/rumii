@@ -1437,6 +1437,15 @@ export type Database = {
         | "townhouse"
         | "duplex"
         | "loft"
+        | "beach house"
+        | "chalet"
+        | "triplex"
+        | "commercial"
+        | "farm house"
+        | "building"
+        | "venue"
+        | "rooftop"
+        | "land"
       user_role:
         | "user"
         | "agent"
@@ -1590,6 +1599,15 @@ export const Constants = {
         "townhouse",
         "duplex",
         "loft",
+        "beach house",
+        "chalet",
+        "triplex",
+        "commercial",
+        "farm house",
+        "building",
+        "venue",
+        "rooftop",
+        "land",
       ],
       user_role: [
         "user",
