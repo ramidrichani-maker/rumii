@@ -32,6 +32,7 @@ const Index = () => {
         .from('properties')
         .select('id, address, city, price, rental_price, listing_type, property_type, bedrooms, bathrooms, square_meters, images, featured_section')
         .eq('status', 'approved')
+        .is('parent_property_id', null)
         .not('featured_section', 'is', null);
 
       if (error) throw error;
