@@ -176,6 +176,47 @@ const ListProperty = () => {
 
   const listingType = form.watch('listingType');
 
+  // Watch fields used for section progress checklist
+  const watchedMunicipality = form.watch('municipality');
+  const watchedCity = form.watch('city');
+  const watchedAddress = form.watch('address');
+  const watchedPropertyType = form.watch('propertyType');
+  const watchedPrice = form.watch('price');
+  const watchedRentalPrice = form.watch('rentalPrice');
+  const watchedMeters = form.watch('metersSquared');
+  const watchedBedrooms = form.watch('bedrooms');
+  const watchedBathrooms = form.watch('bathrooms');
+  const watchedBrokerAgreement = form.watch('brokerAgreement');
+
+  const DEFAULT_COORDS = { lat: 33.8938, lng: 35.5018 };
+  const sectionStatus = {
+    basic: !!(watchedMunicipality && watchedCity && watchedAddress && watchedPropertyType),
+    location:
+      coordinates.lat !== DEFAULT_COORDS.lat || coordinates.lng !== DEFAULT_COORDS.lng,
+    listingType:
+      !!listingType &&
+      ((listingType === 'sale' && !!watchedPrice) ||
+        (listingType === 'rent' && !!watchedRentalPrice) ||
+        (listingType === 'both' && !!watchedPrice && !!watchedRentalPrice)),
+    details: !!(watchedMeters && watchedBedrooms && watchedBathrooms !== ''),
+    media:
+      uploadedImages.length > 0 &&
+      uploadedImages.every((i) => i.status !== 'failed' && i.status !== 'uploading'),
+    amenities: selectedAmenities.length > 0,
+    broker: watchedBrokerAgreement === true,
+  };
+  const sectionList = [
+    { id: 'section-basic', label: 'Basic Info', done: sectionStatus.basic },
+    { id: 'section-location', label: 'Location', done: sectionStatus.location },
+    { id: 'section-listing-type', label: 'Listing Type', done: sectionStatus.listingType },
+    { id: 'section-details', label: 'Property Details', done: sectionStatus.details },
+    { id: 'section-media', label: 'Media', done: sectionStatus.media },
+    { id: 'section-amenities', label: 'Amenities', done: sectionStatus.amenities },
+    { id: 'section-broker', label: 'Broker Agreement', done: sectionStatus.broker },
+  ];
+  const completedCount = sectionList.filter((s) => s.done).length;
+  const progressPercent = Math.round((completedCount / sectionList.length) * 100);
+
   // Restore a pending listing (form values, uploaded media, dialog state) if
   // the user refreshed or navigated away while the confirmation dialog was open.
   useEffect(() => {
