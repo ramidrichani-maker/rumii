@@ -274,7 +274,7 @@ export const AdminPropertyForm = () => {
 
       const { data: parentRow, error } = await supabase
         .from('properties')
-        .insert(parentInsert)
+        .insert(parentInsert as any)
         .select('id')
         .single();
 
