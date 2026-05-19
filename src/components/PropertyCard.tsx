@@ -160,15 +160,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
     }
   };
 
-  const formatPrice = (price: number, listingType: string, rentalPrice?: number | null) => {
-    if (listingType === 'both' && rentalPrice) {
+  const formatPrice = (price: number | null, listingType: string, rentalPrice?: number | null) => {
+    if (listingType === 'both' && rentalPrice != null && price != null) {
       return `$${price.toLocaleString()} / $${rentalPrice.toLocaleString()}/mo`;
     }
     if (listingType === 'rent') {
-      const rp = rentalPrice || price;
-      return `$${rp.toLocaleString()}/mo`;
+      const rp = rentalPrice ?? price;
+      return rp != null ? `$${rp.toLocaleString()}/mo` : 'Price on request';
     }
-    return `$${price.toLocaleString()}`;
+    return price != null ? `$${price.toLocaleString()}` : 'Price on request';
   };
 
   const handlePrevImage = (e: React.MouseEvent) => {
