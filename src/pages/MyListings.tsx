@@ -21,7 +21,8 @@ interface Property {
   square_meters: number;
   bedrooms: number;
   bathrooms: number;
-  price: number;
+  price: number | null;
+  rental_price?: number | null;
   listing_type: string;
   status: string;
   images: string[];
@@ -396,8 +397,13 @@ export default function MyListings() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold">
-                      ${property.price?.toLocaleString()}
-                      {property.listing_type === 'rent' && '/mo'}
+                      {property.listing_type === 'rent'
+                        ? (property.rental_price ?? property.price) != null
+                          ? `$${(property.rental_price ?? property.price).toLocaleString()}/mo`
+                          : 'Price on request'
+                        : property.price != null
+                          ? `$${property.price.toLocaleString()}`
+                          : 'Price on request'}
                     </span>
                   </div>
                   <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>

@@ -8,7 +8,8 @@ interface Property {
   id: string;
   address: string;
   city: string;
-  price: number;
+  price: number | null;
+  rental_price?: number | null;
   listing_type: string;
   property_type: string;
   bedrooms: number;
@@ -38,8 +39,15 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
     return diffDays <= 7;
   };
 
-  const formatPrice = (price: number, listingType: string) => {
-    return listingType === 'rent' ? `$${price?.toLocaleString()}/mo` : `$${price?.toLocaleString()}`;
+  const formatPrice = (p: Property) => {
+    if (p.listing_type === 'rent') {
+      const rp = p.rental_price ?? p.price;
+      return rp != null ? `$${rp.toLocaleString()}/mo` : 'Price on request';
+    }
+    if (p.listing_type === 'both' && p.rental_price != null && p.price != null) {
+      return `$${p.price.toLocaleString()} / $${p.rental_price.toLocaleString()}/mo`;
+    }
+    return p.price != null ? `$${p.price.toLocaleString()}` : 'Price on request';
   };
 
   const goLeft = (e: React.MouseEvent) => {
@@ -123,7 +131,7 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
           <div className="flex justify-between items-start mb-2">
             <Badge variant={badgeVariant}>{badgeLabel}</Badge>
             <span className="text-2xl font-bold text-primary">
-              {formatPrice(property.price, property.listing_type)}
+              {formatPrice(property)}
             </span>
           </div>
           <CardTitle className="text-lg">{property.address}</CardTitle>
