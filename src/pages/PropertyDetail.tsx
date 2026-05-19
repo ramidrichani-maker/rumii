@@ -432,7 +432,7 @@ const PropertyDetail = () => {
           variant="ghost"
           size="sm"
           className="mb-4 gap-1"
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
         >
           <ArrowLeft className="w-4 h-4" />
           Back
