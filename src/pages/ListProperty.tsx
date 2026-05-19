@@ -1031,9 +1031,51 @@ const ListProperty = () => {
             })}
             className="space-y-8"
           >
+            {/* Sticky section progress checklist */}
+            <div className="sticky top-0 z-20 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <p className="text-sm font-medium text-foreground">
+                  Listing progress
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {completedCount} of {sectionList.length} sections complete
+                </p>
+              </div>
+              <Progress value={progressPercent} className="h-1.5 mb-3" />
+              <div className="flex flex-wrap gap-2">
+                {sectionList.map((s) => (
+                  <a
+                    key={s.id}
+                    href={`#${s.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const el = document.getElementById(s.id);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      s.done
+                        ? 'bg-primary/10 border-primary/40 text-primary'
+                        : 'bg-muted/40 border-border text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex h-4 w-4 items-center justify-center rounded-full border ${
+                        s.done
+                          ? 'bg-primary border-primary text-primary-foreground'
+                          : 'border-muted-foreground/40 text-transparent'
+                      }`}
+                    >
+                      <Check className="h-3 w-3" />
+                    </span>
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Basic Information */}
-              <Card className="relative z-10">
+              <Card id="section-basic" className="relative z-10 scroll-mt-32">
                 <CardHeader>
                   <CardTitle>Basic Information</CardTitle>
                 </CardHeader>
@@ -1119,7 +1161,7 @@ const ListProperty = () => {
               </Card>
 
               {/* Location Map */}
-              <Card className="relative z-0">
+              <Card id="section-location" className="relative z-0 scroll-mt-32">
                 <CardHeader>
                   <CardTitle>Property Location</CardTitle>
                   <p className="text-sm text-muted-foreground">Click on the map to pinpoint exact location</p>
@@ -1131,7 +1173,7 @@ const ListProperty = () => {
             </div>
 
             {/* Listing Type - shown before property details */}
-            <Card>
+            <Card id="section-listing-type" className="scroll-mt-32">
               <CardHeader>
                 <CardTitle>Listing Type</CardTitle>
               </CardHeader>
@@ -1162,7 +1204,7 @@ const ListProperty = () => {
 
             <div className="space-y-8">
               {/* Property Details */}
-              <Card>
+              <Card id="section-details" className="scroll-mt-32">
                 <CardHeader>
                   <CardTitle>Property Details</CardTitle>
                 </CardHeader>
@@ -1311,7 +1353,7 @@ const ListProperty = () => {
             </div>
 
             {/* Media Upload */}
-            <Card>
+            <Card id="section-media" className="scroll-mt-32">
               <CardHeader>
                 <CardTitle>Images & Videos</CardTitle>
               </CardHeader>
