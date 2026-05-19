@@ -21,7 +21,8 @@ interface Property {
   square_meters: number;
   bedrooms: number;
   bathrooms: number;
-  price: number;
+  price: number | null;
+  rental_price?: number | null;
   listing_type: string;
   status: string;
   images: string[];
