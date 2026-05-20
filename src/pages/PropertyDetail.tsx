@@ -13,6 +13,7 @@ import { useGoogleMaps, MAP_STYLES_NO_POI } from "@/hooks/useGoogleMaps";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import PropertyCard from "@/components/PropertyCard";
+import SimilarPropertyCard from "@/components/SimilarPropertyCard";
 
 interface Property {
   id: string;
@@ -906,14 +907,9 @@ const PropertyDetail = () => {
               View all
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
             {similarProperties.map((similar) => (
-              <div key={similar.id} className="w-full h-full">
-                <PropertyCard
-                  property={similar as any}
-                  onClick={() => {}}
-                />
-              </div>
+              <SimilarPropertyCard key={similar.id} property={similar as any} />
             ))}
           </div>
         </div>
