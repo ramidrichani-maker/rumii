@@ -906,12 +906,9 @@ const PropertyDetail = () => {
               View all
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {similarProperties.map((similar) => (
-              <div
-                key={similar.id}
-                className="snap-start flex-shrink-0 w-[300px] md:w-[480px]"
-              >
+              <div key={similar.id} className="w-full h-full">
                 <PropertyCard
                   property={similar as any}
                   onClick={() => {}}
