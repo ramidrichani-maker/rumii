@@ -894,6 +894,34 @@ const PropertyDetail = () => {
         </div>
       )}
 
+      {/* Similar Properties */}
+      {similarProperties.length > 0 && (
+        <div className="max-w-5xl mx-auto px-4 mt-16">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-foreground">Similar Properties</h2>
+            <Link
+              to={property.listing_type === 'rent' ? `/rent?type=${property.property_type}` : `/purchase?type=${property.property_type}`}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4">
+            {similarProperties.map((similar) => (
+              <div
+                key={similar.id}
+                className="snap-start flex-shrink-0 w-[300px] md:w-[480px]"
+              >
+                <PropertyCard
+                  property={similar as any}
+                  onClick={() => {}}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {fullscreenOpen && property.images?.length > 0 && (
         <FullscreenImageViewer
           images={property.images}
