@@ -546,7 +546,7 @@ const Purchase = () => {
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Sale</h3>
                 </ScrollReveal>
                 <div className={`grid grid-cols-1 gap-6`}>
-                  {sortedProperties.map((property, index) => (
+                  {paginatedProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
                         property={property}
@@ -555,6 +555,11 @@ const Purchase = () => {
                     </ScrollReveal>
                   ))}
                 </div>
+                <PropertyPagination
+                  currentPage={safePage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
             ) : null}
           </div>
