@@ -499,7 +499,7 @@ const Purchase = () => {
               <p className="text-muted-foreground">Loading properties...</p>
             ) : sortedProperties.length > 0 ? (
               <p className="text-muted-foreground">
-                Found {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for sale
+                Showing {startIdx + 1}–{endIdx} of {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for sale
                 {hasDrawnArea && ` in selected area`}
               </p>
             ) : (
