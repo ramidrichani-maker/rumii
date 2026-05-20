@@ -116,7 +116,22 @@ const PropertyDetail = () => {
       setSubUnits((data || []) as unknown as Property[]);
     };
     fetchSubUnits();
-  }, [property?.id, property?.property_type]);
+  useEffect(() => {
+    const fetchSimilar = async () => {
+      if (!property) { setSimilarProperties([]); return; }
+      const { data } = await supabase
+        .from('properties_public' as any)
+        .select('*')
+        .eq('listing_type', property.listing_type)
+        .eq('property_type', property.property_type)
+        .eq('status', 'approved')
+        .neq('id', property.id)
+        .order('created_at', { ascending: false })
+        .limit(4);
+      setSimilarProperties((data || []) as unknown as Property[]);
+    };
+    fetchSimilar();
+  }, [property?.id, property?.listing_type, property?.property_type]);
 
   // Set Open Graph / Twitter meta tags so shared links unfurl with the property photo
   useEffect(() => {
