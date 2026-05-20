@@ -8,6 +8,7 @@ interface SimilarPropertyCardProps {
     price: number | null;
     rental_price?: number | null;
     listing_type: string;
+    city: string;
     bedrooms: number;
     bathrooms: number;
     square_meters: number;
@@ -97,6 +98,7 @@ const SimilarPropertyCard = ({ property }: SimilarPropertyCardProps) => {
         </div>
         <div className="p-3 flex flex-col gap-2">
           <div className="text-base font-semibold text-primary truncate">{formatPrice()}</div>
+          <div className="text-xs text-muted-foreground truncate">{property.city}</div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <div className="flex items-center"><Bed className="w-3.5 h-3.5 mr-1" />{property.bedrooms}</div>
             <div className="flex items-center"><Bath className="w-3.5 h-3.5 mr-1" />{property.bathrooms}</div>
