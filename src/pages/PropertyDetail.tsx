@@ -48,6 +48,7 @@ const PropertyDetail = () => {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [subUnits, setSubUnits] = useState<Property[]>([]);
+  const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
