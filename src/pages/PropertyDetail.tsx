@@ -103,6 +103,12 @@ const PropertyDetail = () => {
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [descriptionClamped, setDescriptionClamped] = useState(false);
 
+  // Affordability calculator state
+  const [calcOpen, setCalcOpen] = useState(false);
+  const [calcPrice, setCalcPrice] = useState<number>(0);
+  const [calcDownPercent, setCalcDownPercent] = useState<number>(20);
+  const [calcTermYears, setCalcTermYears] = useState<number>(25);
+
   useEffect(() => {
     const fetchProperty = async () => {
       if (!id) return;
