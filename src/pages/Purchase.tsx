@@ -382,6 +382,24 @@ const Purchase = () => {
     }
   }, [filteredProperties, sortBy]);
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(sortedProperties.length / PAGE_SIZE));
+  useEffect(() => { setCurrentPage(1); }, [sortedProperties.length, sortBy]);
+  const safePage = Math.min(currentPage, totalPages);
+  const startIdx = (safePage - 1) * PAGE_SIZE;
+  const endIdx = Math.min(startIdx + PAGE_SIZE, sortedProperties.length);
+  const paginatedProperties = useMemo(
+    () => sortedProperties.slice(startIdx, endIdx),
+    [sortedProperties, startIdx, endIdx]
+  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setTimeout(() => {
+      document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  };
+
   const filterChips = buildFilterChips({
     selectedPropertyTypes, setSelectedPropertyTypes,
     squareMetersRange, setSquareMetersRange, sqmDefault: [50, 1000],
