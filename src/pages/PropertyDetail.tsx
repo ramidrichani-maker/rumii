@@ -12,6 +12,7 @@ import { getCityCenter } from "@/utils/cityCenter";
 import { useGoogleMaps, MAP_STYLES_NO_POI } from "@/hooks/useGoogleMaps";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import PropertyCard from "@/components/PropertyCard";
 
 interface Property {
   id: string;
