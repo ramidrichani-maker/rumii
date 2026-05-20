@@ -8,6 +8,7 @@ interface SimilarPropertyCardProps {
     price: number | null;
     rental_price?: number | null;
     listing_type: string;
+    city: string;
     bedrooms: number;
     bathrooms: number;
     square_meters: number;
