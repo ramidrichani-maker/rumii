@@ -116,6 +116,8 @@ const PropertyDetail = () => {
       setSubUnits((data || []) as unknown as Property[]);
     };
     fetchSubUnits();
+  }, [property?.id, property?.property_type]);
+
   useEffect(() => {
     const fetchSimilar = async () => {
       if (!property) { setSimilarProperties([]); return; }
