@@ -213,9 +213,9 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
 
   return (
     <div className="mt-4 rounded-xl overflow-hidden border border-border bg-card">
-      <div className="p-3 flex items-center justify-between gap-2">
+      <div className="p-3 flex flex-col gap-2">
         <p className="text-sm font-medium text-foreground">Draw your search area</p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
             variant="outline"
