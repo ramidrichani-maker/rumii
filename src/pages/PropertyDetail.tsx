@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers, Share2, Shield } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,6 +12,7 @@ import { getCityCenter } from "@/utils/cityCenter";
 import { useGoogleMaps, MAP_STYLES_NO_POI } from "@/hooks/useGoogleMaps";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import PropertyCard from "@/components/PropertyCard";
 
 interface Property {
   id: string;
@@ -47,6 +48,7 @@ const PropertyDetail = () => {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [subUnits, setSubUnits] = useState<Property[]>([]);
+  const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -115,6 +117,23 @@ const PropertyDetail = () => {
     };
     fetchSubUnits();
   }, [property?.id, property?.property_type]);
+
+  useEffect(() => {
+    const fetchSimilar = async () => {
+      if (!property) { setSimilarProperties([]); return; }
+      const { data } = await supabase
+        .from('properties_public' as any)
+        .select('*')
+        .eq('listing_type', property.listing_type)
+        .eq('property_type', property.property_type)
+        .eq('status', 'approved')
+        .neq('id', property.id)
+        .order('created_at', { ascending: false })
+        .limit(4);
+      setSimilarProperties((data || []) as unknown as Property[]);
+    };
+    fetchSimilar();
+  }, [property?.id, property?.listing_type, property?.property_type]);
 
   // Set Open Graph / Twitter meta tags so shared links unfurl with the property photo
   useEffect(() => {
@@ -872,6 +891,34 @@ const PropertyDetail = () => {
             </button>
           </div>
           <div ref={overlayMapRef} className="flex-1" />
+        </div>
+      )}
+
+      {/* Similar Properties */}
+      {similarProperties.length > 0 && (
+        <div className="max-w-5xl mx-auto px-4 mt-16">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-foreground">Similar Properties</h2>
+            <Link
+              to={property.listing_type === 'rent' ? `/rent?type=${property.property_type}` : `/purchase?type=${property.property_type}`}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4">
+            {similarProperties.map((similar) => (
+              <div
+                key={similar.id}
+                className="snap-start flex-shrink-0 w-[300px] md:w-[480px]"
+              >
+                <PropertyCard
+                  property={similar as any}
+                  onClick={() => {}}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
