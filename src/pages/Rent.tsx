@@ -19,6 +19,9 @@ import { usePolygonFilter } from "@/hooks/usePolygonFilter";
 import ActiveFilterChips from "@/components/ActiveFilterChips";
 import { buildFilterChips } from "@/lib/buildFilterChips";
 import { loadFilters, saveFilters, clearStoredFilters } from "@/lib/persistFilters";
+import PropertyPagination from "@/components/PropertyPagination";
+
+const PAGE_SIZE = 12;
 
 const propertyTypes = [
   { id: "apartment", name: "Apartment", icon: Building },
@@ -372,6 +375,24 @@ const Rent = () => {
     }
   }, [filteredProperties, sortBy]);
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(sortedProperties.length / PAGE_SIZE));
+  useEffect(() => { setCurrentPage(1); }, [sortedProperties.length, sortBy]);
+  const safePage = Math.min(currentPage, totalPages);
+  const startIdx = (safePage - 1) * PAGE_SIZE;
+  const endIdx = Math.min(startIdx + PAGE_SIZE, sortedProperties.length);
+  const paginatedProperties = useMemo(
+    () => sortedProperties.slice(startIdx, endIdx),
+    [sortedProperties, startIdx, endIdx]
+  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setTimeout(() => {
+      document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  };
+
   const filterChips = buildFilterChips({
     selectedPropertyTypes, setSelectedPropertyTypes,
     squareMetersRange, setSquareMetersRange, sqmDefault: [50, 1000],
@@ -471,7 +492,7 @@ const Rent = () => {
               <p className="text-muted-foreground">Loading properties...</p>
             ) : sortedProperties.length > 0 ? (
               <p className="text-muted-foreground">
-                Found {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for rent
+                Showing {startIdx + 1}–{endIdx} of {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for rent
                 {hasDrawnArea && ` in selected area`}
               </p>
             ) : (
@@ -518,7 +539,7 @@ const Rent = () => {
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
                 </ScrollReveal>
                 <div className={`grid grid-cols-1 gap-6`}>
-                  {sortedProperties.map((property, index) => (
+                  {paginatedProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
                         property={property}
@@ -527,6 +548,11 @@ const Rent = () => {
                     </ScrollReveal>
                   ))}
                 </div>
+                <PropertyPagination
+                  currentPage={safePage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
             ) : null}
           </div>
