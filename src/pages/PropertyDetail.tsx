@@ -126,6 +126,13 @@ const PropertyDetail = () => {
     fetchProperty();
   }, [id]);
 
+  // Sync calculator price with property price
+  useEffect(() => {
+    if (property?.price != null) {
+      setCalcPrice(property.price);
+    }
+  }, [property?.price]);
+
   useEffect(() => {
     const fetchSubUnits = async () => {
       if (!property || property.property_type !== 'stacked_unit') { setSubUnits([]); return; }
