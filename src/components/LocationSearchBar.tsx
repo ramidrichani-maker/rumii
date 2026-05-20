@@ -265,7 +265,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Mobile backdrop for bottom-sheet filters */}
         {isMobile && mobileFiltersOpen && (
           <div
-            className="fixed inset-0 z-40 bg-black/50 md:hidden animate-in fade-in"
+            className="fixed inset-0 z-[9998] bg-black/50 md:hidden animate-in fade-in"
             onClick={() => setMobileFiltersOpen(false)}
           />
         )}
@@ -274,7 +274,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           id="mobile-filters-panel"
           className={`${mobileFiltersOpen ? 'flex' : 'hidden'} md:flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0 ${
             isMobile && mobileFiltersOpen
-              ? 'fixed inset-x-0 top-0 max-h-[90vh] z-50 overflow-y-auto overscroll-contain bg-background rounded-b-2xl p-4 pb-4 shadow-2xl animate-in slide-in-from-top duration-300 md:static md:max-h-none md:overflow-visible md:bg-transparent md:rounded-none md:p-0 md:shadow-none'
+              ? 'fixed inset-x-0 top-0 max-h-[90vh] z-[9999] overflow-y-auto overscroll-contain bg-background rounded-b-2xl p-4 pb-4 shadow-2xl animate-in slide-in-from-top duration-300 md:static md:max-h-none md:overflow-visible md:bg-transparent md:rounded-none md:p-0 md:shadow-none'
               : ''
           }`}
         >
