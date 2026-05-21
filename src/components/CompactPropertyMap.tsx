@@ -776,7 +776,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           </button>
         </div>
         {enableDrawing && (
-          <div className="absolute top-2 right-20 z-[1000] flex gap-1">
+          <div className={`absolute z-[1000] flex gap-1 ${hasDrawnArea ? 'top-12 left-2' : 'top-2 right-20'}`}>
             {isDrawingMode ? (
               <button
                 onClick={cancelDrawing}
