@@ -227,20 +227,20 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
             Current location
           </Button>
           {hasPolygon && (
-            <Button size="sm" variant="ghost" onClick={clearDrawing} className="h-8 px-2">
-              <Trash2 className="h-4 w-4 mr-1" />
-              Clear
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" onClick={clearDrawing} className="h-8 px-2">
+                <Trash2 className="h-4 w-4 mr-1" />
+                Clear
+              </Button>
+              <Button size="sm" onClick={confirmArea} className="h-8">
+                Search area
+              </Button>
+            </div>
           )}
           {!isDrawing && !hasPolygon && (
             <Button size="sm" variant="outline" onClick={startDrawing} className="h-8" disabled={!loaded}>
               <Pencil className="h-4 w-4 mr-1" />
               Draw
-            </Button>
-          )}
-          {hasPolygon && (
-            <Button size="sm" onClick={confirmArea} className="h-8">
-              Search area
             </Button>
           )}
         </div>
