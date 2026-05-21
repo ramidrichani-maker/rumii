@@ -215,31 +215,31 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
     <div className="mt-4 rounded-xl overflow-hidden border border-border bg-card">
       <div className="p-3 flex flex-col gap-2">
         <p className="text-sm font-medium text-foreground">Draw your search area</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-nowrap gap-1.5 items-center">
           <Button
             size="sm"
             variant="outline"
             onClick={goToCurrentLocation}
-            className="h-8"
+            className="h-8 px-2 text-xs shrink-0"
             disabled={!loaded || locating}
           >
-            {locating ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Locate className="h-4 w-4 mr-1" />}
+            {locating ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Locate className="h-3.5 w-3.5 mr-1" />}
             Current location
           </Button>
           {hasPolygon && (
-            <div className="flex gap-2">
-              <Button size="sm" variant="ghost" onClick={clearDrawing} className="h-8 px-2">
-                <Trash2 className="h-4 w-4 mr-1" />
+            <>
+              <Button size="sm" variant="ghost" onClick={clearDrawing} className="h-8 px-2 text-xs shrink-0">
+                <Trash2 className="h-3.5 w-3.5 mr-1" />
                 Clear
               </Button>
-              <Button size="sm" onClick={confirmArea} className="h-8">
+              <Button size="sm" onClick={confirmArea} className="h-8 px-2 text-xs shrink-0">
                 Search area
               </Button>
-            </div>
+            </>
           )}
           {!isDrawing && !hasPolygon && (
-            <Button size="sm" variant="outline" onClick={startDrawing} className="h-8" disabled={!loaded}>
-              <Pencil className="h-4 w-4 mr-1" />
+            <Button size="sm" variant="outline" onClick={startDrawing} className="h-8 px-2 text-xs shrink-0" disabled={!loaded}>
+              <Pencil className="h-3.5 w-3.5 mr-1" />
               Draw
             </Button>
           )}
