@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -216,6 +216,47 @@ const ListProperty = () => {
   ];
   const completedCount = sectionList.filter((s) => s.done).length;
   const progressPercent = Math.round((completedCount / sectionList.length) * 100);
+
+  // Detect whether the user has entered any data on the form
+  const hasFormData = useCallback(() => {
+    const vals = form.getValues();
+    if (vals.municipality?.trim()) return true;
+    if (vals.city?.trim()) return true;
+    if (vals.address?.trim()) return true;
+    if (vals.propertyType?.trim()) return true;
+    if (vals.description?.trim()) return true;
+    if (vals.metersSquared?.trim()) return true;
+    if (vals.bedrooms?.trim()) return true;
+    if (vals.bathrooms?.trim()) return true;
+    if (vals.listingType) return true;
+    if (vals.price?.trim()) return true;
+    if (vals.rentalPrice?.trim()) return true;
+    if (vals.yearBuilt?.trim()) return true;
+    if (vals.lastRenovated?.trim()) return true;
+    if (vals.floors?.trim()) return true;
+    if (vals.apartmentsCount?.trim()) return true;
+    if (selectedAmenities.length > 0) return true;
+    if (uploadedImages.length > 0) return true;
+    if (persistedFloorPlans.length > 0) return true;
+    if (floorPlanFiles.length > 0) return true;
+    if (coordinates.lat !== DEFAULT_COORDS.lat || coordinates.lng !== DEFAULT_COORDS.lng) return true;
+    return false;
+  }, [form, selectedAmenities, uploadedImages, persistedFloorPlans, floorPlanFiles, coordinates]);
+
+  // beforeunload guard: warn if user has filled fields and hasn't successfully submitted
+  useEffect(() => {
+    if (isEditMode || submittedListing) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!hasFormData()) return;
+      e.preventDefault();
+      // Modern browsers require returnValue to be set for the dialog to show
+      e.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isEditMode, submittedListing, hasFormData]);
 
   // Restore a pending listing (form values, uploaded media, dialog state) if
   // the user refreshed or navigated away while the confirmation dialog was open.
