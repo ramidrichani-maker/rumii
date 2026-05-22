@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -80,6 +80,8 @@ const Rent = () => {
   const [mapClosing, setMapClosing] = useState(false);
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [sortBy, setSortBy] = useState<string>("newest");
+  const [hasNewUpdates, setHasNewUpdates] = useState(false);
+  const hasActiveFiltersRef = useRef(false);
 
   const closeMap = useCallback(() => {
     setMapClosing(true);
@@ -249,7 +251,13 @@ const Rent = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'properties' },
-        () => { fetchProperties(); }
+        () => {
+          if (hasActiveFiltersRef.current) {
+            setHasNewUpdates(true);
+          } else {
+            fetchProperties();
+          }
+        }
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -517,6 +525,18 @@ const Rent = () => {
           )}
         </div>
         <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
+        {hasNewUpdates && (
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary/5 px-4 py-2 text-sm">
+            <span className="text-foreground">New listings available</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { setHasNewUpdates(false); fetchProperties(); }}
+            >
+              Refresh results
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Split Layout: full-width when map is shown */}
