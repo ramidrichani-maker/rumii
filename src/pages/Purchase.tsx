@@ -427,6 +427,10 @@ const Purchase = () => {
     newHomesOnly, setNewHomesOnly,
   });
 
+  useEffect(() => {
+    hasActiveFiltersRef.current = filterChips.length > 0 || !!searchQuery || hasDrawnArea;
+  }, [filterChips.length, searchQuery, hasDrawnArea]);
+
   return (
     <div className="min-h-screen bg-transparent">
       {/* Header & Filters - always in container */}
