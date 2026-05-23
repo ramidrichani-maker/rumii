@@ -495,10 +495,14 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
             map,
           });
 
-          // Auto-drawn city boundary is visual only — do NOT apply as a polygon
-          // filter. The city search itself already filters results via SQL, and
-          // applying this boundary as a filter would exclude properties that
-          // lack exact coordinates.
+          // Apply the auto-drawn city boundary as the active polygon filter so
+          // results AND markers are restricted to properties within the
+          // searched area (with city-center fallback for properties missing
+          // exact coordinates).
+          if (coords.length >= 3) {
+            setHasDrawnArea(true);
+            onDrawnAreaChange?.(coords);
+          }
 
           const bounds = new google.maps.LatLngBounds();
           polygonPath.forEach((p) => bounds.extend(p));
