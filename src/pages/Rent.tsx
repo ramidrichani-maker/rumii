@@ -165,7 +165,8 @@ const Rent = () => {
       }
 
       if (searchQuery) {
-        query = query.or(`city.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,municipality.ilike.%${searchQuery}%`);
+        // Strict city match: only show listings whose city matches the search.
+        query = query.ilike('city', `%${searchQuery}%`);
       }
 
       const isMinStudio = barMinBedrooms === 'Studio';
