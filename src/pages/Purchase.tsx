@@ -95,6 +95,7 @@ const Purchase = () => {
   }, []);
   
   const { setDrawnPolygon, filterPropertiesByPolygon, hasDrawnArea, clearPolygon, resolveCityCenters } = usePolygonFilter();
+  const prevHasDrawnAreaRef = useRef(hasDrawnArea);
 
   // Read polygon from URL query param (passed from homepage draw)
   const initialPolygon = useMemo(() => {
@@ -113,6 +114,15 @@ const Purchase = () => {
       setShowMap(true);
     }
   }, [initialPolygon]);
+
+  // Clear radius when search area is cleared
+  useEffect(() => {
+    if (prevHasDrawnAreaRef.current && !hasDrawnArea && radius > 0) {
+      setRadius(0);
+    }
+    prevHasDrawnAreaRef.current = hasDrawnArea;
+  }, [hasDrawnArea, radius]);
+
 
 
   const togglePropertyType = (typeId: string) => {
