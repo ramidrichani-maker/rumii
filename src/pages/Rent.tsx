@@ -164,10 +164,11 @@ const Rent = () => {
         query = query.lte('price', priceRange[1]);
       }
 
-      if (searchQuery) {
-        // Strict city match: only show listings whose city matches the search.
-        query = query.ilike('city', `%${searchQuery}%`);
-      }
+      // NOTE: searchQuery is intentionally NOT applied as a SQL filter.
+      // Spatial filtering happens client-side via the auto-drawn boundary
+      // polygon (see filterPropertiesByPolygon below), which correctly
+      // includes properties stored under neighborhood names that fall
+      // inside the searched city's boundary.
 
       const isMinStudio = barMinBedrooms === 'Studio';
       const isMaxStudio = barMaxBedrooms === 'Studio';
