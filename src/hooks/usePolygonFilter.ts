@@ -41,11 +41,39 @@ function haversineDistance(a: Coordinate, b: Coordinate): number {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-// Minimum distance from a point to any edge of the polygon
+// Minimum distance (km) from a point to any edge segment of the polygon,
+// using perpendicular distance to each segment (not just vertices). This
+// yields a true uniform buffer around the polygon when a search radius is
+// applied, so listings just outside a long edge are still matched.
+function pointToSegmentDistance(p: Coordinate, a: Coordinate, b: Coordinate): number {
+  // Project onto a local equirectangular plane around point `a` so we can
+  // use planar geometry, then convert the resulting fractional projection
+  // back into a haversine distance for accuracy.
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const latRef = toRad(a.latitude);
+  const x = (c: Coordinate) => toRad(c.longitude - a.longitude) * Math.cos(latRef);
+  const y = (c: Coordinate) => toRad(c.latitude - a.latitude);
+
+  const ax = 0, ay = 0;
+  const bx = x(b), by = y(b);
+  const px = x(p), py = y(p);
+
+  const dx = bx - ax, dy = by - ay;
+  const lenSq = dx * dx + dy * dy;
+  let t = lenSq === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / lenSq;
+  t = Math.max(0, Math.min(1, t));
+
+  const closest: Coordinate = {
+    latitude: a.latitude + t * (b.latitude - a.latitude),
+    longitude: a.longitude + t * (b.longitude - a.longitude),
+  };
+  return haversineDistance(p, closest);
+}
+
 function minDistanceToPolygon(point: Coordinate, polygon: Coordinate[]): number {
   let minDist = Infinity;
-  for (let i = 0; i < polygon.length; i++) {
-    const dist = haversineDistance(point, polygon[i]);
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const dist = pointToSegmentDistance(point, polygon[j], polygon[i]);
     if (dist < minDist) minDist = dist;
   }
   return minDist;
