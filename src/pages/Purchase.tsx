@@ -602,7 +602,7 @@ const Purchase = () => {
 
           {/* Map Panel - right half of viewport */}
           {showMap && !mapFullscreen && (
-            <div className={`w-full h-[50vh] min-h-[250px] md:h-[calc(100vh-120px)] md:w-[55%] md:sticky md:top-0 md:self-start relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
+            <div className={`w-full h-[50vh] min-h-[250px] md:h-[calc(100vh-120px)] md:w-[55%] sticky top-0 self-start z-30 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
               <div className="absolute top-2 right-2 z-[1000] flex gap-1">
                 <button
                   onClick={() => setMapFullscreen(true)}
