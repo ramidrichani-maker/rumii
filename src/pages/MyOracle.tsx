@@ -73,6 +73,10 @@ export default function MyOracle() {
   const [savedAreas, setSavedAreas] = useState<SavedArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [showAllEnquiries, setShowAllEnquiries] = useState(false);
+  const [showAllFavorites, setShowAllFavorites] = useState(false);
+  const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
+  const [showAllMyPlaces, setShowAllMyPlaces] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -175,42 +179,53 @@ export default function MyOracle() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {enquiries.map((enquiry) => (
-              <Card
-                key={enquiry.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => navigate(`/property/${enquiry.property_id}`)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex gap-3">
-                    {enquiry.properties?.images?.[0] && (
-                      <img
-                        src={enquiry.properties.images[0]}
-                        alt={enquiry.properties.address}
-                        className="w-20 h-20 rounded-md object-cover shrink-0"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">
-                        {enquiry.properties?.address}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {enquiry.properties?.city} • {enquiry.properties?.property_type}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(enquiry.created_at).toLocaleDateString()}
-                      </p>
-                      {enquiry.wants_viewing && (
-                        <Badge variant="secondary" className="text-xs mt-1">Viewing requested</Badge>
+          <>
+            <div className="grid gap-4 md:grid-cols-2">
+              {(showAllEnquiries ? enquiries : enquiries.slice(0, 2)).map((enquiry) => (
+                <Card
+                  key={enquiry.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => navigate(`/property/${enquiry.property_id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      {enquiry.properties?.images?.[0] && (
+                        <img
+                          src={enquiry.properties.images[0]}
+                          alt={enquiry.properties.address}
+                          className="w-20 h-20 rounded-md object-cover shrink-0"
+                        />
                       )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">
+                          {enquiry.properties?.address}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {enquiry.properties?.city} • {enquiry.properties?.property_type}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(enquiry.created_at).toLocaleDateString()}
+                        </p>
+                        {enquiry.wants_viewing && (
+                          <Badge variant="secondary" className="text-xs mt-1">Viewing requested</Badge>
+                        )}
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 self-center" />
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 self-center" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {enquiries.length > 2 && (
+              <Button
+                variant="outline"
+                className="mt-3 w-full md:w-auto"
+                onClick={() => setShowAllEnquiries(v => !v)}
+              >
+                {showAllEnquiries ? 'Show less' : `Show more (${enquiries.length - 2})`}
+              </Button>
+            )}
+          </>
         )}
       </section>
 
@@ -229,28 +244,39 @@ export default function MyOracle() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {favorites.map((property) => (
-              <Card
-                key={property.id}
-                className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
-                onClick={() => setSelectedProperty(property)}
+          <>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {(showAllFavorites ? favorites : favorites.slice(0, 2)).map((property) => (
+                <Card
+                  key={property.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
+                  onClick={() => setSelectedProperty(property)}
+                >
+                  {property.images?.[0] && (
+                    <img
+                      src={property.images[0]}
+                      alt={property.address}
+                      className="w-full h-36 object-cover"
+                    />
+                  )}
+                  <CardContent className="p-3">
+                    <p className="font-semibold text-sm text-foreground">{formatPrice(property)}</p>
+                    <p className="text-xs text-muted-foreground truncate">{property.address}</p>
+                    <p className="text-xs text-muted-foreground">{property.city}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {favorites.length > 2 && (
+              <Button
+                variant="outline"
+                className="mt-3 w-full md:w-auto"
+                onClick={() => setShowAllFavorites(v => !v)}
               >
-                {property.images?.[0] && (
-                  <img
-                    src={property.images[0]}
-                    alt={property.address}
-                    className="w-full h-36 object-cover"
-                  />
-                )}
-                <CardContent className="p-3">
-                  <p className="font-semibold text-sm text-foreground">{formatPrice(property)}</p>
-                  <p className="text-xs text-muted-foreground truncate">{property.address}</p>
-                  <p className="text-xs text-muted-foreground">{property.city}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                {showAllFavorites ? 'Show less' : `Show more (${favorites.length - 2})`}
+              </Button>
+            )}
+          </>
         )}
       </section>
       {/* Saved Search Areas */}
@@ -261,7 +287,7 @@ export default function MyOracle() {
             <h2 className="text-xl font-semibold text-foreground">Saved Search Areas</h2>
           </div>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {savedAreas.map((area) => {
+            {(showAllSavedAreas ? savedAreas : savedAreas.slice(0, 2)).map((area) => {
               const coords = typeof area.coordinates === 'string' ? JSON.parse(area.coordinates) : area.coordinates;
               const pointCount = Array.isArray(coords) ? coords.length : 0;
               return (
@@ -289,6 +315,15 @@ export default function MyOracle() {
               );
             })}
           </div>
+          {savedAreas.length > 2 && (
+            <Button
+              variant="outline"
+              className="mt-3 w-full md:w-auto"
+              onClick={() => setShowAllSavedAreas(v => !v)}
+            >
+              {showAllSavedAreas ? 'Show less' : `Show more (${savedAreas.length - 2})`}
+            </Button>
+          )}
         </>
       )}
 
@@ -317,41 +352,52 @@ export default function MyOracle() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {myPlaces.map((property) => (
-              <Card
-                key={property.id}
-                className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
-                onClick={() => setSelectedProperty(property)}
-              >
-                <div className="flex">
-                  {property.images?.[0] && (
-                    <img
-                      src={property.images[0]}
-                      alt={property.address}
-                      className="w-28 h-full object-cover shrink-0"
-                    />
-                  )}
-                  <CardContent className="p-3 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-foreground">{formatPrice(property)}</p>
-                        <p className="text-xs text-muted-foreground truncate">{property.address}</p>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                          <MapPin className="h-3 w-3" />
-                          {property.city}
+          <>
+            <div className="grid gap-4 md:grid-cols-2">
+              {(showAllMyPlaces ? myPlaces : myPlaces.slice(0, 2)).map((property) => (
+                <Card
+                  key={property.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
+                  onClick={() => setSelectedProperty(property)}
+                >
+                  <div className="flex">
+                    {property.images?.[0] && (
+                      <img
+                        src={property.images[0]}
+                        alt={property.address}
+                        className="w-28 h-full object-cover shrink-0"
+                      />
+                    )}
+                    <CardContent className="p-3 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-sm text-foreground">{formatPrice(property)}</p>
+                          <p className="text-xs text-muted-foreground truncate">{property.address}</p>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                            <MapPin className="h-3 w-3" />
+                            {property.city}
+                          </div>
                         </div>
+                        {getStatusBadge(property.status)}
                       </div>
-                      {getStatusBadge(property.status)}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {property.bedrooms} bed • {property.bathrooms} bath • {property.square_meters}m²
-                    </p>
-                  </CardContent>
-                </div>
-              </Card>
-            ))}
-          </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {property.bedrooms} bed • {property.bathrooms} bath • {property.square_meters}m²
+                      </p>
+                    </CardContent>
+                  </div>
+                </Card>
+              ))}
+            </div>
+            {myPlaces.length > 2 && (
+              <Button
+                variant="outline"
+                className="mt-3 w-full md:w-auto"
+                onClick={() => setShowAllMyPlaces(v => !v)}
+              >
+                {showAllMyPlaces ? 'Show less' : `Show more (${myPlaces.length - 2})`}
+              </Button>
+            )}
+          </>
         )}
       </section>
 
