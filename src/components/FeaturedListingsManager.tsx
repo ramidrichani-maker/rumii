@@ -112,7 +112,7 @@ const FeaturedListingsManager = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="w-5 h-5" />
-            Featured Rentals
+            &nbsp;Rentals
           </CardTitle>
           <CardDescription>
             Select up to 4 rental properties to display on the homepage
@@ -181,7 +181,7 @@ const FeaturedListingsManager = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Home className="w-5 h-5" />
-            Properties for Sale
+            &nbsp;For sale
           </CardTitle>
           <CardDescription>
             Select up to 4 sale properties to display on the homepage

@@ -55,7 +55,7 @@ const Index = () => {
               Find your place with <span className="font-bold text-primary">Rumi</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed">
-              Lebanon's most trusted platform for renting and buying property
+              What you seek will find you...
             </p>
           </div>
         </ScrollReveal>
@@ -70,7 +70,7 @@ const Index = () => {
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4 text-foreground">Popular Listings</h2>
                 <p className="text-lg text-muted-foreground">
-                  Discover the most sought-after properties in your area
+                  Discover the most sought-after properties&nbsp;
                 </p>
               </div>
             </ScrollReveal>
@@ -78,7 +78,7 @@ const Index = () => {
             {featuredSales.length > 0 && (
               <div className="mb-16">
                 <ScrollReveal animation="fade-left">
-                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Listings</h3>
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">&nbsp;For sale</h3>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredSales.map((property, index) => (
@@ -93,7 +93,7 @@ const Index = () => {
             {featuredRentals.length > 0 && (
               <div>
                 <ScrollReveal animation="fade-right">
-                  <h3 className="text-2xl font-semibold mb-6 text-foreground">Featured Rentals</h3>
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">&nbsp;Rentals</h3>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredRentals.map((property, index) => (
