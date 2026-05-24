@@ -73,6 +73,10 @@ export default function MyOracle() {
   const [savedAreas, setSavedAreas] = useState<SavedArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [showAllEnquiries, setShowAllEnquiries] = useState(false);
+  const [showAllFavorites, setShowAllFavorites] = useState(false);
+  const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
+  const [showAllMyPlaces, setShowAllMyPlaces] = useState(false);
 
   useEffect(() => {
     if (user) {
