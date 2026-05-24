@@ -93,7 +93,7 @@ const Index = () => {
             {featuredRentals.length > 0 && (
               <div>
                 <ScrollReveal animation="fade-right">
-                  <h3 className="text-2xl font-semibold mb-6 text-foreground">&nbsp;Rentals</h3>
+                  <h3 className="text-2xl font-semibold mb-6 text-foreground">&nbsp;For rent</h3>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredRentals.map((property, index) => (
