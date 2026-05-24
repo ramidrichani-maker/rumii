@@ -567,8 +567,7 @@ const Purchase = () => {
         <div className={`flex ${showMap ? 'flex-col-reverse md:flex-row' : 'flex-col'} gap-6`}>
           {/* Property Grid */}
           <div
-            className={`${showMap ? 'w-full md:w-[45%] md:overflow-y-auto' : 'w-full'} transition-all duration-300`}
-            style={showMap ? { maxHeight: 'calc(100vh - 120px)' } : undefined}
+            className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto max-h-[calc(50vh-120px)] md:max-h-[calc(100vh-120px)]' : 'w-full'} transition-all duration-300`}
           >
             {isLoading ? (
               <div className="mb-8 grid grid-cols-1 gap-6">
@@ -602,7 +601,7 @@ const Purchase = () => {
 
           {/* Map Panel - right half of viewport */}
           {showMap && !mapFullscreen && (
-            <div className={`w-full h-[50vh] min-h-[250px] md:h-[calc(100vh-120px)] md:w-[55%] sticky top-0 self-start z-30 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
+            <div className={`w-full h-[50vh] md:h-[calc(100vh-120px)] md:w-[55%] md:sticky md:top-0 md:self-start z-30 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
               <div className="absolute top-2 right-2 z-[1000] flex gap-1">
                 <button
                   onClick={() => setMapFullscreen(true)}
