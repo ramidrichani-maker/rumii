@@ -180,7 +180,7 @@ export default function MyOracle() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {enquiries.map((enquiry) => (
+            {(showAllEnquiries ? enquiries : enquiries.slice(0, 2)).map((enquiry) => (
               <Card
                 key={enquiry.id}
                 className="cursor-pointer hover:shadow-md transition-shadow"
@@ -215,6 +215,15 @@ export default function MyOracle() {
               </Card>
             ))}
           </div>
+          {enquiries.length > 2 && (
+            <Button
+              variant="outline"
+              className="mt-3 w-full md:w-auto"
+              onClick={() => setShowAllEnquiries(v => !v)}
+            >
+              {showAllEnquiries ? 'Show less' : `Show more (${enquiries.length - 2})`}
+            </Button>
+          )}
         )}
       </section>
 
