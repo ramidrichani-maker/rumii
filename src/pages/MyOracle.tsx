@@ -179,51 +179,53 @@ export default function MyOracle() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {(showAllEnquiries ? enquiries : enquiries.slice(0, 2)).map((enquiry) => (
-              <Card
-                key={enquiry.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => navigate(`/property/${enquiry.property_id}`)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex gap-3">
-                    {enquiry.properties?.images?.[0] && (
-                      <img
-                        src={enquiry.properties.images[0]}
-                        alt={enquiry.properties.address}
-                        className="w-20 h-20 rounded-md object-cover shrink-0"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">
-                        {enquiry.properties?.address}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {enquiry.properties?.city} • {enquiry.properties?.property_type}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(enquiry.created_at).toLocaleDateString()}
-                      </p>
-                      {enquiry.wants_viewing && (
-                        <Badge variant="secondary" className="text-xs mt-1">Viewing requested</Badge>
+          <>
+            <div className="grid gap-4 md:grid-cols-2">
+              {(showAllEnquiries ? enquiries : enquiries.slice(0, 2)).map((enquiry) => (
+                <Card
+                  key={enquiry.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => navigate(`/property/${enquiry.property_id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      {enquiry.properties?.images?.[0] && (
+                        <img
+                          src={enquiry.properties.images[0]}
+                          alt={enquiry.properties.address}
+                          className="w-20 h-20 rounded-md object-cover shrink-0"
+                        />
                       )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">
+                          {enquiry.properties?.address}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {enquiry.properties?.city} • {enquiry.properties?.property_type}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(enquiry.created_at).toLocaleDateString()}
+                        </p>
+                        {enquiry.wants_viewing && (
+                          <Badge variant="secondary" className="text-xs mt-1">Viewing requested</Badge>
+                        )}
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 self-center" />
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 self-center" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          {enquiries.length > 2 && (
-            <Button
-              variant="outline"
-              className="mt-3 w-full md:w-auto"
-              onClick={() => setShowAllEnquiries(v => !v)}
-            >
-              {showAllEnquiries ? 'Show less' : `Show more (${enquiries.length - 2})`}
-            </Button>
-          )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {enquiries.length > 2 && (
+              <Button
+                variant="outline"
+                className="mt-3 w-full md:w-auto"
+                onClick={() => setShowAllEnquiries(v => !v)}
+              >
+                {showAllEnquiries ? 'Show less' : `Show more (${enquiries.length - 2})`}
+              </Button>
+            )}
+          </>
         )}
       </section>
 
