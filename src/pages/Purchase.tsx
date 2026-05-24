@@ -568,7 +568,7 @@ const Purchase = () => {
           {/* Property Grid */}
           <div
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto' : 'w-full'} transition-all duration-300`}
-            style={showMap ? { maxHeight: 'calc(100vh - 50vh - 120px)', minHeight: '40vh' } : undefined}
+            style={showMap ? { maxHeight: 'calc(50vh - 120px)' } : undefined}
           >
             {isLoading ? (
               <div className="mb-8 grid grid-cols-1 gap-6">
