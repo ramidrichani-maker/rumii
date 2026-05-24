@@ -352,7 +352,7 @@ const PropertyDetail = () => {
           </Button>
           <Button asChild variant="outline" className="w-full sm:w-auto">
             <Link to="/rent">
-              <Key className="w-4 h-4 mr-2" /> {/* Key not imported yet */}
+              <Key className="w-4 h-4 mr-2" />
               Browse properties for rent
             </Link>
           </Button>
