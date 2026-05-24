@@ -333,11 +333,30 @@ const PropertyDetail = () => {
 
   if (!property) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">Property not found</p>
-        <Button variant="outline" onClick={() => navigate('/purchase')}>
-          Go back
-        </Button>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-2">
+          <Search className="w-10 h-10 text-muted-foreground" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold text-foreground">Property not found</h1>
+          <p className="text-muted-foreground max-w-sm">
+            This property may have been removed or the link is incorrect.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <Button asChild variant="default" className="w-full sm:w-auto">
+            <Link to="/purchase">
+              <Home className="w-4 h-4 mr-2" />
+              Browse properties for sale
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <Link to="/rent">
+              <Key className="w-4 h-4 mr-2" /> {/* Key not imported yet */}
+              Browse properties for rent
+            </Link>
+          </Button>
+        </div>
       </div>
     );
   }
