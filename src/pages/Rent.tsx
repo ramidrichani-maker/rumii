@@ -560,7 +560,7 @@ const Rent = () => {
         <div className={`flex ${showMap ? 'flex-col-reverse md:flex-row' : 'flex-col'} gap-6`}>
           {/* Property Grid */}
           <div
-            className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto' : 'w-full'} transition-all duration-300`}
+            className={`${showMap ? 'w-full md:w-[45%] md:overflow-y-auto' : 'w-full'} transition-all duration-300`}
             style={showMap ? { maxHeight: 'calc(100vh - 120px)' } : undefined}
           >
             {isLoading ? (
