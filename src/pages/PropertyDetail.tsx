@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers, Share2, Shield, ChevronDown, Calculator } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, BedDouble, Bath, Maximize2, X, Image, MapPin, Layers, Share2, Shield, ChevronDown, Calculator, Home, Search, Key } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import FullscreenImageViewer from "@/components/FullscreenImageViewer";
 import { Button } from "@/components/ui/button";
@@ -333,11 +333,30 @@ const PropertyDetail = () => {
 
   if (!property) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">Property not found</p>
-        <Button variant="outline" onClick={() => navigate('/purchase')}>
-          Go back
-        </Button>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-2">
+          <Search className="w-10 h-10 text-muted-foreground" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold text-foreground">Property not found</h1>
+          <p className="text-muted-foreground max-w-sm">
+            This property may have been removed or the link is incorrect.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <Button asChild variant="default" className="w-full sm:w-auto">
+            <Link to="/purchase">
+              <Home className="w-4 h-4 mr-2" />
+              Browse properties for sale
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <Link to="/rent">
+              <Key className="w-4 h-4 mr-2" />
+              Browse properties for rent
+            </Link>
+          </Button>
+        </div>
       </div>
     );
   }
