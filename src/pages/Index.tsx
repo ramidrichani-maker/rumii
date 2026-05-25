@@ -75,27 +75,8 @@ const Index = () => {
               </div>
             </ScrollReveal>
             
-            {featuredSales.length > 0 && (
-              <div className="mb-16">
-                <ScrollReveal animation="fade-left">
-                  <div className="flex justify-center mb-8">
-                    <span className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide">
-                      For sale
-                    </span>
-                  </div>
-                </ScrollReveal>
-                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {featuredSales.map((property, index) => (
-                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
-                      <FeaturedPropertyCard property={property} badgeLabel="For Sale" />
-                    </ScrollReveal>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {featuredRentals.length > 0 && (
-              <div>
+              <div className="mb-16">
                 <ScrollReveal animation="fade-right">
                   <div className="flex justify-center mb-8">
                     <span className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide">
@@ -107,6 +88,25 @@ const Index = () => {
                   {featuredRentals.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
                       <FeaturedPropertyCard property={property} badgeLabel="For Rent" badgeVariant="secondary" />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {featuredSales.length > 0 && (
+              <div>
+                <ScrollReveal animation="fade-left">
+                  <div className="flex justify-center mb-8">
+                    <span className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide">
+                      For sale
+                    </span>
+                  </div>
+                </ScrollReveal>
+                <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {featuredSales.map((property, index) => (
+                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
+                      <FeaturedPropertyCard property={property} badgeLabel="For Sale" />
                     </ScrollReveal>
                   ))}
                 </div>
