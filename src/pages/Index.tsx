@@ -55,7 +55,7 @@ const Index = () => {
               Find your place with <span className="font-bold text-primary">Rumi</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed">
-              What you seek will find you...
+              Your next home is closer than you think.
             </p>
           </div>
         </ScrollReveal>
