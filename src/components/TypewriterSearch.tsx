@@ -10,7 +10,7 @@ interface TypewriterSearchProps {
   onBlur?: () => void;
 }
 
-const PLACEHOLDER_WORDS = ['area', 'post code', 'city', 'school', 'university', 'mall'];
+const PLACEHOLDER_WORDS = ['area', 'city', 'school', 'university', 'mall'];
 const TYPE_SPEED = 80;
 const DELETE_SPEED = 50;
 const PAUSE_DURATION = 1000;
