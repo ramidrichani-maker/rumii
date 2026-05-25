@@ -78,7 +78,11 @@ const Index = () => {
             {featuredSales.length > 0 && (
               <div className="mb-16">
                 <ScrollReveal animation="fade-left">
-                  <h3 className="text-2xl font-semibold mb-6 text-foreground">&nbsp;For sale</h3>
+                  <div className="flex justify-center mb-8">
+                    <span className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide">
+                      For sale
+                    </span>
+                  </div>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredSales.map((property, index) => (
@@ -93,7 +97,11 @@ const Index = () => {
             {featuredRentals.length > 0 && (
               <div>
                 <ScrollReveal animation="fade-right">
-                  <h3 className="text-2xl font-semibold mb-6 text-foreground">&nbsp;For rent</h3>
+                  <div className="flex justify-center mb-8">
+                    <span className="inline-flex items-center px-5 py-2 rounded-full text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide">
+                      For rent
+                    </span>
+                  </div>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {featuredRentals.map((property, index) => (
