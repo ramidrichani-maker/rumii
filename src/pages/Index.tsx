@@ -68,7 +68,7 @@ const Index = () => {
           <div className="mt-24">
             <ScrollReveal animation="fade-up">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4 text-foreground">Featured Listings</h2>
+                <h2 className="font-bold mb-4 text-foreground text-[#b8a694] text-2xl">Featured Listings</h2>
                 <p className="text-lg text-muted-foreground">
                   Discover the most sought-after properties&nbsp;
                 </p>
