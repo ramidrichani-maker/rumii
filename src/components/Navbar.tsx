@@ -190,11 +190,31 @@ export const Navbar = () => {
                   )}
                 </Link>
                 
-                <Button variant="ghost" className="flex items-center gap-2 px-3 py-1.5 rounded-full" onClick={() => setProfilePanelOpen(true)}>
+                {/* Desktop My Rumi */}
+                <Button variant="ghost" className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full" onClick={() => setProfilePanelOpen(true)}>
                   <User className="h-4 w-4" />
                   <span className="text-sm font-medium">My Rumi</span>
                 </Button>
-              </> : <Button onClick={() => setAuthPanelOpen(true)}>Sign In</Button>}
+
+                {/* Mobile My Rumi */}
+                <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 rounded-full" onClick={() => setProfilePanelOpen(true)}>
+                  <User className="h-5 w-5" />
+                </Button>
+              </> : <>
+                {/* Desktop Sign In */}
+                <Button className="hidden md:inline-flex" onClick={() => setAuthPanelOpen(true)}>Sign In</Button>
+
+                {/* Mobile Sign In */}
+                <button
+                  className="md:hidden flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setAuthPanelOpen(true)}
+                >
+                  <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
+                    <User className="h-5 w-5" />
+                  </div>
+                  <span className="text-[10px] font-medium leading-none">Sign in</span>
+                </button>
+              </>}
           </div>
         </div>
       </div>
