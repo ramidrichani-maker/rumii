@@ -48,7 +48,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="container mx-auto px-4 py-16 text-primary">
+      <div className="container mx-auto px-4 py-8 text-primary">
         <ScrollReveal animation="fade-up">
           <div className="text-center mb-8 md:mb-12 px-2">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight mb-3 md:mb-5 leading-tight text-primary">
@@ -65,7 +65,7 @@ const Index = () => {
         </ScrollReveal>
         
         {!isLoading && (featuredRentals.length > 0 || featuredSales.length > 0) && (
-          <div className="mt-24">
+          <div className="mt-12">
             <ScrollReveal animation="fade-up">
               <div className="text-center mb-12">
                 <h2 className="font-bold mb-4 text-foreground text-2xl text-[#b8a694]">Featured Listings</h2>
