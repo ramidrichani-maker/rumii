@@ -93,10 +93,10 @@ const HeroSearch = () => {
                   setShowDrawMap(true);
                   setInputFocused(false);
                 }}
-                className="w-full py-3.5 px-4 text-sm font-medium text-primary hover:bg-accent transition-colors flex items-center gap-3"
+                className="w-full py-3 px-3 text-xs font-medium text-primary hover:bg-accent transition-colors flex items-center gap-2 whitespace-nowrap"
               >
-                <span className="inline-block w-5 h-5 rounded-full border-2 border-primary/50 relative flex-shrink-0">
-                  <span className="absolute inset-1 rounded-full bg-primary/30" />
+                <span className="inline-block w-4 h-4 rounded-full border-2 border-primary/50 relative flex-shrink-0">
+                  <span className="absolute inset-0.5 rounded-full bg-primary/30" />
                 </span>
                 Draw your search area
               </button>
