@@ -42,7 +42,7 @@ const HeroSearch = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto relative z-[60]">
       {/* Buy / Rent Toggle */}
       <div className="flex mb-6 bg-muted/60 backdrop-blur-sm rounded-xl p-1.5 max-w-xs mx-auto">
         <button
@@ -87,7 +87,7 @@ const HeroSearch = () => {
 
           {/* Dropdown with "Draw your search area" when input is focused on mobile */}
           {isMobile && inputFocused && !showDrawMap && (
-            <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute left-0 right-0 top-full mt-1 z-[100] bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               <button
                 onClick={() => {
                   setShowDrawMap(true);
