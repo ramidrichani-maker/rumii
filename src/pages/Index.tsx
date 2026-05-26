@@ -60,7 +60,7 @@ const Index = () => {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal animation="fade-up" delay={150}>
+        <ScrollReveal animation="fade-up" delay={150} className="relative z-[60]">
           <HeroSearch />
         </ScrollReveal>
         
