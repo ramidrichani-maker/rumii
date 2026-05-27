@@ -215,6 +215,36 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     };
   }, [isMobile, mobileFiltersOpen]);
 
+  useEffect(() => {
+    if (!isMobile || !advancedFilterOpen) return;
+
+    let animationFrame = 0;
+    const pinAdvancedFilterToViewport = () => {
+      const content = document.querySelector('.advanced-filter-popover');
+      const wrapper = content?.closest('[data-radix-popper-content-wrapper]') as HTMLElement | null;
+
+      if (wrapper) {
+        Object.assign(wrapper.style, {
+          position: 'fixed',
+          inset: '0px',
+          top: '0px',
+          left: '0px',
+          right: '0px',
+          bottom: '0px',
+          transform: 'none',
+          width: '100vw',
+          height: '100dvh',
+          maxWidth: 'none',
+          maxHeight: '100dvh',
+          zIndex: '10060',
+        });
+      }
+    };
+
+    animationFrame = requestAnimationFrame(pinAdvancedFilterToViewport);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isMobile, advancedFilterOpen]);
+
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
@@ -699,7 +729,11 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             </PopoverTrigger>
           <PopoverContent
             align="end"
-            className="bg-background backdrop-blur-md z-[10050] border-border/50 overflow-y-auto p-4 max-md:!fixed max-md:!inset-0 max-md:!top-0 max-md:!left-0 max-md:!transform-none max-md:w-screen max-md:h-[100dvh] max-md:max-h-[100dvh] max-md:max-w-none max-md:rounded-none md:w-[400px] md:max-h-[80vh] md:rounded-2xl md:bg-background/15"
+            className={`advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-4 ${
+              isMobile
+                ? '!fixed !inset-0 !top-0 !left-0 !right-0 !bottom-0 !z-[10060] !w-screen !h-[100dvh] !max-h-[100dvh] !max-w-none !translate-x-0 !translate-y-0 !transform-none !rounded-none'
+                : 'z-[10050] w-[400px] max-h-[80vh] rounded-2xl bg-background/15'
+            }`}
           >
             <div className="flex items-center justify-between mb-4 md:hidden sticky top-0 bg-background z-10 -mx-4 px-4 py-2 border-b border-border">
               <h3 className="text-base font-semibold">Filters</h3>
