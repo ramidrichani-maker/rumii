@@ -689,7 +689,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Row 5: Advanced Filter */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
-          <Popover>
+          <Popover open={advancedFilterOpen} onOpenChange={setAdvancedFilterOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[110px] flex-1 md:flex-initial">
                 <SlidersHorizontal className="w-4 h-4" />
@@ -697,8 +697,22 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </PopoverTrigger>
-          <PopoverContent align="end" className="w-[calc(100vw-2rem)] md:w-[400px] bg-background/15 backdrop-blur-md z-[10050] p-4 max-h-[80vh] overflow-y-auto border-border/50 rounded-2xl">
-            <div className="space-y-5">
+          <PopoverContent
+            align="end"
+            className="bg-background backdrop-blur-md z-[10050] border-border/50 overflow-y-auto p-4 w-screen h-[100dvh] max-h-[100dvh] max-w-none rounded-none md:w-[400px] md:h-auto md:max-h-[80vh] md:rounded-2xl md:bg-background/15"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 } as React.CSSProperties}
+          >
+            <div className="flex items-center justify-between mb-4 md:hidden sticky top-0 bg-background z-10 -mx-4 px-4 py-2 border-b border-border">
+              <h3 className="text-base font-semibold">Filters</h3>
+              <button
+                onClick={() => setAdvancedFilterOpen(false)}
+                className="p-2 rounded-full hover:bg-muted transition-colors"
+                aria-label="Close filters"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-5 pb-6">
               {/* Bedrooms section */}
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-2">Bedrooms</h4>
