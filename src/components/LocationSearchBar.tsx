@@ -1081,6 +1081,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               </Popover>
             );
           })()}
+        </div>
           {isMobile && mobileFiltersOpen && (
             <div className="mt-3 md:hidden">
               <Button
