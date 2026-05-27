@@ -1,8 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bed, Bath, Square, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Property {
   id: string;
@@ -17,6 +19,7 @@ interface Property {
   square_meters: number;
   images: string[];
   created_at?: string;
+  agency_id?: string | null;
 }
 
 interface FeaturedPropertyCardProps {
@@ -29,6 +32,25 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   const images = property.images?.length ? property.images : [];
   const hasMultiple = images.length > 1;
   const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd, wasSwipe } = useSwipeCarousel(images.length);
+
+  const [agencyName, setAgencyName] = useState<string | null>(null);
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAgency = async () => {
+      if (!property.agency_id) return;
+      const { data } = await supabase
+        .from('agencies')
+        .select('name, logo_url')
+        .eq('id', property.agency_id)
+        .single();
+      if (data) {
+        setAgencyName(data.name);
+        setAgencyLogo(data.logo_url);
+      }
+    };
+    fetchAgency();
+  }, [property.agency_id]);
 
   const isJustListed = (createdAt?: string) => {
     if (!createdAt) return false;
