@@ -719,6 +719,37 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Row 5: Advanced Filter */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
+          {isMobile ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => setAdvancedFilterOpen(true)}
+                className="h-10 md:h-12 px-4 gap-2 min-w-[110px] flex-1 md:flex-initial"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                <span className="text-sm font-medium">Filter</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+              {advancedFilterOpen && createPortal(
+                <div className="fixed inset-0 z-[10060] bg-background flex flex-col overflow-y-auto">
+                  <div className="flex items-center justify-between sticky top-0 bg-background z-10 px-4 py-3 border-b border-border">
+                    <h3 className="text-base font-semibold">Filters</h3>
+                    <button
+                      onClick={() => setAdvancedFilterOpen(false)}
+                      className="p-2 rounded-full hover:bg-muted transition-colors"
+                      aria-label="Close filters"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="p-4">
+                    {renderAdvancedFilterBody()}
+                  </div>
+                </div>,
+                document.body
+              )}
+            </>
+          ) : (
           <Popover open={advancedFilterOpen} onOpenChange={setAdvancedFilterOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[110px] flex-1 md:flex-initial">
@@ -729,13 +760,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             </PopoverTrigger>
           <PopoverContent
             align="end"
-            className={`advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-4 ${
-              isMobile
-                ? '!fixed !inset-0 !top-0 !left-0 !right-0 !bottom-0 !z-[10060] !w-screen !h-[100dvh] !max-h-[100dvh] !max-w-none !translate-x-0 !translate-y-0 !transform-none !rounded-none'
-                : 'z-[10050] w-[400px] max-h-[80vh] rounded-2xl bg-background/15'
-            }`}
+            className="advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-4 z-[10050] w-[400px] max-h-[80vh] rounded-2xl bg-background/15"
           >
-            <div className="flex items-center justify-between mb-4 md:hidden sticky top-0 bg-background z-10 -mx-4 px-4 py-2 border-b border-border">
+            <div className="hidden flex items-center justify-between mb-4 sticky top-0 bg-background z-10 -mx-4 px-4 py-2 border-b border-border">
               <h3 className="text-base font-semibold">Filters</h3>
               <button
                 onClick={() => setAdvancedFilterOpen(false)}
