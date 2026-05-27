@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
+import { Bed, Bath, Square, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import rumiLogo from "@/assets/rumi-logo.png";
 
 interface Property {
   id: string;
@@ -33,20 +34,22 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   const hasMultiple = images.length > 1;
   const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd, wasSwipe } = useSwipeCarousel(images.length);
 
-  const [agencyName, setAgencyName] = useState<string | null>(null);
-  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
+  const [agencyName, setAgencyName] = useState("Rumi");
+  const [agencyLogo, setAgencyLogo] = useState<string>(rumiLogo);
 
   useEffect(() => {
     const fetchAgency = async () => {
+      setAgencyName("Rumi");
+      setAgencyLogo(rumiLogo);
       if (!property.agency_id) return;
       const { data } = await supabase
         .from('agencies')
         .select('name, logo_url')
         .eq('id', property.agency_id)
-        .single();
+        .maybeSingle();
       if (data) {
-        setAgencyName(data.name);
-        setAgencyLogo(data.logo_url);
+        setAgencyName(data.name || "Rumi");
+        setAgencyLogo(data.logo_url || rumiLogo);
       }
     };
     fetchAgency();
@@ -156,16 +159,10 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               <span className="text-2xl font-bold text-primary">
                 {formatPrice(property)}
               </span>
-              {agencyName && (
-                <div className="flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 max-w-[10rem]">
-                  {agencyLogo ? (
-                    <img src={agencyLogo} alt={agencyName} className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
-                  ) : (
-                    <Building2 className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                  )}
-                  <span className="text-[10px] font-medium text-muted-foreground truncate">{agencyName}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 max-w-[10rem]">
+                <img src={agencyLogo} alt={agencyName} className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                <span className="text-[10px] font-medium text-muted-foreground truncate">{agencyName}</span>
+              </div>
             </div>
           </div>
           <CardTitle className="text-lg">{property.address}</CardTitle>
