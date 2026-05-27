@@ -989,9 +989,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               <div className="border-t border-border" />
 
-              {/* Added to Oracle section */}
+              {/* Added to rumi section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Added to Oracle</h4>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Added to rumi</h4>
                 <div className="flex flex-col gap-1">
                   {addedToRumiOptions.map((option) => (
                     <button
