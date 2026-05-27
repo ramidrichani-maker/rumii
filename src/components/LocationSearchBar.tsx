@@ -637,7 +637,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+            <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-[10050] p-3 border-border/50 rounded-2xl">
               <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
                 <button
                   onClick={() => onPropertyTypesChange([])}
