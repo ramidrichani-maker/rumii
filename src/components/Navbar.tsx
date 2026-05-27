@@ -190,10 +190,10 @@ export const Navbar = () => {
                   )}
                 </Link>
                 
-                {/* Desktop My Rumi */}
+                {/* Desktop My rumi */}
                 <Button variant="ghost" className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full" onClick={() => setProfilePanelOpen(true)}>
                   <User className="h-4 w-4" />
-                  <span className="text-sm font-medium">My Rumi</span>
+                  <span className="text-sm font-medium">My rumi</span>
                 </Button>
 
                 {/* Mobile My Rumi */}
@@ -382,8 +382,8 @@ export const Navbar = () => {
                       {profile.role}
                     </Badge>
                   )}
-                  <Link to="/my-oracle" onClick={() => setProfilePanelOpen(false)} className="mt-1 text-xs text-primary hover:underline">
-                    View My Rumi
+                  <Link to="/my-rumi" onClick={() => setProfilePanelOpen(false)} className="mt-1 text-xs text-primary hover:underline">
+                    View My rumi
                   </Link>
                 </div>
               </div>

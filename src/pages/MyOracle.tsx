@@ -164,7 +164,7 @@ export default function MyOracle() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl space-y-10">
-      <h1 className="text-3xl font-bold text-foreground">My Oracle</h1>
+      <h1 className="text-3xl font-bold text-foreground">My rumi</h1>
 
       {/* Enquiries Section */}
       <section>

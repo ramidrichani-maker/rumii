@@ -373,7 +373,7 @@ const Purchase = () => {
     if (error) {
       toast({ title: "Error", description: "Failed to save area.", variant: "destructive" });
     } else {
-      toast({ title: "Area saved", description: "You can view it in My Oracle." });
+      toast({ title: "Area saved", description: "You can view it in My rumi." });
     }
   }, [locationInput]);
 
