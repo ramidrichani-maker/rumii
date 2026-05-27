@@ -79,7 +79,7 @@ const Index = () => {
               <div className="mb-16">
                 <ScrollReveal animation="fade-right">
                   <div className="flex justify-start mb-8">
-                    <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-75">
+                    <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-100">
                       For rent
                     </span>
                   </div>
@@ -98,7 +98,7 @@ const Index = () => {
               <div>
                 <ScrollReveal animation="fade-left">
                   <div className="flex justify-start mb-8">
-                    <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-75">
+                    <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-100">
                       For sale
                     </span>
                   </div>
