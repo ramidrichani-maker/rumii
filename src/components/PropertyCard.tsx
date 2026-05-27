@@ -379,18 +379,19 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
       {/* Right: Details */}
       <div className="flex flex-col flex-1 p-2 md:p-4 relative min-w-0">
         {/* Top-right: Agency + Favorite */}
-        <div className="absolute top-1 right-1 md:top-2 md:right-2 flex items-center gap-1">
-          {agencyName && (
-            <div className="hidden md:flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
-              {agencyLogo ? (
-                <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
-              ) : (
-                <Building2 className="w-4 h-4 text-muted-foreground" />
-              )}
-              <span className="text-xs font-medium text-muted-foreground">{agencyName}</span>
-            </div>
-          )}
-          <Button
+        <div className="absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1">
+          <div className="flex items-center gap-1">
+            {agencyName && (
+              <div className="hidden md:flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+                {agencyLogo ? (
+                  <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                  <Building2 className="w-4 h-4 text-muted-foreground" />
+                )}
+                <span className="text-xs font-medium text-muted-foreground">{agencyName}</span>
+              </div>
+            )}
+            <Button
             variant="ghost"
             size="icon"
             className="h-6 w-6 md:h-8 md:w-8"
@@ -409,6 +410,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           >
             <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
           </Button>
+          </div>
+          {agencyName && (
+            <div className="flex md:hidden items-center gap-1 bg-muted/60 rounded-full px-1.5 py-0.5 max-w-[8rem]">
+              {agencyLogo ? (
+                <img src={agencyLogo} alt={agencyName} className="w-3.5 h-3.5 rounded-full object-cover flex-shrink-0" />
+              ) : (
+                <Building2 className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+              )}
+              <span className="text-[10px] font-medium text-muted-foreground truncate">{agencyName}</span>
+            </div>
+          )}
         </div>
 
         {/* Price */}

@@ -1,8 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bed, Bath, Square, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Property {
   id: string;
@@ -17,6 +19,7 @@ interface Property {
   square_meters: number;
   images: string[];
   created_at?: string;
+  agency_id?: string | null;
 }
 
 interface FeaturedPropertyCardProps {
@@ -29,6 +32,25 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
   const images = property.images?.length ? property.images : [];
   const hasMultiple = images.length > 1;
   const { currentIndex: imgIndex, goTo, swipeOffset, onTouchStart, onTouchMove, onTouchEnd, wasSwipe } = useSwipeCarousel(images.length);
+
+  const [agencyName, setAgencyName] = useState<string | null>(null);
+  const [agencyLogo, setAgencyLogo] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAgency = async () => {
+      if (!property.agency_id) return;
+      const { data } = await supabase
+        .from('agencies')
+        .select('name, logo_url')
+        .eq('id', property.agency_id)
+        .single();
+      if (data) {
+        setAgencyName(data.name);
+        setAgencyLogo(data.logo_url);
+      }
+    };
+    fetchAgency();
+  }, [property.agency_id]);
 
   const isJustListed = (createdAt?: string) => {
     if (!createdAt) return false;
@@ -130,9 +152,21 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start mb-2">
             <Badge variant={badgeVariant}>{badgeLabel}</Badge>
-            <span className="text-2xl font-bold text-primary">
-              {formatPrice(property)}
-            </span>
+            <div className="flex flex-col items-end gap-1">
+              <span className="text-2xl font-bold text-primary">
+                {formatPrice(property)}
+              </span>
+              {agencyName && (
+                <div className="flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 max-w-[10rem]">
+                  {agencyLogo ? (
+                    <img src={agencyLogo} alt={agencyName} className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <Building2 className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                  )}
+                  <span className="text-[10px] font-medium text-muted-foreground truncate">{agencyName}</span>
+                </div>
+              )}
+            </div>
           </div>
           <CardTitle className="text-lg">{property.address}</CardTitle>
           <CardDescription>{property.city}</CardDescription>
