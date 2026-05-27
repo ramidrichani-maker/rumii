@@ -15,6 +15,8 @@ interface Property {
   bathrooms: number;
   square_meters: number;
   images: string[];
+  rental_price?: number | null;
+  agency_id?: string | null;
 }
 
 const Index = () => {
