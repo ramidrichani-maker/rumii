@@ -404,7 +404,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+              <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-[10050] p-3 border-border/50 rounded-2xl">
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <button
@@ -554,7 +554,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-50 p-3 border-border/50 rounded-2xl">
+              <PopoverContent align="start" className="w-auto bg-background/15 backdrop-blur-md z-[10050] p-3 border-border/50 rounded-2xl">
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <button
