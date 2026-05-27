@@ -696,7 +696,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </PopoverTrigger>
-          <PopoverContent align="end" className="w-[400px] bg-background/15 backdrop-blur-md z-50 p-4 max-h-[80vh] overflow-y-auto border-border/50 rounded-2xl">
+          <PopoverContent align="end" className="w-[calc(100vw-2rem)] md:w-[400px] bg-background/15 backdrop-blur-md z-[10050] p-4 max-h-[80vh] overflow-y-auto border-border/50 rounded-2xl">
             <div className="space-y-5">
               {/* Bedrooms section */}
               <div>
