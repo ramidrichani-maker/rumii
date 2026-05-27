@@ -91,7 +91,7 @@ const AppRoutes = () => {
           <Route path="/messages" element={<Messages />} />
           <Route path="/agent-valuation" element={<AgentValuation />} />
           <Route path="/support-portal" element={<SupportPortal />} />
-          <Route path="/my-oracle" element={<MyOracle />} />
+          <Route path="/my-rumi" element={<MyOracle />} />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="/change-password" element={<ChangePassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -47,7 +47,7 @@ const propertyFeatureOptions = [
   'Sea View', 'Mountain View', 'Fireplace', 'Smart-home',
 ];
 
-const addedToOracleOptions = [
+const addedToRumiOptions = [
   { label: 'Anytime', value: '' },
   { label: 'Last 24 hours', value: '1' },
   { label: 'Last 3 days', value: '3' },
@@ -989,11 +989,11 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               <div className="border-t border-border" />
 
-              {/* Added to Oracle section */}
+              {/* Added to rumi section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Added to Oracle</h4>
+                <h4 className="text-sm font-semibold text-foreground mb-2">Added to rumi</h4>
                 <div className="flex flex-col gap-1">
-                  {addedToOracleOptions.map((option) => (
+                  {addedToRumiOptions.map((option) => (
                     <button
                       key={option.label}
                       onClick={() => onAddedToOracleChange(option.value)}
