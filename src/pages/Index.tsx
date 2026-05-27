@@ -78,7 +78,7 @@ const Index = () => {
             {featuredRentals.length > 0 && (
               <div className="mb-16">
                 <ScrollReveal animation="fade-right">
-                  <div className="flex justify-start mb-8">
+                  <div className="flex justify-start mb-4">
                     <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-100">
                       For rent
                     </span>
@@ -97,7 +97,7 @@ const Index = () => {
             {featuredSales.length > 0 && (
               <div>
                 <ScrollReveal animation="fade-left">
-                  <div className="flex justify-start mb-8">
+                  <div className="flex justify-start mb-4">
                     <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-100">
                       For sale
                     </span>
