@@ -699,8 +699,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             </PopoverTrigger>
           <PopoverContent
             align="end"
-            className="bg-background backdrop-blur-md z-[10050] border-border/50 overflow-y-auto p-4 w-screen h-[100dvh] max-h-[100dvh] max-w-none rounded-none md:w-[400px] md:h-auto md:max-h-[80vh] md:rounded-2xl md:bg-background/15"
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 } as React.CSSProperties}
+            className="bg-background backdrop-blur-md z-[10050] border-border/50 overflow-y-auto p-4 max-md:!fixed max-md:!inset-0 max-md:!top-0 max-md:!left-0 max-md:!transform-none max-md:w-screen max-md:h-[100dvh] max-md:max-h-[100dvh] max-md:max-w-none max-md:rounded-none md:w-[400px] md:max-h-[80vh] md:rounded-2xl md:bg-background/15"
           >
             <div className="flex items-center justify-between mb-4 md:hidden sticky top-0 bg-background z-10 -mx-4 px-4 py-2 border-b border-border">
               <h3 className="text-base font-semibold">Filters</h3>
