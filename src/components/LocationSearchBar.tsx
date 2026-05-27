@@ -142,6 +142,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [activeFilterPriceTab, setActiveFilterPriceTab] = useState<'min' | 'max' | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [radiusOpen, setRadiusOpen] = useState(false);
+  const [advancedFilterOpen, setAdvancedFilterOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
 
   // Cross-validation helpers: prevent picking a max < min (or min > max).
