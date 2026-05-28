@@ -114,8 +114,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
           const c = cityCenters[property.city];
           if (!c) return;
           pos = {
-            lat: c.lat + (Math.random() - 0.5) * 0.008,
-            lng: c.lng + (Math.random() - 0.5) * 0.008,
+            lat: c.lat + (hashStringToUnit(property.id) - 0.5) * 0.008,
+            lng: c.lng + (hashStringToUnit(property.id + ':lng') - 0.5) * 0.008,
           };
         }
 
