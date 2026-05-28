@@ -38,7 +38,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
 
   const [agencyName, setAgencyName] = useState("Rumi");
   const [agencyLogo, setAgencyLogo] = useState<string>(rumiLogo);
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
   const { toast } = useToast();
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
@@ -222,8 +223,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               </div>
             </div>
           </div>
-          <CardTitle className="text-lg">{property.address}</CardTitle>
-          <CardDescription>{property.city}</CardDescription>
+          <CardTitle className="text-lg">{isAdmin ? property.address : property.city}</CardTitle>
+          <CardDescription>{isAdmin ? property.city : ''}</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
