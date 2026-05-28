@@ -225,9 +225,11 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         } else {
           const c = cityCenters[property.city];
           if (!c) return;
+          const seed = hashStringToUnit(property.id);
+          const seed2 = hashStringToUnit(property.id + ':lng');
           pos = {
-            lat: c.lat + (Math.random() - 0.5) * 0.008,
-            lng: c.lng + (Math.random() - 0.5) * 0.008,
+            lat: c.lat + (seed - 0.5) * 0.008,
+            lng: c.lng + (seed2 - 0.5) * 0.008,
           };
         }
 
