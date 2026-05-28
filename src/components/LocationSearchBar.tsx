@@ -1056,32 +1056,40 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     <ChevronDown className="w-4 h-4" />
                   </Button>
                   {advancedFilterOpen && createPortal(
-                    <div className="fixed inset-0 z-[10060] bg-background flex flex-col h-[100dvh]">
-                      <div className="flex-shrink-0 flex items-center justify-between bg-background px-4 py-3 border-b border-border">
-                        <h3 className="text-base font-semibold">Filters</h3>
-                        <button
-                          onClick={() => setAdvancedFilterOpen(false)}
-                          className="p-2 rounded-full hover:bg-muted transition-colors"
-                          aria-label="Close filters"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
+                    <>
+                      {/* Backdrop - closes on click outside */}
+                      <div
+                        className="fixed inset-0 z-[10059] bg-black/50"
+                        onClick={() => setAdvancedFilterOpen(false)}
+                      />
+                      {/* Popup - 10% smaller than full screen (90% viewport) */}
+                      <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl">
+                        <div className="flex-shrink-0 flex items-center justify-between bg-background px-4 py-3 border-b border-border">
+                          <h3 className="text-base font-semibold">Filters</h3>
+                          <button
+                            onClick={() => setAdvancedFilterOpen(false)}
+                            className="p-2 rounded-full hover:bg-muted transition-colors"
+                            aria-label="Close filters"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4">
+                          {advancedFilterBody}
+                        </div>
+                        <div className="flex-shrink-0 bg-background px-4 py-3 border-t border-border">
+                          <Button
+                            className="w-full h-12 text-base"
+                            onClick={() => {
+                              setAdvancedFilterOpen(false);
+                              onApplyMobileFilters?.();
+                            }}
+                          >
+                            Apply filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex-1 overflow-y-auto p-4">
-                        {advancedFilterBody}
-                      </div>
-                      <div className="flex-shrink-0 bg-background px-4 py-3 border-t border-border">
-                        <Button
-                          className="w-full h-12 text-base"
-                          onClick={() => {
-                            setAdvancedFilterOpen(false);
-                            onApplyMobileFilters?.();
-                          }}
-                        >
-                          Apply filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-                        </Button>
-                      </div>
-                    </div>,
+                    </>,
                     document.body
                   )}
                 </>
