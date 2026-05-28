@@ -461,14 +461,51 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
 
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&polygon_geojson=1&q=${encodeURIComponent(
-            initialSearchLocation + ', Lebanon'
-          )}&limit=1`,
-          { headers: { Accept: 'application/json' } }
-        );
-        const data = await res.json();
-        if (!data || data.length === 0) return;
+        // Try Nominatim first for a true polygon boundary; fall back to
+        // Google geocoder viewport bounds if the request fails (CORS,
+        // rate limit, etc.) so the searched area is always drawn.
+        let data: any[] | null = null;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&accept-language=en&polygon_geojson=1&q=${encodeURIComponent(
+              initialSearchLocation + ', Lebanon'
+            )}&limit=1`,
+            { headers: { Accept: 'application/json' } }
+          );
+          data = await res.json();
+        } catch {
+          data = null;
+        }
+
+        if (!data || data.length === 0) {
+          // Google geocoder fallback — derive a rectangular polygon from
+          // the result's viewport / bounds.
+          const geocoder = new google.maps.Geocoder();
+          const gr = await geocoder.geocode({
+            address: initialSearchLocation + ', Lebanon',
+            region: 'LB',
+          });
+          if (!gr.results.length) return;
+          const geom = gr.results[0].geometry;
+          const vp = geom.bounds || geom.viewport;
+          if (!vp) return;
+          const ne = vp.getNorthEast();
+          const sw = vp.getSouthWest();
+          data = [{
+            geojson: {
+              type: 'Polygon',
+              coordinates: [[
+                [sw.lng(), sw.lat()],
+                [ne.lng(), sw.lat()],
+                [ne.lng(), ne.lat()],
+                [sw.lng(), ne.lat()],
+                [sw.lng(), sw.lat()],
+              ]],
+            },
+            lat: String(geom.location.lat()),
+            lon: String(geom.location.lng()),
+          }];
+        }
         const result = data[0];
 
         searchBoundaryRef.current?.setMap(null);
