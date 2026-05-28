@@ -356,7 +356,13 @@ const Purchase = () => {
 
   const handleDrawnAreaChange = useCallback((polygon: { latitude: number; longitude: number }[] | null) => {
     setDrawnPolygon(polygon);
-  }, [setDrawnPolygon]);
+    if (polygon === null && locationInput) {
+      setLocationInput('');
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('search');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [setDrawnPolygon, locationInput, searchParams, setSearchParams, setLocationInput]);
 
   const handleSaveArea = useCallback(async (coordinates: { latitude: number; longitude: number }[]) => {
     const { data: { user } } = await supabase.auth.getUser();
