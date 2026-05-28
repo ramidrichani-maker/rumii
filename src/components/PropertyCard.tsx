@@ -307,9 +307,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
         onTouchEnd={imageCarousel.onTouchEnd}
-        onClick={() => {
-          if (imageCarousel.wasSwipe()) return;
-          navigate(`/property/${property.id}`);
+        onClick={(e) => {
+          if (imageCarousel.wasSwipe()) {
+            e.stopPropagation();
+          }
         }}
       >
         {isJustListed(property.created_at) && (
