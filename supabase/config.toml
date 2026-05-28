@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.get-maps-config]
 verify_jwt = false
+
+[functions.get-commute-time]
+verify_jwt = false
