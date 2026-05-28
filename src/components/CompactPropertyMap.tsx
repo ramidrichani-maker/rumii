@@ -100,6 +100,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const bufferCirclesRef = useRef<google.maps.Circle[]>([]);
   const bufferPolygonRef = useRef<google.maps.Polygon | null>(null);
   const [drawnPath, setDrawnPath] = useState<google.maps.LatLngLiteral[] | null>(null);
+  const prevSearchLocationRef = useRef<string>('');
 
   const infoCloseTimerRef = useRef<number | null>(null);
 
@@ -182,6 +183,9 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     const radiusMeters = searchRadius * 1000;
     const spherical = google.maps.geometry?.spherical;
     if (!spherical) return;
+    // Expand each vertex outward along the average heading from its
+    // neighbours, so concave shapes still grow outward (not toward an
+    // arbitrary centroid). Falls back to centroid-heading for simple cases.
     const centroidLat =
       drawnPath.reduce((s, p) => s + p.lat, 0) / drawnPath.length;
     const centroidLng =
@@ -446,18 +450,27 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     if (!loaded || !google || !mapInstance.current) return;
 
     if (!initialSearchLocation?.trim()) {
-      searchBoundaryRef.current?.setMap(null);
-      searchBoundaryRef.current = null;
-      searchCircleRef.current?.setMap(null);
-      searchCircleRef.current = null;
-      if (!initialPolygon || initialPolygon.length < 3) {
-        drawnPolygonRef.current?.setMap(null);
-        drawnPolygonRef.current = null;
-        setHasDrawnArea(false);
-        onDrawnAreaChange?.(null);
+      // Only tear down search-boundary / drawn polygon when the location
+      // actually transitioned from non-empty to empty (i.e. user cleared
+      // the search). Avoid wiping a manually-drawn polygon when this
+      // effect re-runs only because `searchRadius` changed.
+      const prev = prevSearchLocationRef.current;
+      if (prev) {
+        searchBoundaryRef.current?.setMap(null);
+        searchBoundaryRef.current = null;
+        searchCircleRef.current?.setMap(null);
+        searchCircleRef.current = null;
+        if (!initialPolygon || initialPolygon.length < 3) {
+          drawnPolygonRef.current?.setMap(null);
+          drawnPolygonRef.current = null;
+          setHasDrawnArea(false);
+          onDrawnAreaChange?.(null);
+        }
       }
+      prevSearchLocationRef.current = '';
       return;
     }
+    prevSearchLocationRef.current = initialSearchLocation;
 
     const timer = setTimeout(async () => {
       try {
@@ -550,6 +563,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           // exact coordinates).
           if (coords.length >= 3) {
             setHasDrawnArea(true);
+            setDrawnPath(polygonPath);
             onDrawnAreaChange?.(coords);
           }
 
@@ -557,22 +571,18 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           polygonPath.forEach((p) => bounds.extend(p));
 
           if (searchRadius > 0) {
+            // Fit to the expanded buffer extent — the buffer outline itself
+            // is drawn by the dedicated buffer effect (keyed off drawnPath).
+            const expandedBounds = new google.maps.LatLngBounds();
+            const sph = google.maps.geometry.spherical;
             const center = bounds.getCenter();
-            const cornerDist = google.maps.geometry.spherical.computeDistanceBetween(
-              center,
-              bounds.getNorthEast()
-            );
-            const totalRadius = cornerDist + searchRadius * 1000;
-            searchCircleRef.current = new google.maps.Circle({
-              center,
-              radius: totalRadius,
-              strokeColor: 'hsl(30, 20%, 55%)',
-              strokeWeight: 1,
-              fillColor: 'hsl(30, 20%, 65%)',
-              fillOpacity: 0.05,
-              map,
+            polygonPath.forEach((p) => {
+              const pt = new google.maps.LatLng(p.lat, p.lng);
+              const heading = sph.computeHeading(center, pt);
+              const off = sph.computeOffset(pt, searchRadius * 1000, heading);
+              expandedBounds.extend(off);
             });
-            map.fitBounds(searchCircleRef.current.getBounds()!, 10);
+            map.fitBounds(expandedBounds, 10);
           } else {
             map.fitBounds(bounds, 10);
           }
