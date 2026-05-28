@@ -333,9 +333,14 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Row 1: Radius */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
-          <Popover open={radiusOpen} onOpenChange={setRadiusOpen}>
+          <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
+              <Button
+                variant="outline"
+                disabled={radiusDisabled}
+                title={radiusDisabled ? 'Enter or draw a search area first' : undefined}
+                className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <span className="text-sm font-medium">Radius: {selectedLabel}</span>
                 <ChevronDown className="w-4 h-4" />
               </Button>
