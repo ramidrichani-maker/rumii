@@ -405,7 +405,8 @@ const PropertyDetail = () => {
 
   const photoCount = property.images?.length || 0;
 
-  const formatPrice = (price: number, listingType: string) => {
+  const formatPrice = (price: number | null | undefined, listingType: string) => {
+    if (price == null) return "Price on request";
     const formatted = `$${price.toLocaleString()}`;
     return listingType === "rent" ? `${formatted}/mo` : formatted;
   };
