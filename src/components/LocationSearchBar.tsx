@@ -317,19 +317,6 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               : ''
           }`}
         >
-          {isMobile && mobileFiltersOpen && (
-            <div className="sticky top-0 -mx-4 -mt-4 px-4 pt-4 pb-2 mb-1 bg-background border-b border-border z-10 flex items-center justify-between md:hidden">
-              <span className="text-base font-semibold">Filters</span>
-              <button
-                type="button"
-                onClick={() => setMobileFiltersOpen(false)}
-                aria-label="Close filters"
-                className="p-1.5 rounded-md hover:bg-muted"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          )}
         {/* Row 1: Radius */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
