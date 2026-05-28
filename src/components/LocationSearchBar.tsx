@@ -102,6 +102,7 @@ interface LocationSearchBarProps {
   onNewHomesOnlyChange?: (value: boolean) => void;
   trailingContent?: React.ReactNode;
   onApplyMobileFilters?: () => void;
+  hasDrawnArea?: boolean;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -134,6 +135,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onNewHomesOnlyChange,
     trailingContent,
     onApplyMobileFilters,
+    hasDrawnArea,
   } = props;
   const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
@@ -144,6 +146,12 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [radiusOpen, setRadiusOpen] = useState(false);
   const [advancedFilterOpen, setAdvancedFilterOpen] = useState(false);
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
+  const radiusDisabled = !location?.trim() && !hasDrawnArea;
+  useEffect(() => {
+    if (radiusDisabled && radius !== 0) {
+      onRadiusChange(0);
+    }
+  }, [radiusDisabled, radius, onRadiusChange]);
 
   // Cross-validation helpers: prevent picking a max < min (or min > max).
   const bedroomIdx = (v: string) => (v === '' ? -1 : bedroomOptions.indexOf(v));
@@ -325,9 +333,14 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {/* Row 1: Radius */}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
-          <Popover open={radiusOpen} onOpenChange={setRadiusOpen}>
+          <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial">
+              <Button
+                variant="outline"
+                disabled={radiusDisabled}
+                title={radiusDisabled ? 'Enter or draw a search area first' : undefined}
+                className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <span className="text-sm font-medium">Radius: {selectedLabel}</span>
                 <ChevronDown className="w-4 h-4" />
               </Button>

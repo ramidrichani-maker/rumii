@@ -463,6 +463,7 @@ const Purchase = () => {
           onLocationChange={handleLocationChange}
           radius={radius}
           onRadiusChange={setRadius}
+          hasDrawnArea={hasDrawnArea}
           minBedrooms={barMinBedrooms}
           maxBedrooms={barMaxBedrooms}
           onMinBedroomsChange={setBarMinBedrooms}
