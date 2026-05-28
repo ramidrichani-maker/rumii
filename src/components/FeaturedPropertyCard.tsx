@@ -223,8 +223,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               </div>
             </div>
           </div>
-          <CardTitle className="text-lg">{isAdmin ? property.address : property.city}</CardTitle>
-          <CardDescription>{isAdmin ? property.city : ''}</CardDescription>
+          <CardTitle className="text-lg">{property.city}</CardTitle>
+          <CardDescription>&nbsp;</CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
