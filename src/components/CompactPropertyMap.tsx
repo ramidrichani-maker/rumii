@@ -162,7 +162,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       strokeWeight: 2,
       fillColor: 'hsl(262, 83%, 58%)',
       fillOpacity: 0.15,
-      map: mapInstance.current,
+      map: searchRadius > 0 ? null : mapInstance.current,
     });
     setHasDrawnArea(true);
     setDrawnPath(path);
@@ -170,7 +170,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     path.forEach((p) => bounds.extend(p));
     mapInstance.current.fitBounds(bounds, 30);
     onDrawnAreaChange?.(initialPolygon);
-  }, [loaded, google, initialPolygon, onDrawnAreaChange]);
+  }, [loaded, google, initialPolygon, searchRadius, onDrawnAreaChange]);
 
   // Render an expanded outline around the drawn polygon when a search radius is selected.
   // Each vertex is pushed outward from the polygon centroid by `searchRadius` km,
@@ -179,7 +179,13 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     if (!loaded || !google || !mapInstance.current) return;
     bufferPolygonRef.current?.setMap(null);
     bufferPolygonRef.current = null;
-    if (!drawnPath || drawnPath.length < 3 || !searchRadius || searchRadius <= 0) return;
+    if (!drawnPath || drawnPath.length < 3 || !searchRadius || searchRadius <= 0) {
+      drawnPolygonRef.current?.setMap(mapInstance.current);
+      searchBoundaryRef.current?.setMap(mapInstance.current);
+      return;
+    }
+    drawnPolygonRef.current?.setMap(null);
+    searchBoundaryRef.current?.setMap(null);
     const radiusMeters = searchRadius * 1000;
     const spherical = google.maps.geometry?.spherical;
     if (!spherical) return;
@@ -202,7 +208,8 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
       strokeColor: 'hsl(262, 83%, 58%)',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillOpacity: 0,
+      fillColor: 'hsl(262, 83%, 58%)',
+      fillOpacity: 0.15,
       clickable: false,
       map: mapInstance.current!,
     });
