@@ -426,7 +426,7 @@ const PropertyDetail = () => {
           )}
 
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            {property.address}
+            {isAdmin ? property.address : property.city}
           </h1>
           <p className="text-muted-foreground mb-2 flex items-center gap-1">
             <MapPin className="w-4 h-4" /> {property.city}
@@ -705,7 +705,7 @@ const PropertyDetail = () => {
               {property.listing_type === "rent" ? "rent" : property.listing_type === "both" ? "rent & sale" : "sale"}
             </p>
             <p className="text-muted-foreground">
-              {property.address}, {property.city}
+              {isAdmin ? `${property.address}, ${property.city}` : property.city}
               {property.municipality && `, ${property.municipality}`}
             </p>
           </div>
