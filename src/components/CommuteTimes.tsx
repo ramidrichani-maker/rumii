@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CommuteTimesProps {
   originLat: number;
@@ -92,12 +93,11 @@ const fetchRoute = async (
   dest: { lat: number; lng: number }
 ): Promise<number | null> => {
   try {
-    const url = `https://router.project-osrm.org/route/v1/${profile}/${origin.lng},${origin.lat};${dest.lng},${dest.lat}?overview=false`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (data?.code !== "Ok" || !Array.isArray(data.routes) || data.routes.length === 0) return null;
-    return data.routes[0].duration as number;
+    const { data, error } = await supabase.functions.invoke('get-commute-time', {
+      body: { origin, destination: dest },
+    });
+    if (error) return null;
+    return typeof data?.driving === 'number' ? data.driving : null;
   } catch {
     return null;
   }
@@ -310,7 +310,7 @@ export default function CommuteTimes({ originLat, originLng }: CommuteTimesProps
       )}
 
       <p className="mt-3 text-xs text-muted-foreground">
-        Estimates use OpenStreetMap routing from the property's neighbourhood. Times are indicative only.
+        Estimates use Google Maps driving times from the property's neighbourhood. Times are indicative only.
       </p>
     </div>
   );
