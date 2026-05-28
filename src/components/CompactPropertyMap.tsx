@@ -563,6 +563,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           // exact coordinates).
           if (coords.length >= 3) {
             setHasDrawnArea(true);
+            setDrawnPath(polygonPath);
             onDrawnAreaChange?.(coords);
           }
 
@@ -570,22 +571,18 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
           polygonPath.forEach((p) => bounds.extend(p));
 
           if (searchRadius > 0) {
+            // Fit to the expanded buffer extent — the buffer outline itself
+            // is drawn by the dedicated buffer effect (keyed off drawnPath).
+            const expandedBounds = new google.maps.LatLngBounds();
+            const sph = google.maps.geometry.spherical;
             const center = bounds.getCenter();
-            const cornerDist = google.maps.geometry.spherical.computeDistanceBetween(
-              center,
-              bounds.getNorthEast()
-            );
-            const totalRadius = cornerDist + searchRadius * 1000;
-            searchCircleRef.current = new google.maps.Circle({
-              center,
-              radius: totalRadius,
-              strokeColor: 'hsl(30, 20%, 55%)',
-              strokeWeight: 1,
-              fillColor: 'hsl(30, 20%, 65%)',
-              fillOpacity: 0.05,
-              map,
+            polygonPath.forEach((p) => {
+              const pt = new google.maps.LatLng(p.lat, p.lng);
+              const heading = sph.computeHeading(center, pt);
+              const off = sph.computeOffset(pt, searchRadius * 1000, heading);
+              expandedBounds.extend(off);
             });
-            map.fitBounds(searchCircleRef.current.getBounds()!, 10);
+            map.fitBounds(expandedBounds, 10);
           } else {
             map.fitBounds(bounds, 10);
           }
