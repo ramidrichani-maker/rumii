@@ -6,6 +6,15 @@ import { getCityCenter } from '@/utils/cityCenter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 
+function hashStringToUnit(str: string): number {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return (h >>> 0) / 4294967296;
+}
+
 interface Property {
   id: string;
   latitude: number;
@@ -105,8 +114,8 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
           const c = cityCenters[property.city];
           if (!c) return;
           pos = {
-            lat: c.lat + (Math.random() - 0.5) * 0.008,
-            lng: c.lng + (Math.random() - 0.5) * 0.008,
+            lat: c.lat + (hashStringToUnit(property.id) - 0.5) * 0.008,
+            lng: c.lng + (hashStringToUnit(property.id + ':lng') - 0.5) * 0.008,
           };
         }
 

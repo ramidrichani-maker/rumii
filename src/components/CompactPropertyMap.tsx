@@ -9,6 +9,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 
+// Deterministic hash → [0,1) so jittered marker positions stay stable per id
+function hashStringToUnit(str: string): number {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return (h >>> 0) / 4294967296;
+}
+
 interface Property {
   id: string;
   latitude: number;
@@ -225,9 +235,11 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
         } else {
           const c = cityCenters[property.city];
           if (!c) return;
+          const seed = hashStringToUnit(property.id);
+          const seed2 = hashStringToUnit(property.id + ':lng');
           pos = {
-            lat: c.lat + (Math.random() - 0.5) * 0.008,
-            lng: c.lng + (Math.random() - 0.5) * 0.008,
+            lat: c.lat + (seed - 0.5) * 0.008,
+            lng: c.lng + (seed2 - 0.5) * 0.008,
           };
         }
 
