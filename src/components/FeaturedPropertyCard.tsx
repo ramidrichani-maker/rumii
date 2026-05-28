@@ -1,10 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bed, Bath, Square, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import rumiLogo from "@/assets/rumi-logo.png";
 
 interface Property {
@@ -36,6 +38,53 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
 
   const [agencyName, setAgencyName] = useState("Rumi");
   const [agencyLogo, setAgencyLogo] = useState<string>(rumiLogo);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setIsFavorited(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('favorites')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('property_id', property.id)
+        .maybeSingle();
+      if (!cancelled) setIsFavorited(!!data);
+    })();
+    return () => { cancelled = true; };
+  }, [user, property.id]);
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      toast({ title: "Sign in required", description: "Please sign in to favorite properties", variant: "destructive" });
+      return;
+    }
+    setIsTogglingFavorite(true);
+    try {
+      if (isFavorited) {
+        await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', property.id);
+        setIsFavorited(false);
+        toast({ title: "Removed from favorites" });
+      } else {
+        await supabase.from('favorites').insert({ user_id: user.id, property_id: property.id });
+        setIsFavorited(true);
+        toast({ title: "Added to favorites" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to update favorite", variant: "destructive" });
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  };
 
   useEffect(() => {
     const fetchAgency = async () => {
@@ -101,6 +150,14 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               Just Listed
             </Badge>
           )}
+          <button
+            onClick={toggleFavorite}
+            disabled={isTogglingFavorite}
+            aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+            className="absolute top-2 right-2 z-20 bg-background/80 hover:bg-background rounded-full w-8 h-8 flex items-center justify-center shadow-sm transition-colors"
+          >
+            <Heart className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+          </button>
           {images.length > 0 ? (
             <div
               className="flex h-full"
