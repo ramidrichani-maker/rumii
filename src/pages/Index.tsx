@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import HeroSearch from "@/components/HeroSearch";
 import FeaturedPropertyCard from "@/components/FeaturedPropertyCard";
+import FeaturedPropertyCardSkeleton from "@/components/FeaturedPropertyCardSkeleton";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Property {
@@ -66,7 +67,40 @@ const Index = () => {
           <HeroSearch />
         </ScrollReveal>
         
-        {!isLoading && (featuredRentals.length > 0 || featuredSales.length > 0) && (
+        {isLoading ? (
+          <div className="mt-12">
+            <div className="text-center mb-12">
+              <h2 className="font-bold mb-4 text-2xl text-[#b8a694]">Featured Listings</h2>
+              <p className="text-lg text-[#b8a694]/80">
+                Discover the most sought-after properties&nbsp;
+              </p>
+            </div>
+            <div className="mb-16">
+              <div className="flex justify-start mb-4">
+                <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
+                  For rent
+                </span>
+              </div>
+              <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <FeaturedPropertyCardSkeleton key={`rent-skel-${i}`} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-start mb-4">
+                <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
+                  For sale
+                </span>
+              </div>
+              <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <FeaturedPropertyCardSkeleton key={`sale-skel-${i}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (featuredRentals.length > 0 || featuredSales.length > 0) && (
           <div className="mt-12">
             <ScrollReveal animation="fade-up">
               <div className="text-center mb-12">
