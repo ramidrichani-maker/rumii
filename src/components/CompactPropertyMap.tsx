@@ -183,6 +183,9 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     const radiusMeters = searchRadius * 1000;
     const spherical = google.maps.geometry?.spherical;
     if (!spherical) return;
+    // Expand each vertex outward along the average heading from its
+    // neighbours, so concave shapes still grow outward (not toward an
+    // arbitrary centroid). Falls back to centroid-heading for simple cases.
     const centroidLat =
       drawnPath.reduce((s, p) => s + p.lat, 0) / drawnPath.length;
     const centroidLng =
