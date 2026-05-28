@@ -100,6 +100,7 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
   const bufferCirclesRef = useRef<google.maps.Circle[]>([]);
   const bufferPolygonRef = useRef<google.maps.Polygon | null>(null);
   const [drawnPath, setDrawnPath] = useState<google.maps.LatLngLiteral[] | null>(null);
+  const prevSearchLocationRef = useRef<string>('');
 
   const infoCloseTimerRef = useRef<number | null>(null);
 
@@ -446,18 +447,27 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     if (!loaded || !google || !mapInstance.current) return;
 
     if (!initialSearchLocation?.trim()) {
-      searchBoundaryRef.current?.setMap(null);
-      searchBoundaryRef.current = null;
-      searchCircleRef.current?.setMap(null);
-      searchCircleRef.current = null;
-      if (!initialPolygon || initialPolygon.length < 3) {
-        drawnPolygonRef.current?.setMap(null);
-        drawnPolygonRef.current = null;
-        setHasDrawnArea(false);
-        onDrawnAreaChange?.(null);
+      // Only tear down search-boundary / drawn polygon when the location
+      // actually transitioned from non-empty to empty (i.e. user cleared
+      // the search). Avoid wiping a manually-drawn polygon when this
+      // effect re-runs only because `searchRadius` changed.
+      const prev = prevSearchLocationRef.current;
+      if (prev) {
+        searchBoundaryRef.current?.setMap(null);
+        searchBoundaryRef.current = null;
+        searchCircleRef.current?.setMap(null);
+        searchCircleRef.current = null;
+        if (!initialPolygon || initialPolygon.length < 3) {
+          drawnPolygonRef.current?.setMap(null);
+          drawnPolygonRef.current = null;
+          setHasDrawnArea(false);
+          onDrawnAreaChange?.(null);
+        }
       }
+      prevSearchLocationRef.current = '';
       return;
     }
+    prevSearchLocationRef.current = initialSearchLocation;
 
     const timer = setTimeout(async () => {
       try {
