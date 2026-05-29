@@ -168,8 +168,11 @@ const PropertyDetail = () => {
     if (!property) return;
 
     const formatPrice = () => {
-      if (property.listing_type === 'rent') return `$${property.price?.toLocaleString()}/mo`;
-      return `$${property.price?.toLocaleString()}`;
+      const p = property.listing_type === 'rent'
+        ? ((property as any).rental_price ?? property.price)
+        : property.price;
+      if (p == null) return 'Price on request';
+      return property.listing_type === 'rent' ? `$${p.toLocaleString()}/mo` : `$${p.toLocaleString()}`;
     };
 
     const title = `${property.property_type} in ${property.city} — ${formatPrice()}`;
