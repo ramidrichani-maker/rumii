@@ -697,7 +697,12 @@ const PropertyDetail = () => {
         {/* Property info */}
         <div className="mt-6 space-y-2">
           <p className="text-3xl font-bold text-foreground">
-            {formatPrice(property.price, property.listing_type)}
+            {formatPrice(
+              property.listing_type === 'rent'
+                ? ((property as any).rental_price ?? property.price)
+                : property.price,
+              property.listing_type
+            )}
           </p>
 
           <div className="flex items-baseline gap-3 flex-wrap">
