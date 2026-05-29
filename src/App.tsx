@@ -61,12 +61,10 @@ const RouteProgress = () => {
 };
 
 const AppRoutes = () => {
-  const location = useLocation();
-
   return (
     <div className="relative">
-      <div key={location.pathname} className="animate-fade-in">
-        <Routes location={location}>
+      <div>
+        <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/purchase" element={<Purchase />} />
