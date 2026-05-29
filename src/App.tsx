@@ -60,6 +60,31 @@ const RouteProgress = () => {
   );
 };
 
+// Quick fade overlay on route change — gives a smooth perceived transition
+// without unmounting/remounting the route tree (which caused the "loading twice" lag).
+const RouteFadeOverlay = () => {
+  const location = useLocation();
+  const [visible, setVisible] = useState(false);
+  const first = useState(true)[0];
+
+  useEffect(() => {
+    if (first) return; // skip initial mount
+    setVisible(true);
+    const t = setTimeout(() => setVisible(false), 180);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none fixed inset-0 z-[60] bg-background transition-opacity duration-200 ease-out ${
+        visible ? "opacity-60" : "opacity-0"
+      }`}
+    />
+  );
+};
+
 const AppRoutes = () => {
   return (
     <div className="relative">
@@ -109,6 +134,7 @@ const App = () => (
         <BrowserRouter>
           <Navbar />
           <RouteProgress />
+          <RouteFadeOverlay />
           <FloatingChatWidget />
           <AppRoutes />
           <SupportReviewWidget />
