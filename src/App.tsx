@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -65,14 +65,16 @@ const RouteProgress = () => {
 const RouteFadeOverlay = () => {
   const location = useLocation();
   const [visible, setVisible] = useState(false);
-  const first = useState(true)[0];
+  const firstRef = useRef(true);
 
   useEffect(() => {
-    if (first) return; // skip initial mount
+    if (firstRef.current) {
+      firstRef.current = false;
+      return;
+    }
     setVisible(true);
     const t = setTimeout(() => setVisible(false), 180);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   return (
