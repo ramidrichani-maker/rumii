@@ -10,9 +10,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY');
-    if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'GOOGLE_MAPS_API_KEY not configured' }), {
+    const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+    const connectorKey = Deno.env.get('GOOGLE_MAPS_API_KEY_1') || Deno.env.get('GOOGLE_MAPS_API_KEY');
+    if (!lovableKey || !connectorKey) {
+      return new Response(JSON.stringify({ error: 'Google Maps connector not configured' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -26,11 +27,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    const res = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
+    const res = await fetch('https://connector-gateway.lovable.dev/google_maps/routes/directions/v2:computeRoutes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey,
+        'Authorization': `Bearer ${lovableKey}`,
+        'X-Connection-Api-Key': connectorKey,
         'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters',
       },
       body: JSON.stringify({
