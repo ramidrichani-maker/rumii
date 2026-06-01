@@ -660,12 +660,12 @@ const AdminDashboard = () => {
           <EmailBroadcastManager />
         </div>
 
-        {/* Row 2: User & Viewings Management */}
+        {/* Row 2: User Management */}
         <div className="mb-8">
           <div>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Users className="w-5 h-5" />
-              User & Viewings Management
+              User Management
             </h2>
             <Tabs defaultValue="users" className="space-y-4">
               <TabsList className="grid w-full grid-cols-3">
