@@ -42,38 +42,37 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
     "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
   ];
 
-  // Check if agency is Oracle Estates
-  useEffect(() => {
-    if (!isOpen) return;
-    const checkAgency = async () => {
-      setCheckingAgency(true);
-      if (!agencyId) {
-        setIsOracleEstates(false);
-        setCheckingAgency(false);
-        return;
-      }
-      const { data } = await supabase
-        .from('agencies')
-        .select('name')
-        .eq('id', agencyId)
-        .single();
-      setIsOracleEstates(data?.name?.toLowerCase() === 'oracle estates');
-      setCheckingAgency(false);
-    };
-    checkAgency();
-  }, [isOpen, agencyId]);
-
+  // Determine Oracle Estates eligibility:
+  // Allow full date/time booking when the property's agency OR the assigned agent's agency is Oracle Estates.
   // Fetch assigned agent and check for existing booking
   useEffect(() => {
     if (!isOpen || !property.id) return;
-    const fetchAgent = async () => {
+    const fetchAgentAndAgency = async () => {
+      setCheckingAgency(true);
+
+      // Get Oracle Estates agency id
+      const { data: oracle } = await supabase
+        .from('agencies')
+        .select('id')
+        .ilike('name', 'oracle estates')
+        .maybeSingle();
+      const oracleId = oracle?.id || null;
+
+      // Get assigned agent + their agency
       const { data } = await supabase
         .from('property_agents')
-        .select('agent_id')
+        .select('agent_id, profiles:agent_id(agency_id)')
         .eq('property_id', property.id)
         .limit(1)
         .maybeSingle();
-      setAgentId(data?.agent_id || null);
+      const fetchedAgentId = data?.agent_id || null;
+      const agentAgencyId = (data as any)?.profiles?.agency_id || null;
+      setAgentId(fetchedAgentId);
+
+      const propertyIsOracle = !!agencyId && !!oracleId && agencyId === oracleId;
+      const agentIsOracle = !!agentAgencyId && !!oracleId && agentAgencyId === oracleId;
+      setIsOracleEstates(propertyIsOracle || agentIsOracle);
+      setCheckingAgency(false);
     };
     const checkExistingBooking = async () => {
       if (!user) return;
@@ -89,9 +88,9 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
       setExistingBooking(!!data);
       setCheckingExisting(false);
     };
-    fetchAgent();
+    fetchAgentAndAgency();
     checkExistingBooking();
-  }, [isOpen, property.id, user]);
+  }, [isOpen, property.id, user, agencyId]);
 
   // Fetch agent's busy slots for selected date
   useEffect(() => {
