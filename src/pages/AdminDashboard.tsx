@@ -611,16 +611,19 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
             </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Row 1.5: Service Requests */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
               Service Requests
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="valuations" className="space-y-4">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="valuations" className="flex items-center gap-1 text-xs sm:text-sm">
@@ -655,25 +658,33 @@ const AdminDashboard = () => {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Email Broadcast */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Mail className="w-5 h-5" />
-            Email Broadcast
-          </h2>
-          <EmailBroadcastManager />
-        </div>
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Mail className="w-5 h-5" />
+              Email Broadcast
+            </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <EmailBroadcastManager />
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Row 2: User Management */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <Users className="w-5 h-5" />
               User Management
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="users" className="space-y-4">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="users" className="flex items-center gap-1 text-xs sm:text-sm">
@@ -708,16 +719,19 @@ const AdminDashboard = () => {
                 </div>
               </TabsContent>
           </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Viewings Management */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <Calendar className="w-5 h-5" />
               Viewings Management
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="viewings" className="space-y-4">
               <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="viewings" className="flex items-center gap-1 text-xs sm:text-sm">
