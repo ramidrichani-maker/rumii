@@ -433,7 +433,7 @@ const AdminDashboard = () => {
               Property Management
             </h2>
             <Tabs defaultValue="properties" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-8">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Home className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Pending</span>
@@ -445,22 +445,6 @@ const AdminDashboard = () => {
                 <TabsTrigger value="add-property" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Add</span>
-                </TabsTrigger>
-                <TabsTrigger value="bulk-import" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Import</span>
-                </TabsTrigger>
-                <TabsTrigger value="ai-designer" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Wand2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">AI Design</span>
-                </TabsTrigger>
-                <TabsTrigger value="featured" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Star className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Featured</span>
-                </TabsTrigger>
-                <TabsTrigger value="feature-requests" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Requests</span>
                 </TabsTrigger>
                 <TabsTrigger value="media" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -538,17 +522,47 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="bulk-import">
+              <TabsContent value="media">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Bulk Import Properties</CardTitle>
-                    <CardDescription>Import multiple properties from a CSV file</CardDescription>
+                    <CardTitle>Pending Media Approvals</CardTitle>
+                    <CardDescription>Review and approve photos/videos</CardDescription>
                   </CardHeader>
-                  <CardContent className="max-h-[600px] overflow-y-auto">
-                    <BulkPropertyImport />
+                  <CardContent className="max-h-[500px] overflow-y-auto">
+                    <PendingMediaApproval />
                   </CardContent>
                 </Card>
               </TabsContent>
+          </Tabs>
+          </div>
+        </div>
+
+        {/* Row 1.2: Property Extras */}
+        <div className="mb-8">
+          <div>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              Property Extras
+            </h2>
+            <Tabs defaultValue="ai-designer" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="ai-designer" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Wand2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">AI Design</span>
+                </TabsTrigger>
+                <TabsTrigger value="featured" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Featured</span>
+                </TabsTrigger>
+                <TabsTrigger value="feature-requests" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Requests</span>
+                </TabsTrigger>
+                <TabsTrigger value="bulk-import" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Import</span>
+                </TabsTrigger>
+              </TabsList>
 
               <TabsContent value="ai-designer">
                 <div className="max-h-[600px] overflow-y-auto">
@@ -578,18 +592,18 @@ const AdminDashboard = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="media">
+              <TabsContent value="bulk-import">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Pending Media Approvals</CardTitle>
-                    <CardDescription>Review and approve photos/videos</CardDescription>
+                    <CardTitle>Bulk Import Properties</CardTitle>
+                    <CardDescription>Import multiple properties from a CSV file</CardDescription>
                   </CardHeader>
-                  <CardContent className="max-h-[500px] overflow-y-auto">
-                    <PendingMediaApproval />
+                  <CardContent className="max-h-[600px] overflow-y-auto">
+                    <BulkPropertyImport />
                   </CardContent>
                 </Card>
               </TabsContent>
-          </Tabs>
+            </Tabs>
           </div>
         </div>
 
