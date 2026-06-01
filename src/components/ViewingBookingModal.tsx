@@ -94,7 +94,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
 
   // Fetch agent's busy slots for selected date
   useEffect(() => {
-    if (!selectedDate || !agentId) {
+    if (!selectedDate) {
       setBusySlots([]);
       return;
     }
@@ -103,13 +103,31 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
       setLoadingSlots(true);
       try {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        const { data } = await supabase
+
+        // Slots booked for THIS property on that date
+        const { data: propRows } = await supabase
           .from('property_viewings')
           .select('viewing_time')
-          .eq('agent_id', agentId)
+          .eq('property_id', property.id)
           .eq('viewing_date', dateStr)
           .in('status', ['confirmed', 'pending']);
-        setBusySlots((data || []).map(v => v.viewing_time?.substring(0, 5)));
+
+        // Slots booked for the assigned agent on that date (across properties)
+        let agentRows: { viewing_time: string }[] = [];
+        if (agentId) {
+          const { data } = await supabase
+            .from('property_viewings')
+            .select('viewing_time')
+            .eq('agent_id', agentId)
+            .eq('viewing_date', dateStr)
+            .in('status', ['confirmed', 'pending']);
+          agentRows = data || [];
+        }
+
+        const all = [...(propRows || []), ...agentRows]
+          .map(v => v.viewing_time?.substring(0, 5))
+          .filter(Boolean) as string[];
+        setBusySlots(Array.from(new Set(all)));
       } catch {
         setBusySlots([]);
       } finally {
@@ -117,7 +135,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
       }
     };
     fetchBusySlots();
-  }, [selectedDate, agentId]);
+  }, [selectedDate, agentId, property.id]);
 
   const formatTimeSlot = (time: string) => {
     const [hours, mins] = time.split(':');
@@ -181,19 +199,40 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
 
     setLoading(true);
     try {
-      const { data: existingSlot, error: checkError } = await supabase
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
+
+      // Conflict on the same listing (pending or confirmed)
+      const { data: propertyConflict, error: propCheckError } = await supabase
         .from('property_viewings')
         .select('id')
         .eq('property_id', property.id)
-        .eq('viewing_date', format(selectedDate, 'yyyy-MM-dd'))
+        .eq('viewing_date', dateStr)
         .eq('viewing_time', selectedTime)
-        .eq('status', 'confirmed')
+        .in('status', ['pending', 'confirmed'])
         .maybeSingle();
 
-      if (checkError) throw checkError;
-      if (existingSlot) {
+      if (propCheckError) throw propCheckError;
+      if (propertyConflict) {
         toast({ title: "Time Slot Unavailable", description: "This time slot is already booked. Please select another time.", variant: "destructive" });
         return;
+      }
+
+      // Conflict on the assigned agent's calendar (pending or confirmed)
+      if (agentId) {
+        const { data: agentConflict, error: agentCheckError } = await supabase
+          .from('property_viewings')
+          .select('id')
+          .eq('agent_id', agentId)
+          .eq('viewing_date', dateStr)
+          .eq('viewing_time', selectedTime)
+          .in('status', ['pending', 'confirmed'])
+          .maybeSingle();
+
+        if (agentCheckError) throw agentCheckError;
+        if (agentConflict) {
+          toast({ title: "Time Slot Unavailable", description: "The agent is already booked at this time. Please select another time.", variant: "destructive" });
+          return;
+        }
       }
 
       const confirmMethods = [];
@@ -205,7 +244,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
         .insert({
           property_id: property.id,
           user_id: user.id,
-          viewing_date: format(selectedDate, 'yyyy-MM-dd'),
+          viewing_date: dateStr,
           viewing_time: selectedTime,
           status: 'pending',
           notes: `Confirmation preference: ${confirmMethods.join(', ')}`
