@@ -538,16 +538,19 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
           </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Row 1.2: Property Extras */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <Sparkles className="w-5 h-5" />
               Property Extras
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="ai-designer" className="space-y-4">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="ai-designer" className="flex items-center gap-1 text-xs sm:text-sm">
