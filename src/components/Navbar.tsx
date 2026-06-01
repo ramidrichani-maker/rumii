@@ -248,7 +248,7 @@ export const Navbar = () => {
             {activeMenu === 'rent' && (
               <>
                 <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Property to rent
+                  Rent
                 </Link>
               </>
             )}
@@ -315,7 +315,7 @@ export const Navbar = () => {
                   <div className="space-y-1">
                     <p className="px-3 py-2 text-sm font-semibold text-foreground">Rent</p>
                     <Link to="/rent" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Property to rent
+                      Rent
                     </Link>
                   </div>
 
