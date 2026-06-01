@@ -668,7 +668,7 @@ const AdminDashboard = () => {
               User & Viewings Management
             </h2>
             <Tabs defaultValue="users" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="users" className="flex items-center gap-1 text-xs sm:text-sm">
                   <UserCog className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Users</span>
@@ -680,10 +680,6 @@ const AdminDashboard = () => {
                 <TabsTrigger value="agencies" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Agencies</span>
-                </TabsTrigger>
-                <TabsTrigger value="viewings" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Viewings</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -704,6 +700,24 @@ const AdminDashboard = () => {
                   <AgencyManager />
                 </div>
               </TabsContent>
+          </Tabs>
+          </div>
+        </div>
+
+        {/* Viewings Management */}
+        <div className="mb-8">
+          <div>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Viewings Management
+            </h2>
+            <Tabs defaultValue="viewings" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-1">
+                <TabsTrigger value="viewings" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span>Viewings</span>
+                </TabsTrigger>
+              </TabsList>
 
               <TabsContent value="viewings">
                 <Card>
