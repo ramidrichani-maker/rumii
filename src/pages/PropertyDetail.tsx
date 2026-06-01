@@ -910,6 +910,17 @@ const PropertyDetail = () => {
         {/* Local area information */}
         {cityCoords && (
           <div className="mt-10">
+            {/* Mobile-only: show agent contact box above local area info */}
+            <div className="lg:hidden mb-6">
+              <AgentContactBox
+                propertyId={property.id}
+                agencyId={property.agency_id}
+                propertyAddress={property.address}
+                propertyType={property.property_type}
+                propertyPrice={property.price}
+                listingType={property.listing_type}
+              />
+            </div>
             <h2 className="text-xl font-semibold text-foreground mb-4">
               Local area information
             </h2>
@@ -971,7 +982,7 @@ const PropertyDetail = () => {
         </div>
 
         {/* Right column - agent contact box */}
-        <div className="lg:w-[300px] shrink-0">
+        <div className="hidden lg:block lg:w-[300px] shrink-0">
           <div className="lg:sticky lg:top-20">
             <AgentContactBox
               propertyId={property.id}
