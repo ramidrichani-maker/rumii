@@ -210,8 +210,8 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
             </>
           )}
         </div>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-start mb-2">
+        <CardHeader className="pb-1 pt-3">
+          <div className="flex justify-between items-start mb-1">
             <Badge variant={badgeVariant}>{badgeLabel}</Badge>
             <div className="flex flex-col items-end gap-1">
               <span className="text-2xl font-bold text-primary">
@@ -223,10 +223,9 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               </div>
             </div>
           </div>
-          <CardTitle className="text-lg">{property.city}</CardTitle>
-          <CardDescription>&nbsp;</CardDescription>
+          <CardTitle className="text-lg leading-tight">{property.city}</CardTitle>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-2 pb-4">
           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
             <div className="flex items-center">
               <Bed className="w-4 h-4 mr-1" />
