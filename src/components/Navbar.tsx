@@ -250,9 +250,6 @@ export const Navbar = () => {
                 <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
                   Property to rent
                 </Link>
-                <span className="px-4 py-3 rounded-md text-sm font-medium text-muted-foreground cursor-default">
-                  Student property to rent
-                </span>
               </>
             )}
             {activeMenu === 'commercial' && (
@@ -320,9 +317,6 @@ export const Navbar = () => {
                     <Link to="/rent" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Property to rent
                     </Link>
-                    <span className="block px-6 py-2 text-sm text-muted-foreground/50 cursor-default">
-                      Student property to rent
-                    </span>
                   </div>
 
                   {/* Find agents */}
