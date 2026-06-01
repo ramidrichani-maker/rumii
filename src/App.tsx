@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -60,33 +60,6 @@ const RouteProgress = () => {
   );
 };
 
-// Quick fade overlay on route change — gives a smooth perceived transition
-// without unmounting/remounting the route tree (which caused the "loading twice" lag).
-const RouteFadeOverlay = () => {
-  const location = useLocation();
-  const [visible, setVisible] = useState(false);
-  const firstRef = useRef(true);
-
-  useEffect(() => {
-    if (firstRef.current) {
-      firstRef.current = false;
-      return;
-    }
-    setVisible(true);
-    const t = setTimeout(() => setVisible(false), 180);
-    return () => clearTimeout(t);
-  }, [location.pathname]);
-
-  return (
-    <div
-      aria-hidden
-      className={`pointer-events-none fixed inset-0 z-[60] bg-background transition-opacity duration-200 ease-out ${
-        visible ? "opacity-60" : "opacity-0"
-      }`}
-    />
-  );
-};
-
 const AppRoutes = () => {
   return (
     <div className="relative">
@@ -136,7 +109,6 @@ const App = () => (
         <BrowserRouter>
           <Navbar />
           <RouteProgress />
-          <RouteFadeOverlay />
           <FloatingChatWidget />
           <AppRoutes />
           <SupportReviewWidget />
