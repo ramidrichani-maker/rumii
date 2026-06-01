@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2, ListChecks, ClipboardCheck, Search, MessageSquare, HeadphonesIcon } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Home, Eye, UserCog, TrendingUp, Calendar, Trash2, Building, Star, Camera, Building2, Sparkles, Plus, FileSpreadsheet, Wand2, ListChecks, ClipboardCheck, Search, MessageSquare, HeadphonesIcon, ChevronDown } from "lucide-react";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import UserRoleManager from "@/components/UserRoleManager";
 import UserAnalytics from "@/components/UserAnalytics";
@@ -426,12 +427,15 @@ const AdminDashboard = () => {
         </div>
 
         {/* Row 1: Property Management */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <Home className="w-5 h-5" />
               Property Management
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="properties" className="space-y-4">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="properties" className="flex items-center gap-1 text-xs sm:text-sm">
@@ -534,16 +538,19 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
           </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Row 1.2: Property Extras */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <Sparkles className="w-5 h-5" />
               Property Extras
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="ai-designer" className="space-y-4">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="ai-designer" className="flex items-center gap-1 text-xs sm:text-sm">
@@ -604,16 +611,19 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
             </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Row 1.5: Service Requests */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
               Service Requests
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="valuations" className="space-y-4">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="valuations" className="flex items-center gap-1 text-xs sm:text-sm">
@@ -648,25 +658,33 @@ const AdminDashboard = () => {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Email Broadcast */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Mail className="w-5 h-5" />
-            Email Broadcast
-          </h2>
-          <EmailBroadcastManager />
-        </div>
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Mail className="w-5 h-5" />
+              Email Broadcast
+            </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <EmailBroadcastManager />
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Row 2: User Management */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <Users className="w-5 h-5" />
               User Management
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="users" className="space-y-4">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="users" className="flex items-center gap-1 text-xs sm:text-sm">
@@ -701,16 +719,19 @@ const AdminDashboard = () => {
                 </div>
               </TabsContent>
           </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Viewings Management */}
-        <div className="mb-8">
-          <div>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
               <Calendar className="w-5 h-5" />
               Viewings Management
             </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
             <Tabs defaultValue="viewings" className="space-y-4">
               <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="viewings" className="flex items-center gap-1 text-xs sm:text-sm">
@@ -843,25 +864,34 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
           </Tabs>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Customer Support Management */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <HeadphonesIcon className="w-5 h-5" />
-            Customer Support
-          </h2>
-          <SupportDashboard />
-        </div>
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <HeadphonesIcon className="w-5 h-5" />
+              Customer Support
+            </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SupportDashboard />
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Row 3: Analytics & Agent Performance */}
-        <div className="mb-8 space-y-6">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Analytics & Agent Performance
-          </h2>
-          <Tabs defaultValue="agents" className="space-y-4">
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" />
+              Analytics & Agent Performance
+            </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Tabs defaultValue="agents" className="space-y-4">
             <TabsList className="w-auto">
               <TabsTrigger value="agents" className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
@@ -880,8 +910,9 @@ const AdminDashboard = () => {
             <TabsContent value="analytics">
               <UserAnalytics />
             </TabsContent>
-          </Tabs>
-        </div>
+            </Tabs>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Property Detail Modal */}
         <PropertyDetailModal
