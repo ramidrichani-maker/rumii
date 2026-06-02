@@ -295,7 +295,12 @@ export default function MyOracle() {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div
                       className="cursor-pointer flex-1"
-                      onClick={() => navigate(`/${area.page}`)}
+                      onClick={() => {
+                        const coordsStr = typeof area.coordinates === 'string'
+                          ? area.coordinates
+                          : JSON.stringify(area.coordinates);
+                        navigate(`/${area.page}?polygon=${encodeURIComponent(coordsStr)}`);
+                      }}
                     >
                       <p className="font-medium text-sm text-foreground">{area.name}</p>
                       <p className="text-xs text-muted-foreground">
