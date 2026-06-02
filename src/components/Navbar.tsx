@@ -144,14 +144,9 @@ export const Navbar = () => {
               >
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
               </div>
-              <div
-                className="relative"
-                onMouseEnter={() => openMenu('rent')}
-                onMouseLeave={scheduleClose}
-                onClick={() => setActiveMenu(prev => prev === 'rent' ? null : 'rent')}
-              >
+              <Link to="/rent" onMouseEnter={() => closeMenu()}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
-              </div>
+              </Link>
               <Link to="/find-agents" onMouseEnter={() => closeMenu()}>
                 <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
               </Link>
@@ -245,13 +240,6 @@ export const Navbar = () => {
                 </Link>
               </>
             )}
-            {activeMenu === 'rent' && (
-              <>
-                <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Rent
-                </Link>
-              </>
-            )}
             {activeMenu === 'commercial' && (
               <>
                 <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
@@ -312,12 +300,9 @@ export const Navbar = () => {
                   </div>
 
                   {/* Rent */}
-                  <div className="space-y-1">
-                    <p className="px-3 py-2 text-sm font-semibold text-foreground">Rent</p>
-                    <Link to="/rent" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Rent
-                    </Link>
-                  </div>
+                  <Link to="/rent" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-sm font-semibold text-foreground hover:bg-accent">
+                    Rent
+                  </Link>
 
                   {/* Find agents */}
                   <div>
