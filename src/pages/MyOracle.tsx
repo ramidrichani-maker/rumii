@@ -64,7 +64,7 @@ interface SavedArea {
 }
 
 export default function MyOracle() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
@@ -77,6 +77,10 @@ export default function MyOracle() {
   const [showAllFavorites, setShowAllFavorites] = useState(false);
   const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
   const [showAllMyPlaces, setShowAllMyPlaces] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/auth');
+  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -137,10 +141,10 @@ export default function MyOracle() {
 
   const formatPrice = (property: { price: number | null; rental_price: number | null; listing_type: string }) => {
     if (property.listing_type === 'rent' && property.rental_price) {
-      return `€${property.rental_price.toLocaleString()}/mo`;
+      return `$${property.rental_price.toLocaleString()}/mo`;
     }
     if (property.price) {
-      return `€${property.price.toLocaleString()}`;
+      return `$${property.price.toLocaleString()}`;
     }
     return 'Price on request';
   };

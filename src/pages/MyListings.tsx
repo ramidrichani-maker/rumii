@@ -48,7 +48,7 @@ type FeaturedRequestStatus = { property_id: string; status: string };
 const REFRESH_MY_LISTINGS_MS = 2500;
 
 export default function MyListings() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +62,10 @@ export default function MyListings() {
   });
   const [featuredRequests, setFeaturedRequests] = useState<Record<string, string>>({});
   const [requestingId, setRequestingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/auth');
+  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     fetchProperties();
