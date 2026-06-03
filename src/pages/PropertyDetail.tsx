@@ -764,112 +764,6 @@ const PropertyDetail = () => {
           </div>
         </div>
 
-        {/* Affordability Calculator */}
-        {(() => {
-          if (property.listing_type !== 'sale' && property.listing_type !== 'both') return null;
-          if (calcPrice <= 1) return null;
-
-          const downPaymentAmount = calcPrice * (calcDownPercent / 100);
-          const principal = calcPrice - downPaymentAmount;
-          const monthlyRate = 0.07 / 12;
-          const totalPayments = calcTermYears * 12;
-          let monthlyPayment = 0;
-          if (monthlyRate > 1e-12) {
-            monthlyPayment = principal * (
-              (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) /
-              (Math.pow(1 + monthlyRate, totalPayments) - 1)
-            );
-          }
-
-          return (
-            <div className="mt-6">
-              <Collapsible open={calcOpen} onOpenChange={setCalcOpen}>
-                <CollapsibleTrigger asChild>
-                  <button className="flex items-center justify-between w-full text-left group">
-                    <div className="flex items-center gap-2 text-foreground">
-                      <Calculator className="w-5 h-5 text-muted-foreground" />
-                      <span className="text-base font-semibold">Affordability Calculator</span>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${calcOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="mt-4 p-4 rounded-xl border bg-muted/30 space-y-5">
-                    {/* Property Price */}
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1.5 block">Property Price</label>
-                      <Input
-                        type="number"
-                        value={calcPrice}
-                        onChange={(e) => setCalcPrice(Math.max(0, Number(e.target.value)))}
-                        className="h-10"
-                      />
-                    </div>
-
-                    {/* Down Payment */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1.5">
-                        <label className="text-sm font-medium text-foreground">Down Payment</label>
-                        <span className="text-sm text-muted-foreground">{calcDownPercent}%</span>
-                      </div>
-                      <div className="relative px-1">
-                        <Slider
-                          value={[calcDownPercent]}
-                          onValueChange={(v) => setCalcDownPercent(v[0])}
-                          min={5}
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        {/* Custom thumb */}
-                        <div
-                          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary border-2 border-background rounded-full shadow-md pointer-events-none"
-                          style={{ left: `${((calcDownPercent - 5) / 95) * 100}%`, transform: 'translateX(-50%) translateY(-50%)' }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>5%</span>
-                        <span>100%</span>
-                      </div>
-                    </div>
-
-                    {/* Loan Term */}
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1.5 block">Loan Term</label>
-                      <Select
-                        value={String(calcTermYears)}
-                        onValueChange={(v) => setCalcTermYears(Number(v))}
-                      >
-                        <SelectTrigger className="h-10 w-full">
-                          <SelectValue placeholder="Select years" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[10, 15, 20, 25, 30].map((years) => (
-                            <SelectItem key={years} value={String(years)}>{years} years</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Result */}
-                    <div className="pt-3 border-t border-border">
-                      <div className="text-sm text-muted-foreground mb-1">Estimated monthly payment</div>
-                      <div className="text-3xl font-bold text-primary">
-                        ${monthlyPayment.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">estimated at 7% interest rate</div>
-                    </div>
-
-                    <p className="text-xs text-muted-foreground">
-                      For illustration only. Contact a bank for exact rates.
-                    </p>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          );
-        })()}
-
         {/* About this property */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-foreground mb-4">About this property</h2>
@@ -976,6 +870,112 @@ const PropertyDetail = () => {
               originLng={cityCoords.lng}
               city={property.city}
             />
+
+            {/* Affordability Calculator */}
+            {(() => {
+              if (property.listing_type !== 'sale' && property.listing_type !== 'both') return null;
+              if (calcPrice <= 1) return null;
+
+              const downPaymentAmount = calcPrice * (calcDownPercent / 100);
+              const principal = calcPrice - downPaymentAmount;
+              const monthlyRate = 0.07 / 12;
+              const totalPayments = calcTermYears * 12;
+              let monthlyPayment = 0;
+              if (monthlyRate > 1e-12) {
+                monthlyPayment = principal * (
+                  (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) /
+                  (Math.pow(1 + monthlyRate, totalPayments) - 1)
+                );
+              }
+
+              return (
+                <div className="mt-6">
+                  <Collapsible open={calcOpen} onOpenChange={setCalcOpen}>
+                    <CollapsibleTrigger asChild>
+                      <button className="flex items-center justify-between w-full text-left group">
+                        <div className="flex items-center gap-2 text-foreground">
+                          <Calculator className="w-5 h-5 text-muted-foreground" />
+                          <span className="text-base font-semibold">Affordability Calculator</span>
+                        </div>
+                        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${calcOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="mt-4 p-4 rounded-xl border bg-muted/30 space-y-5">
+                        {/* Property Price */}
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-1.5 block">Property Price</label>
+                          <Input
+                            type="number"
+                            value={calcPrice}
+                            onChange={(e) => setCalcPrice(Math.max(0, Number(e.target.value)))}
+                            className="h-10"
+                          />
+                        </div>
+
+                        {/* Down Payment */}
+                        <div>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <label className="text-sm font-medium text-foreground">Down Payment</label>
+                            <span className="text-sm text-muted-foreground">{calcDownPercent}%</span>
+                          </div>
+                          <div className="relative px-1">
+                            <Slider
+                              value={[calcDownPercent]}
+                              onValueChange={(v) => setCalcDownPercent(v[0])}
+                              min={5}
+                              max={100}
+                              step={1}
+                              className="w-full"
+                            />
+                            {/* Custom thumb */}
+                            <div
+                              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary border-2 border-background rounded-full shadow-md pointer-events-none"
+                              style={{ left: `${((calcDownPercent - 5) / 95) * 100}%`, transform: 'translateX(-50%) translateY(-50%)' }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                            <span>5%</span>
+                            <span>100%</span>
+                          </div>
+                        </div>
+
+                        {/* Loan Term */}
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-1.5 block">Loan Term</label>
+                          <Select
+                            value={String(calcTermYears)}
+                            onValueChange={(v) => setCalcTermYears(Number(v))}
+                          >
+                            <SelectTrigger className="h-10 w-full">
+                              <SelectValue placeholder="Select years" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[10, 15, 20, 25, 30].map((years) => (
+                                <SelectItem key={years} value={String(years)}>{years} years</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Result */}
+                        <div className="pt-3 border-t border-border">
+                          <div className="text-sm text-muted-foreground mb-1">Estimated monthly payment</div>
+                          <div className="text-3xl font-bold text-primary">
+                            ${monthlyPayment.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">estimated at 7% interest rate</div>
+                        </div>
+
+                        <p className="text-xs text-muted-foreground">
+                          For illustration only. Contact a bank for exact rates.
+                        </p>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+              );
+            })()}
 
           </div>
         )}
