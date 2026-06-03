@@ -164,7 +164,7 @@ export default function ClientDashboard() {
   };
 
   const formatPrice = (price: number, listingType: string) => {
-    return `€${price.toLocaleString()}${listingType === "rent" ? "/month" : ""}`;
+    return `$${price.toLocaleString()}${listingType === "rent" ? "/mo" : ""}`;
   };
 
   const deleteProperty = async (propertyId: string) => {

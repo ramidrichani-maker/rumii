@@ -94,42 +94,42 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
   }, [user, property.id]);
 
   useEffect(() => {
-    const fetchAgent = async () => {
-      const { data: assignment } = await supabase
-        .from('property_agents')
-        .select('agent_id')
-        .eq('property_id', property.id)
-        .limit(1)
-        .single();
+    let cancelled = false;
+    (async () => {
+      const [assignmentRes, agencyRes] = await Promise.all([
+        supabase
+          .from('property_agents')
+          .select('agent_id')
+          .eq('property_id', property.id)
+          .limit(1)
+          .maybeSingle(),
+        property.agency_id
+          ? supabase
+              .from('agencies')
+              .select('name, logo_url')
+              .eq('id', property.agency_id)
+              .maybeSingle()
+          : Promise.resolve({ data: null } as any),
+      ]);
+      if (cancelled) return;
+      const assignment = assignmentRes.data;
       if (assignment) {
         setAgentId(assignment.agent_id);
         const { data: profile } = await supabase
           .from('profiles')
           .select('phone_number')
           .eq('user_id', assignment.agent_id)
-          .single();
-        if (profile) setAgentPhone(profile.phone_number);
+          .maybeSingle();
+        if (!cancelled && profile) setAgentPhone(profile.phone_number);
       }
-    };
-    fetchAgent();
-  }, [property.id]);
-
-  useEffect(() => {
-    const fetchAgency = async () => {
-      if (property.agency_id) {
-        const { data: agency } = await supabase
-          .from('agencies')
-          .select('name, logo_url')
-          .eq('id', property.agency_id)
-          .single();
-        if (agency) {
-          setAgencyName(agency.name);
-          setAgencyLogo(agency.logo_url);
-        }
+      const agency = agencyRes.data;
+      if (agency) {
+        setAgencyName(agency.name);
+        setAgencyLogo(agency.logo_url);
       }
-    };
-    fetchAgency();
-  }, [property.agency_id]);
+    })();
+    return () => { cancelled = true; };
+  }, [property.id, property.agency_id]);
 
   useEffect(() => {
     const fetchStackedUnits = async () => {

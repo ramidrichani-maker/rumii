@@ -137,10 +137,10 @@ export default function MyOracle() {
 
   const formatPrice = (property: { price: number | null; rental_price: number | null; listing_type: string }) => {
     if (property.listing_type === 'rent' && property.rental_price) {
-      return `€${property.rental_price.toLocaleString()}/mo`;
+      return `$${property.rental_price.toLocaleString()}/mo`;
     }
     if (property.price) {
-      return `€${property.price.toLocaleString()}`;
+      return `$${property.price.toLocaleString()}`;
     }
     return 'Price on request';
   };

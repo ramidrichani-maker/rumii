@@ -429,7 +429,7 @@ const AdminDashboard = () => {
         {/* Row 1: Property Management */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847262]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <Home className="w-5 h-5" />
               Property Management
             </h2>
@@ -544,7 +544,7 @@ const AdminDashboard = () => {
         {/* Row 1.2: Property Extras */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847262]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <Sparkles className="w-5 h-5" />
               Property Extras
             </h2>
@@ -617,7 +617,7 @@ const AdminDashboard = () => {
         {/* Row 1.5: Service Requests */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847162]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <MessageSquare className="w-5 h-5" />
               Service Requests
             </h2>
@@ -664,7 +664,7 @@ const AdminDashboard = () => {
         {/* Email Broadcast */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847062]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <Mail className="w-5 h-5" />
               Email Broadcast
             </h2>
@@ -678,7 +678,7 @@ const AdminDashboard = () => {
         {/* Row 2: User Management */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847062]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <Users className="w-5 h-5" />
               User Management
             </h2>
@@ -725,7 +725,7 @@ const AdminDashboard = () => {
         {/* Viewings Management */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847062]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <Calendar className="w-5 h-5" />
               Viewings Management
             </h2>
@@ -870,7 +870,7 @@ const AdminDashboard = () => {
         {/* Customer Support Management */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847062]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <HeadphonesIcon className="w-5 h-5" />
               Customer Support
             </h2>
@@ -884,7 +884,7 @@ const AdminDashboard = () => {
         {/* Row 3: Analytics & Agent Performance */}
         <Collapsible className="mb-8 group/section">
           <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-[#847062]">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
               <TrendingUp className="w-5 h-5" />
               Analytics & Agent Performance
             </h2>

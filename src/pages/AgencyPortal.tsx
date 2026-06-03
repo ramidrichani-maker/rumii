@@ -318,6 +318,10 @@ const AgencyPortal = () => {
     );
   }
 
+  if (!user || (profile && profile.role !== 'agency_manager')) {
+    return null;
+  }
+
   if (!profile?.agency_id) {
     return (
       <div className="min-h-screen pt-20 px-4">
