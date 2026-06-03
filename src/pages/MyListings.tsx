@@ -31,6 +31,17 @@ interface Property {
   property_code: number | null;
   featured_section?: string | null;
   agency_id?: string | null;
+  parent_property_id?: string | null;
+}
+
+interface StackedAggregate {
+  units: number;
+  minBeds: number;
+  maxBeds: number;
+  minBaths: number;
+  maxBaths: number;
+  minSqm: number;
+  maxSqm: number;
 }
 
 interface ListingUpdate {
@@ -62,6 +73,7 @@ export default function MyListings() {
   });
   const [featuredRequests, setFeaturedRequests] = useState<Record<string, string>>({});
   const [requestingId, setRequestingId] = useState<string | null>(null);
+  const [stackedAggregates, setStackedAggregates] = useState<Record<string, StackedAggregate>>({});
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/auth');
@@ -198,7 +210,44 @@ export default function MyListings() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProperties(data || []);
+      const all = (data || []) as Property[];
+      setProperties(all);
+
+      const stackedParentIds = all
+        .filter((p) => p.property_type === 'stacked_unit' && !p.parent_property_id)
+        .map((p) => p.id);
+
+      if (stackedParentIds.length > 0) {
+        const { data: subs } = await supabase
+          .from('properties')
+          .select('parent_property_id, square_meters, bedrooms, bathrooms')
+          .in('parent_property_id', stackedParentIds);
+
+        const aggregates: Record<string, StackedAggregate> = {};
+        ((subs || []) as Array<{ parent_property_id: string; square_meters: number; bedrooms: number; bathrooms: number }>).forEach((sub) => {
+          const key = sub.parent_property_id;
+          const existing = aggregates[key];
+          if (!existing) {
+            aggregates[key] = {
+              units: 1,
+              minBeds: sub.bedrooms, maxBeds: sub.bedrooms,
+              minBaths: sub.bathrooms, maxBaths: sub.bathrooms,
+              minSqm: sub.square_meters, maxSqm: sub.square_meters,
+            };
+          } else {
+            existing.units += 1;
+            existing.minBeds = Math.min(existing.minBeds, sub.bedrooms);
+            existing.maxBeds = Math.max(existing.maxBeds, sub.bedrooms);
+            existing.minBaths = Math.min(existing.minBaths, sub.bathrooms);
+            existing.maxBaths = Math.max(existing.maxBaths, sub.bathrooms);
+            existing.minSqm = Math.min(existing.minSqm, sub.square_meters);
+            existing.maxSqm = Math.max(existing.maxSqm, sub.square_meters);
+          }
+        });
+        setStackedAggregates(aggregates);
+      } else {
+        setStackedAggregates({});
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
       toast.error('Failed to load your properties');
@@ -268,9 +317,23 @@ export default function MyListings() {
     rejected: properties.filter((p) => p.status === 'rejected').length,
   };
 
+  // Hide stacked sub-units from the grid — they're represented by their parent card.
+  const topLevel = properties.filter((p) => !p.parent_property_id);
   const filtered = statusFilter === 'all'
-    ? properties
-    : properties.filter((p) => p.status === statusFilter);
+    ? topLevel
+    : topLevel.filter((p) => p.status === statusFilter);
+
+  const formatRange = (min: number, max: number) => (min === max ? `${min}` : `${min}–${max}`);
+  const renderSpecs = (property: Property) => {
+    if (property.property_type === 'stacked_unit') {
+      const agg = stackedAggregates[property.id];
+      if (agg && agg.units > 0) {
+        return `${formatRange(agg.minSqm, agg.maxSqm)}m² • ${formatRange(agg.minBeds, agg.maxBeds)} bed • ${formatRange(agg.minBaths, agg.maxBaths)} bath • ${agg.units} unit${agg.units > 1 ? 's' : ''}`;
+      }
+      return 'No units added yet';
+    }
+    return `${property.square_meters}m² • ${property.bedrooms} bed • ${property.bathrooms} bath`;
+  };
 
   const updateIcon = (type: string) => {
     if (type === 'success') return <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />;
@@ -396,7 +459,7 @@ export default function MyListings() {
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
-                      {property.square_meters}m² • {property.bedrooms} bed • {property.bathrooms} bath
+                      {renderSpecs(property)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
