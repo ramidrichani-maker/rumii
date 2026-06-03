@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,8 @@ interface Viewing {
 }
 
 export default function Profile() {
-  const { user, profile, updateProfile } = useAuth();
+  const { user, profile, updateProfile, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -33,6 +35,10 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [viewings, setViewings] = useState<Viewing[]>([]);
   const [loadingViewings, setLoadingViewings] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/auth');
+  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     if (profile) {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -45,7 +46,8 @@ interface Property {
 }
 
 export default function ClientDashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [viewings, setViewings] = useState<PropertyViewing[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,6 +63,10 @@ export default function ClientDashboard() {
     const hour = i + 9;
     return `${hour.toString().padStart(2, '0')}:00`;
   });
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/auth');
+  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     if (user) {
