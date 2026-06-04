@@ -39,9 +39,10 @@ interface Property {
 interface PropertyCardProps {
   property: Property;
   onClick: (property: Property) => void;
+  compact?: boolean;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
+const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact = false }) => {
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
