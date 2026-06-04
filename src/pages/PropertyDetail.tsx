@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 import { useSwipeCarousel } from "@/hooks/useSwipeCarousel";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
