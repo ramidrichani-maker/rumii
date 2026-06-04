@@ -979,11 +979,8 @@ const PropertyDetail = () => {
                           <div className="text-3xl font-bold text-primary">
                             ${monthlyPayment.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                           </div>
+                          <div className="text-xs text-muted-foreground mt-1">estimated at {calcInterestRate}% interest rate</div>
                         </div>
-
-                        <p className="text-xs text-muted-foreground">
-                          For illustration only. Contact a bank for exact rates.
-                        </p>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
