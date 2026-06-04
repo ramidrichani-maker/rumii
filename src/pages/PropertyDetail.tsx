@@ -920,19 +920,19 @@ const PropertyDetail = () => {
                             <span className="text-sm text-muted-foreground">{calcDownPercent}%</span>
                           </div>
                           <div className="relative px-1">
-                            <Slider
+                            <SliderPrimitive.Root
                               value={[calcDownPercent]}
                               onValueChange={(v) => setCalcDownPercent(v[0])}
                               min={5}
                               max={100}
                               step={1}
-                              className="w-full"
-                            />
-                            {/* Custom thumb */}
-                            <div
-                              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary border-2 border-background rounded-full shadow-md pointer-events-none"
-                              style={{ left: `${((calcDownPercent - 5) / 95) * 100}%`, transform: 'translateX(-50%) translateY(-50%)' }}
-                            />
+                              className="relative flex w-full touch-none select-none items-center"
+                            >
+                              <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
+                                <SliderPrimitive.Range className="absolute h-full bg-primary" />
+                              </SliderPrimitive.Track>
+                              <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-background bg-primary shadow-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
+                            </SliderPrimitive.Root>
                           </div>
                           <div className="flex justify-between text-xs text-muted-foreground mt-1">
                             <span>5%</span>
