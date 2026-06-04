@@ -383,6 +383,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
         {/* Top-right: Agency + Favorite */}
         <div className="absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1">
           <div className="flex items-center gap-1">
+            {agencyName && !compact && (
+              <div className="hidden md:flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+                {agencyLogo ? (
+                  <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                  <Building2 className="w-4 h-4 text-muted-foreground" />
+                )}
+                <span className="text-xs font-medium text-muted-foreground">{agencyName}</span>
+              </div>
+            )}
             <Button
             variant="ghost"
             size="icon"
@@ -459,8 +469,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Agency chip (desktop) — placed above action buttons to avoid overlapping the price */}
-        {agencyName && (
+        {/* Agency chip (desktop, map-view only) — placed above action buttons to avoid overlapping the price */}
+        {agencyName && compact && (
           <div className="hidden md:flex justify-end mt-2">
             <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
               {agencyLogo ? (
