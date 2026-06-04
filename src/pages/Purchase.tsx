@@ -593,6 +593,7 @@ const Purchase = () => {
                       <PropertyCard
                         property={property}
                         onClick={handlePropertySelect}
+                        compact={showMap}
                       />
                     </ScrollReveal>
                   ))}
