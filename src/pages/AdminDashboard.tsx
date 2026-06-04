@@ -28,6 +28,7 @@ import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
 import { AdminPropertyListingsManager } from "@/components/AdminPropertyListingsManager";
 import ValuationRequestsManager from "@/components/ValuationRequestsManager";
 import FindAgentRequestsManager from "@/components/FindAgentRequestsManager";
+import CommercialAdvertisementsManager from "@/components/CommercialAdvertisementsManager";
 import EmailBroadcastManager from "@/components/EmailBroadcastManager";
 import { format } from "date-fns";
 import { Mail } from "lucide-react";
@@ -625,7 +626,7 @@ const AdminDashboard = () => {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <Tabs defaultValue="valuations" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="valuations" className="flex items-center gap-1 text-xs sm:text-sm">
                   <ClipboardCheck className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Valuations</span>
@@ -637,6 +638,10 @@ const AdminDashboard = () => {
                 <TabsTrigger value="find-agent" className="flex items-center gap-1 text-xs sm:text-sm">
                   <Search className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Find Agent</span>
+                </TabsTrigger>
+                <TabsTrigger value="commercial-ads" className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Commercial Ads</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -655,6 +660,12 @@ const AdminDashboard = () => {
               <TabsContent value="find-agent">
                 <div className="max-h-[500px] overflow-y-auto">
                   <FindAgentRequestsManager />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="commercial-ads">
+                <div className="max-h-[500px] overflow-y-auto">
+                  <CommercialAdvertisementsManager />
                 </div>
               </TabsContent>
             </Tabs>
