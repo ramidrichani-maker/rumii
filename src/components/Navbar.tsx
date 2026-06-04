@@ -323,6 +323,9 @@ export const Navbar = () => {
                     <Link to="/purchase?type=commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Commercial property for sale
                     </Link>
+                    <Link to="/advertise-commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Advertise commercial property
+                    </Link>
                   </div>
                 </>
               )}
