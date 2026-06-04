@@ -586,6 +586,7 @@ const Rent = () => {
                       <PropertyCard
                         property={property}
                         onClick={handlePropertySelect}
+                        compact={showMap}
                       />
                     </ScrollReveal>
                   ))}
