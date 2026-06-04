@@ -34,6 +34,7 @@ import AgentValuation from "./pages/AgentValuation";
 import SupportPortal from "./pages/SupportPortal";
 import MyOracle from "./pages/MyOracle";
 import AccountSettings from "./pages/AccountSettings";
+import AdvertiseCommercial from "./pages/AdvertiseCommercial";
 import { FloatingChatWidget } from "./components/FloatingChatWidget";
 import { SupportReviewWidget } from "./components/SupportReviewWidget";
 
@@ -92,6 +93,7 @@ const AppRoutes = () => {
           <Route path="/my-rumi" element={<MyOracle />} />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/advertise-commercial" element={<AdvertiseCommercial />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

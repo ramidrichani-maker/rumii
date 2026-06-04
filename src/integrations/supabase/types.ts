@@ -203,6 +203,63 @@ export type Database = {
           },
         ]
       }
+      commercial_advertisements: {
+        Row: {
+          address: string
+          city: string | null
+          created_at: string
+          description: string | null
+          email: string
+          full_name: string
+          id: string
+          listing_type: string
+          municipality: string | null
+          phone_number: string
+          price: number | null
+          property_type: string
+          size_sqm: number | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address: string
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          email: string
+          full_name: string
+          id?: string
+          listing_type: string
+          municipality?: string | null
+          phone_number: string
+          price?: number | null
+          property_type: string
+          size_sqm?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          listing_type?: string
+          municipality?: string | null
+          phone_number?: string
+          price?: number | null
+          property_type?: string
+          size_sqm?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string | null

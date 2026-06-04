@@ -248,6 +248,9 @@ export const Navbar = () => {
                 <Link to="/purchase?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
                   Commercial property for sale
                 </Link>
+                <Link to="/advertise-commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Advertise commercial property
+                </Link>
               </>
             )}
           </div>
@@ -319,6 +322,9 @@ export const Navbar = () => {
                     </Link>
                     <Link to="/purchase?type=commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Commercial property for sale
+                    </Link>
+                    <Link to="/advertise-commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Advertise commercial property
                     </Link>
                   </div>
                 </>
