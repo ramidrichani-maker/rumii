@@ -880,7 +880,7 @@ const PropertyDetail = () => {
 
               const downPaymentAmount = calcPrice * (calcDownPercent / 100);
               const principal = calcPrice - downPaymentAmount;
-              const monthlyRate = 0.07 / 12;
+              const monthlyRate = (calcInterestRate / 100) / 12;
               const totalPayments = calcTermYears * 12;
               let monthlyPayment = 0;
               if (monthlyRate > 1e-12) {
@@ -942,6 +942,19 @@ const PropertyDetail = () => {
                           </div>
                         </div>
 
+                        {/* Interest Rate */}
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-1.5 block">Interest Rate (%)</label>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            min={0}
+                            value={calcInterestRate}
+                            onChange={(e) => setCalcInterestRate(Math.max(0, Number(e.target.value)))}
+                            className="h-10"
+                          />
+                        </div>
+
                         {/* Loan Term */}
                         <div>
                           <label className="text-sm font-medium text-foreground mb-1.5 block">Loan Term</label>
@@ -966,7 +979,7 @@ const PropertyDetail = () => {
                           <div className="text-3xl font-bold text-primary">
                             ${monthlyPayment.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                           </div>
-                          <div className="text-xs text-muted-foreground mt-1">estimated at 7% interest rate</div>
+                          <div className="text-xs text-muted-foreground mt-1">estimated at {calcInterestRate}% interest rate</div>
                         </div>
 
                         <p className="text-xs text-muted-foreground">
