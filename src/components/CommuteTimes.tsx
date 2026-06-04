@@ -266,7 +266,7 @@ export default function CommuteTimes({ originLat, originLng }: CommuteTimesProps
 
       {destinations.length === 0 && !adding && (
         <p className="text-sm text-muted-foreground py-4 text-center">
-          No destinations yet. Add a place to see driving times.
+          No destinations yet. Add a place to see.
         </p>
       )}
 
@@ -310,7 +310,7 @@ export default function CommuteTimes({ originLat, originLng }: CommuteTimesProps
       )}
 
       <p className="mt-3 text-xs text-muted-foreground">
-        Estimates use Google Maps driving times from the property's neighbourhood. Times are indicative only.
+        Estimates use Google Maps driving times.
       </p>
     </div>
   );
