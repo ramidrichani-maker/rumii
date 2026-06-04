@@ -109,6 +109,7 @@ const PropertyDetail = () => {
   const [calcPrice, setCalcPrice] = useState<number>(0);
   const [calcDownPercent, setCalcDownPercent] = useState<number>(20);
   const [calcTermYears, setCalcTermYears] = useState<number>(25);
+  const [calcInterestRate, setCalcInterestRate] = useState<number>(7);
 
   useEffect(() => {
     const fetchProperty = async () => {
