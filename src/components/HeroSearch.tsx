@@ -85,8 +85,8 @@ const HeroSearch = () => {
             }}
           />
 
-          {/* Dropdown with "Draw your search area" when input is focused on mobile */}
-          {isMobile && inputFocused && !showDrawMap && (
+          {/* Dropdown with "Draw your search area" when input is focused */}
+          {inputFocused && !showDrawMap && (
             <div className="absolute left-0 right-0 top-full mt-1 z-[100] bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               <button
                 onClick={() => {
@@ -113,8 +113,8 @@ const HeroSearch = () => {
         </Button>
       </div>
 
-      {/* Mobile draw map */}
-      {isMobile && showDrawMap && (
+      {/* Draw map */}
+      {showDrawMap && (
         <div className="mt-4">
           <Suspense fallback={<div className="h-[340px] rounded-xl bg-muted animate-pulse mt-4" />}>
             <DrawSearchArea onDrawComplete={handleDrawComplete} />
