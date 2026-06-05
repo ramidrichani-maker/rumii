@@ -170,83 +170,6 @@ export default function MyOracle() {
     <div className="container mx-auto py-8 px-4 max-w-5xl space-y-10">
       <h1 className="text-3xl font-bold text-foreground">My rumi</h1>
 
-      {/* Enquiries Section */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <Mail className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold text-foreground">Enquiries</h2>
-        </div>
-        <h3 className="text-base font-medium text-foreground mb-3">Initial Enquiry</h3>
-        {enquiries.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center space-y-4">
-              <div className="space-y-1">
-                <p className="text-foreground font-medium">You haven't sent any enquiries yet.</p>
-                <p className="text-sm text-muted-foreground">If you send an enquiry to an agent it will appear here</p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
-                <Button variant="outline" onClick={() => navigate('/rent')}>
-                  Search property to rent
-                </Button>
-                <Button variant="outline" onClick={() => navigate('/purchase')}>
-                  Search property for sale
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <div className="grid gap-4 md:grid-cols-2">
-              {(showAllEnquiries ? enquiries : enquiries.slice(0, 2)).map((enquiry) => (
-                <Card
-                  key={enquiry.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => navigate(`/property/${enquiry.property_id}`)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex gap-3">
-                      {enquiry.properties?.images?.[0] && (
-                        <img
-                          src={enquiry.properties.images[0]}
-                          alt={enquiry.properties.address}
-                          className="w-20 h-20 rounded-md object-cover shrink-0"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-foreground truncate">
-                          {enquiry.properties?.address}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {enquiry.properties?.city} • {enquiry.properties?.property_type}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(enquiry.created_at).toLocaleDateString()}
-                        </p>
-                        {enquiry.wants_viewing && (
-                          <Badge variant="secondary" className="text-xs mt-1">Viewing requested</Badge>
-                        )}
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 self-center" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            {enquiries.length > 2 && (
-              <Button
-                variant="outline"
-                className="mt-3 w-full md:w-auto"
-                onClick={() => setShowAllEnquiries(v => !v)}
-              >
-                {showAllEnquiries ? 'Show less' : `Show more (${enquiries.length - 2})`}
-              </Button>
-            )}
-          </>
-        )}
-      </section>
-
-      <Separator />
-
       {/* Saved Properties Section */}
       <section>
         <div className="flex items-center gap-2 mb-4">
@@ -347,6 +270,83 @@ export default function MyOracle() {
           )}
         </>
       )}
+
+      <Separator />
+
+      {/* Enquiries Section */}
+      <section>
+        <div className="flex items-center gap-2 mb-4">
+          <Mail className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold text-foreground">Enquiries</h2>
+        </div>
+        <h3 className="text-base font-medium text-foreground mb-3">Initial Enquiry</h3>
+        {enquiries.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center space-y-4">
+              <div className="space-y-1">
+                <p className="text-foreground font-medium">You haven't sent any enquiries yet.</p>
+                <p className="text-sm text-muted-foreground">If you send an enquiry to an agent it will appear here</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+                <Button variant="outline" onClick={() => navigate('/rent')}>
+                  Search property to rent
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/purchase')}>
+                  Search property for sale
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <div className="grid gap-4 md:grid-cols-2">
+              {(showAllEnquiries ? enquiries : enquiries.slice(0, 2)).map((enquiry) => (
+                <Card
+                  key={enquiry.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => navigate(`/property/${enquiry.property_id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      {enquiry.properties?.images?.[0] && (
+                        <img
+                          src={enquiry.properties.images[0]}
+                          alt={enquiry.properties.address}
+                          className="w-20 h-20 rounded-md object-cover shrink-0"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">
+                          {enquiry.properties?.address}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {enquiry.properties?.city} • {enquiry.properties?.property_type}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(enquiry.created_at).toLocaleDateString()}
+                        </p>
+                        {enquiry.wants_viewing && (
+                          <Badge variant="secondary" className="text-xs mt-1">Viewing requested</Badge>
+                        )}
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 self-center" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {enquiries.length > 2 && (
+              <Button
+                variant="outline"
+                className="mt-3 w-full md:w-auto"
+                onClick={() => setShowAllEnquiries(v => !v)}
+              >
+                {showAllEnquiries ? 'Show less' : `Show more (${enquiries.length - 2})`}
+              </Button>
+            )}
+          </>
+        )}
+      </section>
 
       <Separator />
 
