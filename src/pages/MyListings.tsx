@@ -352,7 +352,7 @@ export default function MyListings() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Property Listings</h1>
+        <h1 className="text-3xl font-bold mb-2">My places</h1>
         <p className="text-muted-foreground">
           Track the status of your submitted listings and see the latest updates from our team.
         </p>
