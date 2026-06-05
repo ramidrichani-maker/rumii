@@ -175,16 +175,6 @@ export const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             {user ? <>
-                <Link to="/messages" className="hidden md:flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Messages</span>
-                  {unreadMessages > 0 && (
-                    <Badge variant="destructive" className="absolute -top-2 -right-3 h-4 w-4 flex items-center justify-center p-0 text-[10px]">
-                      {unreadMessages > 9 ? '9+' : unreadMessages}
-                    </Badge>
-                  )}
-                </Link>
-                
                 {/* Desktop My rumi */}
                 <Button variant="ghost" className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full" onClick={() => setProfilePanelOpen(true)}>
                   <User className="h-4 w-4" />
