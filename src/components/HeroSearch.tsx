@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import TypewriterSearch from './TypewriterSearch';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -115,8 +115,16 @@ const HeroSearch = () => {
 
       {/* Draw map */}
       {showDrawMap && (
-        <div className="mt-4">
-          <Suspense fallback={<div className="h-[340px] rounded-xl bg-muted animate-pulse mt-4" />}>
+        <div className="mt-4 relative">
+          <button
+            type="button"
+            onClick={() => setShowDrawMap(false)}
+            aria-label="Close draw search area"
+            className="absolute top-2 right-2 z-[110] h-8 w-8 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-md flex items-center justify-center hover:bg-background transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <Suspense fallback={<div className="h-[340px] rounded-xl bg-muted animate-pulse" />}>
             <DrawSearchArea onDrawComplete={handleDrawComplete} />
           </Suspense>
         </div>
