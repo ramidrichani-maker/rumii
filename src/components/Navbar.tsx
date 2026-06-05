@@ -404,7 +404,7 @@ export const Navbar = () => {
                   </Link>
                   <Link to="/my-listings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                     <Home className="h-4 w-4 text-muted-foreground" />
-                    <span>My Listings</span>
+                    <span>My places</span>
                   </Link>
                   <Link to="/list-property" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                     <PlusCircle className="h-4 w-4 text-muted-foreground" />
