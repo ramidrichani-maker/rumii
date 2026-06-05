@@ -174,12 +174,24 @@ export default function MyOracle() {
       <section>
         <div className="flex items-center gap-2 mb-4">
           <Mail className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold text-foreground">My Enquiries</h2>
+          <h2 className="text-xl font-semibold text-foreground">Enquiries</h2>
         </div>
+        <h3 className="text-base font-medium text-foreground mb-3">Initial Enquiry</h3>
         {enquiries.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              You haven't made any enquiries yet
+            <CardContent className="py-8 text-center space-y-4">
+              <div className="space-y-1">
+                <p className="text-foreground font-medium">You haven't sent any enquiries yet.</p>
+                <p className="text-sm text-muted-foreground">If you send an enquiry to an agent it will appear here</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+                <Button variant="outline" onClick={() => navigate('/rent')}>
+                  Search property to rent
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/purchase')}>
+                  Search property for sale
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
