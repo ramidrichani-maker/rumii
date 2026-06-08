@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,6 +66,8 @@ interface SavedArea {
 export default function MyOracle() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const activeSection = searchParams.get('section');
   const { toast } = useToast();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [favorites, setFavorites] = useState<Property[]>([]);
@@ -168,14 +170,18 @@ export default function MyOracle() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl space-y-10">
-      <h1 className="text-3xl font-bold text-foreground">My rumi</h1>
+      <h1 className="text-3xl font-bold text-foreground">
+        {activeSection === 'enquiries' ? 'Enquiries' : 'My rumi'}
+      </h1>
 
       {/* Enquiries Section */}
       <section>
+        {activeSection !== 'enquiries' && (
         <div className="flex items-center gap-2 mb-4">
           <Mail className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold text-foreground">Enquiries</h2>
         </div>
+        )}
         <h3 className="text-base font-medium text-foreground mb-3">Initial Enquiry</h3>
         {enquiries.length === 0 ? (
           <Card>
@@ -245,6 +251,8 @@ export default function MyOracle() {
         )}
       </section>
 
+      {activeSection !== 'enquiries' && (
+      <>
       <Separator />
 
       {/* Saved Properties Section */}
@@ -421,6 +429,8 @@ export default function MyOracle() {
           </>
         )}
       </section>
+      </>
+      )}
 
       <PropertyDetailModal
         property={selectedProperty}
