@@ -144,8 +144,9 @@ export default function MyOracle() {
     if (list.length === 0) { setViewedProps([]); return; }
     const ids = list.map(v => v.id);
     const { data } = await supabase.from('properties').select('*').in('id', ids);
-    const byId = new Map((data as any[] || []).map(p => [p.id, p]));
-    const ordered = ids.map(id => byId.get(id)).filter(Boolean) as Property[];
+    const byId: Record<string, Property> = {};
+    (data as any[] || []).forEach((p) => { byId[p.id] = p; });
+    const ordered = ids.map(id => byId[id]).filter(Boolean) as Property[];
     setViewedProps(ordered);
   };
 
