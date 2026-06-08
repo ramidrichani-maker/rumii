@@ -264,6 +264,47 @@ export default function MyOracle() {
             )}
           </>
         )}
+
+        {/* Viewed subsection */}
+        <div className="mt-6">
+          <button
+            type="button"
+            disabled={viewedProps.length === 0}
+            onClick={() => viewedProps.length > 0 && setViewedOpen(v => !v)}
+            className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <h3 className="text-base font-medium text-foreground">
+              Viewed {viewedProps.length > 0 && `(${viewedProps.length})`}
+            </h3>
+            <ChevronDown
+              className={`h-4 w-4 text-muted-foreground transition-transform ${viewedOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {viewedOpen && viewedProps.length > 0 && (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-3">
+              {viewedProps.map((property) => (
+                <Card
+                  key={property.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
+                  onClick={() => setSelectedProperty(property)}
+                >
+                  {property.images?.[0] && (
+                    <img
+                      src={property.images[0]}
+                      alt={property.address}
+                      className="w-full h-36 object-cover"
+                    />
+                  )}
+                  <CardContent className="p-3">
+                    <p className="font-semibold text-sm text-foreground">{formatPrice(property)}</p>
+                    <p className="text-xs text-muted-foreground truncate">{property.address}</p>
+                    <p className="text-xs text-muted-foreground">{property.city}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
       {activeSection !== 'enquiries' && (
