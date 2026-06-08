@@ -9,6 +9,8 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2, Mail, Heart, Home, PlusCircle, MapPin, ChevronRight, Map, Trash2 } from 'lucide-react';
 import PropertyDetailModal from '@/components/PropertyDetailModal';
 import { useToast } from '@/hooks/use-toast';
+import { getViewedProperties } from '@/lib/viewedProperties';
+import { ChevronDown } from 'lucide-react';
 
 interface Enquiry {
   id: string;
@@ -75,6 +77,8 @@ export default function MyOracle() {
   const [savedAreas, setSavedAreas] = useState<SavedArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [viewedProps, setViewedProps] = useState<Property[]>([]);
+  const [viewedOpen, setViewedOpen] = useState(false);
   const [showAllEnquiries, setShowAllEnquiries] = useState(false);
   const [showAllFavorites, setShowAllFavorites] = useState(false);
   const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
@@ -86,7 +90,7 @@ export default function MyOracle() {
 
   useEffect(() => {
     if (user) {
-      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas()]).finally(() => setLoading(false));
+      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -133,6 +137,16 @@ export default function MyOracle() {
       .eq('user_id', user?.id)
       .order('created_at', { ascending: false });
     setSavedAreas((data as any) || []);
+  };
+
+  const fetchViewed = async () => {
+    const list = getViewedProperties(user?.id);
+    if (list.length === 0) { setViewedProps([]); return; }
+    const ids = list.map(v => v.id);
+    const { data } = await supabase.from('properties').select('*').in('id', ids);
+    const byId = new Map((data as any[] || []).map(p => [p.id, p]));
+    const ordered = ids.map(id => byId.get(id)).filter(Boolean) as Property[];
+    setViewedProps(ordered);
   };
 
   const handleDeleteArea = async (id: string) => {
