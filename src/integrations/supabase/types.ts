@@ -994,6 +994,57 @@ export type Database = {
           },
         ]
       }
+      property_offers: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          message: string | null
+          offer_type: string
+          property_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          message?: string | null
+          offer_type: string
+          property_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          message?: string | null
+          offer_type?: string
+          property_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_offers_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_offers_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_viewings: {
         Row: {
           agent_id: string | null
