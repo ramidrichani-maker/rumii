@@ -121,6 +121,9 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   useEffect(() => {
     if (!property?.id || !isOpen) return;
     setShowPhone(false);
+    import("@/lib/viewedProperties").then((m) =>
+      m.addViewedProperty(property.id, user?.id ?? null)
+    );
     const fetchAgent = async () => {
       const { data: assignment } = await supabase
         .from('property_agents')
