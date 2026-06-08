@@ -85,6 +85,7 @@ export default function MyOracle() {
   const [viewedProps, setViewedProps] = useState<Property[]>([]);
   const [viewedOpen, setViewedOpen] = useState(false);
   const [offersOpen, setOffersOpen] = useState(false);
+  const [acceptedOpen, setAcceptedOpen] = useState(false);
   const [offers, setOffers] = useState<any[]>([]);
   const [offerProperty, setOfferProperty] = useState<Property | null>(null);
   const [offerType, setOfferType] = useState<'buy' | 'rent'>('buy');
@@ -418,6 +419,62 @@ export default function MyOracle() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Offer Accepted subsection */}
+        <div className="mt-6">
+          {(() => {
+            const acceptedOffers = offers.filter(o => o.status === 'accepted');
+            return (
+              <>
+                <button
+                  type="button"
+                  disabled={acceptedOffers.length === 0}
+                  onClick={() => acceptedOffers.length > 0 && setAcceptedOpen(v => !v)}
+                  className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <h3 className="text-base font-medium text-foreground">
+                    Offer accepted {acceptedOffers.length > 0 && `(${acceptedOffers.length})`}
+                  </h3>
+                  <ChevronDown
+                    className={`h-4 w-4 text-muted-foreground transition-transform ${acceptedOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {acceptedOpen && acceptedOffers.length > 0 && (
+                  <div className="grid gap-4 md:grid-cols-2 mt-3">
+                    {acceptedOffers.map((offer) => (
+                      <Card key={offer.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex gap-3">
+                            {offer.properties?.images?.[0] && (
+                              <img
+                                src={offer.properties.images[0]}
+                                alt={offer.properties.address}
+                                className="w-20 h-20 rounded-md object-cover shrink-0"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm text-foreground truncate">
+                                {offer.properties?.address}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{offer.properties?.city}</p>
+                              <p className="text-sm font-semibold text-foreground mt-1">
+                                ${Number(offer.amount).toLocaleString()}{offer.offer_type === 'rent' ? '/mo' : ''}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="secondary" className="text-xs capitalize">{offer.offer_type}</Badge>
+                                <Badge className="text-xs">Accepted</Badge>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       </section>
 
