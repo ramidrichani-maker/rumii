@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,6 +66,8 @@ interface SavedArea {
 export default function MyOracle() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const activeSection = searchParams.get('section');
   const { toast } = useToast();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [favorites, setFavorites] = useState<Property[]>([]);
