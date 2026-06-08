@@ -251,6 +251,8 @@ export default function MyOracle() {
         )}
       </section>
 
+      {activeSection !== 'enquiries' && (
+      <>
       <Separator />
 
       {/* Saved Properties Section */}
