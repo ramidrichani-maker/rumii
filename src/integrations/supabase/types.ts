@@ -260,6 +260,64 @@ export type Database = {
         }
         Relationships: []
       }
+      contract_meetings: {
+        Row: {
+          created_at: string
+          id: string
+          meeting_date: string
+          offer_id: string | null
+          property_id: string
+          status: string
+          time_preference: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meeting_date: string
+          offer_id?: string | null
+          property_id: string
+          status?: string
+          time_preference: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meeting_date?: string
+          offer_id?: string | null
+          property_id?: string
+          status?: string
+          time_preference?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_meetings_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "property_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_meetings_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_meetings_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string | null
