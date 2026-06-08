@@ -87,6 +87,12 @@ export default function MyOracle() {
   const [offersOpen, setOffersOpen] = useState(false);
   const [acceptedOpen, setAcceptedOpen] = useState(false);
   const [offers, setOffers] = useState<any[]>([]);
+  const [stcOpen, setStcOpen] = useState(false);
+  const [meetings, setMeetings] = useState<any[]>([]);
+  const [stcOffer, setStcOffer] = useState<any | null>(null);
+  const [stcDate, setStcDate] = useState<string>('');
+  const [stcTime, setStcTime] = useState<'morning' | 'afternoon' | 'all_day'>('morning');
+  const [submittingStc, setSubmittingStc] = useState(false);
   const [offerProperty, setOfferProperty] = useState<Property | null>(null);
   const [offerType, setOfferType] = useState<'buy' | 'rent'>('buy');
   const [offerAmount, setOfferAmount] = useState('');
@@ -103,7 +109,7 @@ export default function MyOracle() {
 
   useEffect(() => {
     if (user) {
-      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed(), fetchOffers()]).finally(() => setLoading(false));
+      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed(), fetchOffers(), fetchMeetings()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -171,6 +177,60 @@ export default function MyOracle() {
       .order('created_at', { ascending: false });
     setOffers((data as any) || []);
   };
+
+  const fetchMeetings = async () => {
+    const { data } = await supabase
+      .from('contract_meetings' as any)
+      .select('*, properties(address, city, images, listing_type)')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    setMeetings((data as any) || []);
+  };
+
+  const openStcDialog = (offer: any) => {
+    setStcOffer(offer);
+    setStcDate('');
+    setStcTime('morning');
+  };
+
+  const submitStc = async () => {
+    if (!stcOffer || !user || !stcDate) {
+      toast({ title: 'Pick a day', variant: 'destructive' });
+      return;
+    }
+    setSubmittingStc(true);
+    const { error } = await supabase.from('contract_meetings' as any).insert({
+      user_id: user.id,
+      property_id: stcOffer.property_id,
+      offer_id: stcOffer.id,
+      meeting_date: stcDate,
+      time_preference: stcTime,
+    });
+    setSubmittingStc(false);
+    if (error) {
+      toast({ title: 'Failed to request meeting', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Meeting request sent' });
+    setStcOffer(null);
+    fetchMeetings();
+  };
+
+  const next7Days = (() => {
+    const days: { iso: string; label: string }[] = [];
+    const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const today = new Date();
+    for (let i = 0; i < 8; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const label = `${dayNames[d.getDay()]}, ${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}`;
+      days.push({ iso, label });
+    }
+    return days;
+  })();
+
+  const timeLabel = (t: string) => t === 'morning' ? 'Morning' : t === 'afternoon' ? 'Afternoon' : 'All day';
 
   const openOfferDialog = (property: Property) => {
     setOfferProperty(property);
@@ -465,11 +525,88 @@ export default function MyOracle() {
                                 <Badge variant="secondary" className="text-xs capitalize">{offer.offer_type}</Badge>
                                 <Badge className="text-xs">Accepted</Badge>
                               </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="mt-2"
+                                onClick={() => openStcDialog(offer)}
+                              >
+                                Schedule contract meeting
+                              </Button>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
+
+        {/* Purchased STC subsection */}
+        <div className="mt-6">
+          {(() => {
+            const acceptedOffers = offers.filter(o => o.status === 'accepted');
+            const canOpen = acceptedOffers.length > 0 || meetings.length > 0;
+            return (
+              <>
+                <button
+                  type="button"
+                  disabled={!canOpen}
+                  onClick={() => canOpen && setStcOpen(v => !v)}
+                  className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <h3 className="text-base font-medium text-foreground">
+                    Purchased STC {meetings.length > 0 && `(${meetings.length})`}
+                  </h3>
+                  <ChevronDown
+                    className={`h-4 w-4 text-muted-foreground transition-transform ${stcOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {stcOpen && (
+                  <div className="mt-3 space-y-4">
+                    {meetings.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        No pending contract meetings yet. Schedule one from an accepted offer above.
+                      </p>
+                    ) : (
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {meetings.map((m) => {
+                          const d = new Date(m.meeting_date);
+                          const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                          return (
+                            <Card key={m.id} className="hover:shadow-md transition-shadow">
+                              <CardContent className="p-4">
+                                <div className="flex gap-3">
+                                  {m.properties?.images?.[0] && (
+                                    <img
+                                      src={m.properties.images[0]}
+                                      alt={m.properties.address}
+                                      className="w-20 h-20 rounded-md object-cover shrink-0"
+                                    />
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm text-foreground truncate">
+                                      {m.properties?.address}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">{m.properties?.city}</p>
+                                    <p className="text-sm text-foreground mt-1">
+                                      {dayNames[d.getDay()]}, {d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge variant="secondary" className="text-xs">{timeLabel(m.time_preference)}</Badge>
+                                      <Badge variant="outline" className="text-xs capitalize">{m.status}</Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </>
@@ -719,6 +856,55 @@ export default function MyOracle() {
             <Button variant="outline" onClick={() => setOfferProperty(null)}>Cancel</Button>
             <Button onClick={submitOffer} disabled={submittingOffer}>
               {submittingOffer ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit offer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!stcOffer} onOpenChange={(open) => !open && setStcOffer(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Schedule contract meeting</DialogTitle>
+          </DialogHeader>
+          {stcOffer && (
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground">
+                {stcOffer.properties?.address}, {stcOffer.properties?.city}
+              </div>
+              <div className="space-y-2">
+                <Label>Pick a day</Label>
+                <RadioGroup value={stcDate} onValueChange={setStcDate} className="grid grid-cols-1 gap-1.5">
+                  {next7Days.map((d) => (
+                    <div key={d.iso} className="flex items-center gap-2">
+                      <RadioGroupItem value={d.iso} id={`stc-day-${d.iso}`} />
+                      <Label htmlFor={`stc-day-${d.iso}`} className="cursor-pointer">{d.label}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+              <div className="space-y-2">
+                <Label>Preferred time</Label>
+                <RadioGroup value={stcTime} onValueChange={(v) => setStcTime(v as any)} className="flex gap-4 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="morning" id="stc-morning" />
+                    <Label htmlFor="stc-morning" className="cursor-pointer">Morning</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="afternoon" id="stc-afternoon" />
+                    <Label htmlFor="stc-afternoon" className="cursor-pointer">Afternoon</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="all_day" id="stc-all-day" />
+                    <Label htmlFor="stc-all-day" className="cursor-pointer">All day</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setStcOffer(null)}>Cancel</Button>
+            <Button onClick={submitStc} disabled={submittingStc || !stcDate}>
+              {submittingStc ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit'}
             </Button>
           </DialogFooter>
         </DialogContent>
