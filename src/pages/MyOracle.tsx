@@ -85,6 +85,7 @@ export default function MyOracle() {
   const [viewedProps, setViewedProps] = useState<Property[]>([]);
   const [viewedOpen, setViewedOpen] = useState(false);
   const [offersOpen, setOffersOpen] = useState(false);
+  const [acceptedOpen, setAcceptedOpen] = useState(false);
   const [offers, setOffers] = useState<any[]>([]);
   const [offerProperty, setOfferProperty] = useState<Property | null>(null);
   const [offerType, setOfferType] = useState<'buy' | 'rent'>('buy');
