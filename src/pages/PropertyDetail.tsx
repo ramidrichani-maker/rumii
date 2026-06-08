@@ -122,11 +122,14 @@ const PropertyDetail = () => {
 
       if (!error && data) {
         setProperty(data as unknown as Property);
+        import("@/lib/viewedProperties").then((m) =>
+          m.addViewedProperty(id, profile?.user_id ?? null)
+        );
       }
       setLoading(false);
     };
     fetchProperty();
-  }, [id]);
+  }, [id, profile?.user_id]);
 
   // Sync calculator price with property price
   useEffect(() => {
