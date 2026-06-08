@@ -429,6 +429,8 @@ export default function MyOracle() {
           </>
         )}
       </section>
+      </>
+      )}
 
       <PropertyDetailModal
         property={selectedProperty}
