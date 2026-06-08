@@ -6,11 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, Mail, Heart, Home, PlusCircle, MapPin, ChevronRight, Map, Trash2 } from 'lucide-react';
+import { Loader2, Mail, Heart, Home, PlusCircle, MapPin, ChevronRight, Map, Trash2, HandCoins } from 'lucide-react';
 import PropertyDetailModal from '@/components/PropertyDetailModal';
 import { useToast } from '@/hooks/use-toast';
 import { getViewedProperties } from '@/lib/viewedProperties';
 import { ChevronDown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface Enquiry {
   id: string;
@@ -79,6 +84,13 @@ export default function MyOracle() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [viewedProps, setViewedProps] = useState<Property[]>([]);
   const [viewedOpen, setViewedOpen] = useState(false);
+  const [offersOpen, setOffersOpen] = useState(false);
+  const [offers, setOffers] = useState<any[]>([]);
+  const [offerProperty, setOfferProperty] = useState<Property | null>(null);
+  const [offerType, setOfferType] = useState<'buy' | 'rent'>('buy');
+  const [offerAmount, setOfferAmount] = useState('');
+  const [offerMessage, setOfferMessage] = useState('');
+  const [submittingOffer, setSubmittingOffer] = useState(false);
   const [showAllEnquiries, setShowAllEnquiries] = useState(false);
   const [showAllFavorites, setShowAllFavorites] = useState(false);
   const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
@@ -90,7 +102,7 @@ export default function MyOracle() {
 
   useEffect(() => {
     if (user) {
-      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed()]).finally(() => setLoading(false));
+      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed(), fetchOffers()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -148,6 +160,48 @@ export default function MyOracle() {
     (data as any[] || []).forEach((p) => { byId[p.id] = p; });
     const ordered = ids.map(id => byId[id]).filter(Boolean) as Property[];
     setViewedProps(ordered);
+  };
+
+  const fetchOffers = async () => {
+    const { data } = await supabase
+      .from('property_offers' as any)
+      .select('*, properties(address, city, images, listing_type)')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    setOffers((data as any) || []);
+  };
+
+  const openOfferDialog = (property: Property) => {
+    setOfferProperty(property);
+    const defaultType: 'buy' | 'rent' = property.listing_type === 'rent' ? 'rent' : 'buy';
+    setOfferType(defaultType);
+    setOfferAmount('');
+    setOfferMessage('');
+  };
+
+  const submitOffer = async () => {
+    if (!offerProperty || !user) return;
+    const amount = parseFloat(offerAmount);
+    if (!amount || amount <= 0) {
+      toast({ title: 'Enter a valid amount', variant: 'destructive' });
+      return;
+    }
+    setSubmittingOffer(true);
+    const { error } = await supabase.from('property_offers' as any).insert({
+      user_id: user.id,
+      property_id: offerProperty.id,
+      offer_type: offerType,
+      amount,
+      message: offerMessage || null,
+    });
+    setSubmittingOffer(false);
+    if (error) {
+      toast({ title: 'Failed to submit offer', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Offer submitted' });
+    setOfferProperty(null);
+    fetchOffers();
   };
 
   const handleDeleteArea = async (id: string) => {
@@ -285,20 +339,80 @@ export default function MyOracle() {
               {viewedProps.map((property) => (
                 <Card
                   key={property.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
-                  onClick={() => setSelectedProperty(property)}
+                  className="hover:shadow-md transition-shadow overflow-hidden"
                 >
                   {property.images?.[0] && (
                     <img
                       src={property.images[0]}
                       alt={property.address}
-                      className="w-full h-36 object-cover"
+                      className="w-full h-36 object-cover cursor-pointer"
+                      onClick={() => setSelectedProperty(property)}
                     />
                   )}
                   <CardContent className="p-3">
-                    <p className="font-semibold text-sm text-foreground">{formatPrice(property)}</p>
-                    <p className="text-xs text-muted-foreground truncate">{property.address}</p>
-                    <p className="text-xs text-muted-foreground">{property.city}</p>
+                    <div className="cursor-pointer" onClick={() => setSelectedProperty(property)}>
+                      <p className="font-semibold text-sm text-foreground">{formatPrice(property)}</p>
+                      <p className="text-xs text-muted-foreground truncate">{property.address}</p>
+                      <p className="text-xs text-muted-foreground">{property.city}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full mt-2 gap-1.5"
+                      onClick={(e) => { e.stopPropagation(); openOfferDialog(property); }}
+                    >
+                      <HandCoins className="h-3.5 w-3.5" />
+                      Make an Offer
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Made an Offer subsection */}
+        <div className="mt-6">
+          <button
+            type="button"
+            disabled={offers.length === 0}
+            onClick={() => offers.length > 0 && setOffersOpen(v => !v)}
+            className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <h3 className="text-base font-medium text-foreground">
+              Made an Offer {offers.length > 0 && `(${offers.length})`}
+            </h3>
+            <ChevronDown
+              className={`h-4 w-4 text-muted-foreground transition-transform ${offersOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {offersOpen && offers.length > 0 && (
+            <div className="grid gap-4 md:grid-cols-2 mt-3">
+              {offers.map((offer) => (
+                <Card key={offer.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      {offer.properties?.images?.[0] && (
+                        <img
+                          src={offer.properties.images[0]}
+                          alt={offer.properties.address}
+                          className="w-20 h-20 rounded-md object-cover shrink-0"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">
+                          {offer.properties?.address}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{offer.properties?.city}</p>
+                        <p className="text-sm font-semibold text-foreground mt-1">
+                          ${Number(offer.amount).toLocaleString()}{offer.offer_type === 'rent' ? '/mo' : ''}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary" className="text-xs capitalize">{offer.offer_type}</Badge>
+                          <Badge variant="outline" className="text-xs capitalize">{offer.status}</Badge>
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -493,6 +607,65 @@ export default function MyOracle() {
         isOpen={!!selectedProperty}
         onClose={() => setSelectedProperty(null)}
       />
+
+      <Dialog open={!!offerProperty} onOpenChange={(open) => !open && setOfferProperty(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Make an Offer</DialogTitle>
+          </DialogHeader>
+          {offerProperty && (
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground">
+                {offerProperty.address}, {offerProperty.city}
+              </div>
+              {offerProperty.listing_type === 'both' && (
+                <div className="space-y-2">
+                  <Label>Offer type</Label>
+                  <RadioGroup value={offerType} onValueChange={(v) => setOfferType(v as 'buy' | 'rent')} className="flex gap-4">
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="buy" id="offer-buy" />
+                      <Label htmlFor="offer-buy" className="cursor-pointer">Buy</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="rent" id="offer-rent" />
+                      <Label htmlFor="offer-rent" className="cursor-pointer">Rent</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="offer-amount">
+                  Offer amount {offerType === 'rent' ? '(per month)' : ''}
+                </Label>
+                <Input
+                  id="offer-amount"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={offerAmount}
+                  onChange={(e) => setOfferAmount(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="offer-message">Message (optional)</Label>
+                <Textarea
+                  id="offer-message"
+                  placeholder="Add a note for the agent..."
+                  value={offerMessage}
+                  onChange={(e) => setOfferMessage(e.target.value)}
+                  maxLength={1000}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOfferProperty(null)}>Cancel</Button>
+            <Button onClick={submitOffer} disabled={submittingOffer}>
+              {submittingOffer ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit offer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
