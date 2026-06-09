@@ -1,0 +1,1 @@
+ALTER TABLE public.agencies ADD COLUMN IF NOT EXISTS represents_platform boolean NOT NULL DEFAULT false;
