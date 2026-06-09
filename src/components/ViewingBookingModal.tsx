@@ -50,13 +50,12 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
     const fetchAgentAndAgency = async () => {
       setCheckingAgency(true);
 
-      // Get Oracle Estates agency id
-      const { data: oracle } = await supabase
+      // Get the set of agencies that represent the My Rumi platform
+      const { data: reps } = await supabase
         .from('agencies')
         .select('id')
-        .ilike('name', 'oracle estates')
-        .maybeSingle();
-      const oracleId = oracle?.id || null;
+        .eq('represents_platform' as any, true);
+      const repIds = new Set((reps || []).map((r: any) => r.id));
 
       // Get assigned agent + their agency
       const { data } = await supabase
@@ -69,9 +68,9 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
       const agentAgencyId = (data as any)?.profiles?.agency_id || null;
       setAgentId(fetchedAgentId);
 
-      const propertyIsOracle = !!agencyId && !!oracleId && agencyId === oracleId;
-      const agentIsOracle = !!agentAgencyId && !!oracleId && agentAgencyId === oracleId;
-      setIsOracleEstates(propertyIsOracle || agentIsOracle);
+      const propertyIsRep = !!agencyId && repIds.has(agencyId);
+      const agentIsRep = !!agentAgencyId && repIds.has(agentAgencyId);
+      setIsOracleEstates(propertyIsRep || agentIsRep);
       setCheckingAgency(false);
     };
     const checkExistingBooking = async () => {
