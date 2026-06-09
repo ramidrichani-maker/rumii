@@ -268,6 +268,29 @@ export default function MyOracle() {
 
   const timeLabel = (t: string) => t === 'morning' ? 'Morning' : t === 'afternoon' ? 'Afternoon' : 'All day';
 
+  const enquiryNav = [
+    { key: 'initial', label: 'Initial enquiry', ref: initialRef, onOpen: () => {} },
+    { key: 'viewed', label: 'Viewed', ref: viewedRef, onOpen: () => viewedProps.length > 0 && setViewedOpen(true), disabled: () => viewedProps.length === 0 },
+    { key: 'offers', label: 'Made an offer', ref: offersRef, onOpen: () => offers.length > 0 && setOffersOpen(true), disabled: () => offers.length === 0 },
+    { key: 'accepted', label: 'Offer accepted', ref: acceptedRef, onOpen: () => offers.filter(o => o.status === 'accepted').length > 0 && setAcceptedOpen(true), disabled: () => offers.filter(o => o.status === 'accepted').length === 0 },
+    { key: 'stc', label: 'Purchased STC', ref: stcRef, onOpen: () => (offers.filter(o => o.status === 'accepted').length > 0 || meetings.length > 0) && setStcOpen(true), disabled: () => offers.filter(o => o.status === 'accepted').length === 0 && meetings.length === 0 },
+    { key: 'movedin', label: 'Moved in', ref: movedInRef, onOpen: () => {
+        const todayIso = new Date().toISOString().slice(0,10);
+        const canOpen = meetings.filter(m => m.meeting_date <= todayIso).length > 0 || moveIns.length > 0;
+        if (canOpen) setMovedInOpen(true);
+      }, disabled: () => {
+        const todayIso = new Date().toISOString().slice(0,10);
+        return meetings.filter(m => m.meeting_date <= todayIso).length === 0 && moveIns.length === 0;
+      } },
+  ] as const;
+
+  const handleEnquiryNav = (item: typeof enquiryNav[number]) => {
+    if ((item as any).disabled?.()) return;
+    setSelectedEnquiry(item.key as any);
+    (item as any).onOpen?.();
+    setTimeout(() => item.ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
+
   const openOfferDialog = (property: Property) => {
     setOfferProperty(property);
     const defaultType: 'buy' | 'rent' = property.listing_type === 'rent' ? 'rent' : 'buy';
