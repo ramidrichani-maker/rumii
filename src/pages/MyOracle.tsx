@@ -397,6 +397,7 @@ export default function MyOracle() {
           <h2 className="text-xl font-semibold text-foreground">Enquiries</h2>
         </div>
         )}
+        {(activeSection !== 'enquiries' || selectedEnquiry === 'initial') && (
         <div ref={initialRef}>
         <h3 className="text-base font-medium text-foreground mb-3">Initial Enquiry</h3>
         {enquiries.length === 0 ? (
@@ -466,23 +467,27 @@ export default function MyOracle() {
           </>
         )}
         </div>
+        )}
 
         {/* Viewed subsection */}
+        {(activeSection !== 'enquiries' || selectedEnquiry === 'viewed') && (
         <div ref={viewedRef} className="mt-6">
-          <button
-            type="button"
-            disabled={viewedProps.length === 0}
-            onClick={() => viewedProps.length > 0 && setViewedOpen(v => !v)}
-            className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <h3 className="text-base font-medium text-foreground">
-              Viewed {viewedProps.length > 0 && `(${viewedProps.length})`}
-            </h3>
-            <ChevronDown
-              className={`h-4 w-4 text-muted-foreground transition-transform ${viewedOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {viewedOpen && viewedProps.length > 0 && (
+          {activeSection !== 'enquiries' && (
+            <button
+              type="button"
+              disabled={viewedProps.length === 0}
+              onClick={() => viewedProps.length > 0 && setViewedOpen(v => !v)}
+              className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <h3 className="text-base font-medium text-foreground">
+                Viewed {viewedProps.length > 0 && `(${viewedProps.length})`}
+              </h3>
+              <ChevronDown
+                className={`h-4 w-4 text-muted-foreground transition-transform ${viewedOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+          )}
+          {(activeSection === 'enquiries' || viewedOpen) && viewedProps.length > 0 && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-3">
               {viewedProps.map((property) => (
                 <Card
@@ -518,23 +523,27 @@ export default function MyOracle() {
             </div>
           )}
         </div>
+        )}
 
         {/* Made an Offer subsection */}
+        {(activeSection !== 'enquiries' || selectedEnquiry === 'offers') && (
         <div ref={offersRef} className="mt-6">
-          <button
-            type="button"
-            disabled={offers.length === 0}
-            onClick={() => offers.length > 0 && setOffersOpen(v => !v)}
-            className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <h3 className="text-base font-medium text-foreground">
-              Made an Offer {offers.length > 0 && `(${offers.length})`}
-            </h3>
-            <ChevronDown
-              className={`h-4 w-4 text-muted-foreground transition-transform ${offersOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {offersOpen && offers.length > 0 && (
+          {activeSection !== 'enquiries' && (
+            <button
+              type="button"
+              disabled={offers.length === 0}
+              onClick={() => offers.length > 0 && setOffersOpen(v => !v)}
+              className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <h3 className="text-base font-medium text-foreground">
+                Made an Offer {offers.length > 0 && `(${offers.length})`}
+              </h3>
+              <ChevronDown
+                className={`h-4 w-4 text-muted-foreground transition-transform ${offersOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+          )}
+          {(activeSection === 'enquiries' || offersOpen) && offers.length > 0 && (
             <div className="grid gap-4 md:grid-cols-2 mt-3">
               {offers.map((offer) => (
                 <Card key={offer.id} className="hover:shadow-md transition-shadow">
@@ -567,27 +576,31 @@ export default function MyOracle() {
             </div>
           )}
         </div>
+        )}
 
         {/* Offer Accepted subsection */}
+        {(activeSection !== 'enquiries' || selectedEnquiry === 'accepted') && (
         <div ref={acceptedRef} className="mt-6">
           {(() => {
             const acceptedOffers = offers.filter(o => o.status === 'accepted');
             return (
               <>
-                <button
-                  type="button"
-                  disabled={acceptedOffers.length === 0}
-                  onClick={() => acceptedOffers.length > 0 && setAcceptedOpen(v => !v)}
-                  className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <h3 className="text-base font-medium text-foreground">
-                    Offer accepted {acceptedOffers.length > 0 && `(${acceptedOffers.length})`}
-                  </h3>
-                  <ChevronDown
-                    className={`h-4 w-4 text-muted-foreground transition-transform ${acceptedOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {acceptedOpen && acceptedOffers.length > 0 && (
+                {activeSection !== 'enquiries' && (
+                  <button
+                    type="button"
+                    disabled={acceptedOffers.length === 0}
+                    onClick={() => acceptedOffers.length > 0 && setAcceptedOpen(v => !v)}
+                    className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <h3 className="text-base font-medium text-foreground">
+                      Offer accepted {acceptedOffers.length > 0 && `(${acceptedOffers.length})`}
+                    </h3>
+                    <ChevronDown
+                      className={`h-4 w-4 text-muted-foreground transition-transform ${acceptedOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                )}
+                {(activeSection === 'enquiries' || acceptedOpen) && acceptedOffers.length > 0 && (
                   <div className="grid gap-4 md:grid-cols-2 mt-3">
                     {acceptedOffers.map((offer) => (
                       <Card key={offer.id} className="hover:shadow-md transition-shadow">
@@ -631,28 +644,32 @@ export default function MyOracle() {
             );
           })()}
         </div>
+        )}
 
         {/* Purchased STC subsection */}
+        {(activeSection !== 'enquiries' || selectedEnquiry === 'stc') && (
         <div ref={stcRef} className="mt-6">
           {(() => {
             const acceptedOffers = offers.filter(o => o.status === 'accepted');
             const canOpen = acceptedOffers.length > 0 || meetings.length > 0;
             return (
               <>
-                <button
-                  type="button"
-                  disabled={!canOpen}
-                  onClick={() => canOpen && setStcOpen(v => !v)}
-                  className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <h3 className="text-base font-medium text-foreground">
-                    Purchased STC {meetings.length > 0 && `(${meetings.length})`}
-                  </h3>
-                  <ChevronDown
-                    className={`h-4 w-4 text-muted-foreground transition-transform ${stcOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {stcOpen && (
+                {activeSection !== 'enquiries' && (
+                  <button
+                    type="button"
+                    disabled={!canOpen}
+                    onClick={() => canOpen && setStcOpen(v => !v)}
+                    className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <h3 className="text-base font-medium text-foreground">
+                      Purchased STC {meetings.length > 0 && `(${meetings.length})`}
+                    </h3>
+                    <ChevronDown
+                      className={`h-4 w-4 text-muted-foreground transition-transform ${stcOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                )}
+                {(activeSection === 'enquiries' || stcOpen) && (
                   <div className="mt-3 space-y-4">
                     {meetings.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
@@ -700,8 +717,10 @@ export default function MyOracle() {
             );
           })()}
         </div>
+        )}
 
         {/* Moved In subsection */}
+        {(activeSection !== 'enquiries' || selectedEnquiry === 'movedin') && (
         <div ref={movedInRef} className="mt-6">
           {(() => {
             const todayIso = new Date().toISOString().slice(0,10);
@@ -711,20 +730,22 @@ export default function MyOracle() {
             const canOpen = completedMeetings.length > 0 || moveIns.length > 0;
             return (
               <>
-                <button
-                  type="button"
-                  disabled={!canOpen}
-                  onClick={() => canOpen && setMovedInOpen(v => !v)}
-                  className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <h3 className="text-base font-medium text-foreground">
-                    Moved in {moveIns.length > 0 && `(${moveIns.length})`}
-                  </h3>
-                  <ChevronDown
-                    className={`h-4 w-4 text-muted-foreground transition-transform ${movedInOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {movedInOpen && (
+                {activeSection !== 'enquiries' && (
+                  <button
+                    type="button"
+                    disabled={!canOpen}
+                    onClick={() => canOpen && setMovedInOpen(v => !v)}
+                    className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <h3 className="text-base font-medium text-foreground">
+                      Moved in {moveIns.length > 0 && `(${moveIns.length})`}
+                    </h3>
+                    <ChevronDown
+                      className={`h-4 w-4 text-muted-foreground transition-transform ${movedInOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                )}
+                {(activeSection === 'enquiries' || movedInOpen) && (
                   <div className="mt-3 space-y-4">
                     {pendingMoveIn.length === 0 && moveIns.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
@@ -793,6 +814,7 @@ export default function MyOracle() {
             );
           })()}
         </div>
+        )}
         </section>
       </div>
 
