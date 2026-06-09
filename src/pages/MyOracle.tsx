@@ -364,13 +364,40 @@ export default function MyOracle() {
       </h1>
 
       {/* Enquiries Section */}
-      <section>
+      <div className={activeSection === 'enquiries' ? 'grid md:grid-cols-[240px_1fr] gap-6 items-start' : ''}>
+        {activeSection === 'enquiries' && (
+          <aside className="md:sticky md:top-24 rounded-xl border bg-muted/30 shadow-md overflow-hidden">
+            <nav className="flex flex-col">
+              {enquiryNav.map((item) => {
+                const isDisabled = (item as any).disabled?.() ?? false;
+                const isActive = selectedEnquiry === item.key;
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    disabled={isDisabled}
+                    onClick={() => handleEnquiryNav(item)}
+                    className={`text-left px-5 py-4 text-sm font-medium border-b last:border-b-0 transition-colors ${
+                      isActive
+                        ? 'bg-primary/10 text-foreground border-l-4 border-l-primary'
+                        : 'text-muted-foreground hover:bg-[hsl(30_20%_92%)] hover:text-foreground'
+                    } disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
+        )}
+        <section>
         {activeSection !== 'enquiries' && (
         <div className="flex items-center gap-2 mb-4">
           <Mail className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold text-foreground">Enquiries</h2>
         </div>
         )}
+        <div ref={initialRef}>
         <h3 className="text-base font-medium text-foreground mb-3">Initial Enquiry</h3>
         {enquiries.length === 0 ? (
           <Card>
@@ -438,9 +465,10 @@ export default function MyOracle() {
             )}
           </>
         )}
+        </div>
 
         {/* Viewed subsection */}
-        <div className="mt-6">
+        <div ref={viewedRef} className="mt-6">
           <button
             type="button"
             disabled={viewedProps.length === 0}
@@ -492,7 +520,7 @@ export default function MyOracle() {
         </div>
 
         {/* Made an Offer subsection */}
-        <div className="mt-6">
+        <div ref={offersRef} className="mt-6">
           <button
             type="button"
             disabled={offers.length === 0}
@@ -541,7 +569,7 @@ export default function MyOracle() {
         </div>
 
         {/* Offer Accepted subsection */}
-        <div className="mt-6">
+        <div ref={acceptedRef} className="mt-6">
           {(() => {
             const acceptedOffers = offers.filter(o => o.status === 'accepted');
             return (
@@ -605,7 +633,7 @@ export default function MyOracle() {
         </div>
 
         {/* Purchased STC subsection */}
-        <div className="mt-6">
+        <div ref={stcRef} className="mt-6">
           {(() => {
             const acceptedOffers = offers.filter(o => o.status === 'accepted');
             const canOpen = acceptedOffers.length > 0 || meetings.length > 0;
@@ -674,7 +702,7 @@ export default function MyOracle() {
         </div>
 
         {/* Moved In subsection */}
-        <div className="mt-6">
+        <div ref={movedInRef} className="mt-6">
           {(() => {
             const todayIso = new Date().toISOString().slice(0,10);
             const completedMeetings = meetings.filter(m => m.meeting_date <= todayIso);
@@ -765,7 +793,8 @@ export default function MyOracle() {
             );
           })()}
         </div>
-      </section>
+        </section>
+      </div>
 
       {activeSection !== 'enquiries' && (
       <>
