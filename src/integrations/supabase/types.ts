@@ -1052,6 +1052,36 @@ export type Database = {
           },
         ]
       }
+      property_move_ins: {
+        Row: {
+          created_at: string
+          id: string
+          meeting_id: string | null
+          moved_in_at: string
+          property_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meeting_id?: string | null
+          moved_in_at?: string
+          property_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meeting_id?: string | null
+          moved_in_at?: string
+          property_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       property_offers: {
         Row: {
           amount: number
