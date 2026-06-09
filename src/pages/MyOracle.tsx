@@ -642,6 +642,99 @@ export default function MyOracle() {
             );
           })()}
         </div>
+
+        {/* Moved In subsection */}
+        <div className="mt-6">
+          {(() => {
+            const todayIso = new Date().toISOString().slice(0,10);
+            const completedMeetings = meetings.filter(m => m.meeting_date <= todayIso);
+            const movedInIds = new Set(moveIns.map(mi => mi.property_id));
+            const pendingMoveIn = completedMeetings.filter(m => !movedInIds.has(m.property_id));
+            const canOpen = completedMeetings.length > 0 || moveIns.length > 0;
+            return (
+              <>
+                <button
+                  type="button"
+                  disabled={!canOpen}
+                  onClick={() => canOpen && setMovedInOpen(v => !v)}
+                  className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <h3 className="text-base font-medium text-foreground">
+                    Moved in {moveIns.length > 0 && `(${moveIns.length})`}
+                  </h3>
+                  <ChevronDown
+                    className={`h-4 w-4 text-muted-foreground transition-transform ${movedInOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {movedInOpen && (
+                  <div className="mt-3 space-y-4">
+                    {pendingMoveIn.length === 0 && moveIns.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        No properties ready to confirm yet.
+                      </p>
+                    ) : (
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {pendingMoveIn.map((m) => (
+                          <Card key={`pending-${m.id}`} className="hover:shadow-md transition-shadow">
+                            <CardContent className="p-4">
+                              <div className="flex gap-3">
+                                {m.properties?.images?.[0] && (
+                                  <img
+                                    src={m.properties.images[0]}
+                                    alt={m.properties.address}
+                                    className="w-20 h-20 rounded-md object-cover shrink-0"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm text-foreground truncate">
+                                    {m.properties?.address}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">{m.properties?.city}</p>
+                                  <Button
+                                    size="sm"
+                                    className="mt-2"
+                                    disabled={confirmingMoveIn === m.id}
+                                    onClick={() => confirmMoveIn(m)}
+                                  >
+                                    {confirmingMoveIn === m.id ? 'Confirming...' : 'Confirm you moved in'}
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                        {moveIns.map((mi) => (
+                          <Card key={mi.id} className="hover:shadow-md transition-shadow">
+                            <CardContent className="p-4">
+                              <div className="flex gap-3">
+                                {mi.properties?.images?.[0] && (
+                                  <img
+                                    src={mi.properties.images[0]}
+                                    alt={mi.properties.address}
+                                    className="w-20 h-20 rounded-md object-cover shrink-0"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm text-foreground truncate">
+                                    {mi.properties?.address}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">{mi.properties?.city}</p>
+                                  <Badge variant="secondary" className="text-xs mt-2">
+                                    Moved in {new Date(mi.moved_in_at).toLocaleDateString()}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
       </section>
 
       {activeSection !== 'enquiries' && (
