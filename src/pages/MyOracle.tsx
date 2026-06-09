@@ -93,6 +93,9 @@ export default function MyOracle() {
   const [stcDate, setStcDate] = useState<string>('');
   const [stcTime, setStcTime] = useState<'morning' | 'afternoon' | 'all_day'>('morning');
   const [submittingStc, setSubmittingStc] = useState(false);
+  const [movedInOpen, setMovedInOpen] = useState(false);
+  const [moveIns, setMoveIns] = useState<any[]>([]);
+  const [confirmingMoveIn, setConfirmingMoveIn] = useState<string | null>(null);
   const [offerProperty, setOfferProperty] = useState<Property | null>(null);
   const [offerType, setOfferType] = useState<'buy' | 'rent'>('buy');
   const [offerAmount, setOfferAmount] = useState('');
@@ -109,7 +112,7 @@ export default function MyOracle() {
 
   useEffect(() => {
     if (user) {
-      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed(), fetchOffers(), fetchMeetings()]).finally(() => setLoading(false));
+      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed(), fetchOffers(), fetchMeetings(), fetchMoveIns()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -185,6 +188,32 @@ export default function MyOracle() {
       .eq('user_id', user?.id)
       .order('created_at', { ascending: false });
     setMeetings((data as any) || []);
+  };
+
+  const fetchMoveIns = async () => {
+    const { data } = await supabase
+      .from('property_move_ins' as any)
+      .select('*, properties(address, city, images, listing_type)')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    setMoveIns((data as any) || []);
+  };
+
+  const confirmMoveIn = async (meeting: any) => {
+    if (!user) return;
+    setConfirmingMoveIn(meeting.id);
+    const { error } = await supabase.from('property_move_ins' as any).insert({
+      user_id: user.id,
+      property_id: meeting.property_id,
+      meeting_id: meeting.id,
+    });
+    setConfirmingMoveIn(null);
+    if (error) {
+      toast({ title: 'Failed to confirm', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Move-in confirmed' });
+    fetchMoveIns();
   };
 
   const openStcDialog = (offer: any) => {
