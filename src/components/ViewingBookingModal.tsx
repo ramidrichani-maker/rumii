@@ -51,10 +51,10 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
       setCheckingAgency(true);
 
       // Get the set of agencies that represent the My Rumi platform
-      const { data: reps } = await supabase
+      const { data: reps } = await (supabase as any)
         .from('agencies')
         .select('id')
-        .eq('represents_platform' as any, true);
+        .eq('represents_platform', true);
       const repIds = new Set((reps || []).map((r: any) => r.id));
 
       // Get assigned agent + their agency
