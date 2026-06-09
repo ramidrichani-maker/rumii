@@ -102,6 +102,13 @@ export default function MyOracle() {
   const [offerMessage, setOfferMessage] = useState('');
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const [showAllEnquiries, setShowAllEnquiries] = useState(false);
+  const [selectedEnquiry, setSelectedEnquiry] = useState<'initial' | 'viewed' | 'offers' | 'accepted' | 'stc' | 'movedin'>('initial');
+  const initialRef = useRef<HTMLDivElement>(null);
+  const viewedRef = useRef<HTMLDivElement>(null);
+  const offersRef = useRef<HTMLDivElement>(null);
+  const acceptedRef = useRef<HTMLDivElement>(null);
+  const stcRef = useRef<HTMLDivElement>(null);
+  const movedInRef = useRef<HTMLDivElement>(null);
   const [showAllFavorites, setShowAllFavorites] = useState(false);
   const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
   const [showAllMyPlaces, setShowAllMyPlaces] = useState(false);
