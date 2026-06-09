@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Building2, Plus, Trash2, Loader2, Upload, X, ImageIcon } from "lucide-react";
+import { Building2, Plus, Trash2, Loader2, Upload, X, ImageIcon, Star } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface Agency {
   id: string;
   name: string;
   logo_url: string | null;
   created_at: string;
+  represents_platform?: boolean;
 }
 
 export const AgencyManager = () => {
@@ -21,6 +23,7 @@ export const AgencyManager = () => {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -155,6 +158,29 @@ export const AgencyManager = () => {
     }
   };
 
+  const togglePlatformRep = async (agency: Agency, value: boolean) => {
+    setTogglingId(agency.id);
+    try {
+      const { error } = await supabase
+        .from('agencies')
+        .update({ represents_platform: value } as any)
+        .eq('id', agency.id);
+      if (error) throw error;
+      setAgencies(prev => prev.map(a => a.id === agency.id ? { ...a, represents_platform: value } : a));
+      toast({
+        title: "Updated",
+        description: value
+          ? `"${agency.name}" now represents My Rumi`
+          : `"${agency.name}" no longer represents My Rumi`,
+      });
+    } catch (error) {
+      console.error('Error toggling platform rep:', error);
+      toast({ title: "Error", description: "Failed to update agency", variant: "destructive" });
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -281,6 +307,55 @@ export const AgencyManager = () => {
             {agencies.length} {agencies.length === 1 ? 'agency' : 'agencies'} registered
           </Badge>
         </div>
+
+        {/* My Rumi Representatives */}
+        {agencies.length > 0 && (
+          <div className="pt-4 border-t space-y-3">
+            <div>
+              <h3 className="font-semibold flex items-center gap-2">
+                <Star className="w-4 h-4 text-primary" />
+                My Rumi Representatives
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Choose which agencies officially represent the My Rumi platform.
+              </p>
+            </div>
+            <div className="space-y-2">
+              {agencies.map((agency) => (
+                <div
+                  key={`rep-${agency.id}`}
+                  className="flex items-center justify-between p-3 border rounded-lg bg-muted/30"
+                >
+                  <div className="flex items-center gap-3">
+                    {agency.logo_url ? (
+                      <img
+                        src={agency.logo_url}
+                        alt={`${agency.name} logo`}
+                        className="w-8 h-8 rounded object-contain border bg-background"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded border bg-background flex items-center justify-center">
+                        <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    <span className="font-medium text-sm">{agency.name}</span>
+                    {agency.represents_platform && (
+                      <Badge variant="default" className="flex items-center gap-1">
+                        <Star className="w-3 h-3" />
+                        Representative
+                      </Badge>
+                    )}
+                  </div>
+                  <Switch
+                    checked={!!agency.represents_platform}
+                    disabled={togglingId === agency.id}
+                    onCheckedChange={(v) => togglePlatformRep(agency, v)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
