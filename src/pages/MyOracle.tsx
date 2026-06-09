@@ -93,6 +93,9 @@ export default function MyOracle() {
   const [stcDate, setStcDate] = useState<string>('');
   const [stcTime, setStcTime] = useState<'morning' | 'afternoon' | 'all_day'>('morning');
   const [submittingStc, setSubmittingStc] = useState(false);
+  const [movedInOpen, setMovedInOpen] = useState(false);
+  const [moveIns, setMoveIns] = useState<any[]>([]);
+  const [confirmingMoveIn, setConfirmingMoveIn] = useState<string | null>(null);
   const [offerProperty, setOfferProperty] = useState<Property | null>(null);
   const [offerType, setOfferType] = useState<'buy' | 'rent'>('buy');
   const [offerAmount, setOfferAmount] = useState('');
@@ -109,7 +112,7 @@ export default function MyOracle() {
 
   useEffect(() => {
     if (user) {
-      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed(), fetchOffers(), fetchMeetings()]).finally(() => setLoading(false));
+      Promise.all([fetchEnquiries(), fetchFavorites(), fetchMyPlaces(), fetchSavedAreas(), fetchViewed(), fetchOffers(), fetchMeetings(), fetchMoveIns()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -185,6 +188,32 @@ export default function MyOracle() {
       .eq('user_id', user?.id)
       .order('created_at', { ascending: false });
     setMeetings((data as any) || []);
+  };
+
+  const fetchMoveIns = async () => {
+    const { data } = await supabase
+      .from('property_move_ins' as any)
+      .select('*, properties(address, city, images, listing_type)')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    setMoveIns((data as any) || []);
+  };
+
+  const confirmMoveIn = async (meeting: any) => {
+    if (!user) return;
+    setConfirmingMoveIn(meeting.id);
+    const { error } = await supabase.from('property_move_ins' as any).insert({
+      user_id: user.id,
+      property_id: meeting.property_id,
+      meeting_id: meeting.id,
+    });
+    setConfirmingMoveIn(null);
+    if (error) {
+      toast({ title: 'Failed to confirm', description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Move-in confirmed' });
+    fetchMoveIns();
   };
 
   const openStcDialog = (offer: any) => {
@@ -605,6 +634,99 @@ export default function MyOracle() {
                             </Card>
                           );
                         })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
+
+        {/* Moved In subsection */}
+        <div className="mt-6">
+          {(() => {
+            const todayIso = new Date().toISOString().slice(0,10);
+            const completedMeetings = meetings.filter(m => m.meeting_date <= todayIso);
+            const movedInIds = new Set(moveIns.map(mi => mi.property_id));
+            const pendingMoveIn = completedMeetings.filter(m => !movedInIds.has(m.property_id));
+            const canOpen = completedMeetings.length > 0 || moveIns.length > 0;
+            return (
+              <>
+                <button
+                  type="button"
+                  disabled={!canOpen}
+                  onClick={() => canOpen && setMovedInOpen(v => !v)}
+                  className="w-full flex items-center justify-between text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <h3 className="text-base font-medium text-foreground">
+                    Moved in {moveIns.length > 0 && `(${moveIns.length})`}
+                  </h3>
+                  <ChevronDown
+                    className={`h-4 w-4 text-muted-foreground transition-transform ${movedInOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {movedInOpen && (
+                  <div className="mt-3 space-y-4">
+                    {pendingMoveIn.length === 0 && moveIns.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        No properties ready to confirm yet.
+                      </p>
+                    ) : (
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {pendingMoveIn.map((m) => (
+                          <Card key={`pending-${m.id}`} className="hover:shadow-md transition-shadow">
+                            <CardContent className="p-4">
+                              <div className="flex gap-3">
+                                {m.properties?.images?.[0] && (
+                                  <img
+                                    src={m.properties.images[0]}
+                                    alt={m.properties.address}
+                                    className="w-20 h-20 rounded-md object-cover shrink-0"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm text-foreground truncate">
+                                    {m.properties?.address}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">{m.properties?.city}</p>
+                                  <Button
+                                    size="sm"
+                                    className="mt-2"
+                                    disabled={confirmingMoveIn === m.id}
+                                    onClick={() => confirmMoveIn(m)}
+                                  >
+                                    {confirmingMoveIn === m.id ? 'Confirming...' : 'Confirm you moved in'}
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                        {moveIns.map((mi) => (
+                          <Card key={mi.id} className="hover:shadow-md transition-shadow">
+                            <CardContent className="p-4">
+                              <div className="flex gap-3">
+                                {mi.properties?.images?.[0] && (
+                                  <img
+                                    src={mi.properties.images[0]}
+                                    alt={mi.properties.address}
+                                    className="w-20 h-20 rounded-md object-cover shrink-0"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm text-foreground truncate">
+                                    {mi.properties?.address}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">{mi.properties?.city}</p>
+                                  <Badge variant="secondary" className="text-xs mt-2">
+                                    Moved in {new Date(mi.moved_in_at).toLocaleDateString()}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
                     )}
                   </div>
