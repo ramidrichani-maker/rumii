@@ -191,7 +191,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
   };
 
   const handleBookViewing = async () => {
-    if (!selectedDate || !selectedTime || !user) {
+    if (!selectedDate || !timePreference || !user) {
       toast({ title: "Missing Information", description: "Please select both date and time for your viewing", variant: "destructive" });
       return;
     }
@@ -203,40 +203,8 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
     setLoading(true);
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
-
-      // Conflict on the same listing (pending or confirmed)
-      const { data: propertyConflict, error: propCheckError } = await supabase
-        .from('property_viewings')
-        .select('id')
-        .eq('property_id', property.id)
-        .eq('viewing_date', dateStr)
-        .eq('viewing_time', selectedTime)
-        .in('status', ['pending', 'confirmed'])
-        .maybeSingle();
-
-      if (propCheckError) throw propCheckError;
-      if (propertyConflict) {
-        toast({ title: "Time Slot Unavailable", description: "This time slot is already booked. Please select another time.", variant: "destructive" });
-        return;
-      }
-
-      // Conflict on the assigned agent's calendar (pending or confirmed)
-      if (agentId) {
-        const { data: agentConflict, error: agentCheckError } = await supabase
-          .from('property_viewings')
-          .select('id')
-          .eq('agent_id', agentId)
-          .eq('viewing_date', dateStr)
-          .eq('viewing_time', selectedTime)
-          .in('status', ['pending', 'confirmed'])
-          .maybeSingle();
-
-        if (agentCheckError) throw agentCheckError;
-        if (agentConflict) {
-          toast({ title: "Time Slot Unavailable", description: "The agent is already booked at this time. Please select another time.", variant: "destructive" });
-          return;
-        }
-      }
+      const pref = timePreferenceOptions.find(o => o.value === timePreference)!;
+      const viewingTime = pref.time;
 
       const confirmMethods = [];
       if (confirmByEmail) confirmMethods.push('email');
@@ -248,9 +216,9 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
           property_id: property.id,
           user_id: user.id,
           viewing_date: dateStr,
-          viewing_time: selectedTime,
+          viewing_time: viewingTime,
           status: 'pending',
-          notes: `Confirmation preference: ${confirmMethods.join(', ')}`
+          notes: `Preferred time: ${pref.label} | Confirmation preference: ${confirmMethods.join(', ')}`
         });
 
       if (insertError) throw insertError;
@@ -259,6 +227,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
       onClose();
       setSelectedDate(undefined);
       setSelectedTime("");
+      setTimePreference("");
       setConfirmByEmail(false);
       setConfirmByPhone(false);
     } catch (error) {
@@ -272,12 +241,6 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
   const formatPrice = (price: number, listingType: string) => {
     const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
     return `${formatter.format(price)}${listingType === 'rent' ? '/mo' : ''}`;
-  };
-
-  const isDateDisabled = (date: Date) => {
-    const today = startOfToday();
-    const maxDate = addDays(today, 30);
-    return isBefore(date, today) || isBefore(maxDate, date);
   };
 
   const hasConfirmation = confirmByEmail || confirmByPhone;
@@ -354,68 +317,64 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <CalendarIcon className="w-5 h-5" />
-                  Select Date
+                  Select Day
                 </h3>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={isDateDisabled}
-                  className="rounded-md border"
-                />
+                <p className="text-sm text-muted-foreground">Choose a day within the next 7 days.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {dayOptions.map((d) => {
+                    const dateStr = format(d, 'yyyy-MM-dd');
+                    const selected = selectedDate && format(selectedDate, 'yyyy-MM-dd') === dateStr;
+                    return (
+                      <button
+                        key={dateStr}
+                        type="button"
+                        onClick={() => setSelectedDate(d)}
+                        className={`p-3 text-left rounded-lg border transition-colors ${
+                          selected
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="font-medium">{format(d, 'EEEE')}</div>
+                        <div className="text-xs text-muted-foreground">{format(d, 'MMM d')}</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Clock className="w-5 h-5" />
-                  Select Time
+                  Preferred Time
                 </h3>
-                {selectedDate ? (
-                  loadingSlots ? (
-                    <p className="text-muted-foreground text-center py-8">Loading available slots...</p>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      {timeSlots.map((time) => {
-                        const isBusy = busySlots.includes(time);
-                        return (
-                          <button
-                            key={time}
-                            type="button"
-                            disabled={isBusy}
-                            className={`p-3 text-center font-medium rounded-lg border transition-colors ${
-                              isBusy
-                                ? 'border-border bg-muted text-muted-foreground opacity-50 cursor-not-allowed line-through'
-                                : selectedTime === time
-                                  ? 'border-primary bg-primary/10 text-primary'
-                                  : 'border-border hover:border-primary/50'
-                            }`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setSelectedTime(time);
-                            }}
-                          >
-                            {formatTimeSlot(time)}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    Please select a date first to see available time slots
-                  </p>
-                )}
+                <p className="text-sm text-muted-foreground">Pick when you'd prefer to visit.</p>
+                <div className="grid grid-cols-1 gap-2">
+                  {timePreferenceOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => { setTimePreference(opt.value); setSelectedTime(opt.time); }}
+                      className={`p-3 text-center font-medium rounded-lg border transition-colors ${
+                        timePreference === opt.value
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {selectedDate && selectedTime && (
+            {selectedDate && timePreference && (
               <div className="border-t pt-4 space-y-4">
                 <div className="bg-muted p-4 rounded-lg">
                   <h4 className="font-semibold mb-2">Viewing Summary</h4>
                   <p><strong>Property:</strong> {property.address}</p>
-                  <p><strong>Date:</strong> {format(selectedDate, 'EEEE, MMMM do, yyyy')}</p>
-                  <p><strong>Time:</strong> {formatTimeSlot(selectedTime)}</p>
+                  <p><strong>Day:</strong> {format(selectedDate, 'EEEE, MMMM do, yyyy')}</p>
+                  <p><strong>Preferred time:</strong> {timePreferenceOptions.find(o => o.value === timePreference)?.label}</p>
                 </div>
 
                 <div className="space-y-3">
@@ -444,7 +403,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
               <Button variant="outline" onClick={onClose}>Cancel</Button>
               <Button
                 onClick={handleBookViewing}
-                disabled={!selectedDate || !selectedTime || !hasConfirmation || loading}
+                disabled={!selectedDate || !timePreference || !hasConfirmation || loading}
                 className="min-w-[120px]"
               >
                 {loading ? "Requesting..." : "Request Viewing"}
