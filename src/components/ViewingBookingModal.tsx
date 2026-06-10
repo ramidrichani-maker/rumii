@@ -350,20 +350,34 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
                 </h3>
                 <p className="text-sm text-muted-foreground">Pick when you'd prefer to visit.</p>
                 <div className="grid grid-cols-1 gap-2">
-                  {timePreferenceOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => { setTimePreference(opt.value); setSelectedTime(opt.time); }}
-                      className={`p-3 text-center font-medium rounded-lg border transition-colors ${
-                        timePreference === opt.value
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-border hover:border-primary/50'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                  {timePreferenceOptions.map((opt) => {
+                    const isToday = selectedDate && format(selectedDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+                    const morningDisabled = opt.value === 'morning' && isToday && new Date().getHours() >= 12;
+                    const afternoonDisabled = opt.value === 'afternoon' && isToday && new Date().getHours() >= 17;
+                    const disabled = morningDisabled || afternoonDisabled;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        disabled={disabled}
+                        onClick={() => {
+                          if (disabled) return;
+                          setTimePreference(opt.value);
+                          setSelectedTime(opt.time);
+                        }}
+                        className={`p-3 text-center font-medium rounded-lg border transition-colors ${
+                          disabled
+                            ? 'border-border bg-muted text-muted-foreground cursor-not-allowed opacity-50'
+                            : timePreference === opt.value
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {opt.label}
+                        {morningDisabled && <span className="block text-xs font-normal">Unavailable (past noon)</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
