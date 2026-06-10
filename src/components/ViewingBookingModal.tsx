@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Clock, Calendar as CalendarIcon, Mail, Phone } from "lucide-react";
-import { format, addDays, isBefore, startOfToday } from "date-fns";
+import { format, addDays, startOfToday } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +27,7 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [timePreference, setTimePreference] = useState<"morning" | "afternoon" | "all_day" | "">("");
   const [loading, setLoading] = useState(false);
   const [confirmByEmail, setConfirmByEmail] = useState(false);
   const [confirmByPhone, setConfirmByPhone] = useState(false);
@@ -38,8 +39,11 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
   const [isOracleEstates, setIsOracleEstates] = useState<boolean | null>(null);
   const [checkingAgency, setCheckingAgency] = useState(true);
 
-  const timeSlots = [
-    "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30", "18:30", "19:30"
+  const dayOptions = Array.from({ length: 8 }, (_, i) => addDays(startOfToday(), i));
+  const timePreferenceOptions: { value: "morning" | "afternoon" | "all_day"; label: string; time: string }[] = [
+    { value: "morning", label: "Morning", time: "09:00" },
+    { value: "afternoon", label: "Afternoon", time: "14:00" },
+    { value: "all_day", label: "All day", time: "12:00" },
   ];
 
   // Determine Oracle Estates eligibility:
