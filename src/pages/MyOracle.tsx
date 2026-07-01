@@ -358,13 +358,13 @@ export default function MyOracle() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-5xl space-y-10">
-      <h1 className="text-3xl font-bold text-foreground">
+    <div className={`py-8 space-y-10 ${activeSection === 'enquiries' ? 'px-0 max-w-none w-full' : 'container mx-auto px-4 max-w-5xl'}`}>
+      <h1 className={`text-3xl font-bold text-foreground ${activeSection === 'enquiries' ? 'px-4 max-w-7xl mx-auto' : ''}`}>
         {activeSection === 'enquiries' ? 'Enquiries' : 'My rumi'}
       </h1>
 
       {/* Enquiries Section */}
-      <div className={activeSection === 'enquiries' ? 'grid md:grid-cols-[240px_1fr] gap-6 items-start' : ''}>
+      <div className={activeSection === 'enquiries' ? 'grid md:grid-cols-[336px_1fr] gap-6 items-start px-4 max-w-7xl mx-auto' : ''}>
         {activeSection === 'enquiries' && (
           <aside className="md:sticky md:top-24 rounded-xl border bg-muted/30 shadow-md overflow-hidden">
             <nav className="flex flex-col">
