@@ -102,13 +102,14 @@ export default function MyOracle() {
   const [offerMessage, setOfferMessage] = useState('');
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const [showAllEnquiries, setShowAllEnquiries] = useState(false);
-  const [selectedEnquiry, setSelectedEnquiry] = useState<'initial' | 'viewed' | 'offers' | 'accepted' | 'stc' | 'movedin'>('initial');
+  const [selectedEnquiry, setSelectedEnquiry] = useState<'initial' | 'viewed' | 'offers' | 'accepted' | 'stc' | 'movedin' | 'drawn'>('initial');
   const initialRef = useRef<HTMLDivElement>(null);
   const viewedRef = useRef<HTMLDivElement>(null);
   const offersRef = useRef<HTMLDivElement>(null);
   const acceptedRef = useRef<HTMLDivElement>(null);
   const stcRef = useRef<HTMLDivElement>(null);
   const movedInRef = useRef<HTMLDivElement>(null);
+  const drawnRef = useRef<HTMLDivElement>(null);
   const [showAllFavorites, setShowAllFavorites] = useState(false);
   const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
   const [showAllMyPlaces, setShowAllMyPlaces] = useState(false);
@@ -282,6 +283,7 @@ export default function MyOracle() {
         const todayIso = new Date().toISOString().slice(0,10);
         return meetings.filter(m => m.meeting_date <= todayIso).length === 0 && moveIns.length === 0;
       } },
+    { key: 'drawn', label: 'Drawn areas', ref: drawnRef, onOpen: () => {} },
   ] as const;
 
   const handleEnquiryNav = (item: typeof enquiryNav[number]) => {
