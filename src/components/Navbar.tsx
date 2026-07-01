@@ -379,7 +379,7 @@ export const Navbar = () => {
                 )}
               </Link>
               <Link to="/favorites" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
-                <Bookmark className="h-4 w-4 text-muted-foreground" />
+                <Heart className="h-4 w-4 text-muted-foreground" />
                 <span>Saved</span>
               </Link>
               <Link to="/my-rumi?section=enquiries" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
