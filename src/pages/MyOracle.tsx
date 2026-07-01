@@ -102,13 +102,14 @@ export default function MyOracle() {
   const [offerMessage, setOfferMessage] = useState('');
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const [showAllEnquiries, setShowAllEnquiries] = useState(false);
-  const [selectedEnquiry, setSelectedEnquiry] = useState<'initial' | 'viewed' | 'offers' | 'accepted' | 'stc' | 'movedin'>('initial');
+  const [selectedEnquiry, setSelectedEnquiry] = useState<'initial' | 'viewed' | 'offers' | 'accepted' | 'stc' | 'movedin' | 'drawn'>('initial');
   const initialRef = useRef<HTMLDivElement>(null);
   const viewedRef = useRef<HTMLDivElement>(null);
   const offersRef = useRef<HTMLDivElement>(null);
   const acceptedRef = useRef<HTMLDivElement>(null);
   const stcRef = useRef<HTMLDivElement>(null);
   const movedInRef = useRef<HTMLDivElement>(null);
+  const drawnRef = useRef<HTMLDivElement>(null);
   const [showAllFavorites, setShowAllFavorites] = useState(false);
   const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
   const [showAllMyPlaces, setShowAllMyPlaces] = useState(false);
@@ -282,6 +283,7 @@ export default function MyOracle() {
         const todayIso = new Date().toISOString().slice(0,10);
         return meetings.filter(m => m.meeting_date <= todayIso).length === 0 && moveIns.length === 0;
       } },
+    { key: 'drawn', label: 'Drawn areas', ref: drawnRef, onOpen: () => {} },
   ] as const;
 
   const handleEnquiryNav = (item: typeof enquiryNav[number]) => {
@@ -814,6 +816,58 @@ export default function MyOracle() {
             );
           })()}
         </div>
+        )}
+
+        {/* Drawn areas subsection (enquiries view only) */}
+        {activeSection === 'enquiries' && selectedEnquiry === 'drawn' && (
+          <div ref={drawnRef} className="mt-6">
+            <h3 className="text-base font-medium text-foreground mb-3">Drawn areas</h3>
+            {savedAreas.length === 0 ? (
+              <Card>
+                <CardContent className="py-16 text-center space-y-4">
+                  <p className="text-foreground font-medium">You have not yet drawn any areas</p>
+                  <div className="flex justify-center">
+                    <Button onClick={() => navigate('/purchase')}>Create an area</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {savedAreas.map((area) => {
+                  const coords = typeof area.coordinates === 'string' ? JSON.parse(area.coordinates) : area.coordinates;
+                  const pointCount = Array.isArray(coords) ? coords.length : 0;
+                  return (
+                    <Card key={area.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div
+                          className="cursor-pointer flex-1"
+                          onClick={() => {
+                            const coordsStr = typeof area.coordinates === 'string'
+                              ? area.coordinates
+                              : JSON.stringify(area.coordinates);
+                            navigate(`/${area.page}?polygon=${encodeURIComponent(coordsStr)}`);
+                          }}
+                        >
+                          <p className="font-medium text-sm text-foreground">{area.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {pointCount} points • {area.page === 'purchase' ? 'Buy' : 'Rent'} • {new Date(area.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive h-8 w-8"
+                          onClick={() => handleDeleteArea(area.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         )}
         </section>
       </div>
