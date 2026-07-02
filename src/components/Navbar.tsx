@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, Menu, Mail } from 'lucide-react';
+import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, Menu, Mail, Map } from 'lucide-react';
 import rumiLogo from '@/assets/rumi-logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
@@ -385,6 +385,10 @@ export const Navbar = () => {
               <Link to="/my-rumi?section=enquiries" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 <span>Enquiries</span>
+              </Link>
+              <Link to="/my-rumi?section=drawn-areas" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                <Map className="h-4 w-4 text-muted-foreground" />
+                <span>Drawn areas</span>
               </Link>
               <Link to="/profile" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                 <User className="h-4 w-4 text-muted-foreground" />
