@@ -109,7 +109,7 @@ export default function MyOracle() {
   const acceptedRef = useRef<HTMLDivElement>(null);
   const stcRef = useRef<HTMLDivElement>(null);
   const movedInRef = useRef<HTMLDivElement>(null);
-  const drawnRef = useRef<HTMLDivElement>(null);
+  
   const [showAllFavorites, setShowAllFavorites] = useState(false);
   const [showAllSavedAreas, setShowAllSavedAreas] = useState(false);
   const [showAllMyPlaces, setShowAllMyPlaces] = useState(false);
