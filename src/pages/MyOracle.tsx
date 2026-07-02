@@ -821,7 +821,73 @@ export default function MyOracle() {
         </section>
       </div>
 
-      {activeSection !== 'enquiries' && (
+      {/* Drawn areas Section */}
+      {(activeSection === 'drawn-areas' || activeSection !== 'enquiries') && (
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Map className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-semibold text-foreground">Drawn areas</h2>
+          </div>
+          {savedAreas.length === 0 ? (
+            <Card>
+              <CardContent className="py-16 text-center space-y-4">
+                <p className="text-foreground font-medium">You have not yet drawn any areas</p>
+                <div className="flex justify-center">
+                  <Button onClick={() => navigate('/purchase')}>Create an area</Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {savedAreas.map((area) => {
+                  const coords = typeof area.coordinates === 'string' ? JSON.parse(area.coordinates) : area.coordinates;
+                  const pointCount = Array.isArray(coords) ? coords.length : 0;
+                  return (
+                    <Card key={area.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div
+                          className="cursor-pointer flex-1"
+                          onClick={() => {
+                            const coordsStr = typeof area.coordinates === 'string'
+                              ? area.coordinates
+                              : JSON.stringify(area.coordinates);
+                            navigate(`/${area.page}?polygon=${encodeURIComponent(coordsStr)}`);
+                          }}
+                        >
+                          <p className="font-medium text-sm text-foreground">{area.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {pointCount} points • {area.page === 'purchase' ? 'Buy' : 'Rent'} • {new Date(area.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive h-8 w-8"
+                          onClick={() => handleDeleteArea(area.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+              {savedAreas.length > 2 && (
+                <Button
+                  variant="outline"
+                  className="mt-3 w-full md:w-auto"
+                  onClick={() => setShowAllSavedAreas(v => !v)}
+                >
+                  {showAllSavedAreas ? 'Show less' : `Show more (${savedAreas.length - 2})`}
+                </Button>
+              )}
+            </>
+          )}
+        </section>
+      )}
+
+      {activeSection !== 'enquiries' && activeSection !== 'drawn-areas' && (
       <>
       <Separator />
 
