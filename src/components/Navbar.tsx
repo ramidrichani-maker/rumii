@@ -386,6 +386,10 @@ export const Navbar = () => {
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 <span>Enquiries</span>
               </Link>
+              <Link to="/my-rumi?section=drawn-areas" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
+                <Map className="h-4 w-4 text-muted-foreground" />
+                <span>Drawn areas</span>
+              </Link>
               <Link to="/profile" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-accent transition-colors">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span>Profile</span>
