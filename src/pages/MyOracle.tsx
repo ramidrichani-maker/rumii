@@ -283,7 +283,7 @@ export default function MyOracle() {
         const todayIso = new Date().toISOString().slice(0,10);
         return meetings.filter(m => m.meeting_date <= todayIso).length === 0 && moveIns.length === 0;
       } },
-    { key: 'drawn', label: 'Drawn areas', ref: drawnRef, onOpen: () => {} },
+    
   ] as const;
 
   const handleEnquiryNav = (item: typeof enquiryNav[number]) => {
