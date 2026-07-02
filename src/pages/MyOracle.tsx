@@ -360,9 +360,9 @@ export default function MyOracle() {
   }
 
   return (
-    <div className={`py-8 space-y-10 ${activeSection === 'enquiries' ? 'px-4 max-w-none w-full' : 'container mx-auto px-4 max-w-5xl'}`}>
-      <h1 className={`text-3xl font-bold text-foreground ${activeSection === 'enquiries' ? 'max-w-none' : ''}`}>
-        {activeSection === 'enquiries' ? 'Enquiries' : 'My rumi'}
+    <div className={`py-8 space-y-10 ${activeSection === 'enquiries' || activeSection === 'drawn-areas' ? 'px-4 max-w-none w-full' : 'container mx-auto px-4 max-w-5xl'}`}>
+      <h1 className={`text-3xl font-bold text-foreground ${activeSection === 'enquiries' || activeSection === 'drawn-areas' ? 'max-w-none' : ''}`}>
+        {activeSection === 'enquiries' ? 'Enquiries' : activeSection === 'drawn-areas' ? 'Drawn areas' : 'My rumi'}
       </h1>
 
       {/* Enquiries Section */}
