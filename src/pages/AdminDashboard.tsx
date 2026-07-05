@@ -644,10 +644,6 @@ const AdminDashboard = () => {
                   <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Commercial Ads</span>
                 </TabsTrigger>
-                <TabsTrigger value="offers" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Handshake className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Offers</span>
-                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="valuations">
@@ -673,13 +669,21 @@ const AdminDashboard = () => {
                   <CommercialAdvertisementsManager />
                 </div>
               </TabsContent>
-
-              <TabsContent value="offers">
-                <div className="max-h-[500px] overflow-y-auto">
-                  <PropertyOffersManager />
-                </div>
-              </TabsContent>
             </Tabs>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Property Offers */}
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+              <Handshake className="w-5 h-5" />
+              Property Offers
+            </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <PropertyOffersManager />
           </CollapsibleContent>
         </Collapsible>
 
