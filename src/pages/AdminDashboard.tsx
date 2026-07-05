@@ -669,12 +669,6 @@ const AdminDashboard = () => {
                   <CommercialAdvertisementsManager />
                 </div>
               </TabsContent>
-
-              <TabsContent value="offers">
-                <div className="max-h-[500px] overflow-y-auto">
-                  <PropertyOffersManager />
-                </div>
-              </TabsContent>
             </Tabs>
           </CollapsibleContent>
         </Collapsible>
