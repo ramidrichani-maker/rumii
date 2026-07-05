@@ -644,10 +644,6 @@ const AdminDashboard = () => {
                   <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Commercial Ads</span>
                 </TabsTrigger>
-                <TabsTrigger value="offers" className="flex items-center gap-1 text-xs sm:text-sm">
-                  <Handshake className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Offers</span>
-                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="valuations">
