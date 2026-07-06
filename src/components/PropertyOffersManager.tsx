@@ -238,5 +238,104 @@ export default function PropertyOffersManager() {
         )}
       </CardContent>
     </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <CalendarClock className="w-5 h-5" />
+          Contract Meeting Requests
+        </CardTitle>
+        <CardDescription>Accept or reject scheduled contract meetings from accepted offers</CardDescription>
+        <div className="flex flex-wrap gap-2 pt-2">
+          {(["pending", "accepted", "rejected", "all"] as const).map((f) => (
+            <Button
+              key={f}
+              variant={meetingFilter === f ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMeetingFilter(f)}
+              className="capitalize"
+            >
+              {f} {f !== "all" && `(${meetings.filter((m) => m.status === f).length})`}
+            </Button>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent>
+        {meetingsLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : visibleMeetings.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">No {meetingFilter} meeting requests</p>
+        ) : (
+          <div className="space-y-4">
+            {visibleMeetings.map((m) => (
+              <div key={m.id} className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-start justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <Home className="w-4 h-4 text-muted-foreground" />
+                    <h4 className="font-semibold">
+                      {m.properties?.address || "Property"}{m.properties?.city ? `, ${m.properties.city}` : ""}
+                    </h4>
+                  </div>
+                  <Badge
+                    variant={
+                      m.status === "accepted" ? "default" : m.status === "rejected" ? "destructive" : "secondary"
+                    }
+                    className="capitalize"
+                  >
+                    {m.status}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>{m.senderName || "Unknown"}</span>
+                  </div>
+                  {m.senderPhone && (
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span>{m.senderPhone}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5">
+                    <CalendarClock className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="font-medium">
+                      {format(new Date(m.meeting_date), "MMM dd, yyyy")}
+                    </span>
+                    <Badge variant="outline">{timeLabel(m.time_preference)}</Badge>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    Requested {format(new Date(m.created_at), "MMM dd, yyyy HH:mm")}
+                  </span>
+                  {m.status === "pending" && (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={meetingActing === m.id}
+                        onClick={() => decideMeeting(m.id, "rejected")}
+                      >
+                        <X className="w-4 h-4" /> Reject
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={meetingActing === m.id}
+                        onClick={() => decideMeeting(m.id, "accepted")}
+                      >
+                        <Check className="w-4 h-4" /> Accept
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+    </div>
   );
 }
