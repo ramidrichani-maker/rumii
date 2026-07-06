@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Handshake, Loader2, Check, X, Home, User, Mail } from "lucide-react";
+import { Handshake, Loader2, Check, X, Home, User, Mail, CalendarClock } from "lucide-react";
 import { format } from "date-fns";
 
 interface Offer {
@@ -21,11 +21,28 @@ interface Offer {
   senderPhone?: string;
 }
 
+interface Meeting {
+  id: string;
+  user_id: string;
+  property_id: string;
+  meeting_date: string;
+  time_preference: string;
+  status: string;
+  created_at: string;
+  properties?: { address: string | null; city: string | null } | null;
+  senderName?: string;
+  senderPhone?: string;
+}
+
 export default function PropertyOffersManager() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
   const [filter, setFilter] = useState<"pending" | "accepted" | "rejected" | "all">("pending");
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [meetingsLoading, setMeetingsLoading] = useState(true);
+  const [meetingActing, setMeetingActing] = useState<string | null>(null);
+  const [meetingFilter, setMeetingFilter] = useState<"pending" | "accepted" | "rejected" | "all">("pending");
 
   const load = async () => {
     setLoading(true);
@@ -53,8 +70,35 @@ export default function PropertyOffersManager() {
     setLoading(false);
   };
 
+  const loadMeetings = async () => {
+    setMeetingsLoading(true);
+    const { data, error } = await supabase
+      .from("contract_meetings" as any)
+      .select("*, properties(address, city)")
+      .order("created_at", { ascending: false });
+    if (error) {
+      toast({ title: "Failed to load meetings", description: error.message, variant: "destructive" });
+      setMeetingsLoading(false);
+      return;
+    }
+    const rows = (data as any[]) || [];
+    const enriched = await Promise.all(
+      rows.map(async (m) => {
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("full_name, phone_number")
+          .eq("user_id", m.user_id)
+          .maybeSingle();
+        return { ...m, senderName: p?.full_name, senderPhone: p?.phone_number } as Meeting;
+      })
+    );
+    setMeetings(enriched);
+    setMeetingsLoading(false);
+  };
+
   useEffect(() => {
     load();
+    loadMeetings();
   }, []);
 
   const decide = async (id: string, status: "accepted" | "rejected") => {
@@ -74,7 +118,29 @@ export default function PropertyOffersManager() {
 
   const visible = filter === "all" ? offers : offers.filter((o) => o.status === filter);
 
+  const decideMeeting = async (id: string, status: "accepted" | "rejected") => {
+    setMeetingActing(id);
+    const { error } = await supabase
+      .from("contract_meetings" as any)
+      .update({ status })
+      .eq("id", id);
+    setMeetingActing(null);
+    if (error) {
+      toast({ title: "Update failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Meeting ${status}` });
+    setMeetings((prev) => prev.map((m) => (m.id === id ? { ...m, status } : m)));
+  };
+
+  const timeLabel = (t: string) =>
+    t === "morning" ? "Morning" : t === "afternoon" ? "Afternoon" : "All day";
+
+  const visibleMeetings =
+    meetingFilter === "all" ? meetings : meetings.filter((m) => m.status === meetingFilter);
+
   return (
+    <div className="space-y-6">
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
