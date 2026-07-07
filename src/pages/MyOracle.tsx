@@ -326,6 +326,31 @@ export default function MyOracle() {
     fetchOffers();
   };
 
+  const respondToCounter = async (offer: any, accept: boolean) => {
+    if (accept) {
+      const { error } = await supabase
+        .from('property_offers' as any)
+        .update({ status: 'accepted', amount: offer.counter_amount })
+        .eq('id', offer.id);
+      if (error) {
+        toast({ title: 'Failed', description: error.message, variant: 'destructive' });
+        return;
+      }
+      toast({ title: 'Counter accepted' });
+    } else {
+      const { error } = await supabase
+        .from('property_offers' as any)
+        .update({ status: 'rejected' })
+        .eq('id', offer.id);
+      if (error) {
+        toast({ title: 'Failed', description: error.message, variant: 'destructive' });
+        return;
+      }
+      toast({ title: 'Counter rejected' });
+    }
+    fetchOffers();
+  };
+
   const handleDeleteArea = async (id: string) => {
     await supabase.from('saved_search_areas' as any).delete().eq('id', id);
     setSavedAreas(prev => prev.filter(a => a.id !== id));
@@ -568,8 +593,41 @@ export default function MyOracle() {
                         </p>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="secondary" className="text-xs capitalize">{offer.offer_type}</Badge>
-                          <Badge variant="outline" className="text-xs capitalize">{offer.status}</Badge>
+                          <Badge
+                            variant={offer.status === 'countered' ? 'default' : 'outline'}
+                            className="text-xs capitalize"
+                          >
+                            {offer.status}
+                          </Badge>
                         </div>
+                        {offer.status === 'countered' && offer.counter_amount && (
+                          <div className="mt-2 p-2 rounded-md bg-muted/50 border">
+                            <p className="text-xs text-muted-foreground">Admin counter offer</p>
+                            <p className="text-sm font-semibold text-foreground">
+                              ${Number(offer.counter_amount).toLocaleString()}{offer.offer_type === 'rent' ? '/mo' : ''}
+                            </p>
+                            {offer.counter_message && (
+                              <p className="text-xs text-muted-foreground mt-1 italic">"{offer.counter_message}"</p>
+                            )}
+                            <div className="flex gap-2 mt-2">
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="h-7 text-xs"
+                                onClick={() => respondToCounter(offer, false)}
+                              >
+                                Reject
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => respondToCounter(offer, true)}
+                              >
+                                Accept counter
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>
