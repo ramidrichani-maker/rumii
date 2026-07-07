@@ -6,6 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Handshake, Loader2, Check, X, Home, User, Mail, CalendarClock } from "lucide-react";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface Offer {
   id: string;
@@ -16,6 +20,8 @@ interface Offer {
   message: string | null;
   status: string;
   created_at: string;
+  counter_amount?: number | null;
+  counter_message?: string | null;
   properties?: { address: string | null; city: string | null; listing_type: string | null } | null;
   senderName?: string;
   senderPhone?: string;
@@ -43,6 +49,10 @@ export default function PropertyOffersManager() {
   const [meetingsLoading, setMeetingsLoading] = useState(true);
   const [meetingActing, setMeetingActing] = useState<string | null>(null);
   const [meetingFilter, setMeetingFilter] = useState<"pending" | "accepted" | "rejected" | "all">("pending");
+  const [counterOffer, setCounterOffer] = useState<Offer | null>(null);
+  const [counterAmount, setCounterAmount] = useState("");
+  const [counterMessage, setCounterMessage] = useState("");
+  const [submittingCounter, setSubmittingCounter] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -117,6 +127,40 @@ export default function PropertyOffersManager() {
   };
 
   const visible = filter === "all" ? offers : offers.filter((o) => o.status === filter);
+
+  const openCounter = (o: Offer) => {
+    setCounterOffer(o);
+    setCounterAmount(o.counter_amount ? String(o.counter_amount) : String(o.amount));
+    setCounterMessage("");
+  };
+
+  const submitCounter = async () => {
+    if (!counterOffer) return;
+    const amt = parseFloat(counterAmount);
+    if (!amt || amt <= 0) {
+      toast({ title: "Enter a valid counter amount", variant: "destructive" });
+      return;
+    }
+    setSubmittingCounter(true);
+    const { error } = await supabase
+      .from("property_offers" as any)
+      .update({ status: "countered", counter_amount: amt, counter_message: counterMessage || null })
+      .eq("id", counterOffer.id);
+    setSubmittingCounter(false);
+    if (error) {
+      toast({ title: "Counter failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Counter offer sent" });
+    setOffers((prev) =>
+      prev.map((o) =>
+        o.id === counterOffer.id
+          ? { ...o, status: "countered", counter_amount: amt, counter_message: counterMessage || null }
+          : o
+      )
+    );
+    setCounterOffer(null);
+  };
 
   const decideMeeting = async (id: string, status: "accepted" | "rejected") => {
     setMeetingActing(id);
@@ -212,8 +256,13 @@ export default function PropertyOffersManager() {
                   <span className="text-xs text-muted-foreground">
                     {format(new Date(o.created_at), "MMM dd, yyyy HH:mm")}
                   </span>
-                  {o.status === "pending" && (
+                  {(o.status === "pending" || o.status === "countered") && (
                     <div className="flex gap-2">
+                      {o.status === "countered" && o.counter_amount && (
+                        <span className="text-xs text-muted-foreground self-center mr-2">
+                          Counter sent: ${Number(o.counter_amount).toLocaleString()}
+                        </span>
+                      )}
                       <Button
                         size="sm"
                         variant="destructive"
@@ -221,6 +270,14 @@ export default function PropertyOffersManager() {
                         onClick={() => decide(o.id, "rejected")}
                       >
                         <X className="w-4 h-4" /> Reject
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={acting === o.id}
+                        onClick={() => openCounter(o)}
+                      >
+                        Counter
                       </Button>
                       <Button
                         size="sm"
