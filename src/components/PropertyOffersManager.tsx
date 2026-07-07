@@ -394,5 +394,45 @@ export default function PropertyOffersManager() {
       </CardContent>
     </Card>
     </div>
+    <Dialog open={!!counterOffer} onOpenChange={(o) => !o && setCounterOffer(null)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Send Counter Offer</DialogTitle>
+        </DialogHeader>
+        {counterOffer && (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Original offer: <span className="font-semibold text-foreground">${Number(counterOffer.amount).toLocaleString()}</span>
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="counter-amount">Counter amount ($)</Label>
+              <Input
+                id="counter-amount"
+                type="number"
+                value={counterAmount}
+                onChange={(e) => setCounterAmount(e.target.value)}
+                placeholder="Enter counter amount"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="counter-message">Message (optional)</Label>
+              <Textarea
+                id="counter-message"
+                value={counterMessage}
+                onChange={(e) => setCounterMessage(e.target.value)}
+                placeholder="Add a note to the buyer/renter"
+              />
+            </div>
+          </div>
+        )}
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setCounterOffer(null)}>Cancel</Button>
+          <Button onClick={submitCounter} disabled={submittingCounter}>
+            {submittingCounter ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Counter"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
