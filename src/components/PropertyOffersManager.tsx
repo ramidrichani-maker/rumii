@@ -184,6 +184,7 @@ export default function PropertyOffersManager() {
     meetingFilter === "all" ? meetings : meetings.filter((m) => m.status === meetingFilter);
 
   return (
+    <>
     <div className="space-y-6">
     <Card>
       <CardHeader>
