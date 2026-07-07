@@ -326,6 +326,31 @@ export default function MyOracle() {
     fetchOffers();
   };
 
+  const respondToCounter = async (offer: any, accept: boolean) => {
+    if (accept) {
+      const { error } = await supabase
+        .from('property_offers' as any)
+        .update({ status: 'accepted', amount: offer.counter_amount })
+        .eq('id', offer.id);
+      if (error) {
+        toast({ title: 'Failed', description: error.message, variant: 'destructive' });
+        return;
+      }
+      toast({ title: 'Counter accepted' });
+    } else {
+      const { error } = await supabase
+        .from('property_offers' as any)
+        .update({ status: 'rejected' })
+        .eq('id', offer.id);
+      if (error) {
+        toast({ title: 'Failed', description: error.message, variant: 'destructive' });
+        return;
+      }
+      toast({ title: 'Counter rejected' });
+    }
+    fetchOffers();
+  };
+
   const handleDeleteArea = async (id: string) => {
     await supabase.from('saved_search_areas' as any).delete().eq('id', id);
     setSavedAreas(prev => prev.filter(a => a.id !== id));
