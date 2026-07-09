@@ -391,6 +391,7 @@ export default function MyOracle() {
       </h1>
 
       {/* Enquiries Section */}
+      {activeSection !== 'drawn-areas' && (
       <div className={activeSection === 'enquiries' ? 'grid md:grid-cols-[336px_1fr] gap-6 items-start w-full' : ''}>
         {activeSection === 'enquiries' && (
           <aside className="md:sticky md:top-24 rounded-xl border bg-muted/30 shadow-md overflow-hidden">
