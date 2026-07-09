@@ -879,6 +879,7 @@ export default function MyOracle() {
 
         </section>
       </div>
+      )}
 
       {/* Drawn areas Section */}
       {(activeSection === 'drawn-areas' || activeSection !== 'enquiries') && (
