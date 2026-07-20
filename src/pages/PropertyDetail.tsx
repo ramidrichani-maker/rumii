@@ -825,15 +825,14 @@ const PropertyDetail = () => {
             </h2>
 
             <div className="relative rounded-xl overflow-hidden border border-border">
-              <div ref={miniMapRef} className="w-full h-[200px]" />
+              <div ref={miniMapRef} className="w-full h-[290px]" />
               <Button
-                variant="outline"
+                variant="default"
                 size="sm"
-                className="absolute top-3 right-3 z-[1000] gap-1.5 bg-background/80 backdrop-blur-sm"
+                className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[1000] shadow-md"
                 onClick={() => setMapExpanded(true)}
               >
-                <Maximize2 className="w-4 h-4" />
-                Expand
+                Open map
               </Button>
             </div>
 
@@ -847,23 +846,22 @@ const PropertyDetail = () => {
             {mapExpanded && (
               <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
                 <div className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-semibold text-foreground">Map View</h3>
-                    <Button
-                      variant={satelliteView ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSatelliteView(!satelliteView)}
-                    >
-                      Satellite
-                    </Button>
-                  </div>
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setMapExpanded(false)}
-                    className="p-2 rounded-full hover:bg-muted transition-colors"
-                    aria-label="Close map"
+                    className="gap-1.5"
                   >
-                    <X className="w-5 h-5 text-foreground" />
-                  </button>
+                    <X className="w-4 h-4" />
+                    Exit map
+                  </Button>
+                  <Button
+                    variant={satelliteView ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSatelliteView(!satelliteView)}
+                  >
+                    Satellite
+                  </Button>
                 </div>
                 <div ref={expandedMapRef} className="flex-1" />
               </div>
