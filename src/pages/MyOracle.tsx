@@ -93,6 +93,7 @@ export default function MyOracle() {
   const [stcDate, setStcDate] = useState<string>('');
   const [stcTime, setStcTime] = useState<'morning' | 'afternoon' | 'all_day'>('morning');
   const [submittingStc, setSubmittingStc] = useState(false);
+  const [editingMeeting, setEditingMeeting] = useState<any | null>(null);
   const [movedInOpen, setMovedInOpen] = useState(false);
   const [moveIns, setMoveIns] = useState<any[]>([]);
   const [confirmingMoveIn, setConfirmingMoveIn] = useState<string | null>(null);
@@ -230,26 +231,38 @@ export default function MyOracle() {
     setStcTime('morning');
   };
 
+  const openEditMeeting = (m: any) => {
+    setEditingMeeting(m);
+    setStcDate(m.meeting_date);
+    setStcTime(m.time_preference);
+  };
+
   const submitStc = async () => {
-    if (!stcOffer || !user || !stcDate) {
+    if ((!stcOffer && !editingMeeting) || !user || !stcDate) {
       toast({ title: 'Pick a day', variant: 'destructive' });
       return;
     }
     setSubmittingStc(true);
-    const { error } = await supabase.from('contract_meetings' as any).insert({
-      user_id: user.id,
-      property_id: stcOffer.property_id,
-      offer_id: stcOffer.id,
-      meeting_date: stcDate,
-      time_preference: stcTime,
-    });
+    const { error } = editingMeeting
+      ? await supabase
+          .from('contract_meetings' as any)
+          .update({ meeting_date: stcDate, time_preference: stcTime, status: 'pending' })
+          .eq('id', editingMeeting.id)
+      : await supabase.from('contract_meetings' as any).insert({
+          user_id: user.id,
+          property_id: stcOffer.property_id,
+          offer_id: stcOffer.id,
+          meeting_date: stcDate,
+          time_preference: stcTime,
+        });
     setSubmittingStc(false);
     if (error) {
-      toast({ title: 'Failed to request meeting', description: error.message, variant: 'destructive' });
+      toast({ title: editingMeeting ? 'Failed to update meeting' : 'Failed to request meeting', description: error.message, variant: 'destructive' });
       return;
     }
-    toast({ title: 'Meeting request sent' });
+    toast({ title: editingMeeting ? 'Meeting updated' : 'Meeting request sent' });
     setStcOffer(null);
+    setEditingMeeting(null);
     fetchMeetings();
   };
 
