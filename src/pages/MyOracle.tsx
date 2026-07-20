@@ -1169,15 +1169,15 @@ export default function MyOracle() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!stcOffer} onOpenChange={(open) => !open && setStcOffer(null)}>
+      <Dialog open={!!stcOffer || !!editingMeeting} onOpenChange={(open) => { if (!open) { setStcOffer(null); setEditingMeeting(null); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Schedule contract meeting</DialogTitle>
+            <DialogTitle>{editingMeeting ? 'Change contract meeting date' : 'Schedule contract meeting'}</DialogTitle>
           </DialogHeader>
-          {stcOffer && (
+          {(stcOffer || editingMeeting) && (
             <div className="space-y-4">
               <div className="text-sm text-muted-foreground">
-                {stcOffer.properties?.address}, {stcOffer.properties?.city}
+                {(stcOffer || editingMeeting).properties?.address}, {(stcOffer || editingMeeting).properties?.city}
               </div>
               <div className="space-y-2">
                 <Label>Pick a day</Label>
@@ -1210,9 +1210,9 @@ export default function MyOracle() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setStcOffer(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => { setStcOffer(null); setEditingMeeting(null); }}>Cancel</Button>
             <Button onClick={submitStc} disabled={submittingStc || !stcDate}>
-              {submittingStc ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit'}
+              {submittingStc ? <Loader2 className="h-4 w-4 animate-spin" /> : (editingMeeting ? 'Save changes' : 'Submit')}
             </Button>
           </DialogFooter>
         </DialogContent>
