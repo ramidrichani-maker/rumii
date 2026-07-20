@@ -93,6 +93,7 @@ export default function MyOracle() {
   const [stcDate, setStcDate] = useState<string>('');
   const [stcTime, setStcTime] = useState<'morning' | 'afternoon' | 'all_day'>('morning');
   const [submittingStc, setSubmittingStc] = useState(false);
+  const [editingMeeting, setEditingMeeting] = useState<any | null>(null);
   const [movedInOpen, setMovedInOpen] = useState(false);
   const [moveIns, setMoveIns] = useState<any[]>([]);
   const [confirmingMoveIn, setConfirmingMoveIn] = useState<string | null>(null);
@@ -230,26 +231,38 @@ export default function MyOracle() {
     setStcTime('morning');
   };
 
+  const openEditMeeting = (m: any) => {
+    setEditingMeeting(m);
+    setStcDate(m.meeting_date);
+    setStcTime(m.time_preference);
+  };
+
   const submitStc = async () => {
-    if (!stcOffer || !user || !stcDate) {
+    if ((!stcOffer && !editingMeeting) || !user || !stcDate) {
       toast({ title: 'Pick a day', variant: 'destructive' });
       return;
     }
     setSubmittingStc(true);
-    const { error } = await supabase.from('contract_meetings' as any).insert({
-      user_id: user.id,
-      property_id: stcOffer.property_id,
-      offer_id: stcOffer.id,
-      meeting_date: stcDate,
-      time_preference: stcTime,
-    });
+    const { error } = editingMeeting
+      ? await supabase
+          .from('contract_meetings' as any)
+          .update({ meeting_date: stcDate, time_preference: stcTime, status: 'pending' })
+          .eq('id', editingMeeting.id)
+      : await supabase.from('contract_meetings' as any).insert({
+          user_id: user.id,
+          property_id: stcOffer.property_id,
+          offer_id: stcOffer.id,
+          meeting_date: stcDate,
+          time_preference: stcTime,
+        });
     setSubmittingStc(false);
     if (error) {
-      toast({ title: 'Failed to request meeting', description: error.message, variant: 'destructive' });
+      toast({ title: editingMeeting ? 'Failed to update meeting' : 'Failed to request meeting', description: error.message, variant: 'destructive' });
       return;
     }
-    toast({ title: 'Meeting request sent' });
+    toast({ title: editingMeeting ? 'Meeting updated' : 'Meeting request sent' });
     setStcOffer(null);
+    setEditingMeeting(null);
     fetchMeetings();
   };
 
@@ -741,6 +754,11 @@ export default function MyOracle() {
                         {meetings.map((m) => {
                           const d = new Date(m.meeting_date);
                           const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                          const todayIso = new Date().toISOString().slice(0,10);
+                          const tomorrow = new Date();
+                          tomorrow.setDate(tomorrow.getDate() + 1);
+                          const tomorrowIso = tomorrow.toISOString().slice(0,10);
+                          const canEdit = m.status !== 'rejected' && m.meeting_date >= tomorrowIso;
                           return (
                             <Card key={m.id} className="hover:shadow-md transition-shadow">
                               <CardContent className="p-4">
@@ -764,6 +782,16 @@ export default function MyOracle() {
                                       <Badge variant="secondary" className="text-xs">{timeLabel(m.time_preference)}</Badge>
                                       <Badge variant="outline" className="text-xs capitalize">{m.status}</Badge>
                                     </div>
+                                    {canEdit && (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="mt-2"
+                                        onClick={() => openEditMeeting(m)}
+                                      >
+                                        Change date
+                                      </Button>
+                                    )}
                                   </div>
                                 </div>
                               </CardContent>
@@ -1141,15 +1169,15 @@ export default function MyOracle() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!stcOffer} onOpenChange={(open) => !open && setStcOffer(null)}>
+      <Dialog open={!!stcOffer || !!editingMeeting} onOpenChange={(open) => { if (!open) { setStcOffer(null); setEditingMeeting(null); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Schedule contract meeting</DialogTitle>
+            <DialogTitle>{editingMeeting ? 'Change contract meeting date' : 'Schedule contract meeting'}</DialogTitle>
           </DialogHeader>
-          {stcOffer && (
+          {(stcOffer || editingMeeting) && (
             <div className="space-y-4">
               <div className="text-sm text-muted-foreground">
-                {stcOffer.properties?.address}, {stcOffer.properties?.city}
+                {(stcOffer || editingMeeting).properties?.address}, {(stcOffer || editingMeeting).properties?.city}
               </div>
               <div className="space-y-2">
                 <Label>Pick a day</Label>
@@ -1182,9 +1210,9 @@ export default function MyOracle() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setStcOffer(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => { setStcOffer(null); setEditingMeeting(null); }}>Cancel</Button>
             <Button onClick={submitStc} disabled={submittingStc || !stcDate}>
-              {submittingStc ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit'}
+              {submittingStc ? <Loader2 className="h-4 w-4 animate-spin" /> : (editingMeeting ? 'Save changes' : 'Submit')}
             </Button>
           </DialogFooter>
         </DialogContent>
