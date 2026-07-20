@@ -754,6 +754,11 @@ export default function MyOracle() {
                         {meetings.map((m) => {
                           const d = new Date(m.meeting_date);
                           const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                          const todayIso = new Date().toISOString().slice(0,10);
+                          const tomorrow = new Date();
+                          tomorrow.setDate(tomorrow.getDate() + 1);
+                          const tomorrowIso = tomorrow.toISOString().slice(0,10);
+                          const canEdit = m.status !== 'rejected' && m.meeting_date >= tomorrowIso;
                           return (
                             <Card key={m.id} className="hover:shadow-md transition-shadow">
                               <CardContent className="p-4">
@@ -777,6 +782,16 @@ export default function MyOracle() {
                                       <Badge variant="secondary" className="text-xs">{timeLabel(m.time_preference)}</Badge>
                                       <Badge variant="outline" className="text-xs capitalize">{m.status}</Badge>
                                     </div>
+                                    {canEdit && (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="mt-2"
+                                        onClick={() => openEditMeeting(m)}
+                                      >
+                                        Change date
+                                      </Button>
+                                    )}
                                   </div>
                                 </div>
                               </CardContent>
