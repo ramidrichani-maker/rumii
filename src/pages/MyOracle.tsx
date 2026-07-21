@@ -1222,6 +1222,11 @@ export default function MyOracle() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <AreaBuilderMap
+        open={builderOpen}
+        onClose={() => setBuilderOpen(false)}
+        onSaved={fetchSavedAreas}
+      />
     </div>
   );
 }
