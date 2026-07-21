@@ -1223,6 +1223,5 @@ export default function MyOracle() {
         </DialogContent>
       </Dialog>
     </div>
-    // eslint-disable-next-line
   );
 }
