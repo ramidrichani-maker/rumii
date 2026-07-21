@@ -81,6 +81,7 @@ export default function MyOracle() {
   const [favorites, setFavorites] = useState<Property[]>([]);
   const [myPlaces, setMyPlaces] = useState<Property[]>([]);
   const [savedAreas, setSavedAreas] = useState<SavedArea[]>([]);
+  const [builderOpen, setBuilderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [viewedProps, setViewedProps] = useState<Property[]>([]);
@@ -922,12 +923,15 @@ export default function MyOracle() {
               <CardContent className="py-16 text-center space-y-4">
                 <p className="text-foreground font-medium">You have not yet drawn any areas</p>
                 <div className="flex justify-center">
-                  <Button onClick={() => navigate('/purchase')}>Create an area</Button>
+                  <Button onClick={() => setBuilderOpen(true)}>Create an area</Button>
                 </div>
               </CardContent>
             </Card>
           ) : (
             <>
+              <div className="mb-3 flex justify-end">
+                <Button size="sm" onClick={() => setBuilderOpen(true)}>Create an area</Button>
+              </div>
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {savedAreas.map((area) => {
                   const coords = typeof area.coordinates === 'string' ? JSON.parse(area.coordinates) : area.coordinates;
