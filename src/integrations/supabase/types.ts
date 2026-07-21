@@ -1212,6 +1212,7 @@ export type Database = {
       }
       saved_search_areas: {
         Row: {
+          alert_enabled: boolean
           coordinates: Json
           created_at: string
           id: string
@@ -1220,6 +1221,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          alert_enabled?: boolean
           coordinates: Json
           created_at?: string
           id?: string
@@ -1228,6 +1230,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          alert_enabled?: boolean
           coordinates?: Json
           created_at?: string
           id?: string
@@ -1654,6 +1657,10 @@ export type Database = {
       jitter_coord: {
         Args: { _axis: string; _base: number; _seed: string }
         Returns: number
+      }
+      point_in_polygon: {
+        Args: { _coords: Json; _lat: number; _lng: number }
+        Returns: boolean
       }
       start_user_session: {
         Args: { _ip_address?: string; _user_agent?: string; _user_id: string }
