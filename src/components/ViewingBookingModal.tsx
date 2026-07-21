@@ -324,19 +324,25 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
                   {dayOptions.map((d) => {
                     const dateStr = format(d, 'yyyy-MM-dd');
                     const selected = selectedDate && format(selectedDate, 'yyyy-MM-dd') === dateStr;
+                    const isToday = format(d, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+                    const dayDisabled = isToday && new Date().getHours() >= 17;
                     return (
                       <button
                         key={dateStr}
                         type="button"
-                        onClick={() => setSelectedDate(d)}
+                        disabled={dayDisabled}
+                        onClick={() => { if (!dayDisabled) setSelectedDate(d); }}
                         className={`p-3 text-left rounded-lg border transition-colors ${
-                          selected
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-border hover:border-primary/50'
+                          dayDisabled
+                            ? 'border-border bg-muted text-muted-foreground cursor-not-allowed opacity-50'
+                            : selected
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border hover:border-primary/50'
                         }`}
                       >
                         <div className="font-medium">{format(d, 'EEEE')}</div>
                         <div className="text-xs text-muted-foreground">{format(d, 'MMM d')}</div>
+                        {dayDisabled && <div className="text-xs mt-1">Unavailable (after 5 PM)</div>}
                       </button>
                     );
                   })}
