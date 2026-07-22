@@ -67,6 +67,15 @@ function simplifyToVertices(points: google.maps.LatLngLiteral[], target: number)
   return out;
 }
 
+function getTextWidth(text: string, font: string): number {
+  if (typeof document === 'undefined') return text.length * 8;
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) return text.length * 8;
+  context.font = font;
+  return context.measureText(text).width;
+}
+
 const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const { google, loaded } = useGoogleMaps();
   const { user } = useAuth();
