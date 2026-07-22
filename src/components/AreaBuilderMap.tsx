@@ -26,6 +26,7 @@ import {
   Square,
   ChevronLeft,
   ChevronRight,
+  List,
 } from 'lucide-react';
 import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 import { supabase } from '@/integrations/supabase/client';
@@ -306,16 +307,27 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     if (!mapInstance.current) return;
     filtered.forEach(p => {
       if (p.latitude == null || p.longitude == null) return;
+      const priceValue = areaPage === 'rent'
+        ? (p.rental_price ?? p.price)
+        : (p.price ?? p.rental_price);
+      const priceLabel = priceValue
+        ? (areaPage === 'rent' || p.listing_type === 'rent'
+            ? `$${Number(priceValue).toLocaleString()}/mo`
+            : `$${Number(priceValue).toLocaleString()}`)
+        : 'N/A';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="140" height="40" viewBox="0 0 140 40">
+        <rect x="1" y="1" rx="14" ry="14" width="138" height="30" fill="white" stroke="hsl(262,83%,58%)" stroke-width="2"/>
+        <polygon points="65,31 75,31 70,38" fill="white" stroke="hsl(262,83%,58%)" stroke-width="2"/>
+        <polygon points="66,31 74,31 70,37" fill="white"/>
+        <text x="70" y="21" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">${priceLabel}</text>
+      </svg>`;
       const marker = new google.maps.Marker({
         position: { lat: p.latitude, lng: p.longitude },
         map: mapInstance.current!,
         icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: 'hsl(262, 83%, 58%)',
-          fillOpacity: 1,
-          strokeColor: '#fff',
-          strokeWeight: 2,
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+          scaledSize: new google.maps.Size(140, 40),
+          anchor: new google.maps.Point(70, 38),
         },
       });
       marker.addListener('click', () => {
@@ -325,7 +337,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
       markersRef.current.push(marker);
     });
     setViewingProperties(true);
-  }, [google, getPolygonCoords, toast, clearMarkers]);
+  }, [google, getPolygonCoords, toast, clearMarkers, areaPage]);
 
   const commitPolygonEdits = useCallback(() => {
     if (!polygonRef.current) return;
@@ -443,6 +455,16 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         <X className="h-4 w-4 mr-1" /> Exit map
       </Button>
 
+      {viewingProperties && (
+        <Button
+          onClick={viewPropertiesPage}
+          variant="secondary"
+          className="absolute top-16 left-4 z-10 shadow-md"
+        >
+          <List className="h-4 w-4 mr-1" /> List view
+        </Button>
+      )}
+
       {isDrawing && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm text-foreground text-sm font-medium px-4 py-2 rounded-full border border-border shadow-sm">
           Press and drag to draw
@@ -467,7 +489,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
             <Button onClick={openSave} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
               <Save className="h-4 w-4 mr-1" /> Save area
             </Button>
-            <Button onClick={viewPropertiesPage} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
+            <Button onClick={loadProperties} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
               <Eye className="h-4 w-4 mr-1" /> View properties
             </Button>
           </>
