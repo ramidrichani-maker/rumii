@@ -315,19 +315,22 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
             ? `$${Number(priceValue).toLocaleString()}/mo`
             : `$${Number(priceValue).toLocaleString()}`)
         : 'N/A';
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="140" height="40" viewBox="0 0 140 40">
-        <rect x="1" y="1" rx="14" ry="14" width="138" height="30" fill="white" stroke="hsl(262,83%,58%)" stroke-width="2"/>
-        <polygon points="65,31 75,31 70,38" fill="white" stroke="hsl(262,83%,58%)" stroke-width="2"/>
-        <polygon points="66,31 74,31 70,37" fill="white"/>
-        <text x="70" y="21" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">${priceLabel}</text>
+      const tagWidth = Math.max(60, getTextWidth(priceLabel, '700 12px system-ui, sans-serif') + 16);
+      const tagHeight = 34;
+      const half = Math.round(tagWidth / 2);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tagWidth}" height="${tagHeight}" viewBox="0 0 ${tagWidth} ${tagHeight}" shape-rendering="crispEdges">
+        <rect x="1" y="1" width="${tagWidth - 2}" height="${tagHeight - 7}" fill="white" stroke="hsl(262,83%,58%)" stroke-width="1.5" rx="0" ry="0"/>
+        <polygon points="${half - 6},${tagHeight - 7} ${half + 6},${tagHeight - 7} ${half},${tagHeight - 1}" fill="white" stroke="hsl(262,83%,58%)" stroke-width="1.5" stroke-linejoin="miter"/>
+        <polygon points="${half - 5},${tagHeight - 7} ${half + 5},${tagHeight - 7} ${half},${tagHeight - 2}" fill="white" stroke="none"/>
+        <text x="${half}" y="18" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#1a1a1a">${priceLabel}</text>
       </svg>`;
       const marker = new google.maps.Marker({
         position: { lat: p.latitude, lng: p.longitude },
         map: mapInstance.current!,
         icon: {
           url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-          scaledSize: new google.maps.Size(140, 40),
-          anchor: new google.maps.Point(70, 38),
+          scaledSize: new google.maps.Size(tagWidth, tagHeight),
+          anchor: new google.maps.Point(half, tagHeight - 1),
         },
       });
       marker.addListener('click', () => {
