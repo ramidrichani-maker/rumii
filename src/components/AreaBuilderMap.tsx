@@ -390,6 +390,17 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setProperties([]);
   }, [clearMarkers]);
 
+  const viewPropertiesPage = useCallback(() => {
+    if (!polygonRef.current) return;
+    if (isEditing) commitPolygonEdits();
+    const coords = getPolygonCoords();
+    if (coords.length < 3) return;
+    const encoded = encodeURIComponent(JSON.stringify(coords));
+    const path = areaPage === 'rent' ? '/rent' : '/purchase';
+    onClose();
+    navigate(`${path}?polygon=${encoded}`);
+  }, [isEditing, commitPolygonEdits, getPolygonCoords, areaPage, navigate, onClose]);
+
   const createAlert = useCallback(async () => {
     if (!savedAreaId) {
       // Prompt user to save first
@@ -440,31 +451,26 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
 
       {/* Main action buttons */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-wrap justify-center gap-2 px-4">
-        {!isEditing && (
-          <Button onClick={startDrawing} disabled={!loaded || isDrawing} className="shadow-lg">
-            <Pencil className="h-4 w-4 mr-1" />
-            {hasPolygon ? 'Draw again' : 'Draw area'}
-          </Button>
-        )}
-        {hasPolygon && !isEditing && (
-          <Button onClick={toggleEdit} variant="secondary" className="shadow-lg">
-            <Edit3 className="h-4 w-4 mr-1" /> Edit area
-          </Button>
-        )}
-        {isEditing && (
+        {isEditing ? (
           <Button onClick={commitPolygonEdits} variant="secondary" className="shadow-lg">
             <Save className="h-4 w-4 mr-1" /> Done editing
           </Button>
-        )}
-        {hasPolygon && !isEditing && (
-          <Button onClick={openSave} variant="secondary" className="shadow-lg">
-            <Save className="h-4 w-4 mr-1" /> Save area
-          </Button>
-        )}
-        {hasPolygon && !isEditing && (
-          <Button onClick={loadProperties} variant="secondary" className="shadow-lg">
-            <Eye className="h-4 w-4 mr-1" /> View properties
-          </Button>
+        ) : (
+          <>
+            <Button onClick={startDrawing} disabled={!loaded || isDrawing} className="shadow-lg">
+              <Pencil className="h-4 w-4 mr-1" />
+              {hasPolygon ? 'Draw again' : 'Draw area'}
+            </Button>
+            <Button onClick={toggleEdit} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
+              <Edit3 className="h-4 w-4 mr-1" /> Edit area
+            </Button>
+            <Button onClick={openSave} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
+              <Save className="h-4 w-4 mr-1" /> Save area
+            </Button>
+            <Button onClick={viewPropertiesPage} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
+              <Eye className="h-4 w-4 mr-1" /> View properties
+            </Button>
+          </>
         )}
         {viewingProperties && (
           <>
