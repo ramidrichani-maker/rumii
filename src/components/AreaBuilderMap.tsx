@@ -390,6 +390,17 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setProperties([]);
   }, [clearMarkers]);
 
+  const viewPropertiesPage = useCallback(() => {
+    if (!polygonRef.current) return;
+    if (isEditing) commitPolygonEdits();
+    const coords = getPolygonCoords();
+    if (coords.length < 3) return;
+    const encoded = encodeURIComponent(JSON.stringify(coords));
+    const path = areaPage === 'rent' ? '/rent' : '/purchase';
+    onClose();
+    navigate(`${path}?polygon=${encoded}`);
+  }, [isEditing, commitPolygonEdits, getPolygonCoords, areaPage, navigate, onClose]);
+
   const createAlert = useCallback(async () => {
     if (!savedAreaId) {
       // Prompt user to save first
