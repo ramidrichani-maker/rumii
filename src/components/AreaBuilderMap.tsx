@@ -121,7 +121,13 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
       styles: MAP_STYLES_NO_POI,
     });
     infoWindowRef.current = new google.maps.InfoWindow();
+
+    // Close property popup when user clicks anywhere on the map
+    mapInstance.current.addListener('click', () => {
+      setSelectedProp(null);
+    });
   }, [open, loaded, google]);
+
 
   // Reset when closed
   useEffect(() => {
