@@ -294,10 +294,19 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     polygonRef.current.setEditable(true);
     polygonRef.current.setDraggable(false);
     setIsEditing(true);
-  }, []);
+    // Clear pinned listings and exit viewing mode so the user can clearly edit
+    clearMarkers();
+    setViewingProperties(false);
+    setProperties([]);
+  }, [clearMarkers]);
 
   const loadProperties = useCallback(async () => {
     if (!polygonRef.current || !google) return;
+    // Commit any pending vertex edits before showing pins
+    if (polygonRef.current.getEditable()) {
+      polygonRef.current.setEditable(false);
+    }
+    setIsEditing(false);
     const coords = getPolygonCoords();
     // Fetch all approved with coords, filter client-side by polygon
     const { data, error } = await supabase
