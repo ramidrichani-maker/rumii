@@ -91,6 +91,8 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const cleanupRef = useRef<(() => void) | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const overlayRef = useRef<google.maps.OverlayView | null>(null);
+  const collisionListenerRef = useRef<google.maps.MapsEventListener | null>(null);
 
   const [hasPolygon, setHasPolygon] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -136,6 +138,10 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     polylineRef.current?.setMap(null);
     markersRef.current.forEach(m => m.setMap(null));
     markersRef.current = [];
+    collisionListenerRef.current?.remove();
+    collisionListenerRef.current = null;
+    overlayRef.current?.setMap(null);
+    overlayRef.current = null;
     polygonRef.current = null;
     polylineRef.current = null;
     mapInstance.current = null;
@@ -244,6 +250,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         fillColor: 'hsl(262, 83%, 58%)',
         fillOpacity: 0.15,
         editable: false,
+        clickable: false,
         map,
       });
       setHasPolygon(true);
@@ -330,14 +337,14 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
             ? `$${Number(priceValue).toLocaleString()}/mo`
             : `$${Number(priceValue).toLocaleString()}`)
         : 'N/A';
-      const tagWidth = Math.max(60, getTextWidth(priceLabel, '700 12px system-ui, sans-serif') + 16);
-      const tagHeight = 34;
+      const tagWidth = Math.max(44, Math.round(getTextWidth(priceLabel, '700 10px system-ui, sans-serif')) + 12);
+      const tagHeight = 24;
       const half = Math.round(tagWidth / 2);
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tagWidth}" height="${tagHeight}" viewBox="0 0 ${tagWidth} ${tagHeight}" shape-rendering="crispEdges">
-        <rect x="1" y="1" width="${tagWidth - 2}" height="${tagHeight - 7}" fill="white" stroke="hsl(262,83%,58%)" stroke-width="1.5" rx="0" ry="0"/>
-        <polygon points="${half - 6},${tagHeight - 7} ${half + 6},${tagHeight - 7} ${half},${tagHeight - 1}" fill="white" stroke="hsl(262,83%,58%)" stroke-width="1.5" stroke-linejoin="miter"/>
-        <polygon points="${half - 5},${tagHeight - 7} ${half + 5},${tagHeight - 7} ${half},${tagHeight - 2}" fill="white" stroke="none"/>
-        <text x="${half}" y="18" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#1a1a1a">${priceLabel}</text>
+        <rect x="0.75" y="0.75" width="${tagWidth - 1.5}" height="${tagHeight - 6}" fill="white" stroke="hsl(262,83%,58%)" stroke-width="1" rx="0" ry="0"/>
+        <polygon points="${half - 4},${tagHeight - 6} ${half + 4},${tagHeight - 6} ${half},${tagHeight - 1}" fill="white" stroke="hsl(262,83%,58%)" stroke-width="1" stroke-linejoin="miter"/>
+        <polygon points="${half - 3},${tagHeight - 6} ${half + 3},${tagHeight - 6} ${half},${tagHeight - 2}" fill="white" stroke="none"/>
+        <text x="${half}" y="13" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#1a1a1a">${priceLabel}</text>
       </svg>`;
       const marker = new google.maps.Marker({
         position: { lat: p.latitude, lng: p.longitude },
@@ -352,6 +359,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         setSelectedProp(p);
         setImageIdx(0);
       });
+      (marker as any).__size = { w: tagWidth, h: tagHeight };
       markersRef.current.push(marker);
     });
     setViewingProperties(true);
@@ -360,6 +368,53 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     const bounds = new google.maps.LatLngBounds();
     coords.forEach(c => bounds.extend({ lat: c.latitude, lng: c.longitude }));
     mapInstance.current.fitBounds(bounds, 40);
+
+    // Hide markers that overlap after every zoom/pan
+    if (!overlayRef.current) {
+      class Ov extends google.maps.OverlayView {
+        onAdd() {}
+        draw() {}
+        onRemove() {}
+      }
+      overlayRef.current = new Ov();
+      overlayRef.current.setMap(mapInstance.current);
+    }
+    const dedupe = () => {
+      const proj = overlayRef.current?.getProjection();
+      if (!proj) return;
+      type Box = { l: number; t: number; r: number; b: number };
+      const placed: Box[] = [];
+      const sorted = [...markersRef.current].sort((a, b) => {
+        const sa = (a as any).__size?.w ?? 0;
+        const sb = (b as any).__size?.w ?? 0;
+        return sb - sa;
+      });
+      for (const m of sorted) {
+        const pos = m.getPosition();
+        if (!pos) continue;
+        const px = proj.fromLatLngToDivPixel(pos);
+        if (!px) continue;
+        const size = (m as any).__size ?? { w: 44, h: 24 };
+        const box: Box = {
+          l: px.x - size.w / 2 - 2,
+          t: px.y - size.h - 2,
+          r: px.x + size.w / 2 + 2,
+          b: px.y + 2,
+        };
+        const overlaps = placed.some(
+          (p) => !(box.r < p.l || box.l > p.r || box.b < p.t || box.t > p.b)
+        );
+        if (overlaps) {
+          m.setVisible(false);
+        } else {
+          m.setVisible(true);
+          placed.push(box);
+        }
+      }
+    };
+    collisionListenerRef.current?.remove();
+    collisionListenerRef.current = mapInstance.current.addListener('idle', dedupe);
+    google.maps.event.addListenerOnce(mapInstance.current, 'idle', dedupe);
   }, [google, getPolygonCoords, toast, clearMarkers, areaPage]);
 
   const commitPolygonEdits = useCallback(() => {
