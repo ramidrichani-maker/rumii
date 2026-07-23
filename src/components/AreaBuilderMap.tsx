@@ -294,10 +294,19 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     polygonRef.current.setEditable(true);
     polygonRef.current.setDraggable(false);
     setIsEditing(true);
-  }, []);
+    // Clear pinned listings and exit viewing mode so the user can clearly edit
+    clearMarkers();
+    setViewingProperties(false);
+    setProperties([]);
+  }, [clearMarkers]);
 
   const loadProperties = useCallback(async () => {
     if (!polygonRef.current || !google) return;
+    // Commit any pending vertex edits before showing pins
+    if (polygonRef.current.getEditable()) {
+      polygonRef.current.setEditable(false);
+    }
+    setIsEditing(false);
     const coords = getPolygonCoords();
     // Fetch all approved with coords, filter client-side by polygon
     const { data, error } = await supabase
@@ -549,44 +558,46 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         </div>
       )}
 
-      {/* Main action buttons */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-wrap justify-center gap-2 px-4">
-        {isEditing ? (
-          <Button onClick={commitPolygonEdits} variant="secondary" className="shadow-lg">
-            <Save className="h-4 w-4 mr-1" /> Done editing
+      {/* Bottom action buttons — hidden while viewing properties (moved to top-right) */}
+      {!viewingProperties && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-wrap justify-center gap-2 px-4">
+          <Button onClick={startDrawing} disabled={!loaded || isDrawing} className="shadow-lg">
+            <Pencil className="h-4 w-4 mr-1" />
+            {hasPolygon ? 'Draw again' : 'Draw area'}
           </Button>
-        ) : (
-          <>
-            <Button onClick={startDrawing} disabled={!loaded || isDrawing} className="shadow-lg">
-              <Pencil className="h-4 w-4 mr-1" />
-              {hasPolygon ? 'Draw again' : 'Draw area'}
-            </Button>
+          <Button onClick={openSave} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
+            <Save className="h-4 w-4 mr-1" /> Save area
+          </Button>
+          <Button onClick={loadProperties} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
+            <Eye className="h-4 w-4 mr-1" /> View properties
+          </Button>
+          {!isEditing && (
             <Button onClick={toggleEdit} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
               <Edit3 className="h-4 w-4 mr-1" /> Edit area
             </Button>
-            <Button onClick={openSave} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
-              <Save className="h-4 w-4 mr-1" /> Save area
-            </Button>
-            <Button onClick={loadProperties} disabled={!hasPolygon} variant="secondary" className="shadow-lg">
-              <Eye className="h-4 w-4 mr-1" /> View properties
-            </Button>
-          </>
-        )}
-        {viewingProperties && (
-          <>
-            <Button onClick={clearArea} variant="destructive" className="shadow-lg">
-              <Trash2 className="h-4 w-4 mr-1" /> Clear area
-            </Button>
-            <Button onClick={createAlert} className="shadow-lg">
-              <Bell className="h-4 w-4 mr-1" /> Create alert
-            </Button>
-          </>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {viewingProperties && (
-        <div className="absolute top-4 right-4 z-10 bg-background/95 backdrop-blur px-3 py-1.5 rounded-full border border-border shadow-sm text-sm font-medium">
-          {properties.length} propert{properties.length === 1 ? 'y' : 'ies'}
+        <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2">
+          <div className="bg-background/95 backdrop-blur px-3 py-1.5 rounded-full border border-border shadow-sm text-sm font-medium">
+            {properties.length} propert{properties.length === 1 ? 'y' : 'ies'}
+          </div>
+          <div className="flex flex-wrap justify-end gap-2 max-w-[80vw]">
+            <Button onClick={createAlert} size="sm" className="shadow-lg">
+              <Bell className="h-4 w-4 mr-1" /> Create alert
+            </Button>
+            <Button onClick={openSave} size="sm" variant="secondary" className="shadow-lg">
+              <Save className="h-4 w-4 mr-1" /> Save area
+            </Button>
+            <Button onClick={clearArea} size="sm" variant="destructive" className="shadow-lg">
+              <Trash2 className="h-4 w-4 mr-1" /> Clear area
+            </Button>
+            <Button onClick={toggleEdit} size="sm" variant="secondary" className="shadow-lg">
+              <Edit3 className="h-4 w-4 mr-1" /> Edit
+            </Button>
+          </div>
         </div>
       )}
 
