@@ -349,6 +349,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
       markersRef.current.push(marker);
     });
     setViewingProperties(true);
+
+    // Zoom/fit map to the drawn polygon so the search area is clearly visible
+    const bounds = new google.maps.LatLngBounds();
+    coords.forEach(c => bounds.extend({ lat: c.latitude, lng: c.longitude }));
+    mapInstance.current.fitBounds(bounds, 40);
   }, [google, getPolygonCoords, toast, clearMarkers, areaPage]);
 
   const commitPolygonEdits = useCallback(() => {
