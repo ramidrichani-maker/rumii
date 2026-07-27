@@ -241,8 +241,8 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         cleanupRef.current?.(); cleanupRef.current = null;
         return;
       }
-      // Simplify to ~6 vertices as requested
-      const simplified = simplifyToVertices(pts, 6);
+      // Simplify to ~8 vertices for editing handles
+      const simplified = simplifyToVertices(pts, 8);
       polygonRef.current = new google.maps.Polygon({
         paths: simplified,
         strokeColor: 'hsl(262, 83%, 58%)',
