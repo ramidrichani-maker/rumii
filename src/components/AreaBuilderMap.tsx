@@ -524,8 +524,8 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-background">
-      <div ref={mapRef} className="absolute inset-0" style={{ touchAction: isDrawing ? 'none' : 'auto' }} />
+    <div className="fixed top-0 left-0 h-[100dvh] w-screen z-[9999] bg-background">
+      <div ref={mapRef} className="absolute inset-0 h-full w-full" style={{ touchAction: isDrawing ? 'none' : 'auto' }} />
 
       {!loaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-muted/60">
