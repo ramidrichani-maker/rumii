@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -523,8 +524,8 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
 
   if (!open) return null;
 
-  return (
-    <div className="fixed top-0 left-0 h-[100dvh] w-screen z-[9999] bg-background">
+  return createPortal(
+    <div className="fixed inset-0 h-[100dvh] w-screen z-[10000] bg-background overflow-hidden">
       <div ref={mapRef} className="absolute inset-0 h-full w-full" style={{ touchAction: isDrawing ? 'none' : 'auto' }} />
 
       {!loaded && (
@@ -714,7 +715,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  , document.body);
 };
 
 export default AreaBuilderMap;
