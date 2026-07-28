@@ -715,7 +715,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  , document.body);
 };
 
 export default AreaBuilderMap;
