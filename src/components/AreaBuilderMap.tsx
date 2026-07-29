@@ -622,6 +622,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
 
   const clearArea = useCallback(() => {
     polygonRef.current?.setMap(null); polygonRef.current = null;
+    bufferPolygonRef.current?.setMap(null); bufferPolygonRef.current = null;
     clearMarkers();
     setHasPolygon(false);
     setViewingProperties(false);
