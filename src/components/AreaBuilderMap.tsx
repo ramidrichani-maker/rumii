@@ -132,6 +132,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const mapInstance = useRef<google.maps.Map | null>(null);
   const polygonRef = useRef<google.maps.Polygon | null>(null);
   const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const bufferPolygonRef = useRef<google.maps.Polygon | null>(null);
   const drawingPointsRef = useRef<google.maps.LatLngLiteral[]>([]);
   const isDrawingRef = useRef(false);
   const cleanupRef = useRef<(() => void) | null>(null);
@@ -187,6 +188,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     if (open) return;
     polygonRef.current?.setMap(null);
     polylineRef.current?.setMap(null);
+    bufferPolygonRef.current?.setMap(null);
     markersRef.current.forEach(m => m.setMap(null));
     markersRef.current = [];
     collisionListenerRef.current?.remove();
@@ -195,6 +197,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     overlayRef.current = null;
     polygonRef.current = null;
     polylineRef.current = null;
+    bufferPolygonRef.current = null;
     mapInstance.current = null;
     drawingPointsRef.current = [];
     isDrawingRef.current = false;
@@ -350,6 +353,10 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     polygonRef.current.setEditable(true);
     polygonRef.current.setDraggable(false);
     setIsEditing(true);
+    // Reset any radius expansion so the original polygon is visible and editable
+    setRadiusKm(0);
+    polygonRef.current.setMap(mapInstance.current);
+    bufferPolygonRef.current?.setMap(null);
     // Clear pinned listings and exit viewing mode so the user can clearly edit
     clearMarkers();
     setViewingProperties(false);
@@ -495,11 +502,6 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setProperties(filtered);
     renderMarkers(filtered, coords);
     setViewingProperties(true);
-
-    // Zoom/fit map to the drawn polygon so the search area is clearly visible
-    const bounds = new google.maps.LatLngBounds();
-    coords.forEach(c => bounds.extend({ lat: c.latitude, lng: c.longitude }));
-    mapInstance.current.fitBounds(bounds, 40);
   }, [google, getPolygonCoords, toast, applyFilters, renderMarkers, radiusKm, minPrice, maxPrice]);
 
   // Re-apply filters live when they change
@@ -509,6 +511,55 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setProperties(filtered);
     renderMarkers(filtered, polygonCoords);
   }, [radiusKm, minPrice, maxPrice, viewingProperties, allFetched, polygonCoords, applyFilters, renderMarkers]);
+
+  // Visually expand the drawn polygon by the selected radius.
+  // When radius is 0 the original polygon is shown; when > 0 the original is
+  // hidden and a single buffered outline is displayed instead.
+  useEffect(() => {
+    if (!loaded || !google || !mapInstance.current || polygonCoords.length < 3) return;
+    if (!polygonRef.current) return;
+
+    bufferPolygonRef.current?.setMap(null);
+    bufferPolygonRef.current = null;
+
+    if (radiusKm <= 0) {
+      polygonRef.current.setMap(mapInstance.current);
+      return;
+    }
+
+    polygonRef.current.setMap(null);
+
+    const spherical = google.maps.geometry?.spherical;
+    if (!spherical) return;
+
+    const radiusMeters = radiusKm * 1000;
+    const centroidLat = polygonCoords.reduce((s, c) => s + c.latitude, 0) / polygonCoords.length;
+    const centroidLng = polygonCoords.reduce((s, c) => s + c.longitude, 0) / polygonCoords.length;
+    const centroid = new google.maps.LatLng(centroidLat, centroidLng);
+
+    const expanded = polygonCoords.map((c) => {
+      const point = new google.maps.LatLng(c.latitude, c.longitude);
+      const heading = spherical.computeHeading(centroid, point);
+      const offset = spherical.computeOffset(point, radiusMeters, heading);
+      return { lat: offset.lat(), lng: offset.lng() };
+    });
+
+    bufferPolygonRef.current = new google.maps.Polygon({
+      paths: expanded,
+      strokeColor: 'hsl(262, 83%, 58%)',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: 'hsl(262, 83%, 58%)',
+      fillOpacity: 0.15,
+      clickable: false,
+      map: mapInstance.current,
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+    polygonCoords.forEach(c => bounds.extend({ lat: c.latitude, lng: c.longitude }));
+    expanded.forEach(c => bounds.extend(c));
+    mapInstance.current.fitBounds(bounds, 40);
+  }, [loaded, google, polygonCoords, radiusKm]);
 
   const commitPolygonEdits = useCallback(() => {
     if (!polygonRef.current) return;
@@ -566,6 +617,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
 
   const clearArea = useCallback(() => {
     polygonRef.current?.setMap(null); polygonRef.current = null;
+    bufferPolygonRef.current?.setMap(null); bufferPolygonRef.current = null;
     clearMarkers();
     setHasPolygon(false);
     setViewingProperties(false);
