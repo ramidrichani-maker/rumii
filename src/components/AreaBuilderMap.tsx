@@ -630,10 +630,52 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         <Button
           onClick={viewPropertiesPage}
           variant="secondary"
-          className="absolute top-16 left-4 z-10 shadow-md"
+          className="absolute top-20 left-4 z-10 shadow-md"
         >
           <List className="h-4 w-4 mr-1" /> List view
         </Button>
+      )}
+
+      {viewingProperties && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-background/95 backdrop-blur border border-border rounded-full shadow-md px-2 py-1.5">
+          <Select
+            value={String(radiusKm)}
+            onValueChange={(v) => setRadiusKm(parseFloat(v))}
+          >
+            <SelectTrigger className="h-8 w-[150px] border-0 bg-transparent shadow-none focus:ring-0 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="z-[10001]">
+              <SelectItem value="0">This area only</SelectItem>
+              <SelectItem value="0.25">+ 1/4 Km</SelectItem>
+              <SelectItem value="0.5">+ 1/2 Km</SelectItem>
+              <SelectItem value="1">+ 1 Km</SelectItem>
+              <SelectItem value="2">+ 2 Km</SelectItem>
+              <SelectItem value="3">+ 3 Km</SelectItem>
+              <SelectItem value="5">+ 5 Km</SelectItem>
+              <SelectItem value="7">+ 7 Km</SelectItem>
+              <SelectItem value="10">+ 10 Km</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="h-6 w-px bg-border" />
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            placeholder="Min price"
+            className="h-8 w-[110px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
+          />
+          <div className="h-6 w-px bg-border" />
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="Max price"
+            className="h-8 w-[110px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
+          />
+        </div>
       )}
 
       {isDrawing && (
