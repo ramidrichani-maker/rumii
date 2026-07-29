@@ -608,41 +608,15 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 h-[100dvh] w-screen z-[10000] bg-background overflow-hidden">
-      <div ref={mapRef} className="absolute inset-0 h-full w-full" style={{ touchAction: isDrawing ? 'none' : 'auto' }} />
-
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-muted/60">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      )}
-
-      {/* Exit map */}
-      <Button
-        onClick={onClose}
-        variant="secondary"
-        className="absolute top-4 left-4 z-10 shadow-md"
-      >
-        <X className="h-4 w-4 mr-1" /> Exit map
-      </Button>
-
+    <div className="fixed inset-0 h-[100dvh] w-screen z-[10000] bg-background overflow-hidden flex flex-col">
+      {/* Separate top filter bar */}
       {viewingProperties && (
-        <Button
-          onClick={viewPropertiesPage}
-          variant="secondary"
-          className="absolute top-20 left-4 z-10 shadow-md"
-        >
-          <List className="h-4 w-4 mr-1" /> List view
-        </Button>
-      )}
-
-      {viewingProperties && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-background/95 backdrop-blur border border-border rounded-full shadow-md px-2 py-1.5">
+        <div className="shrink-0 z-20 flex items-center justify-center gap-2 bg-background border-b border-border px-4 py-2 shadow-sm">
           <Select
             value={String(radiusKm)}
             onValueChange={(v) => setRadiusKm(parseFloat(v))}
           >
-            <SelectTrigger className="h-8 w-[150px] border-0 bg-transparent shadow-none focus:ring-0 text-sm">
+            <SelectTrigger className="h-9 w-[150px] border-0 bg-transparent shadow-none focus:ring-0 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="z-[10001]">
@@ -664,7 +638,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
             placeholder="Min price"
-            className="h-8 w-[110px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
+            className="h-9 w-[120px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
           />
           <div className="h-6 w-px bg-border" />
           <Input
@@ -673,16 +647,44 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
             placeholder="Max price"
-            className="h-8 w-[110px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
+            className="h-9 w-[120px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
           />
         </div>
       )}
 
-      {isDrawing && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm text-foreground text-sm font-medium px-4 py-2 rounded-full border border-border shadow-sm">
-          Press and drag to draw
-        </div>
-      )}
+      <div className="relative flex-1 w-full overflow-hidden">
+        <div ref={mapRef} className="absolute inset-0 h-full w-full" style={{ touchAction: isDrawing ? 'none' : 'auto' }} />
+
+        {!loaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-muted/60">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
+
+        {/* Exit map */}
+        <Button
+          onClick={onClose}
+          variant="secondary"
+          className="absolute top-4 left-4 z-10 shadow-md"
+        >
+          <X className="h-4 w-4 mr-1" /> Exit map
+        </Button>
+
+        {viewingProperties && (
+          <Button
+            onClick={viewPropertiesPage}
+            variant="secondary"
+            className="absolute top-20 left-4 z-10 shadow-md"
+          >
+            <List className="h-4 w-4 mr-1" /> List view
+          </Button>
+        )}
+
+        {isDrawing && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm text-foreground text-sm font-medium px-4 py-2 rounded-full border border-border shadow-sm">
+            Press and drag to draw
+          </div>
+        )}
 
       {/* Bottom action buttons — hidden while viewing properties (moved to top-right) */}
       {!viewingProperties && (
