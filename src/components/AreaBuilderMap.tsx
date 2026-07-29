@@ -188,6 +188,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     if (open) return;
     polygonRef.current?.setMap(null);
     polylineRef.current?.setMap(null);
+    bufferPolygonRef.current?.setMap(null);
     markersRef.current.forEach(m => m.setMap(null));
     markersRef.current = [];
     collisionListenerRef.current?.remove();
@@ -196,6 +197,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     overlayRef.current = null;
     polygonRef.current = null;
     polylineRef.current = null;
+    bufferPolygonRef.current = null;
     mapInstance.current = null;
     drawingPointsRef.current = [];
     isDrawingRef.current = false;
