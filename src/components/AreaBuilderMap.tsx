@@ -353,6 +353,10 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     polygonRef.current.setEditable(true);
     polygonRef.current.setDraggable(false);
     setIsEditing(true);
+    // Reset any radius expansion so the original polygon is visible and editable
+    setRadiusKm(0);
+    polygonRef.current.setMap(mapInstance.current);
+    bufferPolygonRef.current?.setMap(null);
     // Clear pinned listings and exit viewing mode so the user can clearly edit
     clearMarkers();
     setViewingProperties(false);
