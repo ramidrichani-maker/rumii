@@ -132,6 +132,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const mapInstance = useRef<google.maps.Map | null>(null);
   const polygonRef = useRef<google.maps.Polygon | null>(null);
   const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const bufferPolygonRef = useRef<google.maps.Polygon | null>(null);
   const drawingPointsRef = useRef<google.maps.LatLngLiteral[]>([]);
   const isDrawingRef = useRef(false);
   const cleanupRef = useRef<(() => void) | null>(null);
