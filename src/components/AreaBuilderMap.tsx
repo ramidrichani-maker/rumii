@@ -29,6 +29,13 @@ import {
   ChevronRight,
   List,
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -75,6 +82,44 @@ function getTextWidth(text: string, font: string): number {
   if (!context) return text.length * 8;
   context.font = font;
   return context.measureText(text).width;
+}
+
+// Haversine distance (km) between two lat/lng coordinates
+function haversineKm(a: Coordinate, b: Coordinate): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.latitude - a.latitude);
+  const dLon = toRad(b.longitude - a.longitude);
+  const lat1 = toRad(a.latitude);
+  const lat2 = toRad(b.latitude);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+function minDistanceToPolygonKm(point: Coordinate, polygon: Coordinate[]): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  let minDist = Infinity;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const a = polygon[j];
+    const b = polygon[i];
+    const latRef = toRad(a.latitude);
+    const ax = 0, ay = 0;
+    const bx = toRad(b.longitude - a.longitude) * Math.cos(latRef);
+    const by = toRad(b.latitude - a.latitude);
+    const px = toRad(point.longitude - a.longitude) * Math.cos(latRef);
+    const py = toRad(point.latitude - a.latitude);
+    const dx = bx - ax, dy = by - ay;
+    const lenSq = dx * dx + dy * dy;
+    let t = lenSq === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+    const closest: Coordinate = {
+      latitude: a.latitude + t * (b.latitude - a.latitude),
+      longitude: a.longitude + t * (b.longitude - a.longitude),
+    };
+    const d = haversineKm(point, closest);
+    if (d < minDist) minDist = d;
+  }
+  return minDist;
 }
 
 const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
