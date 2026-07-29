@@ -788,6 +788,8 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         </div>
       )}
 
+      </div>
+
       {/* Save dialog */}
       <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
         <DialogContent>
