@@ -145,6 +145,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [viewingProperties, setViewingProperties] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
+  const [allFetched, setAllFetched] = useState<Property[]>([]);
+  const [polygonCoords, setPolygonCoords] = useState<Coordinate[]>([]);
+  const [radiusKm, setRadiusKm] = useState<number>(0);
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
   const [selectedProp, setSelectedProp] = useState<Property | null>(null);
   const [imageIdx, setImageIdx] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
@@ -203,6 +208,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setAreaName('');
     setAreaPage('purchase');
     setAlertEnabled(true);
+    setAllFetched([]);
+    setPolygonCoords([]);
+    setRadiusKm(0);
+    setMinPrice('');
+    setMaxPrice('');
   }, [open]);
 
   const clearMarkers = useCallback(() => {
