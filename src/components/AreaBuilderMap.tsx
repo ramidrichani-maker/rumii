@@ -29,6 +29,13 @@ import {
   ChevronRight,
   List,
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useGoogleMaps, MAP_STYLES_NO_POI } from '@/hooks/useGoogleMaps';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -77,6 +84,44 @@ function getTextWidth(text: string, font: string): number {
   return context.measureText(text).width;
 }
 
+// Haversine distance (km) between two lat/lng coordinates
+function haversineKm(a: Coordinate, b: Coordinate): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.latitude - a.latitude);
+  const dLon = toRad(b.longitude - a.longitude);
+  const lat1 = toRad(a.latitude);
+  const lat2 = toRad(b.latitude);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+function minDistanceToPolygonKm(point: Coordinate, polygon: Coordinate[]): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  let minDist = Infinity;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const a = polygon[j];
+    const b = polygon[i];
+    const latRef = toRad(a.latitude);
+    const ax = 0, ay = 0;
+    const bx = toRad(b.longitude - a.longitude) * Math.cos(latRef);
+    const by = toRad(b.latitude - a.latitude);
+    const px = toRad(point.longitude - a.longitude) * Math.cos(latRef);
+    const py = toRad(point.latitude - a.latitude);
+    const dx = bx - ax, dy = by - ay;
+    const lenSq = dx * dx + dy * dy;
+    let t = lenSq === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+    const closest: Coordinate = {
+      latitude: a.latitude + t * (b.latitude - a.latitude),
+      longitude: a.longitude + t * (b.longitude - a.longitude),
+    };
+    const d = haversineKm(point, closest);
+    if (d < minDist) minDist = d;
+  }
+  return minDist;
+}
+
 const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const { google, loaded } = useGoogleMaps();
   const { user } = useAuth();
@@ -100,6 +145,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [viewingProperties, setViewingProperties] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
+  const [allFetched, setAllFetched] = useState<Property[]>([]);
+  const [polygonCoords, setPolygonCoords] = useState<Coordinate[]>([]);
+  const [radiusKm, setRadiusKm] = useState<number>(0);
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
   const [selectedProp, setSelectedProp] = useState<Property | null>(null);
   const [imageIdx, setImageIdx] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
@@ -158,6 +208,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setAreaName('');
     setAreaPage('purchase');
     setAlertEnabled(true);
+    setAllFetched([]);
+    setPolygonCoords([]);
+    setRadiusKm(0);
+    setMinPrice('');
+    setMaxPrice('');
   }, [open]);
 
   const clearMarkers = useCallback(() => {
@@ -301,42 +356,9 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setProperties([]);
   }, [clearMarkers]);
 
-  const loadProperties = useCallback(async () => {
-    if (!polygonRef.current || !google) return;
-    // Commit any pending vertex edits before showing pins
-    if (polygonRef.current.getEditable()) {
-      polygonRef.current.setEditable(false);
-    }
-    setIsEditing(false);
-    const coords = getPolygonCoords();
-    // Fetch all approved with coords, filter client-side by polygon
-    const { data, error } = await supabase
-      .from('properties')
-      .select('*')
-      .eq('status', 'approved')
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null);
-    if (error) {
-      toast({ title: 'Failed to load properties', description: error.message, variant: 'destructive' });
-      return;
-    }
-    // Ray-casting filter
-    const inside = (lat: number, lng: number) => {
-      let ins = false;
-      for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
-        const xi = coords[i].longitude, yi = coords[i].latitude;
-        const xj = coords[j].longitude, yj = coords[j].latitude;
-        const intersect = ((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
-        if (intersect) ins = !ins;
-      }
-      return ins;
-    };
-    const filtered = ((data as any[]) || []).filter(p => inside(p.latitude, p.longitude)) as Property[];
-    setProperties(filtered);
-
-    // Add markers
+  const renderMarkers = useCallback((filtered: Property[], coords: Coordinate[]) => {
+    if (!google || !mapInstance.current) return;
     clearMarkers();
-    if (!mapInstance.current) return;
     filtered.forEach(p => {
       if (p.latitude == null || p.longitude == null) return;
       const priceValue = areaPage === 'rent'
@@ -372,13 +394,6 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
       (marker as any).__size = { w: tagWidth, h: tagHeight };
       markersRef.current.push(marker);
     });
-    setViewingProperties(true);
-
-    // Zoom/fit map to the drawn polygon so the search area is clearly visible
-    const bounds = new google.maps.LatLngBounds();
-    coords.forEach(c => bounds.extend({ lat: c.latitude, lng: c.longitude }));
-    mapInstance.current.fitBounds(bounds, 40);
-
     // Hide markers that overlap after every zoom/pan
     if (!overlayRef.current) {
       class Ov extends google.maps.OverlayView {
@@ -425,7 +440,75 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     collisionListenerRef.current?.remove();
     collisionListenerRef.current = mapInstance.current.addListener('idle', dedupe);
     google.maps.event.addListenerOnce(mapInstance.current, 'idle', dedupe);
-  }, [google, getPolygonCoords, toast, clearMarkers, areaPage]);
+  }, [google, clearMarkers, areaPage]);
+
+  const applyFilters = useCallback((source: Property[], coords: Coordinate[], radius: number, minP: string, maxP: string): Property[] => {
+    if (coords.length < 3) return [];
+    const minN = minP ? parseInt(minP.replace(/[^0-9]/g, '')) : NaN;
+    const maxN = maxP ? parseInt(maxP.replace(/[^0-9]/g, '')) : NaN;
+    const inside = (lat: number, lng: number) => {
+      let ins = false;
+      for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
+        const xi = coords[i].longitude, yi = coords[i].latitude;
+        const xj = coords[j].longitude, yj = coords[j].latitude;
+        const intersect = ((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+        if (intersect) ins = !ins;
+      }
+      return ins;
+    };
+    return source.filter((p) => {
+      if (p.latitude == null || p.longitude == null) return false;
+      const inArea = inside(p.latitude, p.longitude) ||
+        (radius > 0 && minDistanceToPolygonKm({ latitude: p.latitude, longitude: p.longitude }, coords) <= radius);
+      if (!inArea) return false;
+      const priceValue = areaPage === 'rent'
+        ? (p.rental_price ?? p.price)
+        : (p.price ?? p.rental_price);
+      if (!isNaN(minN) && (priceValue == null || priceValue < minN)) return false;
+      if (!isNaN(maxN) && (priceValue == null || priceValue > maxN)) return false;
+      return true;
+    });
+  }, [areaPage]);
+
+  const loadProperties = useCallback(async () => {
+    if (!polygonRef.current || !google || !mapInstance.current) return;
+    // Commit any pending vertex edits before showing pins
+    if (polygonRef.current.getEditable()) {
+      polygonRef.current.setEditable(false);
+    }
+    setIsEditing(false);
+    const coords = getPolygonCoords();
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('status', 'approved')
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null);
+    if (error) {
+      toast({ title: 'Failed to load properties', description: error.message, variant: 'destructive' });
+      return;
+    }
+    const all = ((data as any[]) || []) as Property[];
+    setAllFetched(all);
+    setPolygonCoords(coords);
+    const filtered = applyFilters(all, coords, radiusKm, minPrice, maxPrice);
+    setProperties(filtered);
+    renderMarkers(filtered, coords);
+    setViewingProperties(true);
+
+    // Zoom/fit map to the drawn polygon so the search area is clearly visible
+    const bounds = new google.maps.LatLngBounds();
+    coords.forEach(c => bounds.extend({ lat: c.latitude, lng: c.longitude }));
+    mapInstance.current.fitBounds(bounds, 40);
+  }, [google, getPolygonCoords, toast, applyFilters, renderMarkers, radiusKm, minPrice, maxPrice]);
+
+  // Re-apply filters live when they change
+  useEffect(() => {
+    if (!viewingProperties || polygonCoords.length < 3) return;
+    const filtered = applyFilters(allFetched, polygonCoords, radiusKm, minPrice, maxPrice);
+    setProperties(filtered);
+    renderMarkers(filtered, polygonCoords);
+  }, [radiusKm, minPrice, maxPrice, viewingProperties, allFetched, polygonCoords, applyFilters, renderMarkers]);
 
   const commitPolygonEdits = useCallback(() => {
     if (!polygonRef.current) return;
@@ -547,10 +630,52 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         <Button
           onClick={viewPropertiesPage}
           variant="secondary"
-          className="absolute top-16 left-4 z-10 shadow-md"
+          className="absolute top-20 left-4 z-10 shadow-md"
         >
           <List className="h-4 w-4 mr-1" /> List view
         </Button>
+      )}
+
+      {viewingProperties && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-background/95 backdrop-blur border border-border rounded-full shadow-md px-2 py-1.5">
+          <Select
+            value={String(radiusKm)}
+            onValueChange={(v) => setRadiusKm(parseFloat(v))}
+          >
+            <SelectTrigger className="h-8 w-[150px] border-0 bg-transparent shadow-none focus:ring-0 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="z-[10001]">
+              <SelectItem value="0">This area only</SelectItem>
+              <SelectItem value="0.25">+ 1/4 Km</SelectItem>
+              <SelectItem value="0.5">+ 1/2 Km</SelectItem>
+              <SelectItem value="1">+ 1 Km</SelectItem>
+              <SelectItem value="2">+ 2 Km</SelectItem>
+              <SelectItem value="3">+ 3 Km</SelectItem>
+              <SelectItem value="5">+ 5 Km</SelectItem>
+              <SelectItem value="7">+ 7 Km</SelectItem>
+              <SelectItem value="10">+ 10 Km</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="h-6 w-px bg-border" />
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            placeholder="Min price"
+            className="h-8 w-[110px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
+          />
+          <div className="h-6 w-px bg-border" />
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="Max price"
+            className="h-8 w-[110px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
+          />
+        </div>
       )}
 
       {isDrawing && (
