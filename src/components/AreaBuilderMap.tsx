@@ -247,7 +247,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setRadiusKm(0);
     setMinPrice('');
     setMaxPrice('');
+    setPriceOpen(false);
+    setActivePriceTab(null);
+    setTypedPrice('');
   }, [open]);
+
 
   const clearMarkers = useCallback(() => {
     markersRef.current.forEach(m => m.setMap(null));
