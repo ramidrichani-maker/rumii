@@ -124,12 +124,32 @@ function minDistanceToPolygonKm(point: Coordinate, polygon: Coordinate[]): numbe
       longitude: a.longitude + t * (b.longitude - a.longitude),
     };
     const d = haversineKm(point, closest);
-    if (d < minDist) minDist = d;
+  if (d < minDist) minDist = d;
   }
   return minDist;
 }
 
+const generatePriceOptions = (): number[] => {
+  const prices: number[] = [];
+  for (let p = 50000; p < 250000; p += 10000) prices.push(p);
+  for (let p = 250000; p < 500000; p += 25000) prices.push(p);
+  for (let p = 500000; p < 1000000; p += 50000) prices.push(p);
+  for (let p = 1000000; p < 3000000; p += 100000) prices.push(p);
+  for (let p = 3000000; p < 5000000; p += 250000) prices.push(p);
+  for (let p = 5000000; p <= 10000000; p += 500000) prices.push(p);
+  return prices;
+};
+
+const priceOptions = generatePriceOptions();
+
+const formatPriceOption = (value: number | string): string => {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (Number.isNaN(num)) return '';
+  return `$${num.toLocaleString()}`;
+};
+
 const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
+
   const { google, loaded } = useGoogleMaps();
   const { user } = useAuth();
   const { toast } = useToast();
