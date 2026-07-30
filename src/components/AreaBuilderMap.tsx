@@ -712,7 +712,7 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     <div className="fixed inset-0 h-[100dvh] w-screen z-[10000] bg-background overflow-hidden flex flex-col">
       {/* Separate top filter bar */}
       {viewingProperties && (
-        <div className="shrink-0 z-20 flex items-center justify-center gap-2 bg-background border-b border-border px-4 py-2 shadow-sm">
+        <div className="shrink-0 z-20 flex flex-wrap items-center justify-center gap-2 bg-background border-b border-border px-4 py-2 shadow-sm">
           <Select
             value={String(radiusKm)}
             onValueChange={(v) => setRadiusKm(parseFloat(v))}
@@ -732,145 +732,255 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
               <SelectItem value="10">+ 10 Km</SelectItem>
             </SelectContent>
           </Select>
-          <div className="h-6 w-px bg-border" />
-          <Popover open={priceOpen} onOpenChange={setPriceOpen}>
+
+          <div className="h-6 w-px bg-border hidden sm:block" />
+
+          {/* Min price */}
+          <Popover open={minPriceOpen} onOpenChange={setMinPriceOpen}>
             <PopoverTrigger asChild>
-              <div className="flex items-center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="h-9 px-2 text-sm font-normal"
-                  onClick={() => {
-                    setActivePriceTab('min');
-                    setTypedPrice(minPrice);
-                    setPriceOpen(true);
-                  }}
-                >
-                  Min: {minPrice ? formatPriceOption(minPrice) : 'No min'}
-                </Button>
-                <div className="h-4 w-px bg-border" />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="h-9 px-2 text-sm font-normal"
-                  onClick={() => {
-                    setActivePriceTab('max');
-                    setTypedPrice(maxPrice);
-                    setPriceOpen(true);
-                  }}
-                >
-                  Max: {maxPrice ? formatPriceOption(maxPrice) : 'No max'}
-                </Button>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-9 px-2 text-sm font-normal"
+                onClick={() => {
+                  setTypedMinPrice(minPrice);
+                  setMinPriceOpen(true);
+                }}
+              >
+                Min: {minPrice ? formatPriceOption(minPrice) : 'No min'}
+                <ChevronDown className="w-4 h-4 ml-1 text-muted-foreground" />
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-3 bg-background/95 backdrop-blur-md border border-border/50 rounded-2xl z-[10001]">
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActivePriceTab('min');
-                      setTypedPrice(minPrice);
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="Type min price"
+                    value={typedMinPrice}
+                    onChange={(e) => {
+                      setTypedMinPrice(e.target.value);
+                      setMinPrice(e.target.value);
                     }}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activePriceTab === 'min'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
-                  >
-                    Min: {minPrice ? formatPriceOption(minPrice) : 'No min'}
-                  </button>
-                  <button
+                    className="h-9 w-[180px]"
+                  />
+                  <Button
                     type="button"
-                    onClick={() => {
-                      setActivePriceTab('max');
-                      setTypedPrice(maxPrice);
-                    }}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activePriceTab === 'max'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
+                    size="sm"
+                    className="h-9"
+                    onClick={() => { setMinPrice(''); setTypedMinPrice(''); }}
                   >
-                    Max: {maxPrice ? formatPriceOption(maxPrice) : 'No max'}
-                  </button>
+                    Clear
+                  </Button>
                 </div>
-                {activePriceTab && (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        placeholder={`Type ${activePriceTab} price`}
-                        value={typedPrice}
-                        onChange={(e) => {
-                          setTypedPrice(e.target.value);
-                          if (activePriceTab === 'min') setMinPrice(e.target.value);
-                          else setMaxPrice(e.target.value);
-                        }}
-                        className="h-9 w-[180px]"
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        className="h-9"
-                        onClick={() => {
-                          if (activePriceTab === 'min') setMinPrice('');
-                          else setMaxPrice('');
-                          setTypedPrice('');
-                        }}
-                      >
-                        Clear
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-1 gap-1 max-h-[60vh] overflow-y-auto rounded-2xl p-2 w-fit">
+                <div className="grid grid-cols-1 gap-1 max-h-[60vh] overflow-y-auto rounded-2xl p-2 w-fit">
+                  <button
+                    type="button"
+                    onClick={() => { setMinPrice(''); setTypedMinPrice(''); }}
+                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                      minPrice === ''
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
+                    }`}
+                  >
+                    No min
+                  </button>
+                  {priceOptions.map((price) => {
+                    const val = String(price);
+                    const disabled = maxPrice !== '' && price > Number(maxPrice);
+                    return (
                       <button
                         type="button"
-                        onClick={() => {
-                          if (activePriceTab === 'min') setMinPrice('');
-                          else setMaxPrice('');
-                          setTypedPrice('');
-                        }}
+                        key={`min-${price}`}
+                        disabled={disabled}
+                        onClick={() => { if (!disabled) { setMinPrice(val); setTypedMinPrice(val); } }}
                         className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                          (activePriceTab === 'min' ? minPrice : maxPrice) === ''
+                          minPrice === val
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-transparent bg-transparent hover:border-primary/50'
-                        }`}
+                        } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                       >
-                        {activePriceTab === 'min' ? 'No min' : 'No max'}
+                        {formatPriceOption(price)}{price === 10000000 ? '+' : ''}
                       </button>
-                      {priceOptions.map((price) => {
-                        const val = String(price);
-                        const currentVal = activePriceTab === 'min' ? minPrice : maxPrice;
-                        const disabled =
-                          activePriceTab === 'min'
-                            ? maxPrice !== '' && price > Number(maxPrice)
-                            : minPrice !== '' && price < Number(minPrice);
-                        return (
-                          <button
-                            type="button"
-                            key={`${activePriceTab}-${price}`}
-                            disabled={disabled}
-                            onClick={() => {
-                              if (disabled) return;
-                              if (activePriceTab === 'min') setMinPrice(val);
-                              else setMaxPrice(val);
-                              setTypedPrice(val);
-                            }}
-                            className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                              currentVal === val
-                                ? 'border-primary bg-primary text-primary-foreground'
-                                : 'border-transparent bg-transparent hover:border-primary/50'
-                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
-                          >
-                            {formatPriceOption(price)}{price === 10000000 ? '+' : ''}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <span className="text-sm text-muted-foreground">to</span>
+
+          {/* Max price */}
+          <Popover open={maxPriceOpen} onOpenChange={setMaxPriceOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-9 px-2 text-sm font-normal"
+                onClick={() => {
+                  setTypedMaxPrice(maxPrice);
+                  setMaxPriceOpen(true);
+                }}
+              >
+                Max: {maxPrice ? formatPriceOption(maxPrice) : 'No max'}
+                <ChevronDown className="w-4 h-4 ml-1 text-muted-foreground" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-3 bg-background/95 backdrop-blur-md border border-border/50 rounded-2xl z-[10001]">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="Type max price"
+                    value={typedMaxPrice}
+                    onChange={(e) => {
+                      setTypedMaxPrice(e.target.value);
+                      setMaxPrice(e.target.value);
+                    }}
+                    className="h-9 w-[180px]"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="h-9"
+                    onClick={() => { setMaxPrice(''); setTypedMaxPrice(''); }}
+                  >
+                    Clear
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 gap-1 max-h-[60vh] overflow-y-auto rounded-2xl p-2 w-fit">
+                  <button
+                    type="button"
+                    onClick={() => { setMaxPrice(''); setTypedMaxPrice(''); }}
+                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                      maxPrice === ''
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-transparent bg-transparent hover:border-primary/50'
+                    }`}
+                  >
+                    No max
+                  </button>
+                  {priceOptions.map((price) => {
+                    const val = String(price);
+                    const disabled = minPrice !== '' && price < Number(minPrice);
+                    return (
+                      <button
+                        type="button"
+                        key={`max-${price}`}
+                        disabled={disabled}
+                        onClick={() => { if (!disabled) { setMaxPrice(val); setTypedMaxPrice(val); } }}
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          maxPrice === val
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
+                        } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                      >
+                        {formatPriceOption(price)}{price === 10000000 ? '+' : ''}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <div className="h-6 w-px bg-border hidden sm:block" />
+
+          {/* Min beds */}
+          <Popover open={minBedsOpen} onOpenChange={setMinBedsOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-9 px-2 text-sm font-normal"
+              >
+                Min beds: {minBedrooms ? `${minBedrooms === '10' ? '10+' : minBedrooms}` : 'No min'}
+                <ChevronDown className="w-4 h-4 ml-1 text-muted-foreground" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-3 bg-background/95 backdrop-blur-md border border-border/50 rounded-2xl z-[10001]">
+              <div className="grid grid-cols-1 gap-1 max-h-[60vh] overflow-y-auto rounded-2xl p-2 w-fit">
+                <button
+                  type="button"
+                  onClick={() => setMinBedrooms('')}
+                  className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                    minBedrooms === ''
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-transparent bg-transparent hover:border-primary/50'
+                  }`}
+                >
+                  No min
+                </button>
+                {BEDROOM_OPTIONS.map((val) => {
+                  const disabled = maxBedrooms !== '' && Number(val) > Number(maxBedrooms);
+                  return (
+                    <button
+                      type="button"
+                      key={`min-beds-${val}`}
+                      disabled={disabled}
+                      onClick={() => { if (!disabled) setMinBedrooms(val); }}
+                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                        minBedrooms === val
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-transparent bg-transparent hover:border-primary/50'
+                      } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                    >
+                      {val === '10' ? '10+' : val}
+                    </button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <span className="text-sm text-muted-foreground">to</span>
+
+          {/* Max beds */}
+          <Popover open={maxBedsOpen} onOpenChange={setMaxBedsOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-9 px-2 text-sm font-normal"
+              >
+                Max beds: {maxBedrooms ? `${maxBedrooms === '10' ? '10+' : maxBedrooms}` : 'No max'}
+                <ChevronDown className="w-4 h-4 ml-1 text-muted-foreground" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-3 bg-background/95 backdrop-blur-md border border-border/50 rounded-2xl z-[10001]">
+              <div className="grid grid-cols-1 gap-1 max-h-[60vh] overflow-y-auto rounded-2xl p-2 w-fit">
+                <button
+                  type="button"
+                  onClick={() => setMaxBedrooms('')}
+                  className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                    maxBedrooms === ''
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-transparent bg-transparent hover:border-primary/50'
+                  }`}
+                >
+                  No max
+                </button>
+                {BEDROOM_OPTIONS.map((val) => {
+                  const disabled = minBedrooms !== '' && Number(val) < Number(minBedrooms);
+                  return (
+                    <button
+                      type="button"
+                      key={`max-beds-${val}`}
+                      disabled={disabled}
+                      onClick={() => { if (!disabled) setMaxBedrooms(val); }}
+                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                        maxBedrooms === val
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-transparent bg-transparent hover:border-primary/50'
+                      } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                    >
+                      {val === '10' ? '10+' : val}
+                    </button>
+                  );
+                })}
               </div>
             </PopoverContent>
           </Popover>
