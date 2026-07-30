@@ -494,10 +494,12 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     google.maps.event.addListenerOnce(mapInstance.current, 'idle', dedupe);
   }, [google, clearMarkers, areaPage]);
 
-  const applyFilters = useCallback((source: Property[], coords: Coordinate[], radius: number, minP: string, maxP: string): Property[] => {
+  const applyFilters = useCallback((source: Property[], coords: Coordinate[], radius: number, minP: string, maxP: string, minBeds: string, maxBeds: string): Property[] => {
     if (coords.length < 3) return [];
     const minN = minP ? parseInt(minP.replace(/[^0-9]/g, '')) : NaN;
     const maxN = maxP ? parseInt(maxP.replace(/[^0-9]/g, '')) : NaN;
+    const minBedN = minBeds ? parseInt(minBeds.replace(/[^0-9]/g, '')) : NaN;
+    const maxBedN = maxBeds ? parseInt(maxBeds.replace(/[^0-9]/g, '')) : NaN;
     const inside = (lat: number, lng: number) => {
       let ins = false;
       for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
@@ -518,6 +520,8 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         : (p.price ?? p.rental_price);
       if (!isNaN(minN) && (priceValue == null || priceValue < minN)) return false;
       if (!isNaN(maxN) && (priceValue == null || priceValue > maxN)) return false;
+      if (!isNaN(minBedN) && (p.bedrooms == null || p.bedrooms < minBedN)) return false;
+      if (!isNaN(maxBedN) && (p.bedrooms == null || p.bedrooms > maxBedN)) return false;
       return true;
     });
   }, [areaPage]);
