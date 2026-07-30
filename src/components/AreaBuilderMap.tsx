@@ -547,19 +547,19 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     const all = ((data as any[]) || []) as Property[];
     setAllFetched(all);
     setPolygonCoords(coords);
-    const filtered = applyFilters(all, coords, radiusKm, minPrice, maxPrice);
+    const filtered = applyFilters(all, coords, radiusKm, minPrice, maxPrice, minBedrooms, maxBedrooms);
     setProperties(filtered);
     renderMarkers(filtered, coords);
     setViewingProperties(true);
-  }, [google, getPolygonCoords, toast, applyFilters, renderMarkers, radiusKm, minPrice, maxPrice]);
+  }, [google, getPolygonCoords, toast, applyFilters, renderMarkers, radiusKm, minPrice, maxPrice, minBedrooms, maxBedrooms]);
 
   // Re-apply filters live when they change
   useEffect(() => {
     if (!viewingProperties || polygonCoords.length < 3) return;
-    const filtered = applyFilters(allFetched, polygonCoords, radiusKm, minPrice, maxPrice);
+    const filtered = applyFilters(allFetched, polygonCoords, radiusKm, minPrice, maxPrice, minBedrooms, maxBedrooms);
     setProperties(filtered);
     renderMarkers(filtered, polygonCoords);
-  }, [radiusKm, minPrice, maxPrice, viewingProperties, allFetched, polygonCoords, applyFilters, renderMarkers]);
+  }, [radiusKm, minPrice, maxPrice, minBedrooms, maxBedrooms, viewingProperties, allFetched, polygonCoords, applyFilters, renderMarkers]);
 
   // Visually expand the drawn polygon by the selected radius.
   // When radius is 0 the original polygon is shown; when > 0 the original is
