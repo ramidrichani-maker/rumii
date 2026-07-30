@@ -178,7 +178,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const [radiusKm, setRadiusKm] = useState<number>(0);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
+  const [priceOpen, setPriceOpen] = useState(false);
+  const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
+  const [typedPrice, setTypedPrice] = useState('');
   const [selectedProp, setSelectedProp] = useState<Property | null>(null);
+
   const [imageIdx, setImageIdx] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
