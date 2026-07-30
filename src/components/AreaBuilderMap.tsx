@@ -252,9 +252,14 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setRadiusKm(0);
     setMinPrice('');
     setMaxPrice('');
-    setPriceOpen(false);
-    setActivePriceTab(null);
-    setTypedPrice('');
+    setMinPriceOpen(false);
+    setMaxPriceOpen(false);
+    setTypedMinPrice('');
+    setTypedMaxPrice('');
+    setMinBedrooms('');
+    setMaxBedrooms('');
+    setMinBedsOpen(false);
+    setMaxBedsOpen(false);
   }, [open]);
 
 
