@@ -14,6 +14,11 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
   Pencil,
   Edit3,
   Save,
@@ -27,6 +32,7 @@ import {
   Square,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   List,
 } from 'lucide-react';
 import {
@@ -41,6 +47,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+
 
 interface Coordinate { latitude: number; longitude: number; }
 interface Property {
