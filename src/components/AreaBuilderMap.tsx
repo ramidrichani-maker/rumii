@@ -142,6 +142,8 @@ const generatePriceOptions = (): number[] => {
 
 const priceOptions = generatePriceOptions();
 
+const BEDROOM_OPTIONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
 const formatPriceOption = (value: number | string): string => {
   const num = typeof value === 'string' ? parseFloat(value) : value;
   if (Number.isNaN(num)) return '';
