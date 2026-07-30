@@ -14,6 +14,11 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
   Pencil,
   Edit3,
   Save,
@@ -27,6 +32,7 @@ import {
   Square,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   List,
 } from 'lucide-react';
 import {
@@ -41,6 +47,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+
 
 interface Coordinate { latitude: number; longitude: number; }
 interface Property {
@@ -117,12 +124,32 @@ function minDistanceToPolygonKm(point: Coordinate, polygon: Coordinate[]): numbe
       longitude: a.longitude + t * (b.longitude - a.longitude),
     };
     const d = haversineKm(point, closest);
-    if (d < minDist) minDist = d;
+  if (d < minDist) minDist = d;
   }
   return minDist;
 }
 
+const generatePriceOptions = (): number[] => {
+  const prices: number[] = [];
+  for (let p = 50000; p < 250000; p += 10000) prices.push(p);
+  for (let p = 250000; p < 500000; p += 25000) prices.push(p);
+  for (let p = 500000; p < 1000000; p += 50000) prices.push(p);
+  for (let p = 1000000; p < 3000000; p += 100000) prices.push(p);
+  for (let p = 3000000; p < 5000000; p += 250000) prices.push(p);
+  for (let p = 5000000; p <= 10000000; p += 500000) prices.push(p);
+  return prices;
+};
+
+const priceOptions = generatePriceOptions();
+
+const formatPriceOption = (value: number | string): string => {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (Number.isNaN(num)) return '';
+  return `$${num.toLocaleString()}`;
+};
+
 const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
+
   const { google, loaded } = useGoogleMaps();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -151,7 +178,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
   const [radiusKm, setRadiusKm] = useState<number>(0);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
+  const [priceOpen, setPriceOpen] = useState(false);
+  const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
+  const [typedPrice, setTypedPrice] = useState('');
   const [selectedProp, setSelectedProp] = useState<Property | null>(null);
+
   const [imageIdx, setImageIdx] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
@@ -216,7 +247,11 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setRadiusKm(0);
     setMinPrice('');
     setMaxPrice('');
+    setPriceOpen(false);
+    setActivePriceTab(null);
+    setTypedPrice('');
   }, [open]);
+
 
   const clearMarkers = useCallback(() => {
     markersRef.current.forEach(m => m.setMap(null));
@@ -684,25 +719,150 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
             </SelectContent>
           </Select>
           <div className="h-6 w-px bg-border" />
-          <Input
-            type="number"
-            inputMode="numeric"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            placeholder="Min price"
-            className="h-9 w-[120px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
-          />
-          <div className="h-6 w-px bg-border" />
-          <Input
-            type="number"
-            inputMode="numeric"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            placeholder="Max price"
-            className="h-9 w-[120px] border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
-          />
+          <Popover open={priceOpen} onOpenChange={setPriceOpen}>
+            <PopoverTrigger asChild>
+              <div className="flex items-center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-9 px-2 text-sm font-normal"
+                  onClick={() => {
+                    setActivePriceTab('min');
+                    setTypedPrice(minPrice);
+                    setPriceOpen(true);
+                  }}
+                >
+                  Min: {minPrice ? formatPriceOption(minPrice) : 'No min'}
+                </Button>
+                <div className="h-4 w-px bg-border" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-9 px-2 text-sm font-normal"
+                  onClick={() => {
+                    setActivePriceTab('max');
+                    setTypedPrice(maxPrice);
+                    setPriceOpen(true);
+                  }}
+                >
+                  Max: {maxPrice ? formatPriceOption(maxPrice) : 'No max'}
+                </Button>
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-3 bg-background/95 backdrop-blur-md border border-border/50 rounded-2xl z-[10001]">
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActivePriceTab('min');
+                      setTypedPrice(minPrice);
+                    }}
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                      activePriceTab === 'min'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background/15 hover:border-primary/50'
+                    }`}
+                  >
+                    Min: {minPrice ? formatPriceOption(minPrice) : 'No min'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActivePriceTab('max');
+                      setTypedPrice(maxPrice);
+                    }}
+                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                      activePriceTab === 'max'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background/15 hover:border-primary/50'
+                    }`}
+                  >
+                    Max: {maxPrice ? formatPriceOption(maxPrice) : 'No max'}
+                  </button>
+                </div>
+                {activePriceTab && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        placeholder={`Type ${activePriceTab} price`}
+                        value={typedPrice}
+                        onChange={(e) => {
+                          setTypedPrice(e.target.value);
+                          if (activePriceTab === 'min') setMinPrice(e.target.value);
+                          else setMaxPrice(e.target.value);
+                        }}
+                        className="h-9 w-[180px]"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="h-9"
+                        onClick={() => {
+                          if (activePriceTab === 'min') setMinPrice('');
+                          else setMaxPrice('');
+                          setTypedPrice('');
+                        }}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 gap-1 max-h-[60vh] overflow-y-auto rounded-2xl p-2 w-fit">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (activePriceTab === 'min') setMinPrice('');
+                          else setMaxPrice('');
+                          setTypedPrice('');
+                        }}
+                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          (activePriceTab === 'min' ? minPrice : maxPrice) === ''
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-transparent bg-transparent hover:border-primary/50'
+                        }`}
+                      >
+                        {activePriceTab === 'min' ? 'No min' : 'No max'}
+                      </button>
+                      {priceOptions.map((price) => {
+                        const val = String(price);
+                        const currentVal = activePriceTab === 'min' ? minPrice : maxPrice;
+                        const disabled =
+                          activePriceTab === 'min'
+                            ? maxPrice !== '' && price > Number(maxPrice)
+                            : minPrice !== '' && price < Number(minPrice);
+                        return (
+                          <button
+                            type="button"
+                            key={`${activePriceTab}-${price}`}
+                            disabled={disabled}
+                            onClick={() => {
+                              if (disabled) return;
+                              if (activePriceTab === 'min') setMinPrice(val);
+                              else setMaxPrice(val);
+                              setTypedPrice(val);
+                            }}
+                            className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                              currentVal === val
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-transparent bg-transparent hover:border-primary/50'
+                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                          >
+                            {formatPriceOption(price)}{price === 10000000 ? '+' : ''}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       )}
+
 
       <div className="relative flex-1 w-full overflow-hidden">
         <div ref={mapRef} className="absolute inset-0 h-full w-full" style={{ touchAction: isDrawing ? 'none' : 'auto' }} />
