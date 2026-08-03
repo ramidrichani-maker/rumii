@@ -35,7 +35,7 @@ import SupportPortal from "./pages/SupportPortal";
 import MyOracle from "./pages/MyOracle";
 import AccountSettings from "./pages/AccountSettings";
 import AdvertiseCommercial from "./pages/AdvertiseCommercial";
-import { FloatingChatWidget } from "./components/FloatingChatWidget";
+
 import { SupportReviewWidget } from "./components/SupportReviewWidget";
 
 const queryClient = new QueryClient();
@@ -111,9 +111,9 @@ const App = () => (
         <BrowserRouter>
           <Navbar />
           <RouteProgress />
-          <FloatingChatWidget />
           <AppRoutes />
           <SupportReviewWidget />
+
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
