@@ -175,15 +175,15 @@ export const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             {user ? <>
-                {/* Desktop My rumi */}
-                <Button variant="ghost" className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full" onClick={() => setProfilePanelOpen(true)}>
-                  <User className="h-4 w-4" />
-                  <span className="text-sm font-medium">My rumi</span>
-                </Button>
-
-                {/* Mobile My Rumi */}
-                <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 rounded-full" onClick={() => setProfilePanelOpen(true)}>
-                  <User className="h-5 w-5" />
+                {/* My rumi (icon only) */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="My rumi"
+                  className="h-10 w-10 rounded-full"
+                  onClick={() => setProfilePanelOpen(true)}
+                >
+                  <User className="h-6 w-6 text-muted-foreground" strokeWidth={1.25} />
                 </Button>
               </> : <>
                 {/* Desktop Sign In */}
