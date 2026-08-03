@@ -111,9 +111,9 @@ const App = () => (
         <BrowserRouter>
           <Navbar />
           <RouteProgress />
-          <FloatingChatWidget />
           <AppRoutes />
           <SupportReviewWidget />
+
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
