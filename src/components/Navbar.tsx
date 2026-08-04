@@ -131,47 +131,50 @@ export const Navbar = () => {
             </button>
             <Link to="/" className="flex items-center space-x-2">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
-              <span className="text-xl font-bold text-muted-foreground leading-none self-center">rumi</span>
             </Link>
+            {profile?.role !== 'customer_support' ? (
+              <nav className="hidden md:flex items-center space-x-6 ml-2">
+                <div
+                  className="relative"
+                  onMouseEnter={() => openMenu('buy')}
+                  onMouseLeave={scheduleClose}
+                  onClick={() => setActiveMenu(prev => prev === 'buy' ? null : 'buy')}
+                >
+                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+                </div>
+                <Link to="/rent" onMouseEnter={() => closeMenu()}>
+                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
+                </Link>
+                <Link to="/find-agents" onMouseEnter={() => closeMenu()}>
+                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
+                </Link>
+                <div
+                  className="relative"
+                  onMouseEnter={() => openMenu('commercial')}
+                  onMouseLeave={scheduleClose}
+                  onClick={() => setActiveMenu(prev => prev === 'commercial' ? null : 'commercial')}
+                >
+                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Commercial</Button>
+                </div>
+              </nav>
+            ) : (
+              <nav className="hidden md:flex items-center space-x-6 ml-2">
+                <Link to="/purchase">
+                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+                </Link>
+                <Link to="/rent">
+                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
+                </Link>
+                <Link to="/support-portal">
+                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Support Portal</Button>
+                </Link>
+              </nav>
+            )}
           </div>
-          {profile?.role !== 'customer_support' ? (
-            <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
-              <div
-                className="relative"
-                onMouseEnter={() => openMenu('buy')}
-                onMouseLeave={scheduleClose}
-                onClick={() => setActiveMenu(prev => prev === 'buy' ? null : 'buy')}
-              >
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
-              </div>
-              <Link to="/rent" onMouseEnter={() => closeMenu()}>
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
-              </Link>
-              <Link to="/find-agents" onMouseEnter={() => closeMenu()}>
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
-              </Link>
-              <div
-                className="relative"
-                onMouseEnter={() => openMenu('commercial')}
-                onMouseLeave={scheduleClose}
-                onClick={() => setActiveMenu(prev => prev === 'commercial' ? null : 'commercial')}
-              >
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Commercial</Button>
-              </div>
-            </nav>
-          ) : (
-            <nav className="hidden md:flex items-center justify-center flex-1 space-x-8">
-              <Link to="/purchase">
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
-              </Link>
-              <Link to="/rent">
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
-              </Link>
-              <Link to="/support-portal">
-                <Button variant="ghost" size="sm" className="text-[1.05rem]">Support Portal</Button>
-              </Link>
-            </nav>
-          )}
+
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center pointer-events-none">
+            <span className="text-xl font-bold text-muted-foreground leading-none">rumi</span>
+          </div>
 
           <div className="flex items-center space-x-4">
             {user ? <>
