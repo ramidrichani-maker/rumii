@@ -64,6 +64,10 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Brand fonts */
+    --font-display: 'Canela Display', 'Playfair Display', Georgia, serif;
+    --font-title: 'Optima', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+
     /* Brand: Nature dark green for "Trust" emphasis */
     --nature-green: 150 45% 28%;
 
