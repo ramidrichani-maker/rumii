@@ -183,7 +183,10 @@ export const Navbar = () => {
                   className="h-10 w-10 rounded-full"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <User className="h-6 w-6 text-muted-foreground" strokeWidth={1.25} />
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-muted-foreground">
+                    <circle cx="12" cy="7" r="4.5" />
+                    <path d="M4 20a8 8 0 0 1 16 0" />
+                  </svg>
                 </Button>
               </> : <>
                 {/* Desktop Sign In */}
@@ -195,7 +198,10 @@ export const Navbar = () => {
                   onClick={() => setAuthPanelOpen(true)}
                 >
                   <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
-                    <User className="h-5 w-5" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                      <circle cx="12" cy="7" r="4.5" />
+                      <path d="M4 20a8 8 0 0 1 16 0" />
+                    </svg>
                   </div>
                   <span className="text-[10px] font-medium leading-none">Sign in</span>
                 </button>
