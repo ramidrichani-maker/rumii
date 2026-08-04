@@ -121,7 +121,7 @@ export const Navbar = () => {
   return <nav ref={navRef} className="relative border-b bg-background" style={{ zIndex: 50, overflow: 'visible' }}>
       <div className="container mx-auto px-4 py-3 bg-destructive-foreground">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 shrink-0">
+          <div className="flex items-center space-x-1 shrink-0">
             <button
               className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(true)}
@@ -132,21 +132,22 @@ export const Navbar = () => {
             <Link to="/" className="flex items-center space-x-2">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
             </Link>
+            <span className="hidden md:inline-block text-foreground/30 text-lg font-light leading-none select-none pb-0.5">|</span>
             {profile?.role !== 'customer_support' ? (
-              <nav className="hidden md:flex items-center space-x-6 ml-2">
+              <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <div
                   className="relative"
                   onMouseEnter={() => openMenu('buy')}
                   onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'buy' ? null : 'buy')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Buy</Button>
                 </div>
                 <Link to="/rent" onMouseEnter={() => closeMenu()}>
-                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Rent</Button>
                 </Link>
                 <Link to="/find-agents" onMouseEnter={() => closeMenu()}>
-                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Find agents</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Find agents</Button>
                 </Link>
                 <div
                   className="relative"
@@ -154,27 +155,27 @@ export const Navbar = () => {
                   onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'commercial' ? null : 'commercial')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Commercial</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Commercial</Button>
                 </div>
               </nav>
             ) : (
-              <nav className="hidden md:flex items-center space-x-6 ml-2">
+              <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <Link to="/purchase">
-                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Buy</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Buy</Button>
                 </Link>
                 <Link to="/rent">
-                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Rent</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Rent</Button>
                 </Link>
                 <Link to="/support-portal">
-                  <Button variant="ghost" size="sm" className="text-[1.05rem]">Support Portal</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Support Portal</Button>
                 </Link>
               </nav>
             )}
           </div>
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center pointer-events-none">
-            <span className="text-xl font-bold text-muted-foreground leading-none">rumi</span>
-          </div>
+          <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center">
+            <span className="text-xl font-title text-muted-foreground leading-none">rumi</span>
+          </Link>
 
           <div className="flex items-center space-x-4">
             {user ? <>
