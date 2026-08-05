@@ -298,16 +298,19 @@ export const Navbar = () => {
                   <div className="space-y-1">
                     <p className="px-3 py-2 text-sm font-semibold text-foreground">Properties</p>
                     <Link to="/purchase" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Property for sale
+                      Buy
                     </Link>
                     <Link to="/rent" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Property to rent
+                      Rent
                     </Link>
                     <Link to="/purchase?type=commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Commercial property for sale
+                      Commercial sale
                     </Link>
                     <Link to="/rent?type=commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Commercial property to rent
+                      Commercial rent
+                    </Link>
+                    <Link to="/purchase?type=land" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Land
                     </Link>
                   </div>
 
