@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Loads the Google Maps JavaScript API (with Places, Drawing, Geometry libraries)
- * forcing English labels worldwide. The API key is fetched once from the
- * `get-maps-config` edge function and cached for the session.
+ * forcing English labels worldwide. Uses the referrer-restricted browser key
+ * provided by the Google Maps connector.
  */
 
 type GoogleMapsState = {
@@ -13,7 +12,6 @@ type GoogleMapsState = {
   error: string | null;
 };
 
-let cachedKey: string | null = null;
 let loaderPromise: Promise<typeof google> | null = null;
 
 const LIBRARIES = ['places', 'drawing', 'geometry'] as const;
@@ -33,15 +31,6 @@ export const MAP_STYLES_NO_POI: google.maps.MapTypeStyle[] = [
   { featureType: 'transit', stylers: [{ visibility: 'off' }] },
 ];
 
-const fetchKey = async (): Promise<string> => {
-  if (cachedKey) return cachedKey;
-  const { data, error } = await supabase.functions.invoke('get-maps-config');
-  if (error) throw new Error(error.message);
-  if (!data?.apiKey) throw new Error('Google Maps API key not configured');
-  cachedKey = data.apiKey as string;
-  return cachedKey;
-};
-
 const loadGoogleMaps = async (): Promise<typeof google> => {
   if (typeof window !== 'undefined' && (window as any).google?.maps) {
     return (window as any).google;
@@ -49,7 +38,13 @@ const loadGoogleMaps = async (): Promise<typeof google> => {
   if (loaderPromise) return loaderPromise;
 
   loaderPromise = (async () => {
-    const apiKey = await fetchKey();
+    const apiKey = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as
+      | string
+      | undefined;
+    if (!apiKey) {
+      loaderPromise = null;
+      throw new Error('Google Maps browser key is not configured');
+    }
     return new Promise<typeof google>((resolve, reject) => {
       const callbackName = `__googleMapsCallback_${Date.now()}`;
       (window as any)[callbackName] = () => {
