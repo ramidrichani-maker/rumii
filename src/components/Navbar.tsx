@@ -14,11 +14,11 @@ import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<'buy' | 'rent' | 'commercial' | null>(null);
+  const [activeMenu, setActiveMenu] = useState<'properties' | 'services' | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const openMenu = (menu: 'buy' | 'rent' | 'commercial') => {
+  const openMenu = (menu: 'properties' | 'services') => {
     if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
     setActiveMenu(menu);
   };
@@ -137,25 +137,19 @@ export const Navbar = () => {
               <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <div
                   className="relative"
-                  onMouseEnter={() => openMenu('buy')}
+                  onMouseEnter={() => openMenu('properties')}
                   onMouseLeave={scheduleClose}
-                  onClick={() => setActiveMenu(prev => prev === 'buy' ? null : 'buy')}
+                  onClick={() => setActiveMenu(prev => prev === 'properties' ? null : 'properties')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Buy</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Properties</Button>
                 </div>
-                <Link to="/rent" onMouseEnter={() => closeMenu()}>
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Rent</Button>
-                </Link>
-                <Link to="/find-agents" onMouseEnter={() => closeMenu()}>
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Find agents</Button>
-                </Link>
                 <div
                   className="relative"
-                  onMouseEnter={() => openMenu('commercial')}
+                  onMouseEnter={() => openMenu('services')}
                   onMouseLeave={scheduleClose}
-                  onClick={() => setActiveMenu(prev => prev === 'commercial' ? null : 'commercial')}
+                  onClick={() => setActiveMenu(prev => prev === 'services' ? null : 'services')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Commercial</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Services</Button>
                 </div>
               </nav>
             ) : (
@@ -230,23 +224,29 @@ export const Navbar = () => {
           onMouseLeave={scheduleClose}
         >
           <div className="w-full h-full flex items-center justify-center gap-8 px-4">
-            {activeMenu === 'buy' && (
+            {activeMenu === 'properties' && (
               <>
                 <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
                   Property for sale
                 </Link>
-                <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Property valuation request
-                </Link>
-              </>
-            )}
-            {activeMenu === 'commercial' && (
-              <>
-                <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Commercial property to rent
+                <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Property to rent
                 </Link>
                 <Link to="/purchase?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
                   Commercial property for sale
+                </Link>
+                <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Commercial property to rent
+                </Link>
+              </>
+            )}
+            {activeMenu === 'services' && (
+              <>
+                <Link to="/find-agents" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Find agents
+                </Link>
+                <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Property valuation request
                 </Link>
                 <Link to="/advertise-commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
                   Advertise commercial property
@@ -293,35 +293,29 @@ export const Navbar = () => {
                 <>
                   {/* Buy */}
                   <div className="space-y-1">
-                    <p className="px-3 py-2 text-sm font-semibold text-foreground">Buy</p>
+                    <p className="px-3 py-2 text-sm font-semibold text-foreground">Properties</p>
                     <Link to="/purchase" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Property for sale
                     </Link>
-                    <Link to="/agent-valuation" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Property valuation request
-                    </Link>
-                  </div>
-
-                  {/* Rent */}
-                  <Link to="/rent" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-sm font-semibold text-foreground hover:bg-accent">
-                    Rent
-                  </Link>
-
-                  {/* Find agents */}
-                  <div>
-                    <Link to="/find-agents" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded-md text-sm font-semibold text-foreground hover:bg-accent">
-                      Find agents
-                    </Link>
-                  </div>
-
-                  {/* Commercial */}
-                  <div className="space-y-1">
-                    <p className="px-3 py-2 text-sm font-semibold text-foreground">Commercial</p>
-                    <Link to="/rent?type=commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Commercial property to rent
+                    <Link to="/rent" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Property to rent
                     </Link>
                     <Link to="/purchase?type=commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Commercial property for sale
+                    </Link>
+                    <Link to="/rent?type=commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Commercial property to rent
+                    </Link>
+                  </div>
+
+                  {/* Services */}
+                  <div className="space-y-1">
+                    <p className="px-3 py-2 text-sm font-semibold text-foreground">Services</p>
+                    <Link to="/find-agents" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Find agents
+                    </Link>
+                    <Link to="/agent-valuation" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Property valuation request
                     </Link>
                     <Link to="/advertise-commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Advertise commercial property
