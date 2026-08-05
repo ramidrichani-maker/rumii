@@ -227,16 +227,19 @@ export const Navbar = () => {
             {activeMenu === 'properties' && (
               <>
                 <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Property for sale
+                  Buy
                 </Link>
                 <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Property to rent
+                  Rent
                 </Link>
                 <Link to="/purchase?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Commercial property for sale
+                  Commercial sale
                 </Link>
                 <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
-                  Commercial property to rent
+                  Commercial rent
+                </Link>
+                <Link to="/purchase?type=land" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                  Land
                 </Link>
               </>
             )}
