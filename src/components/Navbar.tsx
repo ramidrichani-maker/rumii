@@ -14,11 +14,11 @@ import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<'buy' | 'rent' | 'commercial' | null>(null);
+  const [activeMenu, setActiveMenu] = useState<'properties' | 'services' | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const openMenu = (menu: 'buy' | 'rent' | 'commercial') => {
+  const openMenu = (menu: 'properties' | 'services') => {
     if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
     setActiveMenu(menu);
   };
