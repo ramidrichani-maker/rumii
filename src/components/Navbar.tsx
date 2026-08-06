@@ -134,14 +134,14 @@ export const Navbar = () => {
             </Link>
             <span className="hidden md:inline-block text-foreground/30 text-lg font-light leading-none select-none pb-0.5">|</span>
             {profile?.role !== 'customer_support' ? (
-              <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
+            <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <div
                   className="relative"
                   onMouseEnter={() => openMenu('properties')}
                   onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'properties' ? null : 'properties')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Properties</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Properties</Button>
                 </div>
                 <div
                   className="relative"
@@ -149,7 +149,7 @@ export const Navbar = () => {
                   onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'services' ? null : 'services')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Services</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Services</Button>
                 </div>
               </nav>
             ) : (
