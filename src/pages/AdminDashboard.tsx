@@ -17,6 +17,8 @@ import PendingMediaApproval from "@/components/PendingMediaApproval";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import AccountPropertiesView from "@/components/AccountPropertiesView";
 import FeaturedListingsManager from "@/components/FeaturedListingsManager";
+import { InvestmentWorthyManager } from "@/components/InvestmentWorthyManager";
+import { InvestmentProjectsManager } from "@/components/InvestmentProjectsManager";
 import PhotographyRequestsManager from "@/components/PhotographyRequestsManager";
 import { AgencyManager } from "@/components/AgencyManager";
 import FeatureRequestsManager from "@/components/FeatureRequestsManager";
