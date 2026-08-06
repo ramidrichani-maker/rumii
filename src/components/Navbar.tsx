@@ -218,7 +218,8 @@ export const Navbar = () => {
             top: '100%',
             marginTop: '-10px',
             paddingTop: '10px',
-            height: '120px',
+            height: 'auto',
+            minHeight: '120px',
           }}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
