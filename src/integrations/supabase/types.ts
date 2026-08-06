@@ -415,6 +415,93 @@ export type Database = {
           },
         ]
       }
+      investment_projects: {
+        Row: {
+          address: string
+          amenities: string[]
+          bathrooms: number | null
+          bedrooms: number | null
+          built_area_sqm: number | null
+          city: string
+          completion_status: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          expected_roi: number | null
+          floors: number | null
+          id: string
+          images: string[]
+          land_area_sqm: number | null
+          latitude: number | null
+          longitude: number | null
+          municipality: string | null
+          project_type: string
+          published: boolean
+          title: string
+          total_price: number | null
+          units_count: number | null
+          updated_at: string
+          year_built: number | null
+        }
+        Insert: {
+          address: string
+          amenities?: string[]
+          bathrooms?: number | null
+          bedrooms?: number | null
+          built_area_sqm?: number | null
+          city: string
+          completion_status?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          description?: string | null
+          expected_roi?: number | null
+          floors?: number | null
+          id?: string
+          images?: string[]
+          land_area_sqm?: number | null
+          latitude?: number | null
+          longitude?: number | null
+          municipality?: string | null
+          project_type?: string
+          published?: boolean
+          title: string
+          total_price?: number | null
+          units_count?: number | null
+          updated_at?: string
+          year_built?: number | null
+        }
+        Update: {
+          address?: string
+          amenities?: string[]
+          bathrooms?: number | null
+          bedrooms?: number | null
+          built_area_sqm?: number | null
+          city?: string
+          completion_status?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          expected_roi?: number | null
+          floors?: number | null
+          id?: string
+          images?: string[]
+          land_area_sqm?: number | null
+          latitude?: number | null
+          longitude?: number | null
+          municipality?: string | null
+          project_type?: string
+          published?: boolean
+          title?: string
+          total_price?: number | null
+          units_count?: number | null
+          updated_at?: string
+          year_built?: number | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
@@ -657,6 +744,7 @@ export type Database = {
           floors: number | null
           id: string
           images: string[] | null
+          investment_worthy: boolean
           last_renovated: number | null
           latitude: number | null
           listing_type: Database["public"]["Enums"]["listing_type"]
@@ -691,6 +779,7 @@ export type Database = {
           floors?: number | null
           id?: string
           images?: string[] | null
+          investment_worthy?: boolean
           last_renovated?: number | null
           latitude?: number | null
           listing_type: Database["public"]["Enums"]["listing_type"]
@@ -725,6 +814,7 @@ export type Database = {
           floors?: number | null
           id?: string
           images?: string[] | null
+          investment_worthy?: boolean
           last_renovated?: number | null
           latitude?: number | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
