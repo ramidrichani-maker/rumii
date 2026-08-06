@@ -134,14 +134,14 @@ export const Navbar = () => {
             </Link>
             <span className="hidden md:inline-block text-foreground/30 text-lg font-light leading-none select-none pb-0.5">|</span>
             {profile?.role !== 'customer_support' ? (
-              <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
+            <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <div
                   className="relative"
                   onMouseEnter={() => openMenu('properties')}
                   onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'properties' ? null : 'properties')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Properties</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Properties</Button>
                 </div>
                 <div
                   className="relative"
@@ -149,7 +149,7 @@ export const Navbar = () => {
                   onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'services' ? null : 'services')}
                 >
-                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Services</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Services</Button>
                 </div>
               </nav>
             ) : (
@@ -218,40 +218,41 @@ export const Navbar = () => {
             top: '100%',
             marginTop: '-10px',
             paddingTop: '10px',
-            height: '120px',
+            height: 'auto',
+            minHeight: '120px',
           }}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
         >
-          <div className="w-full h-full flex items-center justify-center gap-8 px-4">
+          <div className="w-full h-full flex flex-col items-start justify-start gap-1 px-6 py-4">
             {activeMenu === 'properties' && (
               <>
-                <Link to="/purchase" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/purchase" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Buy
                 </Link>
-                <Link to="/rent" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/rent" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Rent
                 </Link>
-                <Link to="/purchase?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/purchase?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Commercial sale
                 </Link>
-                <Link to="/rent?type=commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/rent?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Commercial rent
                 </Link>
-                <Link to="/purchase?type=land" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/purchase?type=land" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Land
                 </Link>
               </>
             )}
             {activeMenu === 'services' && (
               <>
-                <Link to="/find-agents" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/find-agents" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Find agents
                 </Link>
-                <Link to="/agent-valuation" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Property valuation request
                 </Link>
-                <Link to="/advertise-commercial" onClick={closeMenu} className="px-4 py-3 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors">
+                <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Advertise commercial property
                 </Link>
               </>
