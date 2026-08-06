@@ -17,6 +17,8 @@ import PendingMediaApproval from "@/components/PendingMediaApproval";
 import { PropertyDeleteDialog } from "@/components/PropertyDeleteDialog";
 import AccountPropertiesView from "@/components/AccountPropertiesView";
 import FeaturedListingsManager from "@/components/FeaturedListingsManager";
+import { InvestmentWorthyManager } from "@/components/InvestmentWorthyManager";
+import { InvestmentProjectsManager } from "@/components/InvestmentProjectsManager";
 import PhotographyRequestsManager from "@/components/PhotographyRequestsManager";
 import { AgencyManager } from "@/components/AgencyManager";
 import FeatureRequestsManager from "@/components/FeatureRequestsManager";
@@ -613,6 +615,23 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
             </Tabs>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Row 1.3: Investment Properties */}
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+              <TrendingUp className="w-5 h-5" />
+              Investment Properties
+            </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="space-y-6">
+              <InvestmentWorthyManager />
+              <InvestmentProjectsManager />
+            </div>
           </CollapsibleContent>
         </Collapsible>
 
