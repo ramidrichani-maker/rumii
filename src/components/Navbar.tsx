@@ -118,7 +118,7 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-  return <nav ref={navRef} className="relative border-b bg-background" style={{ zIndex: 50, overflow: 'visible' }}>
+  return <nav ref={navRef} className="relative border-b bg-background" style={{ zIndex: 9990, overflow: 'visible' }}>
       <div className="container mx-auto px-4 py-3 bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
