@@ -294,9 +294,29 @@ export const InvestmentProjectsManager = () => {
                   <p className="text-sm font-semibold">
                     {p.total_price ? `${p.currency} ${Number(p.total_price).toLocaleString()}` : "Price on request"}
                   </p>
+                  <p className="text-xs text-muted-foreground">
+                    {p.floors ? `${p.floors} floors` : "—"}{p.units_count ? ` · ${p.units_count} apartments` : ""}
+                  </p>
+                  {p.total_price ? (
+                    <div className="space-y-1">
+                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full bg-primary"
+                          style={{ width: `${Math.min(100, (Number(p.invested_amount || 0) / Number(p.total_price)) * 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Invested {p.currency} {Number(p.invested_amount || 0).toLocaleString()} · Available {p.currency} {Math.max(0, Number(p.total_price) - Number(p.invested_amount || 0)).toLocaleString()}
+                      </p>
+                    </div>
+                  ) : null}
                   <div className="flex gap-1 pt-1">
                     <Button size="sm" variant="ghost" onClick={() => openEdit(p)}>
                       <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => openRequests(p)}>
+                      <Users className="h-4 w-4 mr-1" />
+                      <span className="text-xs">{requestCounts[p.id] || 0}</span>
                     </Button>
                     <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(p)}>
                       <Trash2 className="h-4 w-4" />
@@ -402,6 +422,16 @@ export const InvestmentProjectsManager = () => {
               <Label>Expected ROI (%)</Label>
               <Input type="number" value={form.expected_roi} onChange={(e) => setForm({ ...form, expected_roi: e.target.value })} />
             </div>
+            <div>
+              <Label>Amount invested so far</Label>
+              <Input type="number" value={form.invested_amount} onChange={(e) => setForm({ ...form, invested_amount: e.target.value })} />
+            </div>
+            {form.total_price.trim() !== "" && (
+              <div className="sm:col-span-2 rounded-md border bg-muted/30 p-3 text-sm">
+                <span className="font-medium">Still available: </span>
+                {form.currency} {Math.max(0, Number(form.total_price || 0) - Number(form.invested_amount || 0)).toLocaleString()}
+              </div>
+            )}
             <div className="sm:col-span-2">
               <Label>Amenities (comma separated)</Label>
               <Input value={form.amenities} onChange={(e) => setForm({ ...form, amenities: e.target.value })} maxLength={500} />
