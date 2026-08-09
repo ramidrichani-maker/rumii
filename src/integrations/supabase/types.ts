@@ -432,6 +432,7 @@ export type Database = {
           floors: number | null
           id: string
           images: string[]
+          invested_amount: number
           land_area_sqm: number | null
           latitude: number | null
           longitude: number | null
@@ -460,6 +461,7 @@ export type Database = {
           floors?: number | null
           id?: string
           images?: string[]
+          invested_amount?: number
           land_area_sqm?: number | null
           latitude?: number | null
           longitude?: number | null
@@ -488,6 +490,7 @@ export type Database = {
           floors?: number | null
           id?: string
           images?: string[]
+          invested_amount?: number
           land_area_sqm?: number | null
           latitude?: number | null
           longitude?: number | null
@@ -501,6 +504,59 @@ export type Database = {
           year_built?: number | null
         }
         Relationships: []
+      }
+      investment_requests: {
+        Row: {
+          admin_notes: string | null
+          amount: number | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone_number: string
+          project_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount?: number | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone_number: string
+          project_id: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone_number?: string
+          project_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "investment_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {

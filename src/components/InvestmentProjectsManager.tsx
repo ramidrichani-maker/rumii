@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Plus, Pencil, Trash2, X, Loader2, ImagePlus } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Loader2, ImagePlus, Users } from "lucide-react";
 
 const PROJECT_TYPES = ["building", "compound", "villa", "venue"] as const;
 const COMPLETION_STATUSES = ["planning", "under construction", "completed"] as const;
@@ -35,9 +35,22 @@ interface Project {
   year_built: number | null;
   completion_status: string | null;
   expected_roi: number | null;
+  invested_amount: number;
   amenities: string[];
   images: string[];
   published: boolean;
+  created_at: string;
+}
+
+interface InvestmentRequest {
+  id: string;
+  project_id: string;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  amount: number | null;
+  message: string | null;
+  status: string;
   created_at: string;
 }
 
@@ -59,6 +72,7 @@ const emptyForm = {
   year_built: "",
   completion_status: "planning",
   expected_roi: "",
+  invested_amount: "",
   amenities: "",
   published: true,
 };
@@ -75,6 +89,11 @@ export const InvestmentProjectsManager = () => {
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [requestsOpen, setRequestsOpen] = useState(false);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [requests, setRequests] = useState<InvestmentRequest[]>([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [requestCounts, setRequestCounts] = useState<Record<string, number>>({});
 
   const load = async () => {
     setIsLoading(true);
@@ -86,8 +105,37 @@ export const InvestmentProjectsManager = () => {
       toast({ title: "Error", description: "Failed to load projects", variant: "destructive" });
     } else {
       setProjects((data || []) as unknown as Project[]);
+      const { data: reqs } = await supabase.from("investment_requests").select("project_id");
+      const counts: Record<string, number> = {};
+      (reqs || []).forEach((r: any) => { counts[r.project_id] = (counts[r.project_id] || 0) + 1; });
+      setRequestCounts(counts);
     }
     setIsLoading(false);
+  };
+
+  const openRequests = async (p: Project) => {
+    setActiveProject(p);
+    setRequestsOpen(true);
+    setRequestsLoading(true);
+    const { data, error } = await supabase
+      .from("investment_requests")
+      .select("*")
+      .eq("project_id", p.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      toast({ title: "Error", description: "Failed to load requests", variant: "destructive" });
+    }
+    setRequests((data || []) as unknown as InvestmentRequest[]);
+    setRequestsLoading(false);
+  };
+
+  const setRequestStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from("investment_requests").update({ status }).eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: "Could not update request", variant: "destructive" });
+      return;
+    }
+    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
   };
 
   useEffect(() => { load(); }, []);
@@ -119,6 +167,7 @@ export const InvestmentProjectsManager = () => {
       year_built: p.year_built?.toString() || "",
       completion_status: p.completion_status || "planning",
       expected_roi: p.expected_roi?.toString() || "",
+      invested_amount: p.invested_amount?.toString() || "",
       amenities: (p.amenities || []).join(", "),
       published: p.published,
     });
@@ -177,6 +226,7 @@ export const InvestmentProjectsManager = () => {
       year_built: num(form.year_built),
       completion_status: form.completion_status,
       expected_roi: num(form.expected_roi),
+      invested_amount: num(form.invested_amount) ?? 0,
       amenities: form.amenities.split(",").map((a) => a.trim()).filter(Boolean),
       images,
       published: form.published,
@@ -244,9 +294,29 @@ export const InvestmentProjectsManager = () => {
                   <p className="text-sm font-semibold">
                     {p.total_price ? `${p.currency} ${Number(p.total_price).toLocaleString()}` : "Price on request"}
                   </p>
+                  <p className="text-xs text-muted-foreground">
+                    {p.floors ? `${p.floors} floors` : "—"}{p.units_count ? ` · ${p.units_count} apartments` : ""}
+                  </p>
+                  {p.total_price ? (
+                    <div className="space-y-1">
+                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full bg-primary"
+                          style={{ width: `${Math.min(100, (Number(p.invested_amount || 0) / Number(p.total_price)) * 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Invested {p.currency} {Number(p.invested_amount || 0).toLocaleString()} · Available {p.currency} {Math.max(0, Number(p.total_price) - Number(p.invested_amount || 0)).toLocaleString()}
+                      </p>
+                    </div>
+                  ) : null}
                   <div className="flex gap-1 pt-1">
                     <Button size="sm" variant="ghost" onClick={() => openEdit(p)}>
                       <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => openRequests(p)}>
+                      <Users className="h-4 w-4 mr-1" />
+                      <span className="text-xs">{requestCounts[p.id] || 0}</span>
                     </Button>
                     <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(p)}>
                       <Trash2 className="h-4 w-4" />
@@ -352,6 +422,16 @@ export const InvestmentProjectsManager = () => {
               <Label>Expected ROI (%)</Label>
               <Input type="number" value={form.expected_roi} onChange={(e) => setForm({ ...form, expected_roi: e.target.value })} />
             </div>
+            <div>
+              <Label>Amount invested so far</Label>
+              <Input type="number" value={form.invested_amount} onChange={(e) => setForm({ ...form, invested_amount: e.target.value })} />
+            </div>
+            {form.total_price.trim() !== "" && (
+              <div className="sm:col-span-2 rounded-md border bg-muted/30 p-3 text-sm">
+                <span className="font-medium">Still available: </span>
+                {form.currency} {Math.max(0, Number(form.total_price || 0) - Number(form.invested_amount || 0)).toLocaleString()}
+              </div>
+            )}
             <div className="sm:col-span-2">
               <Label>Amenities (comma separated)</Label>
               <Input value={form.amenities} onChange={(e) => setForm({ ...form, amenities: e.target.value })} maxLength={500} />
@@ -396,6 +476,45 @@ export const InvestmentProjectsManager = () => {
               {saving ? "Saving..." : editingId ? "Save changes" : "Create project"}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={requestsOpen} onOpenChange={setRequestsOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Investment requests</DialogTitle>
+            <DialogDescription>{activeProject?.title}</DialogDescription>
+          </DialogHeader>
+          {requestsLoading ? (
+            <div className="py-8 text-center text-muted-foreground">Loading requests...</div>
+          ) : requests.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">No investment requests yet</div>
+          ) : (
+            <div className="space-y-3">
+              {requests.map((r) => (
+                <div key={r.id} className="rounded-lg border p-3 space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-medium">{r.full_name}</p>
+                    <Badge variant={r.status === "accepted" ? "default" : r.status === "rejected" ? "destructive" : "secondary"} className="capitalize">
+                      {r.status}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{r.email} · {r.phone_number}</p>
+                  {r.amount != null && (
+                    <p className="text-sm font-semibold">
+                      Wants to invest: {activeProject?.currency} {Number(r.amount).toLocaleString()}
+                    </p>
+                  )}
+                  {r.message && <p className="text-sm">{r.message}</p>}
+                  <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</p>
+                  <div className="flex gap-2 pt-1">
+                    <Button size="sm" variant="outline" onClick={() => setRequestStatus(r.id, "accepted")}>Accept</Button>
+                    <Button size="sm" variant="outline" onClick={() => setRequestStatus(r.id, "rejected")}>Reject</Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </Card>
