@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Plus, Pencil, Trash2, X, Loader2, ImagePlus } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Loader2, ImagePlus, Users } from "lucide-react";
 
 const PROJECT_TYPES = ["building", "compound", "villa", "venue"] as const;
 const COMPLETION_STATUSES = ["planning", "under construction", "completed"] as const;
@@ -35,9 +35,22 @@ interface Project {
   year_built: number | null;
   completion_status: string | null;
   expected_roi: number | null;
+  invested_amount: number;
   amenities: string[];
   images: string[];
   published: boolean;
+  created_at: string;
+}
+
+interface InvestmentRequest {
+  id: string;
+  project_id: string;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  amount: number | null;
+  message: string | null;
+  status: string;
   created_at: string;
 }
 
@@ -59,6 +72,7 @@ const emptyForm = {
   year_built: "",
   completion_status: "planning",
   expected_roi: "",
+  invested_amount: "",
   amenities: "",
   published: true,
 };
@@ -75,6 +89,11 @@ export const InvestmentProjectsManager = () => {
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [requestsOpen, setRequestsOpen] = useState(false);
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [requests, setRequests] = useState<InvestmentRequest[]>([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [requestCounts, setRequestCounts] = useState<Record<string, number>>({});
 
   const load = async () => {
     setIsLoading(true);
@@ -86,8 +105,37 @@ export const InvestmentProjectsManager = () => {
       toast({ title: "Error", description: "Failed to load projects", variant: "destructive" });
     } else {
       setProjects((data || []) as unknown as Project[]);
+      const { data: reqs } = await supabase.from("investment_requests").select("project_id");
+      const counts: Record<string, number> = {};
+      (reqs || []).forEach((r: any) => { counts[r.project_id] = (counts[r.project_id] || 0) + 1; });
+      setRequestCounts(counts);
     }
     setIsLoading(false);
+  };
+
+  const openRequests = async (p: Project) => {
+    setActiveProject(p);
+    setRequestsOpen(true);
+    setRequestsLoading(true);
+    const { data, error } = await supabase
+      .from("investment_requests")
+      .select("*")
+      .eq("project_id", p.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      toast({ title: "Error", description: "Failed to load requests", variant: "destructive" });
+    }
+    setRequests((data || []) as unknown as InvestmentRequest[]);
+    setRequestsLoading(false);
+  };
+
+  const setRequestStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from("investment_requests").update({ status }).eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: "Could not update request", variant: "destructive" });
+      return;
+    }
+    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
   };
 
   useEffect(() => { load(); }, []);
@@ -119,6 +167,7 @@ export const InvestmentProjectsManager = () => {
       year_built: p.year_built?.toString() || "",
       completion_status: p.completion_status || "planning",
       expected_roi: p.expected_roi?.toString() || "",
+      invested_amount: p.invested_amount?.toString() || "",
       amenities: (p.amenities || []).join(", "),
       published: p.published,
     });
@@ -177,6 +226,7 @@ export const InvestmentProjectsManager = () => {
       year_built: num(form.year_built),
       completion_status: form.completion_status,
       expected_roi: num(form.expected_roi),
+      invested_amount: num(form.invested_amount) ?? 0,
       amenities: form.amenities.split(",").map((a) => a.trim()).filter(Boolean),
       images,
       published: form.published,
