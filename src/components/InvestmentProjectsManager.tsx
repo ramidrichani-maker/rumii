@@ -478,6 +478,45 @@ export const InvestmentProjectsManager = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={requestsOpen} onOpenChange={setRequestsOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Investment requests</DialogTitle>
+            <DialogDescription>{activeProject?.title}</DialogDescription>
+          </DialogHeader>
+          {requestsLoading ? (
+            <div className="py-8 text-center text-muted-foreground">Loading requests...</div>
+          ) : requests.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">No investment requests yet</div>
+          ) : (
+            <div className="space-y-3">
+              {requests.map((r) => (
+                <div key={r.id} className="rounded-lg border p-3 space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-medium">{r.full_name}</p>
+                    <Badge variant={r.status === "accepted" ? "default" : r.status === "rejected" ? "destructive" : "secondary"} className="capitalize">
+                      {r.status}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{r.email} · {r.phone_number}</p>
+                  {r.amount != null && (
+                    <p className="text-sm font-semibold">
+                      Wants to invest: {activeProject?.currency} {Number(r.amount).toLocaleString()}
+                    </p>
+                  )}
+                  {r.message && <p className="text-sm">{r.message}</p>}
+                  <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</p>
+                  <div className="flex gap-2 pt-1">
+                    <Button size="sm" variant="outline" onClick={() => setRequestStatus(r.id, "accepted")}>Accept</Button>
+                    <Button size="sm" variant="outline" onClick={() => setRequestStatus(r.id, "rejected")}>Reject</Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
