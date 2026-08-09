@@ -58,6 +58,15 @@ const AdminDashboard = () => {
   
   const { user, profile, loading: authLoading } = useAuth();
 
+  useEffect(() => {
+    if (!user || !profile || profile.role !== 'admin') return;
+    loadPendingProperties();
+    loadUsers();
+    loadAgents();
+    loadViewings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, profile]);
+
   if (authLoading) return null;
   if (!user) return <Navigate to="/auth" replace />;
   if (!profile) return null;
