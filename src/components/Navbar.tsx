@@ -250,7 +250,10 @@ export const Navbar = () => {
                   Find agents
                 </Link>
                 <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
-                  Property valuation request
+                  Property valuation
+                </Link>
+                <Link to="/investment-consulting" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
+                  Investment consulting
                 </Link>
                 <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
                   Advertise commercial property
@@ -322,7 +325,10 @@ export const Navbar = () => {
                       Find agents
                     </Link>
                     <Link to="/agent-valuation" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
-                      Property valuation request
+                      Property valuation
+                    </Link>
+                    <Link to="/investment-consulting" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
+                      Investment consulting
                     </Link>
                     <Link to="/advertise-commercial" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Advertise commercial property
