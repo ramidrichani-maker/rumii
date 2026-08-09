@@ -218,15 +218,6 @@ const AdminDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    if (!user) return;
-    loadPendingProperties();
-    loadUsers();
-    loadAgents();
-    loadViewings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
-
   const handleApproveProperty = async (propertyId: string) => {
     try {
       const { error } = await supabase
