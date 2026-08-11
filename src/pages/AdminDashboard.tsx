@@ -29,6 +29,7 @@ import { BulkPropertyImport } from "@/components/BulkPropertyImport";
 import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
 import { AdminPropertyListingsManager } from "@/components/AdminPropertyListingsManager";
 import ValuationRequestsManager from "@/components/ValuationRequestsManager";
+import InteriorDesignRequestsManager from "@/components/InteriorDesignRequestsManager";
 import FindAgentRequestsManager from "@/components/FindAgentRequestsManager";
 import CommercialAdvertisementsManager from "@/components/CommercialAdvertisementsManager";
 import EmailBroadcastManager from "@/components/EmailBroadcastManager";
