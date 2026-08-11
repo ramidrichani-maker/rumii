@@ -36,6 +36,7 @@ import MyOracle from "./pages/MyOracle";
 import AccountSettings from "./pages/AccountSettings";
 import AdvertiseCommercial from "./pages/AdvertiseCommercial";
 import InvestmentConsulting from "./pages/InvestmentConsulting";
+import RequestInteriorDesign from "./pages/RequestInteriorDesign";
 
 import { SupportReviewWidget } from "./components/SupportReviewWidget";
 
@@ -96,6 +97,7 @@ const AppRoutes = () => {
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/advertise-commercial" element={<AdvertiseCommercial />} />
           <Route path="/investment-consulting" element={<InvestmentConsulting />} />
+          <Route path="/request-interior-design" element={<RequestInteriorDesign />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
