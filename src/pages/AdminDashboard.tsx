@@ -29,6 +29,7 @@ import { BulkPropertyImport } from "@/components/BulkPropertyImport";
 import AdminAIRoomDesigner from "@/components/AdminAIRoomDesigner";
 import { AdminPropertyListingsManager } from "@/components/AdminPropertyListingsManager";
 import ValuationRequestsManager from "@/components/ValuationRequestsManager";
+import InteriorDesignRequestsManager from "@/components/InteriorDesignRequestsManager";
 import FindAgentRequestsManager from "@/components/FindAgentRequestsManager";
 import CommercialAdvertisementsManager from "@/components/CommercialAdvertisementsManager";
 import EmailBroadcastManager from "@/components/EmailBroadcastManager";
@@ -611,6 +612,22 @@ const AdminDashboard = () => {
                 </Card>
               </TabsContent>
             </Tabs>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Row 1.6: Interior Design Requests */}
+        <Collapsible className="mb-8 group/section">
+          <CollapsibleTrigger className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+              <ClipboardCheck className="w-5 h-5" />
+              Interior Design Requests
+            </h2>
+            <ChevronDown className="w-5 h-5 transition-transform group-data-[state=open]/section:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="max-h-[500px] overflow-y-auto">
+              <InteriorDesignRequestsManager />
+            </div>
           </CollapsibleContent>
         </Collapsible>
 
