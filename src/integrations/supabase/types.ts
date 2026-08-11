@@ -415,6 +415,75 @@ export type Database = {
           },
         ]
       }
+      interior_design_requests: {
+        Row: {
+          admin_notes: string | null
+          city: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          municipality: string | null
+          notes: string | null
+          phone_number: string
+          preferred_date: string | null
+          preferred_time: string | null
+          property_address: string
+          property_size_sqm: number | null
+          property_type: string
+          rescheduled_date: string | null
+          rescheduled_time: string | null
+          rooms_count: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          city: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          municipality?: string | null
+          notes?: string | null
+          phone_number: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          property_address: string
+          property_size_sqm?: number | null
+          property_type: string
+          rescheduled_date?: string | null
+          rescheduled_time?: string | null
+          rooms_count?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          city?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          municipality?: string | null
+          notes?: string | null
+          phone_number?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          property_address?: string
+          property_size_sqm?: number | null
+          property_type?: string
+          rescheduled_date?: string | null
+          rescheduled_time?: string | null
+          rooms_count?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       investment_projects: {
         Row: {
           address: string
