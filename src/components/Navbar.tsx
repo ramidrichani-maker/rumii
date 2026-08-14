@@ -137,16 +137,12 @@ export const Navbar = () => {
             <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <div
                   className="relative"
-                  onMouseEnter={() => openMenu('properties')}
-                  onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'properties' ? null : 'properties')}
                 >
                   <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Properties</Button>
                 </div>
                 <div
                   className="relative"
-                  onMouseEnter={() => openMenu('services')}
-                  onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'services' ? null : 'services')}
                 >
                   <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Services</Button>
