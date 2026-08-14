@@ -219,14 +219,14 @@ export const Navbar = () => {
             left: '0',
             width: '100vw',
             height: 'auto',
-            minHeight: '120px',
+            minHeight: '252px',
             borderRadius: '0 0 8px 8px',
             overflow: 'hidden',
           }}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
         >
-          <div className="w-full h-full flex flex-col items-start justify-start gap-1 px-6 py-4">
+          <div className="w-full h-full flex flex-col items-start justify-start gap-3 px-6 py-6">
             {activeMenu === 'properties' && (
               <>
                 <Link to="/purchase" onClick={closeMenu} className="w-full text-left px-4 py-2 rounded-md text-sm font-['Arial',sans-serif] font-light text-foreground hover:bg-accent transition-colors">
