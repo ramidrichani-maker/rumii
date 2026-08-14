@@ -211,15 +211,17 @@ export const Navbar = () => {
       {/* Mega Menus */}
       {activeMenu && (
         <div
-          className="absolute left-0 right-0 border-b border-border shadow-lg"
+          className="absolute border-b border-border shadow-lg animate-mega-menu-slide"
           style={{ 
             zIndex: 9001, 
             backgroundColor: '#f0f0f0',
             top: '100%',
-            marginTop: '-10px',
-            paddingTop: '10px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '80vw',
             height: 'auto',
             minHeight: '120px',
+            borderRadius: '0 0 8px 8px',
           }}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
