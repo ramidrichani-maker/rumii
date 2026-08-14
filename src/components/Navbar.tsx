@@ -214,8 +214,7 @@ export const Navbar = () => {
             top: '100%',
             left: '0',
             width: '100vw',
-            height: 'auto',
-            minHeight: '378px',
+            height: '80vh',
             borderRadius: '0 0 8px 8px',
             overflow: 'hidden',
           }}
