@@ -215,12 +215,10 @@ export const Navbar = () => {
             left: '0',
             width: '100vw',
             height: 'auto',
-            minHeight: '252px',
+            minHeight: '378px',
             borderRadius: '0 0 8px 8px',
             overflow: 'hidden',
           }}
-          onMouseEnter={cancelClose}
-          onMouseLeave={scheduleClose}
         >
           <div className="w-full h-full flex flex-col items-start justify-start gap-3 px-6 py-6">
             {activeMenu === 'properties' && (
