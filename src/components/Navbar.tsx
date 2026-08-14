@@ -137,16 +137,12 @@ export const Navbar = () => {
             <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <div
                   className="relative"
-                  onMouseEnter={() => openMenu('properties')}
-                  onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'properties' ? null : 'properties')}
                 >
                   <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Properties</Button>
                 </div>
                 <div
                   className="relative"
-                  onMouseEnter={() => openMenu('services')}
-                  onMouseLeave={scheduleClose}
                   onClick={() => setActiveMenu(prev => prev === 'services' ? null : 'services')}
                 >
                   <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide">Services</Button>
@@ -219,12 +215,10 @@ export const Navbar = () => {
             left: '0',
             width: '100vw',
             height: 'auto',
-            minHeight: '252px',
+            minHeight: '378px',
             borderRadius: '0 0 8px 8px',
             overflow: 'hidden',
           }}
-          onMouseEnter={cancelClose}
-          onMouseLeave={scheduleClose}
         >
           <div className="w-full h-full flex flex-col items-start justify-start gap-3 px-6 py-6">
             {activeMenu === 'properties' && (
