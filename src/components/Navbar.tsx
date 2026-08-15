@@ -15,26 +15,32 @@ export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<'properties' | 'services' | null>(null);
+  const [closingMenu, setClosingMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const menuCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const openMenu = (menu: 'properties' | 'services') => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+  const openMenuImmediate = (menu: 'properties' | 'services') => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setClosingMenu(false);
     setActiveMenu(menu);
   };
 
-  const scheduleClose = () => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
-    menuCloseTimeout.current = setTimeout(() => setActiveMenu(null), 150);
-  };
-
-  const cancelClose = () => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
-  };
-
   const closeMenu = () => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
-    setActiveMenu(null);
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    if (!activeMenu || closingMenu) return;
+    setClosingMenu(true);
+    closeTimer.current = setTimeout(() => {
+      setActiveMenu(null);
+      setClosingMenu(false);
+    }, 350);
+  };
+
+  const toggleMenu = (menu: 'properties' | 'services') => {
+    if (activeMenu === menu && !closingMenu) {
+      closeMenu();
+    } else {
+      openMenuImmediate(menu);
+    }
   };
 
   // Close dropdown on click outside (replaces backdrop overlay that caused flickering)
