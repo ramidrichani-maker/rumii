@@ -1070,6 +1070,15 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
         </div>
       )}
 
+      {viewingProperties && (
+        <Button
+          onClick={() => setAreaPage(areaPage === 'rent' ? 'purchase' : 'rent')}
+          className="absolute bottom-6 right-4 z-10 shadow-lg"
+        >
+          {areaPage === 'rent' ? 'Properties for sale' : 'Rental properties'}
+        </Button>
+      )}
+
       {/* Property popup card */}
       {selectedProp && (
         <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 w-[92vw] max-w-sm">
