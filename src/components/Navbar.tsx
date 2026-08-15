@@ -213,7 +213,7 @@ export const Navbar = () => {
       {/* Mega Menus */}
       {activeMenu && (
         <div
-          className="absolute border-b border-border shadow-xl animate-mega-menu-slide"
+          className={`absolute border-b border-border shadow-xl ${closingMenu ? 'animate-mega-menu-slide-up' : 'animate-mega-menu-slide'}`}
           style={{ 
             zIndex: 9001, 
             backgroundColor: '#ffffff',
@@ -223,6 +223,9 @@ export const Navbar = () => {
             height: '80vh',
             borderRadius: '0 0 8px 8px',
             overflow: 'hidden',
+            willChange: 'transform, opacity',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
           }}
         >
           <div className="w-full h-full flex flex-col items-start justify-start gap-0.5 px-6 py-4">
