@@ -15,26 +15,32 @@ export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<'properties' | 'services' | null>(null);
+  const [closingMenu, setClosingMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const menuCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const openMenu = (menu: 'properties' | 'services') => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
+  const openMenuImmediate = (menu: 'properties' | 'services') => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setClosingMenu(false);
     setActiveMenu(menu);
   };
 
-  const scheduleClose = () => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
-    menuCloseTimeout.current = setTimeout(() => setActiveMenu(null), 150);
-  };
-
-  const cancelClose = () => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
-  };
-
   const closeMenu = () => {
-    if (menuCloseTimeout.current) clearTimeout(menuCloseTimeout.current);
-    setActiveMenu(null);
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    if (!activeMenu || closingMenu) return;
+    setClosingMenu(true);
+    closeTimer.current = setTimeout(() => {
+      setActiveMenu(null);
+      setClosingMenu(false);
+    }, 350);
+  };
+
+  const toggleMenu = (menu: 'properties' | 'services') => {
+    if (activeMenu === menu && !closingMenu) {
+      closeMenu();
+    } else {
+      openMenuImmediate(menu);
+    }
   };
 
   // Close dropdown on click outside (replaces backdrop overlay that caused flickering)
@@ -137,15 +143,15 @@ export const Navbar = () => {
             <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <div
                   className="relative"
-                  onClick={() => setActiveMenu(prev => prev === 'properties' ? null : 'properties')}
+                  onClick={() => toggleMenu('properties')}
                 >
-                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'properties' ? 'underline underline-offset-4 decoration-2' : ''}`}>Properties</Button>
+                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'properties' && !closingMenu ? 'underline underline-offset-4 decoration-2' : ''}`}>Properties</Button>
                 </div>
                 <div
                   className="relative"
-                  onClick={() => setActiveMenu(prev => prev === 'services' ? null : 'services')}
+                  onClick={() => toggleMenu('services')}
                 >
-                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'services' ? 'underline underline-offset-4 decoration-2' : ''}`}>Services</Button>
+                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'services' && !closingMenu ? 'underline underline-offset-4 decoration-2' : ''}`}>Services</Button>
                 </div>
               </nav>
             ) : (
@@ -207,7 +213,7 @@ export const Navbar = () => {
       {/* Mega Menus */}
       {activeMenu && (
         <div
-          className="absolute border-b border-border shadow-xl animate-mega-menu-slide"
+          className={`absolute border-b border-border shadow-xl ${closingMenu ? 'animate-mega-menu-slide-up' : 'animate-mega-menu-slide'}`}
           style={{ 
             zIndex: 9001, 
             backgroundColor: '#ffffff',
@@ -217,6 +223,9 @@ export const Navbar = () => {
             height: '80vh',
             borderRadius: '0 0 8px 8px',
             overflow: 'hidden',
+            willChange: 'transform, opacity',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
           }}
         >
           <div className="w-full h-full flex flex-col items-start justify-start gap-0.5 px-6 py-4">
