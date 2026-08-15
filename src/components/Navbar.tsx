@@ -19,8 +19,8 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const megaNavRef = useRef<HTMLElement>(null);
-  const propertiesBtnRef = useRef<HTMLButtonElement>(null);
-  const servicesBtnRef = useRef<HTMLButtonElement>(null);
+  const propertiesTextRef = useRef<HTMLSpanElement>(null);
+  const servicesTextRef = useRef<HTMLSpanElement>(null);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0, top: 0, opacity: 0 });
 
 
@@ -64,17 +64,17 @@ export const Navbar = () => {
   useEffect(() => {
     const measure = () => {
       const nav = megaNavRef.current;
-      const btn = activeMenu === 'properties' ? propertiesBtnRef.current : servicesBtnRef.current;
-      if (!nav || !btn || !activeMenu || closingMenu) {
+      const txt = activeMenu === 'properties' ? propertiesTextRef.current : servicesTextRef.current;
+      if (!nav || !txt || !activeMenu || closingMenu) {
         setUnderlineStyle(s => ({ ...s, opacity: 0 }));
         return;
       }
       const navRect = nav.getBoundingClientRect();
-      const btnRect = btn.getBoundingClientRect();
+      const txtRect = txt.getBoundingClientRect();
       setUnderlineStyle({
-        left: btnRect.left - navRect.left,
-        width: btnRect.width,
-        top: btnRect.bottom - navRect.top - 1,
+        left: txtRect.left - navRect.left,
+        width: txtRect.width,
+        top: txtRect.bottom - navRect.top - 1,
         opacity: 1,
       });
     };
@@ -171,10 +171,10 @@ export const Navbar = () => {
             {profile?.role !== 'customer_support' ? (
             <nav ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
                 <div onClick={() => toggleMenu('properties')}>
-                  <Button ref={propertiesBtnRef} variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent">Properties</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
                 </div>
                 <div onClick={() => toggleMenu('services')}>
-                  <Button ref={servicesBtnRef} variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent">Services</Button>
+                  <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
                 </div>
                 <span className="absolute h-0.5 bg-foreground pointer-events-none transition-all duration-300 ease-out" style={{ left: underlineStyle.left, width: underlineStyle.width, top: underlineStyle.top, opacity: underlineStyle.opacity }} />
               </nav>
