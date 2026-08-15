@@ -18,6 +18,11 @@ export const Navbar = () => {
   const [closingMenu, setClosingMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const megaNavRef = useRef<HTMLElement>(null);
+  const propertiesBtnRef = useRef<HTMLButtonElement>(null);
+  const servicesBtnRef = useRef<HTMLButtonElement>(null);
+  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0, top: 0, opacity: 0 });
+
 
   const openMenuImmediate = (menu: 'properties' | 'services') => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
@@ -54,6 +59,30 @@ export const Navbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [activeMenu]);
+
+  // Measure & animate the sliding underline under the active menu button
+  useEffect(() => {
+    const measure = () => {
+      const nav = megaNavRef.current;
+      const btn = activeMenu === 'properties' ? propertiesBtnRef.current : servicesBtnRef.current;
+      if (!nav || !btn || !activeMenu || closingMenu) {
+        setUnderlineStyle(s => ({ ...s, opacity: 0 }));
+        return;
+      }
+      const navRect = nav.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      setUnderlineStyle({
+        left: btnRect.left - navRect.left,
+        width: btnRect.width,
+        top: btnRect.bottom - navRect.top - 1,
+        opacity: 1,
+      });
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [activeMenu, closingMenu]);
+
   const navRef = useRef<HTMLElement>(null);
   const auth = useAuth();
   const navigate = useNavigate();
@@ -140,19 +169,14 @@ export const Navbar = () => {
             </Link>
             <span className="hidden md:inline-block text-foreground/30 text-lg font-light leading-none select-none pb-0.5">|</span>
             {profile?.role !== 'customer_support' ? (
-            <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
-                <div
-                  className="relative"
-                  onClick={() => toggleMenu('properties')}
-                >
-                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'properties' && !closingMenu ? 'underline underline-offset-4 decoration-2' : ''}`}>Properties</Button>
+            <nav ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
+                <div onClick={() => toggleMenu('properties')}>
+                  <Button ref={propertiesBtnRef} variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent">Properties</Button>
                 </div>
-                <div
-                  className="relative"
-                  onClick={() => toggleMenu('services')}
-                >
-                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'services' && !closingMenu ? 'underline underline-offset-4 decoration-2' : ''}`}>Services</Button>
+                <div onClick={() => toggleMenu('services')}>
+                  <Button ref={servicesBtnRef} variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent">Services</Button>
                 </div>
+                <span className="absolute h-0.5 bg-foreground pointer-events-none transition-all duration-300 ease-out" style={{ left: underlineStyle.left, width: underlineStyle.width, top: underlineStyle.top, opacity: underlineStyle.opacity }} />
               </nav>
             ) : (
               <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
@@ -228,58 +252,55 @@ export const Navbar = () => {
             backfaceVisibility: 'hidden',
           }}
         >
-          <div className="w-full h-full flex flex-col items-start justify-start gap-0.5 px-6 py-4">
-            <div className="w-full text-center mb-3">
-              {activeMenu === 'properties' ? (
+          <div className="w-full h-full flex" style={{ transform: activeMenu === 'services' ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
+            {/* Properties panel */}
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0.5 px-6 py-4">
+              <div className="w-full text-center mb-3">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Properties</span>
                 </h2>
-              ) : (
+              </div>
+              <Link to="/purchase" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Buy
+              </Link>
+              <Link to="/rent" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Rent
+              </Link>
+              <Link to="/purchase?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Commercial sale
+              </Link>
+              <Link to="/rent?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Commercial rent
+              </Link>
+              <Link to="/purchase?type=land" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Land
+              </Link>
+            </div>
+            {/* Services panel */}
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0.5 px-6 py-4">
+              <div className="w-full text-center mb-3">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Services</span>
                 </h2>
-              )}
+              </div>
+              <Link to="/find-agents" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Find agents
+              </Link>
+              <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Property valuation
+              </Link>
+              <Link to="/investment-consulting" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Investment consulting
+              </Link>
+              <Link to="/request-interior-design" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Interior design
+              </Link>
+              <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+                Advertise commercial property
+              </Link>
             </div>
-            {activeMenu === 'properties' && (
-              <>
-                <Link to="/purchase" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Buy
-                </Link>
-                <Link to="/rent" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Rent
-                </Link>
-                <Link to="/purchase?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Commercial sale
-                </Link>
-                <Link to="/rent?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Commercial rent
-                </Link>
-                <Link to="/purchase?type=land" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Land
-                </Link>
-              </>
-            )}
-            {activeMenu === 'services' && (
-              <>
-                <Link to="/find-agents" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Find agents
-                </Link>
-                <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Property valuation
-                </Link>
-                <Link to="/investment-consulting" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Investment consulting
-                </Link>
-                <Link to="/request-interior-design" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Interior design
-                </Link>
-                <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
-                  Advertise commercial property
-                </Link>
-              </>
-            )}
           </div>
         </div>
       )}
