@@ -176,7 +176,7 @@ export const Navbar = () => {
                 <div onClick={() => toggleMenu('services')}>
                   <Button variant="ghost" size="sm" className="text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
                 </div>
-                <span className="absolute h-0.5 bg-foreground pointer-events-none transition-all duration-300 ease-out" style={{ left: underlineStyle.left, width: underlineStyle.width, top: underlineStyle.top, opacity: underlineStyle.opacity }} />
+                <span className="absolute h-0.5 bg-foreground pointer-events-none transition-all duration-300 ease-out" style={{ left: underlineStyle.left, width: underlineStyle.width, top: underlineStyle.top, opacity: underlineStyle.opacity, marginLeft: 0 }} />
               </nav>
             ) : (
               <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
