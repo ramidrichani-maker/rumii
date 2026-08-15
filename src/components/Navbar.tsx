@@ -222,38 +222,38 @@ export const Navbar = () => {
           <div className="w-full h-full flex flex-col items-start justify-start gap-0.5 px-6 py-4">
             {activeMenu === 'properties' && (
               <>
-                <Link to="/purchase" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/purchase" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Buy
                 </Link>
-                <Link to="/rent" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/rent" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Rent
                 </Link>
-                <Link to="/purchase?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/purchase?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Commercial sale
                 </Link>
-                <Link to="/rent?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/rent?type=commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Commercial rent
                 </Link>
-                <Link to="/purchase?type=land" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/purchase?type=land" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Land
                 </Link>
               </>
             )}
             {activeMenu === 'services' && (
               <>
-                <Link to="/find-agents" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/find-agents" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Find agents
                 </Link>
-                <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Property valuation
                 </Link>
-                <Link to="/investment-consulting" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/investment-consulting" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Investment consulting
                 </Link>
-                <Link to="/request-interior-design" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/request-interior-design" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Interior design
                 </Link>
-                <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                   Advertise commercial property
                 </Link>
               </>
@@ -387,7 +387,7 @@ export const Navbar = () => {
 
             {/* Menu Items */}
             <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-              <Link to="/messages" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors relative">
+              <Link to="/messages" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors relative">
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 <span>Messages</span>
                 {unreadMessages > 0 && (
@@ -396,38 +396,38 @@ export const Navbar = () => {
                   </Badge>
                 )}
               </Link>
-              <Link to="/favorites" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+              <Link to="/favorites" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                 <Heart className="h-4 w-4 text-muted-foreground" />
                 <span>Saved</span>
               </Link>
-              <Link to="/my-rumi?section=enquiries" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+              <Link to="/my-rumi?section=enquiries" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 <span>Enquiries</span>
               </Link>
-              <Link to="/my-rumi?section=drawn-areas" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+              <Link to="/my-rumi?section=drawn-areas" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                 <Map className="h-4 w-4 text-muted-foreground" />
                 <span>Drawn areas</span>
               </Link>
-              <Link to="/profile" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+              <Link to="/profile" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span>Profile</span>
               </Link>
               {profile?.role !== 'customer_support' && (
                 <>
-                  <Link to="/request-photography" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+                  <Link to="/request-photography" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                     <Camera className="h-4 w-4 text-muted-foreground" />
                     <span>Photography Service</span>
                   </Link>
-                  <Link to="/my-listings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+                  <Link to="/my-listings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                     <Home className="h-4 w-4 text-muted-foreground" />
                     <span>My places</span>
                   </Link>
-                  <Link to="/list-property" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+                  <Link to="/list-property" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                     <PlusCircle className="h-4 w-4 text-muted-foreground" />
                     <span>List Property</span>
                   </Link>
                   {profile?.role === 'user' && (
-                    <Link to="/my-viewings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+                    <Link to="/my-viewings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                       <Eye className="h-4 w-4 text-muted-foreground" />
                       <span>My Viewings</span>
                     </Link>
@@ -435,32 +435,32 @@ export const Navbar = () => {
                 </>
               )}
               {profile?.role === 'admin' && (
-                <Link to="/admin" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/admin" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                   <Shield className="h-4 w-4 text-muted-foreground" />
                   <span>Admin Dashboard</span>
                 </Link>
               )}
               {(profile?.role === 'agent' || profile?.role === 'admin') && (
-                <Link to="/agent-portal" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/agent-portal" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span>Agent Portal</span>
                 </Link>
               )}
               {profile?.role === 'customer_support' && (
-                <Link to="/support-portal" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+                <Link to="/support-portal" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                   <HeadphonesIcon className="h-4 w-4 text-muted-foreground" />
                   <span>Support Portal</span>
                 </Link>
               )}
 
-              <Link to="/account-settings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors">
+              <Link to="/account-settings" onClick={() => setProfilePanelOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors">
                 <Settings className="h-4 w-4 text-muted-foreground" />
                 <span>Account Settings</span>
               </Link>
 
               <div className="border-t border-border my-3" />
 
-              <button onClick={() => { setProfilePanelOpen(false); handleSignOut(); }} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground transition-colors w-full text-left">
+              <button onClick={() => { setProfilePanelOpen(false); handleSignOut(); }} className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-foreground hover:text-muted-foreground/60 transition-colors w-full text-left">
                 <LogOut className="h-4 w-4 text-muted-foreground" />
                 <span>Sign out</span>
               </button>
