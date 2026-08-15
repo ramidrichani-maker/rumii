@@ -514,6 +514,9 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     };
     return source.filter((p) => {
       if (p.latitude == null || p.longitude == null) return false;
+      // Only show listings matching the current view: sale/both for purchase,
+      // rent/both for rent.
+      if (areaPage === 'rent' ? !(p.listing_type === 'rent' || p.listing_type === 'both') : !(p.listing_type === 'sale' || p.listing_type === 'both')) return false;
       const inArea = inside(p.latitude, p.longitude) ||
         (radius > 0 && minDistanceToPolygonKm({ latitude: p.latitude, longitude: p.longitude }, coords) <= radius);
       if (!inArea) return false;
@@ -1065,6 +1068,15 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
             </Button>
           </div>
         </div>
+      )}
+
+      {viewingProperties && (
+        <Button
+          onClick={() => setAreaPage(areaPage === 'rent' ? 'purchase' : 'rent')}
+          className="absolute bottom-6 right-4 z-10 shadow-lg"
+        >
+          {areaPage === 'rent' ? 'Properties for sale' : 'Rental properties'}
+        </Button>
       )}
 
       {/* Property popup card */}
