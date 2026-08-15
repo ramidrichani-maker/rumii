@@ -556,6 +556,12 @@ const AreaBuilderMap = ({ open, onClose, onSaved }: AreaBuilderMapProps) => {
     setProperties(filtered);
     renderMarkers(filtered, coords);
     setViewingProperties(true);
+    // Zoom to fit the drawn area
+    if (mapInstance.current && coords.length >= 3) {
+      const bounds = new google.maps.LatLngBounds();
+      coords.forEach(c => bounds.extend({ lat: c.latitude, lng: c.longitude }));
+      mapInstance.current.fitBounds(bounds, 60);
+    }
   }, [google, getPolygonCoords, toast, applyFilters, renderMarkers, radiusKm, minPrice, maxPrice, minBedrooms, maxBedrooms]);
 
   // Re-apply filters live when they change
