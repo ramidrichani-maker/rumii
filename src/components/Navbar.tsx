@@ -139,13 +139,13 @@ export const Navbar = () => {
                   className="relative"
                   onClick={() => setActiveMenu(prev => prev === 'properties' ? null : 'properties')}
                 >
-                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors ${activeMenu === 'properties' ? 'underline underline-offset-4' : ''}`}>Properties</Button>
+                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'properties' ? 'underline underline-offset-4 decoration-2' : ''}`}>Properties</Button>
                 </div>
                 <div
                   className="relative"
                   onClick={() => setActiveMenu(prev => prev === 'services' ? null : 'services')}
                 >
-                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors ${activeMenu === 'services' ? 'underline underline-offset-4' : ''}`}>Services</Button>
+                  <Button variant="ghost" size="sm" className={`text-[0.85rem] font-['Arial',sans-serif] font-light tracking-wide text-foreground hover:text-muted-foreground/60 transition-colors hover:bg-transparent ${activeMenu === 'services' ? 'underline underline-offset-4 decoration-2' : ''}`}>Services</Button>
                 </div>
               </nav>
             ) : (
