@@ -222,13 +222,13 @@ export const Navbar = () => {
           <div className="w-full h-full flex flex-col items-start justify-start gap-0.5 px-6 py-4">
             <div className="w-full text-center mb-3">
               {activeMenu === 'properties' ? (
-                <h2 className="text-2xl leading-none">
-                  <span className="font-[Couture,Playfair_Display,Georgia,serif] tracking-[0.15em] text-foreground uppercase">Our</span>{' '}
+                <h2 className="text-2xl leading-none uppercase">
+                  <span className="font-[Couture,Playfair_Display,Georgia,serif] font-extralight tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] text-foreground">Properties</span>
                 </h2>
               ) : (
-                <h2 className="text-2xl leading-none">
-                  <span className="font-[Couture,Playfair_Display,Georgia,serif] tracking-[0.15em] text-foreground uppercase">Our</span>{' '}
+                <h2 className="text-2xl leading-none uppercase">
+                  <span className="font-[Couture,Playfair_Display,Georgia,serif] font-extralight tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] text-foreground">Services</span>
                 </h2>
               )}
