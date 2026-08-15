@@ -219,7 +219,7 @@ export const Navbar = () => {
             overflow: 'hidden',
           }}
         >
-          <div className="w-full h-full flex flex-col items-start justify-start gap-3 px-6 py-6">
+          <div className="w-full h-full flex flex-col items-start justify-start gap-0.5 px-6 py-4">
             {activeMenu === 'properties' && (
               <>
                 <Link to="/purchase" onClick={closeMenu} className="w-full text-left px-4 py-3 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:bg-accent transition-colors">
