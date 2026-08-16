@@ -39,6 +39,7 @@ import InvestmentConsulting from "./pages/InvestmentConsulting";
 import RequestInteriorDesign from "./pages/RequestInteriorDesign";
 
 import { SupportReviewWidget } from "./components/SupportReviewWidget";
+import { Footer } from "./components/Footer";
 
 const queryClient = new QueryClient();
 
