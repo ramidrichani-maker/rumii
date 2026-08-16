@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom';
 import rumiLogo from '@/assets/rumi-logo.png';
 
-const sections = ['PROPERTIES', 'OUR WORLD', 'SERVICES', 'COMPANY'];
+const sections: { title: string; items?: string[] }[] = [
+  {
+    title: 'PROPERTIES',
+    items: ['All Properties', 'Our Collections', 'New Listings', 'Find a Vacation Rental'],
+  },
+  { title: 'OUR WORLD' },
+  { title: 'SERVICES' },
+  { title: 'COMPANY' },
+];
 
 export const Footer = () => {
   return (
