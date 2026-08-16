@@ -1,18 +1,34 @@
 import { Link } from 'react-router-dom';
 import rumiLogo from '@/assets/rumi-logo.png';
 
-const sections = ['PROPERTIES', 'OUR WORLD', 'SERVICES', 'COMPANY'];
+const sections: { title: string; items?: string[] }[] = [
+  {
+    title: 'PROPERTIES',
+    items: ['All Properties', 'Our Collections', 'New Listings', 'Find a Vacation Rental'],
+  },
+  { title: 'OUR WORLD' },
+  { title: 'SERVICES' },
+  { title: 'COMPANY' },
+];
 
 export const Footer = () => {
   return (
     <footer className="border-t border-border bg-background">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {sections.map((title) => (
-            <div key={title} className="flex flex-col gap-3">
+          {sections.map((section) => (
+            <div key={section.title} className="flex flex-col gap-3">
               <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-foreground/80 uppercase">
-                {title}
+                {section.title}
               </h3>
+              {section.items?.map((item) => (
+                <span
+                  key={item}
+                  className="text-sm font-[Arial,sans-serif] font-light text-muted-foreground"
+                >
+                  {item}
+                </span>
+              ))}
             </div>
           ))}
         </div>
