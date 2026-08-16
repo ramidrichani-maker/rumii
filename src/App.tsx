@@ -117,6 +117,7 @@ const App = () => (
           <Navbar />
           <RouteProgress />
           <AppRoutes />
+          <Footer />
           <SupportReviewWidget />
 
         </BrowserRouter>
