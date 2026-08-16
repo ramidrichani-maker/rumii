@@ -11,7 +11,7 @@ const sections: { title: string; items?: string[] }[] = [
     title: 'SERVICES',
     items: ['Maintenance Services', 'Insure Property', 'Int/Ext Architecture', 'Contact us'],
   },
-  { title: 'COMPANY' },
+  { title: 'COMPANY', items: ['Careers', 'Foundations', 'Collaborations', 'Sustainability'] },
 ];
 
 export const Footer = () => {
