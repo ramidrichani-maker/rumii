@@ -16,18 +16,18 @@ const sections: { title: string; items?: string[] }[] = [
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="bg-footer text-footer-foreground">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {sections.map((section) => (
             <div key={section.title} className="flex flex-col gap-3">
-              <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-foreground/80 uppercase">
+              <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-footer-foreground uppercase">
                 {section.title}
               </h3>
               {section.items?.map((item) => (
                 <span
                   key={item}
-                  className="text-sm font-[Arial,sans-serif] font-light text-muted-foreground"
+                  className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70"
                 >
                   {item}
                 </span>
@@ -36,12 +36,12 @@ export const Footer = () => {
           ))}
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border flex flex-col items-center gap-3">
+        <div className="mt-10 pt-6 border-t border-footer-foreground/20 flex flex-col items-center gap-3">
           <Link to="/" className="flex items-center space-x-2">
             <img src={rumiLogo} alt="Rumi" className="w-[36px] h-[36px] object-contain" />
-            <span className="text-lg font-title text-muted-foreground leading-none">rumi</span>
+            <span className="text-lg font-title text-footer-foreground leading-none">rumi</span>
           </Link>
-          <p className="text-xs font-[Arial,sans-serif] font-light text-muted-foreground">
+          <p className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70">
             © {new Date().getFullYear()} Rumi. All rights reserved.
           </p>
         </div>

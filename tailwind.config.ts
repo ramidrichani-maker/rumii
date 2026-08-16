@@ -53,6 +53,10 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				'nature-green': 'hsl(var(--nature-green))',
+				footer: {
+					DEFAULT: 'hsl(var(--footer))',
+					foreground: 'hsl(var(--footer-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
