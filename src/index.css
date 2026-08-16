@@ -71,6 +71,10 @@ All colors MUST be HSL.
     /* Brand: Nature dark green for "Trust" emphasis */
     --nature-green: 150 45% 28%;
 
+    /* Footer surface */
+    --footer: 180 31% 24%;
+    --footer-foreground: 0 0% 100%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 30 15% 30%;
     --sidebar-primary: 30 20% 65%;
