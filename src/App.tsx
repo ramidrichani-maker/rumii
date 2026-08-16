@@ -114,10 +114,12 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Navbar />
-          <RouteProgress />
-          <AppRoutes />
-          <Footer />
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <RouteProgress />
+            <AppRoutes />
+            <Footer />
+          </div>
           <SupportReviewWidget />
 
         </BrowserRouter>

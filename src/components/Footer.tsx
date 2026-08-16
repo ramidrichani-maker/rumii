@@ -16,7 +16,7 @@ const sections: { title: string; items?: string[] }[] = [
 
 export const Footer = () => {
   return (
-    <footer className="bg-footer text-footer-foreground">
+    <footer className="bg-footer text-footer-foreground mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {sections.map((section) => (
