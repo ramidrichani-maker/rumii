@@ -88,8 +88,41 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [hidden, setHidden] = useState(false);
+
+  // Hide navbar on scroll down, reveal on scroll up
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const y = window.scrollY;
+        const delta = y - lastY;
+        if (Math.abs(delta) < 6) return;
+        if (delta > 0 && y > 80) {
+          setHidden(true);
+        } else if (delta < 0) {
+          setHidden(false);
+        }
+        lastY = y;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Close any open mega menu when the bar hides
+  useEffect(() => {
+    if (hidden && activeMenu && !closingMenu) closeMenu();
+  }, [hidden]);
 
   const user = auth?.user;
+
 
   useEffect(() => {
     if (!user) return;
@@ -153,7 +186,7 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-  return <nav ref={navRef} className="relative border-b bg-background" style={{ zIndex: 9990, overflow: 'visible' }}>
+  return <nav ref={navRef} className={`sticky top-0 border-b bg-background transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`} style={{ zIndex: 9990, overflow: 'visible' }}>
       <div className="container mx-auto px-4 py-3 bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
