@@ -53,24 +53,24 @@ export const SupportReviewWidget = () => {
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => setIsOpen(true)}
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="flex items-center gap-2 border-footer-foreground/40 text-footer-foreground hover:bg-footer-foreground/10 hover:text-footer-foreground"
+                className="flex items-center gap-2 border border-footer-foreground/40 text-white hover:bg-footer-foreground/10 hover:text-white"
               >
                 <Star className="h-4 w-4" />
                 Leave a Review
               </Button>
               <Button
                 onClick={() => { setIsOpen(true); setDefaultTab("support"); }}
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="flex items-center gap-2 border-footer-foreground/40 text-footer-foreground hover:bg-footer-foreground/10 hover:text-footer-foreground"
+                className="flex items-center gap-2 border border-footer-foreground/40 text-white hover:bg-footer-foreground/10 hover:text-white"
               >
                 <HeadphonesIcon className="h-4 w-4" />
                 Customer Support
               </Button>
             </div>
-            <p className="text-xs text-footer-foreground/70 text-right max-w-md">
+            <p className="text-xs text-white/80 text-right max-w-md">
               We highly appreciate any review or remarks — your feedback helps us make this a more enjoyable experience.
             </p>
           </div>
