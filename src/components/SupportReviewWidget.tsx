@@ -70,7 +70,7 @@ export const SupportReviewWidget = () => {
                 Customer Support
               </Button>
             </div>
-            <p className="text-xs text-footer-foreground/70 text-right max-w-md">
+            <p className="text-xs text-white/80 text-right max-w-md">
               We highly appreciate any review or remarks — your feedback helps us make this a more enjoyable experience.
             </p>
           </div>
