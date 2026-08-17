@@ -47,7 +47,7 @@ export const SupportReviewWidget = () => {
 
   return (
     <>
-      <div className="w-full border-t bg-muted/20 mt-16">
+      <div className="w-full bg-footer">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col items-end gap-3">
             <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ export const SupportReviewWidget = () => {
                 onClick={() => setIsOpen(true)}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-footer-foreground/40 text-footer-foreground hover:bg-footer-foreground/10 hover:text-footer-foreground"
               >
                 <Star className="h-4 w-4" />
                 Leave a Review
@@ -64,13 +64,13 @@ export const SupportReviewWidget = () => {
                 onClick={() => { setIsOpen(true); setDefaultTab("support"); }}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-footer-foreground/40 text-footer-foreground hover:bg-footer-foreground/10 hover:text-footer-foreground"
               >
                 <HeadphonesIcon className="h-4 w-4" />
                 Customer Support
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground text-right max-w-md">
+            <p className="text-xs text-footer-foreground/70 text-right max-w-md">
               We highly appreciate any review or remarks — your feedback helps us make this a more enjoyable experience.
             </p>
           </div>
