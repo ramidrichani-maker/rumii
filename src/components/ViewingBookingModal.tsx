@@ -61,6 +61,23 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
         .eq('represents_platform', true);
       const repIds = new Set((reps || []).map((r: any) => r.id));
 
+      // Property's own agency + owner (in case the agencyId prop wasn't passed)
+      const { data: propRow } = await (supabase as any)
+        .from('properties')
+        .select('agency_id, user_id')
+        .eq('id', property.id)
+        .maybeSingle();
+
+      let ownerAgencyId: string | null = null;
+      if (propRow?.user_id) {
+        const { data: ownerProfile } = await (supabase as any)
+          .from('profiles')
+          .select('agency_id')
+          .eq('user_id', propRow.user_id)
+          .maybeSingle();
+        ownerAgencyId = ownerProfile?.agency_id || null;
+      }
+
       // Get assigned agent + their agency
       const { data } = await supabase
         .from('property_agents')
@@ -72,9 +89,13 @@ const ViewingBookingModal = ({ isOpen, onClose, property, agencyId }: ViewingBoo
       const agentAgencyId = (data as any)?.profiles?.agency_id || null;
       setAgentId(fetchedAgentId);
 
-      const propertyIsRep = !!agencyId && repIds.has(agencyId);
-      const agentIsRep = !!agentAgencyId && repIds.has(agentAgencyId);
-      setIsOracleEstates(propertyIsRep || agentIsRep);
+      const isRep = (id: string | null | undefined) => !!id && repIds.has(id);
+      setIsOracleEstates(
+        isRep(agencyId) ||
+        isRep(propRow?.agency_id) ||
+        isRep(ownerAgencyId) ||
+        isRep(agentAgencyId)
+      );
       setCheckingAgency(false);
     };
     const checkExistingBooking = async () => {
