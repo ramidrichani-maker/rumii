@@ -6,7 +6,7 @@ const sections: { title: string; items?: string[] }[] = [
     title: 'PROPERTIES',
     items: ['All Properties', 'Our Collections', 'New Listings', 'Find a Vacation Rental'],
   },
-  { title: 'OUR WORLD' },
+  { title: 'OUR WORLD', items: ['Born in Beirut', 'Who We Are', 'Stay Connected', 'Our Projects'] },
   {
     title: 'SERVICES',
     items: ['Maintenance Services', 'Insure Property', 'Int/Ext Architecture', 'Contact us'],
