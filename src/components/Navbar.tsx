@@ -288,7 +288,7 @@ export const Navbar = () => {
           <div className="w-full h-full flex" style={{ transform: activeMenu === 'services' ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
             {/* Properties panel */}
             <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4">
-              <div className="w-1/4 text-center mb-3">
+              <div className="w-1/4 ml-[25%] text-center mb-3">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Properties</span>
