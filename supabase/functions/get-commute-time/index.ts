@@ -1,3 +1,5 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -10,6 +12,27 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Require an authenticated caller
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    if (!token) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+    );
+    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+    if (userError || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const lovableKey = Deno.env.get('LOVABLE_API_KEY');
     const connectorKey = Deno.env.get('GOOGLE_MAPS_API_KEY_1') || Deno.env.get('GOOGLE_MAPS_API_KEY');
     if (!lovableKey || !connectorKey) {

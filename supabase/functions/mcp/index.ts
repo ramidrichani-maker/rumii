@@ -3,7 +3,7 @@
 // supabase function: mcp
 // Bundled from src/lib/mcp/index.ts by @lovable.dev/mcp-js.
 // src/lib/mcp/index.ts
-import { defineMcp } from "npm:@lovable.dev/mcp-js@0.20.0";
+import { auth, defineMcp } from "npm:@lovable.dev/mcp-js@0.20.0";
 
 // src/lib/mcp/tools/search_properties.ts
 import { createClient } from "npm:@supabase/supabase-js@^2.56.0";
@@ -129,6 +129,11 @@ var mcp_default = defineMcp({
   name: "rumi-mcp",
   title: "Rumi Real Estate",
   version: "0.1.0",
+  auth: auth.oauth.issuer({
+    issuer: "https://kubhguqlihooofnyvdpq.supabase.co/auth/v1",
+    acceptedAudiences: ["authenticated"],
+    resourceName: "Rumi Real Estate MCP"
+  }),
   instructions: "Tools for browsing Rumi real estate listings. Use `search_properties` to filter listings by city, price, and type, `get_property` to fetch full details for a listing UUID, and `list_agencies` to look up agencies.",
   tools: [search_properties_default, get_property_default, list_agencies_default]
 });
