@@ -18,6 +18,16 @@ export const Footer = () => {
   return (
     <footer className="bg-footer text-footer-foreground mt-auto">
       <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-10 md:gap-32 mb-12 pb-10 border-b border-footer-foreground/20">
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-title text-footer-foreground tracking-[0.18em] uppercase leading-none">Maison Atelier</h2>
+            <span className="block text-base font-title text-footer-foreground/70 mt-1">rumi</span>
+          </div>
+          <div className="text-center md:text-left">
+            <h2 className="text-lg font-title text-footer-foreground/70 tracking-[0.18em] uppercase leading-none mt-2">Foundations</h2>
+            <span className="block text-2xl font-title text-footer-foreground mt-1">rumi</span>
+          </div>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:ml-auto md:max-w-[60%] lg:max-w-[48%]">
           {sections.map((section) => (
             <div key={section.title} className="flex flex-col gap-1">
