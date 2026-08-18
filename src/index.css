@@ -131,6 +131,12 @@ All colors MUST be HSL.
   }
 }
 
+/* Mega menu content fade-in (used via inline style, so keyframes must be explicit) */
+@keyframes mega-menu-content {
+  0% { opacity: 0; transform: translateX(-24px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
 @keyframes engraving-shimmer {
   0% {
     background-position:
