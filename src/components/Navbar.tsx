@@ -312,7 +312,7 @@ export const Navbar = () => {
             </div>
             {/* Services panel */}
             <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4">
-              <div className="w-1/4 ml-[18%] text-center mb-3">
+              <div className="w-1/4 ml-[14%] text-center mb-3">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Services</span>
