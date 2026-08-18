@@ -18,7 +18,7 @@ export const Footer = () => {
   return (
     <footer className="bg-footer text-footer-foreground mt-auto">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:ml-auto md:max-w-[80%] lg:max-w-[70%]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:ml-auto md:max-w-[80%] lg:max-w-[70%]">
           {sections.map((section) => (
             <div key={section.title} className="flex flex-col gap-1">
               <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-footer-foreground uppercase mb-1">
