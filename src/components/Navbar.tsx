@@ -311,26 +311,26 @@ export const Navbar = () => {
               </Link>
             </div>
             {/* Services panel */}
-            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0.5 px-6 py-4">
-              <div className="w-full text-center mb-3">
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4">
+              <div className="w-1/4 text-left mb-3">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Services</span>
                 </h2>
               </div>
-              <Link to="/find-agents" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/find-agents" onClick={closeMenu} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Find agents
               </Link>
-              <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/agent-valuation" onClick={closeMenu} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Property valuation
               </Link>
-              <Link to="/investment-consulting" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/investment-consulting" onClick={closeMenu} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Investment consulting
               </Link>
-              <Link to="/request-interior-design" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/request-interior-design" onClick={closeMenu} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Interior design
               </Link>
-              <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-1.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/advertise-commercial" onClick={closeMenu} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Advertise commercial property
               </Link>
             </div>
