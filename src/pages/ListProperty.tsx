@@ -345,7 +345,14 @@ const ListProperty = () => {
         });
         setSelectedAmenities(prop.amenities || []);
         if (prop.latitude != null && prop.longitude != null) {
-          setCoordinates({ lat: Number(prop.latitude), lng: Number(prop.longitude) });
+          // properties.latitude/longitude are approximated for privacy; fetch the exact
+          // values (owner-only) so editing does not drift the pin.
+          const { data: exact } = await supabase.rpc('get_property_coords', { _property_id: editId });
+          const point = Array.isArray(exact) ? exact[0] : null;
+          setCoordinates({
+            lat: Number(point?.latitude ?? prop.latitude),
+            lng: Number(point?.longitude ?? prop.longitude),
+          });
         }
 
         // Prefill existing images as persisted entries.
