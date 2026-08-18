@@ -204,10 +204,10 @@ export const Navbar = () => {
             {profile?.role !== 'customer_support' ? (
             <nav ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
                 <div onClick={() => toggleMenu('properties')}>
-                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/70 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
+                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
                 </div>
                 <div onClick={() => toggleMenu('services')}>
-                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/70 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
+                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
                 </div>
                 <span className="absolute h-0.5 bg-foreground pointer-events-none transition-all duration-300 ease-out" style={{ left: underlineStyle.left, width: underlineStyle.width, top: underlineStyle.top, opacity: underlineStyle.opacity, marginLeft: 0 }} />
               </nav>
