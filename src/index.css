@@ -31,35 +31,35 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 92%;
+    --background: 0 0% 100%;
+    --foreground: 30 15% 30%;
 
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 15% 30%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 15% 30%;
 
     --primary: 30 20% 65%;
     --primary-hover: 30 20% 55%;
-    --primary-foreground: 30 15% 12%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 12%;
-    --secondary-hover: 0 0% 16%;
-    --secondary-foreground: 0 0% 92%;
+    --secondary: 0 0% 92%;
+    --secondary-hover: 0 0% 88%;
+    --secondary-foreground: 30 15% 30%;
 
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 62%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 30 15% 45%;
 
     /* Taupe accent instead of baby blue */
-    --accent: 30 18% 20%;
-    --accent-foreground: 0 0% 92%;
+    --accent: 30 18% 78%;
+    --accent-foreground: 30 15% 20%;
 
-    --destructive: 0 62.8% 50%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 30 20% 65%;
 
     --radius: 0.5rem;
@@ -75,16 +75,16 @@ All colors MUST be HSL.
     --footer: 180 31% 24%;
     --footer-foreground: 0 0% 100%;
 
-    --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 0 0% 92%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 30 15% 30%;
     --sidebar-primary: 30 20% 65%;
-    --sidebar-primary-foreground: 30 15% 12%;
+    --sidebar-primary-foreground: 0 0% 100%;
 
     /* Sidebar accent also taupe */
-    --sidebar-accent: 30 18% 20%;
-    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-accent: 30 18% 78%;
+    --sidebar-accent-foreground: 30 15% 20%;
 
-    --sidebar-border: 0 0% 16%;
+    --sidebar-border: 0 0% 90%;
     --sidebar-ring: 30 20% 65%;
   }
 
@@ -173,7 +173,7 @@ All colors MUST be HSL.
   body {
     @apply text-foreground;
     scroll-padding-top: 5rem;
-    background: hsl(var(--background));
+    background: hsl(0 0% 100%);
     min-height: 100vh;
     scroll-behavior: smooth;
   }
