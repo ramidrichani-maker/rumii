@@ -285,7 +285,7 @@ export const Navbar = () => {
         >
           <div className="w-full h-full flex" style={{ transform: activeMenu === 'services' ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
             {/* Properties panel */}
-            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4">
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={!closingMenu ? { animation: 'mega-menu-content 0.3s ease-out 0.4s both' } : undefined}>
               <div className="w-1/4 ml-[17%] text-center mb-8 mt-4">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
@@ -309,7 +309,7 @@ export const Navbar = () => {
               </Link>
             </div>
             {/* Services panel */}
-            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4">
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={!closingMenu ? { animation: 'mega-menu-content 0.3s ease-out 0.4s both' } : undefined}>
               <div className="w-1/4 ml-[17%] text-center mb-6">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
