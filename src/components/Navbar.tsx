@@ -280,9 +280,7 @@ export const Navbar = () => {
             height: '80vh',
             borderRadius: '0 0 8px 8px',
             overflow: 'hidden',
-            willChange: 'transform, opacity',
-            transform: 'translateZ(0)',
-            backfaceVisibility: 'hidden',
+            willChange: 'max-height',
           }}
         >
           <div className="w-full h-full flex" style={{ transform: activeMenu === 'services' ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
