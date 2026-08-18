@@ -1085,6 +1085,42 @@ export type Database = {
           },
         ]
       }
+      property_coordinates: {
+        Row: {
+          latitude: number | null
+          longitude: number | null
+          property_id: string
+          updated_at: string
+        }
+        Insert: {
+          latitude?: number | null
+          longitude?: number | null
+          property_id: string
+          updated_at?: string
+        }
+        Update: {
+          latitude?: number | null
+          longitude?: number | null
+          property_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_coordinates_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_coordinates_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_enquiries: {
         Row: {
           agency_id: string | null
@@ -1732,9 +1768,9 @@ export type Database = {
           id?: string | null
           images?: string[] | null
           last_renovated?: number | null
-          latitude?: never
+          latitude?: number | null
           listing_type?: Database["public"]["Enums"]["listing_type"] | null
-          longitude?: never
+          longitude?: number | null
           municipality?: string | null
           parent_property_id?: string | null
           price?: number | null
@@ -1766,9 +1802,9 @@ export type Database = {
           id?: string | null
           images?: string[] | null
           last_renovated?: number | null
-          latitude?: never
+          latitude?: number | null
           listing_type?: Database["public"]["Enums"]["listing_type"] | null
-          longitude?: never
+          longitude?: number | null
           municipality?: string | null
           parent_property_id?: string | null
           price?: number | null
