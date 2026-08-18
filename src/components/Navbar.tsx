@@ -187,7 +187,7 @@ export const Navbar = () => {
     }
   };
   return <nav ref={navRef} className={`sticky top-0 border-b bg-background transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`} style={{ zIndex: 9990, overflow: 'visible' }}>
-      <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
+      <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-background">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
             <button
@@ -204,10 +204,10 @@ export const Navbar = () => {
             {profile?.role !== 'customer_support' ? (
             <nav ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
                 <div onClick={() => toggleMenu('properties')}>
-                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
+                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-foreground hover:text-foreground/40 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
                 </div>
                 <div onClick={() => toggleMenu('services')}>
-                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
+                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-foreground hover:text-foreground/40 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
                 </div>
                 <span className="absolute h-0.5 bg-foreground pointer-events-none transition-all duration-300 ease-out" style={{ left: underlineStyle.left, width: underlineStyle.width, top: underlineStyle.top, opacity: underlineStyle.opacity, marginLeft: 0 }} />
               </nav>
@@ -273,7 +273,7 @@ export const Navbar = () => {
           className={`absolute border-b border-border shadow-xl ${closingMenu ? 'animate-mega-menu-slide-up' : 'animate-mega-menu-slide'}`}
           style={{ 
             zIndex: 9001, 
-            backgroundColor: '#ffffff',
+            backgroundColor: 'hsl(var(--popover))',
             top: '100%',
             left: '0',
             width: '100vw',
