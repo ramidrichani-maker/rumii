@@ -37,7 +37,7 @@ export const Navbar = () => {
     closeTimer.current = setTimeout(() => {
       setActiveMenu(null);
       setClosingMenu(false);
-    }, 450);
+    }, 800);
   };
 
   const toggleMenu = (menu: 'properties' | 'services') => {
