@@ -117,7 +117,8 @@ const App = () => (
             <Navbar />
             <RouteProgress />
             <AppRoutes />
-          <Footer />
+            <Footer />
+          </div>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
