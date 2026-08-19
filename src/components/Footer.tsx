@@ -35,12 +35,22 @@ export const Footer = () => {
                 {section.title}
               </h3>
               {section.items?.map((item) => (
-                <span
-                  key={item}
-                  className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6"
-                >
-                  {item}
-                </span>
+                item === 'All Properties' ? (
+                  <Link
+                    key={item}
+                    to="/purchase"
+                    className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6 hover:text-footer-foreground transition-colors cursor-pointer"
+                  >
+                    {item}
+                  </Link>
+                ) : (
+                  <span
+                    key={item}
+                    className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6"
+                  >
+                    {item}
+                  </span>
+                )
               ))}
             </div>
           ))}
