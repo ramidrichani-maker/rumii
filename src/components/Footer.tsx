@@ -112,7 +112,6 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             {/* Brand */}
             <Link to="/" className="flex items-center gap-2">
-              <img src={rumiLogo} alt="Rumi" className="w-[36px] h-[36px] object-contain" />
               <span className="text-lg font-title text-footer-foreground leading-none">{"\n"}</span>
             </Link>
 
