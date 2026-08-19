@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Linkedin, MessageCircle } from 'lucide-react';
+import { Instagram, Linkedin, MessageCircle, Facebook, Youtube } from 'lucide-react';
 import rumiLogo from '@/assets/rumi-logo.png';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { CustomerSupportChat } from './CustomerSupportChat';
@@ -118,50 +118,48 @@ export const Footer = () => {
             {/* Social icons + legal links */}
             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
               <div className="flex items-center gap-4">
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <span
                   aria-label="Instagram"
-                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                  className="text-footer-foreground/70"
                 >
                   <Instagram className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://tiktok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                </span>
+                <span
+                  aria-label="Facebook"
+                  className="text-footer-foreground/70"
+                >
+                  <Facebook className="w-5 h-5" />
+                </span>
+                <span
+                  aria-label="Youtube"
+                  className="text-footer-foreground/70"
+                >
+                  <Youtube className="w-5 h-5" />
+                </span>
+                <span
                   aria-label="TikTok"
-                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                  className="text-footer-foreground/70"
                 >
                   <TikTokIcon className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                </span>
+                <span
                   aria-label="LinkedIn"
-                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                  className="text-footer-foreground/70"
                 >
                   <Linkedin className="w-5 h-5" />
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setChatOpen(true)}
+                </span>
+                <span
                   aria-label="Customer support chat"
-                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors cursor-pointer"
+                  className="text-footer-foreground/70"
                 >
                   <MessageCircle className="w-5 h-5" />
-                </button>
-                <a
-                  href="https://x.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                </span>
+                <span
                   aria-label="X"
-                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                  className="text-footer-foreground/70"
                 >
                   <XIcon className="w-5 h-5" />
-                </a>
+                </span>
               </div>
 
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
