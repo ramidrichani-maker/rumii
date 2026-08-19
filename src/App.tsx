@@ -117,10 +117,7 @@ const App = () => (
             <Navbar />
             <RouteProgress />
             <AppRoutes />
-            <Footer />
-          </div>
-          <SupportReviewWidget />
-
+          <Footer />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
