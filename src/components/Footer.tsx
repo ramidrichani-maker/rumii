@@ -114,7 +114,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom bar: brand, social icons, legal links, copyright */}
-        <div className="mt-24 flex flex-col gap-6">
+        <div className="mt-[5.1rem] flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             {/* Brand + social icons */}
             <div className="flex flex-col md:flex-row md:items-center gap-6">
