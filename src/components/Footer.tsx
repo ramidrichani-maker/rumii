@@ -83,7 +83,7 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="w-full border-t border-[hsl(30_18%_78%)]" />
+      <div className="w-full border-t border-[hsl(30_18%_68%)]/85" />
       <div className="container mx-auto px-4 pb-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:ml-auto md:max-w-[60%] lg:max-w-[48%] mt-20">
           {sections.map((section) => (
