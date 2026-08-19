@@ -113,6 +113,10 @@ export default {
 		'mega-menu-content': {
 			'0%': { opacity: '0', transform: 'translateX(-24px)' },
 			'100%': { opacity: '1', transform: 'translateX(0)' }
+		},
+		'mega-menu-content-out': {
+			'0%': { opacity: '1', transform: 'translateX(0)' },
+			'100%': { opacity: '0', transform: 'translateX(24px)' }
 		}
 		},
 		animation: {
