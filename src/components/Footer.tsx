@@ -4,7 +4,7 @@ import rumiLogo from '@/assets/rumi-logo.png';
 const sections: { title: string; items?: string[] }[] = [
   {
     title: 'PROPERTIES',
-    items: ['All Properties', 'Our Collections', 'New Listings', 'Vacation Rentals'],
+    items: ['All Properties', 'Our Collections', 'New Properties', 'Vacation Rentals'],
   },
   { title: 'OUR WORLD', items: ['Born in Beirut', 'Who We Are', 'Stay Connected', 'Our Projects'] },
   {
