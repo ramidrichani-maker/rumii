@@ -7,7 +7,7 @@ import { CustomerSupportChat } from './CustomerSupportChat';
 
 const sections: { title: string; items?: { label: string; to?: string }[] }[] = [
   {
-    title: 'PROPERTIES',
+    title: '\n\nPROPERTIES',
     items: [
       { label: 'All Properties', to: '/purchase' },
       { label: 'Our Collections' },
@@ -16,7 +16,7 @@ const sections: { title: string; items?: { label: string; to?: string }[] }[] = 
     ],
   },
   {
-    title: 'OUR WORLD',
+    title: '\n\nOUR WORLD',
     items: [
       { label: 'Born in Beirut' },
       { label: 'Who We Are' },
@@ -25,7 +25,7 @@ const sections: { title: string; items?: { label: string; to?: string }[] }[] = 
     ],
   },
   {
-    title: 'SERVICES',
+    title: '\n\nSERVICES',
     items: [
       { label: 'Maintenance Services' },
       { label: 'Insure Property' },
@@ -34,7 +34,7 @@ const sections: { title: string; items?: { label: string; to?: string }[] }[] = 
     ],
   },
   {
-    title: 'COMPANY',
+    title: '\n\nCOMPANY',
     items: [
       { label: 'Careers' },
       { label: 'Foundations' },
