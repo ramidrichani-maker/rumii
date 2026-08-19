@@ -285,50 +285,50 @@ export const Navbar = () => {
         >
           <div className="w-full h-full flex" style={{ transform: activeMenu === 'services' ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
             {/* Properties panel */}
-            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.65s both' }}>
-              <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.7s' }}>
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.9s both' }}>
+              <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.95s' }}>
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Properties</span>
                 </h2>
               </div>
-              <Link to="/purchase" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.85s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/purchase" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.1s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Buy
               </Link>
-              <Link to="/rent" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.92s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/rent" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.17s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Rent
               </Link>
-              <Link to="/purchase?type=commercial" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.99s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/purchase?type=commercial" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.24s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Commercial sale
               </Link>
-              <Link to="/rent?type=commercial" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.06s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/rent?type=commercial" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.31s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Commercial rent
               </Link>
-              <Link to="/purchase?type=land" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.13s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/purchase?type=land" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.38s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Land
               </Link>
             </div>
             {/* Services panel */}
-            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.65s both' }}>
-              <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.7s' }}>
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.9s both' }}>
+              <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.95s' }}>
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
                   <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Services</span>
                 </h2>
               </div>
-              <Link to="/find-agents" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.85s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/find-agents" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.1s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Find agents
               </Link>
-              <Link to="/agent-valuation" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.92s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/agent-valuation" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.17s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Property valuation
               </Link>
-              <Link to="/investment-consulting" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.99s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/investment-consulting" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.24s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Investment consulting
               </Link>
-              <Link to="/request-interior-design" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.06s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/request-interior-design" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.31s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Interior design
               </Link>
-              <Link to="/advertise-commercial" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.13s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
+              <Link to="/advertise-commercial" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.38s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Advertise commercial property
               </Link>
             </div>
