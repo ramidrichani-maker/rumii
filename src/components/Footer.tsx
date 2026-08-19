@@ -70,7 +70,7 @@ export const Footer = () => {
     <footer className="bg-footer text-footer-foreground mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-10 md:gap-32 mb-12 pb-10 border-b border-footer-foreground/20">
-          <div className="flex flex-col items-center md:items-start">
+          <div className="flex flex-col items-center">
             <h2 className="text-2xl font-title text-footer-foreground tracking-[0.18em] uppercase leading-none text-center">
               <span className="block">Maison</span>
               <span className="block">Atelier</span>
