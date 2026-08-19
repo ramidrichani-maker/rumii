@@ -85,7 +85,7 @@ export const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:ml-auto md:max-w-[60%] lg:max-w-[48%] mt-12">
           {sections.map((section) => (
             <div key={section.title} className="flex flex-col gap-1">
-              <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-footer-foreground uppercase mb-1">
+              <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-footer-foreground uppercase mb-1 whitespace-pre-wrap">
                 {section.title}
               </h3>
               {section.items?.map((item) => (
