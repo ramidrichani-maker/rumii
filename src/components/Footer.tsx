@@ -108,7 +108,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom bar: brand, social icons, legal links, copyright */}
-        <div className="mt-10 pt-6 border-t border-footer-foreground/20 flex flex-col gap-6">
+        <div className="mt-10 flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             {/* Brand + social icons */}
             <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -186,7 +186,7 @@ export const Footer = () => {
           </div>
 
           {/* Copyright bottom-left */}
-          <p className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70">
+          <p className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70 mb-8">
             © {new Date().getFullYear()} rumi. all rights reserved
           </p>
         </div>
