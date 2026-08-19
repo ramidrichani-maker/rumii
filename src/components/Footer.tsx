@@ -1,20 +1,71 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import rumiLogo from '@/assets/rumi-logo.png';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { CustomerSupportChat } from './CustomerSupportChat';
 
-const sections: { title: string; items?: string[] }[] = [
+const sections: { title: string; items?: { label: string; to?: string }[] }[] = [
   {
     title: 'PROPERTIES',
-    items: ['All Properties', 'Our Collections', 'New Properties', 'Vacation Rentals'],
+    items: [
+      { label: 'All Properties', to: '/purchase' },
+      { label: 'Our Collections' },
+      { label: 'New Properties' },
+      { label: 'Vacation Rentals' },
+    ],
   },
-  { title: 'OUR WORLD', items: ['Born in Beirut', 'Who We Are', 'Stay Connected', 'Our Projects'] },
+  {
+    title: 'OUR WORLD',
+    items: [
+      { label: 'Born in Beirut' },
+      { label: 'Who We Are' },
+      { label: 'Stay Connected' },
+      { label: 'Our Projects' },
+    ],
+  },
   {
     title: 'SERVICES',
-    items: ['Maintenance Services', 'Insure Property', 'Int/Ext Architecture', 'Contact us'],
+    items: [
+      { label: 'Maintenance Services' },
+      { label: 'Insure Property' },
+      { label: 'Int/Ext Architecture' },
+      { label: 'Contact us' },
+    ],
   },
-  { title: 'COMPANY', items: ['Careers', 'Foundations', 'Collaborations', 'Sustainability'] },
+  {
+    title: 'COMPANY',
+    items: [
+      { label: 'Careers' },
+      { label: 'Foundations' },
+      { label: 'Collaborations' },
+      { label: 'Sustainability' },
+    ],
+  },
 ];
 
+const legalLinks = [
+  { label: 'Terms of Use', to: '/terms-of-service' },
+  { label: 'Privacy Notice', to: '#' },
+  { label: 'Cookie Policy', to: '#' },
+  { label: 'Masterclasses Terms of Sale', to: '#' },
+];
+
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <path d="M16.5 3c.3 2.1 1.5 3.6 3.5 3.9v2.4c-1.2.1-2.4-.2-3.5-.8v5.9c0 3.4-2.5 5.6-5.6 5.6-3 0-5.4-2.3-5.4-5.3 0-3.1 2.6-5.4 5.7-5.1v2.5c-.4-.1-.8-.2-1.2-.2-1.5 0-2.7 1.2-2.7 2.7 0 1.5 1.2 2.6 2.7 2.6 1.6 0 2.8-1.2 2.8-2.8V3h2.5z" />
+  </svg>
+);
+
+const XIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <path d="M18.2 2.3h3.3l-7.2 8.3 8.5 11.2h-6.7l-5.3-6.9-6 6.9H1.5l7.7-8.8L1.1 2.3h6.8l4.8 6.3 5.5-6.3zm-1.2 17.9h1.8L7.1 4.2H5.2l11.8 16z" />
+  </svg>
+);
+
 export const Footer = () => {
+  const [chatOpen, setChatOpen] = useState(false);
+
   return (
     <footer className="bg-footer text-footer-foreground mt-auto">
       <div className="container mx-auto px-4 py-12">
@@ -35,20 +86,20 @@ export const Footer = () => {
                 {section.title}
               </h3>
               {section.items?.map((item) => (
-                item === 'All Properties' ? (
+                item.to ? (
                   <Link
-                    key={item}
-                    to="/purchase"
+                    key={item.label}
+                    to={item.to}
                     className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6 hover:text-footer-foreground transition-colors cursor-pointer"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 ) : (
                   <span
-                    key={item}
+                    key={item.label}
                     className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6"
                   >
-                    {item}
+                    {item.label}
                   </span>
                 )
               ))}
@@ -56,16 +107,104 @@ export const Footer = () => {
           ))}
         </div>
 
-        <div className="mt-10 pt-6 border-t border-footer-foreground/20 flex flex-col items-center gap-3">
-          <Link to="/" className="flex items-center space-x-2">
-            <img src={rumiLogo} alt="Rumi" className="w-[36px] h-[36px] object-contain" />
-            <span className="text-lg font-title text-footer-foreground leading-none">rumi</span>
-          </Link>
+        {/* Bottom bar: brand, social icons, legal links, copyright */}
+        <div className="mt-10 pt-6 border-t border-footer-foreground/20 flex flex-col gap-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            {/* Brand */}
+            <Link to="/" className="flex items-center gap-2">
+              <img src={rumiLogo} alt="Rumi" className="w-[36px] h-[36px] object-contain" />
+              <span className="text-lg font-title text-footer-foreground leading-none">rumi</span>
+            </Link>
+
+            {/* Social icons + legal links */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://tiktok.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                >
+                  <TikTokIcon className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setChatOpen(true)}
+                  aria-label="Customer support chat"
+                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors cursor-pointer"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </button>
+                <a
+                  href="https://x.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="X"
+                  className="text-footer-foreground/70 hover:text-footer-foreground transition-colors"
+                >
+                  <XIcon className="w-5 h-5" />
+                </a>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                {legalLinks.map((link) => (
+                  link.to && link.to !== '#' ? (
+                    <Link
+                      key={link.label}
+                      to={link.to}
+                      className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70 hover:text-footer-foreground transition-colors cursor-pointer"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <span
+                      key={link.label}
+                      className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70 cursor-pointer hover:text-footer-foreground transition-colors"
+                    >
+                      {link.label}
+                    </span>
+                  )
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright bottom-left */}
           <p className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70">
-            © {new Date().getFullYear()} Rumi. All rights reserved.
+            © {new Date().getFullYear()} rumi. all rights reserved
           </p>
         </div>
       </div>
+
+      <Sheet open={chatOpen} onOpenChange={setChatOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-xl p-0 flex flex-col h-full">
+          <SheetHeader className="p-4 border-b">
+            <SheetTitle>Customer Support</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-hidden">
+            <CustomerSupportChat />
+          </div>
+        </SheetContent>
+      </Sheet>
     </footer>
   );
 };
