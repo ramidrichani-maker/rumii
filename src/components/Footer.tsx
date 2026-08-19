@@ -110,13 +110,12 @@ export const Footer = () => {
         {/* Bottom bar: brand, social icons, legal links, copyright */}
         <div className="mt-10 pt-6 border-t border-footer-foreground/20 flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            {/* Brand */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-lg font-title text-footer-foreground leading-none">{"\n"}</span>
-            </Link>
+            {/* Brand + social icons */}
+            <div className="flex flex-col md:flex-row md:items-center gap-6">
+              <Link to="/" className="flex items-center gap-2">
+                <span className="text-lg font-title text-footer-foreground leading-none">{"\n"}</span>
+              </Link>
 
-            {/* Social icons + legal links */}
-            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
               <div className="flex items-center gap-4">
                 <span
                   aria-label="Instagram"
@@ -161,27 +160,28 @@ export const Footer = () => {
                   <XIcon className="w-5 h-5" />
                 </span>
               </div>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                {legalLinks.map((link) => (
-                  link.to && link.to !== '#' ? (
-                    <Link
-                      key={link.label}
-                      to={link.to}
-                      className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70 hover:text-footer-foreground transition-colors cursor-pointer"
-                    >
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <span
-                      key={link.label}
-                      className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70 cursor-pointer hover:text-footer-foreground transition-colors"
-                    >
-                      {link.label}
-                    </span>
-                  )
-                ))}
-              </div>
+            {/* Legal links */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              {legalLinks.map((link) => (
+                link.to && link.to !== '#' ? (
+                  <Link
+                    key={link.label}
+                    to={link.to}
+                    className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70 hover:text-footer-foreground transition-colors cursor-pointer"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <span
+                    key={link.label}
+                    className="text-xs font-[Arial,sans-serif] font-light text-footer-foreground/70 cursor-pointer hover:text-footer-foreground transition-colors"
+                  >
+                    {link.label}
+                  </span>
+                )
+              ))}
             </div>
           </div>
 
