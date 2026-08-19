@@ -137,6 +137,12 @@ All colors MUST be HSL.
   100% { opacity: 1; transform: translateX(0); }
 }
 
+/* Mega menu content fade-out towards the right (mirror of the fade-in) */
+@keyframes mega-menu-content-out {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(24px); }
+}
+
 @keyframes engraving-shimmer {
   0% {
     background-position:
