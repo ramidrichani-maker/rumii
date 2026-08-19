@@ -113,7 +113,7 @@ export const Footer = () => {
             {/* Brand */}
             <Link to="/" className="flex items-center gap-2">
               <img src={rumiLogo} alt="Rumi" className="w-[36px] h-[36px] object-contain" />
-              <span className="text-lg font-title text-footer-foreground leading-none">rumi</span>
+              <span className="text-lg font-title text-footer-foreground leading-none">{"\n"}</span>
             </Link>
 
             {/* Social icons + legal links */}
