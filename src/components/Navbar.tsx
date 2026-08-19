@@ -309,7 +309,7 @@ export const Navbar = () => {
               </Link>
             </div>
             {/* Services panel */}
-            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.3s ease-out 0.4s both' }}>
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.65s both' }}>
               <div className="w-1/4 ml-[17%] text-center mb-8 mt-4">
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Our</span>{' '}
