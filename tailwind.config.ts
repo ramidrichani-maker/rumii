@@ -125,7 +125,7 @@ export default {
 			'slide-fade-in-right': 'slide-fade-in-right 0.35s ease-out',
 			'slide-fade-out-right': 'slide-fade-out-right 0.3s ease-in forwards',
 	'mega-menu-slide': 'mega-menu-slide 0.675s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-	'mega-menu-slide-up': 'mega-menu-slide-up 0.5s cubic-bezier(0.4, 0, 1, 1) forwards',
+	'mega-menu-slide-up': 'mega-menu-slide-up 0.325s cubic-bezier(0.4, 0, 1, 1) forwards',
 			'mega-menu-content': 'mega-menu-content 0.3s ease-out'
 		}
 		}
