@@ -227,7 +227,7 @@ export const Navbar = () => {
           </div>
 
           <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center">
-            <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a' }}>rUMı</span>
+            <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a' }}>r<span style={{ fontSize: '0.72em' }}>UM</span>ı</span>
           </Link>
 
           <div className="flex items-center space-x-4">
