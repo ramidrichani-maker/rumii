@@ -179,11 +179,7 @@ All colors MUST be HSL.
   body {
     @apply text-foreground;
     scroll-padding-top: 5rem;
-    background-color: hsl(0 0% 100%);
-    background-image: url("/__l5e/assets-v1/6e6a7147-e84c-4080-bed1-a85a2338bc50/rumi-pattern.jpg");
-    background-repeat: repeat;
-    background-size: 900px auto;
-    background-attachment: fixed;
+    background: hsl(0 0% 100%);
     min-height: 100vh;
     scroll-behavior: smooth;
   }
