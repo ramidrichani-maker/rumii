@@ -186,7 +186,7 @@ const DrawSearchArea = ({ onDrawComplete, onPolygonChange }: DrawSearchAreaProps
       window.removeEventListener('pointercancel', onPointerUp, true);
       container.style.cursor = '';
     };
-  }, [loaded, google]);
+  }, [loaded, google, onPolygonChange]);
 
   const confirmArea = useCallback(() => {
     if (!polygonRef.current) return;
