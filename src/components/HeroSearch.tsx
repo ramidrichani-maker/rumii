@@ -84,7 +84,10 @@ const HeroSearch = () => {
         <div className="flex-1 relative">
           <TypewriterSearch
             value={searchQuery}
-            onChange={setSearchQuery}
+            onChange={(v) => {
+              setSearchQuery(v);
+              if (showDrawMap) setShowDrawMap(false);
+            }}
             onFocus={() => setInputFocused(true)}
             onBlur={() => {
               // Small delay so tap on dropdown registers before it hides
