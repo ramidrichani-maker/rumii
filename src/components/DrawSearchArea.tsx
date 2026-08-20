@@ -10,9 +10,10 @@ interface Coordinate {
 
 interface DrawSearchAreaProps {
   onDrawComplete: (polygon: Coordinate[]) => void;
+  onPolygonChange?: (polygon: Coordinate[] | null) => void;
 }
 
-const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
+const DrawSearchArea = ({ onDrawComplete, onPolygonChange }: DrawSearchAreaProps) => {
   const { google, loaded } = useGoogleMaps();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
@@ -55,6 +56,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
     setHasPolygon(false);
     setIsDrawing(false);
     isDrawingRef.current = false;
+    onPolygonChange?.(null);
     if (mapInstance.current) {
       mapInstance.current.setOptions({ draggable: true, gestureHandling: 'greedy' });
     }
@@ -62,7 +64,7 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
       cleanupRef.current();
       cleanupRef.current = null;
     }
-  }, []);
+  }, [onPolygonChange]);
 
   const startDrawing = useCallback(() => {
     if (!loaded || !google || !mapInstance.current) return;
@@ -145,6 +147,9 @@ const DrawSearchArea = ({ onDrawComplete }: DrawSearchAreaProps) => {
         map,
       });
       setHasPolygon(true);
+      onPolygonChange?.(
+        simplified.map((p) => ({ latitude: p.lat, longitude: p.lng }))
+      );
       cleanupRef.current?.();
       cleanupRef.current = null;
     };
