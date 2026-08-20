@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Search, X } from 'lucide-react';
@@ -40,6 +40,13 @@ const HeroSearch = () => {
     const qs = params.toString();
     navigate(`${route}${qs ? `?${qs}` : ''}`);
   };
+
+  const handlePolygonChange = useCallback(
+    (polygon: { latitude: number; longitude: number }[] | null) => {
+      setDrawnPolygon(polygon);
+    },
+    []
+  );
 
   return (
     <div className="w-full max-w-2xl mx-auto relative z-[60]">
@@ -125,7 +132,7 @@ const HeroSearch = () => {
             <X className="w-4 h-4" />
           </button>
           <Suspense fallback={<div className="h-[340px] rounded-xl bg-muted animate-pulse" />}>
-            <DrawSearchArea onDrawComplete={handleDrawComplete} />
+            <DrawSearchArea onDrawComplete={handleDrawComplete} onPolygonChange={handlePolygonChange} />
           </Suspense>
         </div>
       )}
