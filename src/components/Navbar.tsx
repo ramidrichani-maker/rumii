@@ -210,10 +210,10 @@ export const Navbar = () => {
                 <line x1="3" y1="16" x2="21" y2="16" />
               </svg>
             </button>
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2 ml-3 md:ml-6">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
             </Link>
-            <span className="hidden md:inline-block text-foreground/30 text-lg font-light leading-none select-none pb-0.5">|</span>
+            <span className="hidden md:inline-block text-black text-2xl font-light leading-none select-none pb-0.5">|</span>
             {profile?.role !== 'customer_support' ? (
             <nav ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
                 <div onClick={() => toggleMenu('properties')}>
