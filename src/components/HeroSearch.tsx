@@ -76,9 +76,6 @@ const HeroSearch = () => {
         </button>
       </div>
 
-      {/* Location label */}
-      <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
-
       {/* Search bar */}
       <div className="relative" onKeyDown={handleKeyDown}>
         <div className="flex-1 relative">
