@@ -80,7 +80,7 @@ const HeroSearch = () => {
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
 
       {/* Search bar */}
-      <div className="flex gap-3" onKeyDown={handleKeyDown}>
+      <div className="flex gap-3 relative z-[60]" onKeyDown={handleKeyDown}>
         <div className="flex-1 relative">
           <TypewriterSearch
             value={searchQuery}
@@ -121,6 +121,9 @@ const HeroSearch = () => {
           <Search className="w-6 h-6 text-foreground" strokeWidth={1.25} style={{ transform: 'scaleX(-1)' }} />
         </button>
       </div>
+
+      {/* Full-width underline reaching the logo (left) and profile icon (right) */}
+      <div className="w-[calc(100vw-4.5rem)] md:w-[calc(100vw-9rem)] mx-auto h-[2px] bg-black" />
 
       {/* Draw map */}
       {showDrawMap && (
