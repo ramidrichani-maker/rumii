@@ -252,7 +252,7 @@ export const Navbar = () => {
               aria-label="Properties for sale"
               className="p-1.5 text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 md:h-[1.5625rem] md:w-[1.5625rem]">
                 <path d="M4 11 L12 4 L20 11" />
                 <path d="M6 10.5 V20 H18 V10.5" />
                 <path d="M10 20 V14 H14 V20" opacity="0" />
@@ -264,10 +264,10 @@ export const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   aria-label="My rumi"
-                  className="h-10 w-10 md:h-[3.375rem] md:w-[3.375rem] rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
+                  className="h-10 w-10 md:h-[4.219rem] md:w-[4.219rem] rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 md:h-10 md:w-10 text-muted-foreground">
                     <circle cx="12" cy="7" r="4.5" />
                     <path d="M4 20a8 8 0 0 1 16 0" />
                   </svg>
