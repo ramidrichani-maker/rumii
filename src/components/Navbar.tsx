@@ -246,6 +246,14 @@ export const Navbar = () => {
           </Link>
 
           <div className="flex items-center space-x-4">
+            {/* Home icon — quick link to properties for sale */}
+            <button
+              onClick={() => navigate('/purchase')}
+              aria-label="Properties for sale"
+              className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home className="h-5 w-5" />
+            </button>
             {user ? <>
                 {/* My rumi (icon only) */}
                 <Button
