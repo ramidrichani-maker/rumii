@@ -58,7 +58,7 @@ const TypewriterSearch = ({ value, onChange, className, onFocus, onBlur }: Typew
       onBlur={onBlur}
       placeholder={placeholder || 'Search for area'}
       className={cn(
-        'h-20 md:h-24 text-3xl md:text-5xl font-thin border-0 border-b border-black bg-transparent rounded-none px-5 md:ml-0 md:mr-0 outline-none focus-visible:ring-0 focus-visible:outline-none',
+        'h-20 md:h-24 text-3xl md:text-5xl font-thin text-black/35 font-[\'Inter\'] border-0 border-b border-black bg-transparent rounded-none px-5 md:ml-0 md:mr-0 outline-none focus-visible:ring-0 focus-visible:outline-none',
         className
       )}
     />
