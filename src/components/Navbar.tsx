@@ -245,7 +245,7 @@ export const Navbar = () => {
             <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a' }}>r<span style={{ fontSize: '0.72em' }}>UM</span>ı</span>
           </Link>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 md:mr-[4.5rem]">
             {/* Home icon — quick link to properties for sale */}
             <button
               onClick={() => navigate('/purchase')}
@@ -264,10 +264,10 @@ export const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   aria-label="My rumi"
-                  className="h-10 w-10 rounded-full"
+                  className="h-10 w-10 md:h-[3.375rem] md:w-[3.375rem] rounded-full"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-muted-foreground">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground">
                     <circle cx="12" cy="7" r="4.5" />
                     <path d="M4 20a8 8 0 0 1 16 0" />
                   </svg>
