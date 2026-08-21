@@ -49,7 +49,7 @@ const HeroSearch = () => {
   );
 
   return (
-    <div className="w-[95%] mx-auto relative z-[60]">
+    <div className="w-full mx-auto md:ml-[4.5rem] md:mr-[4.5rem] relative z-[60]">
       {/* Buy / Rent Toggle */}
       <div className="flex mb-6 bg-muted/60 backdrop-blur-sm rounded-xl p-1.5 max-w-xs mx-auto">
         <button
@@ -116,7 +116,7 @@ const HeroSearch = () => {
         <button
           onClick={handleSearch}
           aria-label="Search"
-          className="absolute bottom-0 md:right-[9rem] h-14 w-14 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
+          className="absolute bottom-0 md:right-0 h-14 w-14 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
         >
           <Search className="w-6 h-6 text-foreground" strokeWidth={1.25} style={{ transform: 'scaleX(-1)' }} />
         </button>
