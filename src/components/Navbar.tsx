@@ -200,7 +200,7 @@ export const Navbar = () => {
       <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
-            <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem]">
+            <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
             </Link>
             <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
