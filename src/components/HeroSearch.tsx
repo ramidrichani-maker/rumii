@@ -80,7 +80,7 @@ const HeroSearch = () => {
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
 
       {/* Search bar */}
-      <div className="flex gap-3" onKeyDown={handleKeyDown}>
+      <div className="relative" onKeyDown={handleKeyDown}>
         <div className="flex-1 relative">
           <TypewriterSearch
             value={searchQuery}
@@ -116,7 +116,7 @@ const HeroSearch = () => {
         <button
           onClick={handleSearch}
           aria-label="Search"
-          className="h-14 w-14 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
+          className="absolute bottom-0 md:right-[9rem] h-14 w-14 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
         >
           <Search className="w-6 h-6 text-foreground" strokeWidth={1.25} style={{ transform: 'scaleX(-1)' }} />
         </button>
