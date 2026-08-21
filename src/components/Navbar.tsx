@@ -99,6 +99,8 @@ export const Navbar = () => {
       raf = requestAnimationFrame(() => {
         raf = 0;
         const y = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const nearBottom = y >= maxScroll - 4;
         // Always show when back at the top of the page
         if (y <= 0) {
           setHidden(false);
@@ -110,6 +112,8 @@ export const Navbar = () => {
         if (delta > 0 && y > 80) {
           setHidden(true);
         } else if (delta < 0) {
+          // Ignore the rubber-band bounce that happens at the bottom on mobile
+          if (nearBottom) return;
           setHidden(false);
         }
         lastY = y;
