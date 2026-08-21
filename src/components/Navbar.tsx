@@ -201,7 +201,7 @@ export const Navbar = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
             <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem]">
-              <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
+              <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
             </Link>
             <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
             {/* Vertical divider between logo and hamburger on mobile */}
