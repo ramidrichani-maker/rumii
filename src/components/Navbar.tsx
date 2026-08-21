@@ -245,7 +245,7 @@ export const Navbar = () => {
             <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a' }}>r<span style={{ fontSize: '0.72em' }}>UM</span>ı</span>
           </Link>
 
-          <div className="flex items-center space-x-4 md:mr-[4.5rem]">
+          <div className="flex items-center space-x-4 md:space-x-1 md:mr-[4.5rem]">
             {/* Home icon — quick link to properties for sale */}
             <button
               onClick={() => navigate('/purchase')}
