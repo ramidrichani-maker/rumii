@@ -252,7 +252,11 @@ export const Navbar = () => {
               aria-label="Properties for sale"
               className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <Home className="h-5 w-5" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <path d="M4 11 L12 4 L20 11" />
+                <path d="M6 10.5 V20 H18 V10.5" />
+                <path d="M10 20 V14 H14 V20" opacity="0" />
+              </svg>
             </button>
             {user ? <>
                 {/* My rumi (icon only) */}
