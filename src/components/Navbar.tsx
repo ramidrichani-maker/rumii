@@ -201,7 +201,10 @@ export const Navbar = () => {
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
             >
-              <Menu className="w-6 h-6" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-6 h-6">
+                <line x1="3" y1="8" x2="21" y2="8" />
+                <line x1="3" y1="16" x2="21" y2="16" />
+              </svg>
             </button>
             <Link to="/" className="flex items-center space-x-2">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
