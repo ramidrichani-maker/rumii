@@ -196,7 +196,7 @@ export const Navbar = () => {
         return 'secondary';
     }
   };
-  return <nav ref={navRef} className={`sticky top-0 border-b bg-background transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`} style={{ zIndex: 9990, overflow: 'visible' }}>
+  return <nav ref={navRef} className={`sticky top-0 bg-background transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`} style={{ zIndex: 9990, overflow: 'visible' }}>
       <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
