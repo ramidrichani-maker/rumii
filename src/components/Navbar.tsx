@@ -264,10 +264,10 @@ export const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   aria-label="My rumi"
-                  className="h-10 w-10 md:h-[4.219rem] md:w-[4.219rem] rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
+                  className="h-10 w-10 md:h-[4.219rem] md:w-[4.219rem] md:justify-end rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 md:h-10 md:w-10 text-muted-foreground">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 md:h-10 md:w-10 md:-mr-[0.42rem] text-muted-foreground">
                     <circle cx="12" cy="7" r="4.5" />
                     <path d="M4 20a8 8 0 0 1 16 0" />
                   </svg>
