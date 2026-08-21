@@ -113,14 +113,13 @@ const HeroSearch = () => {
             </div>
           )}
         </div>
-        <Button
+        <button
           onClick={handleSearch}
-          size="lg"
-          className="h-14 px-6 rounded-xl text-base font-semibold"
+          aria-label="Search"
+          className="h-14 w-14 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
         >
-          <Search className="w-5 h-5 mr-2" />
-          Search
-        </Button>
+          <Search className="w-6 h-6 text-foreground" strokeWidth={1.25} />
+        </button>
       </div>
 
       {/* Draw map */}
