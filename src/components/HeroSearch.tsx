@@ -5,7 +5,6 @@ import { X } from 'lucide-react';
 import TypewriterSearch from './TypewriterSearch';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import searchIconAsset from '@/assets/search_icon.png.asset.json';
 
 const DrawSearchArea = lazy(() => import('./DrawSearchArea'));
 
