@@ -200,7 +200,7 @@ export const Navbar = () => {
       <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
-            <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem]">
+            <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
             </Link>
             <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
@@ -241,7 +241,7 @@ export const Navbar = () => {
             )}
           </div>
 
-          <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center">
+          <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center hover:opacity-60 transition-opacity duration-200">
             <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a' }}>r<span style={{ fontSize: '0.72em' }}>UM</span>ı</span>
           </Link>
 
@@ -250,7 +250,7 @@ export const Navbar = () => {
             <button
               onClick={() => navigate('/purchase')}
               aria-label="Properties for sale"
-              className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              className="p-1.5 text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                 <path d="M4 11 L12 4 L20 11" />
@@ -264,7 +264,7 @@ export const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   aria-label="My rumi"
-                  className="h-10 w-10 md:h-[3.375rem] md:w-[3.375rem] rounded-full"
+                  className="h-10 w-10 md:h-[3.375rem] md:w-[3.375rem] rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground">
