@@ -204,6 +204,8 @@ export const Navbar = () => {
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
             </Link>
             <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
+            {/* Vertical divider between logo and hamburger on mobile */}
+            <div className="md:hidden self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
             <button
               className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors ml-auto"
               onClick={() => setMobileMenuOpen(true)}
