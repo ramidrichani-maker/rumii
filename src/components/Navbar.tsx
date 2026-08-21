@@ -200,8 +200,12 @@ export const Navbar = () => {
       <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
+            <Link to="/" className="flex items-center space-x-2 ml-3 md:ml-6">
+              <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
+            </Link>
+            <span className="hidden md:inline-block text-black text-2xl font-light leading-none select-none pb-0.5">|</span>
             <button
-              className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors"
+              className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors ml-auto"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
             >
@@ -210,10 +214,6 @@ export const Navbar = () => {
                 <line x1="3" y1="16" x2="21" y2="16" />
               </svg>
             </button>
-            <Link to="/" className="flex items-center space-x-2 ml-3 md:ml-6">
-              <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
-            </Link>
-            <span className="hidden md:inline-block text-black text-2xl font-light leading-none select-none pb-0.5">|</span>
             {profile?.role !== 'customer_support' ? (
             <nav ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
                 <div onClick={() => toggleMenu('properties')}>
@@ -349,19 +349,12 @@ export const Navbar = () => {
         </div>
       )}
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — full-screen slide-down like desktop blind */}
       {createPortal(
         <>
-          {mobileMenuOpen && (
-            <div
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity md:hidden"
-              style={{ zIndex: 9996 }}
-              onClick={() => setMobileMenuOpen(false)}
-            />
-          )}
           <div
-            className={`fixed top-0 left-0 h-screen w-[280px] border-r border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col md:hidden ${
-              mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            className={`fixed inset-0 w-full h-screen transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col md:hidden ${
+              mobileMenuOpen ? 'translate-y-0' : '-translate-y-full pointer-events-none'
             }`}
             style={{ zIndex: 9997, backgroundColor: 'hsl(var(--background))' }}
           >
