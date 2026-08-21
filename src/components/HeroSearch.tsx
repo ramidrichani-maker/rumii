@@ -49,7 +49,7 @@ const HeroSearch = () => {
   );
 
   return (
-    <div className="w-full max-w-2xl mx-auto relative z-[60]">
+    <div className="w-full max-w-[940px] mx-auto relative z-[60]">
       {/* Buy / Rent Toggle */}
       <div className="flex mb-6 bg-muted/60 backdrop-blur-sm rounded-xl p-1.5 max-w-xs mx-auto">
         <button
