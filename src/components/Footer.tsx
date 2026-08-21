@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Linkedin, MessageCircle, Facebook, Youtube } from 'lucide-react';
+import { Instagram, Linkedin, MessageCircle, Facebook, Youtube, Plus } from 'lucide-react';
 import rumiLogo from '@/assets/rumi-logo.png';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { CustomerSupportChat } from './CustomerSupportChat';
 
-const sections: { title: string; items?: { label: string; to?: string }[] }[] = [
+type FooterItem = { label: string; to?: string };
+type FooterSection = { title: string; items?: FooterItem[] };
+
+const sections: FooterSection[] = [
   {
     title: '\n\nPROPERTIES',
     items: [
@@ -44,7 +47,7 @@ const sections: { title: string; items?: { label: string; to?: string }[] }[] = 
   },
 ];
 
-const legalLinks = [
+const legalLinks: FooterItem[] = [
   { label: 'Terms of Use', to: '/terms-of-service' },
   { label: 'Privacy Notice', to: '#' },
   { label: 'Cookie Policy', to: '#' },
@@ -63,8 +66,33 @@ const XIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const renderItem = (item: FooterItem) =>
+  item.to && item.to !== '#' ? (
+    <Link
+      key={item.label}
+      to={item.to}
+      className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6 hover:text-footer-foreground transition-colors cursor-pointer"
+    >
+      {item.label}
+    </Link>
+  ) : (
+    <span
+      key={item.label}
+      className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6"
+    >
+      {item.label}
+    </span>
+  );
+
 export const Footer = () => {
   const [chatOpen, setChatOpen] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  const toggleSection = (title: string) =>
+    setOpenSection((prev) => (prev === title ? null : title));
+
+  // Combine the four sections + Legal for the mobile accordion
+  const mobileSections: FooterSection[] = [...sections, { title: '\n\nLEGAL', items: legalLinks }];
 
   return (
     <footer className="bg-footer text-footer-foreground mt-auto">
@@ -85,35 +113,54 @@ export const Footer = () => {
       </div>
       <div className="w-full border-t border-[hsl(30_18%_58%)]/64" />
       <div className="container mx-auto px-4 pb-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:ml-auto md:max-w-[60%] lg:max-w-[48%] mt-20">
+        {/* Mobile: stacked accordions with + toggle */}
+        <div className="md:hidden mt-10 flex flex-col">
+          {mobileSections.map((section) => {
+            const isOpen = openSection === section.title;
+            return (
+              <div key={section.title} className="border-b border-[hsl(30_18%_58%)]/30">
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.title)}
+                  className="w-full flex items-center justify-between py-4 text-left"
+                  aria-expanded={isOpen}
+                >
+                  <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-footer-foreground uppercase whitespace-pre-wrap">
+                    {section.title}
+                  </h3>
+                  <Plus
+                    className={`w-4 h-4 text-footer-foreground/70 transition-transform duration-300 shrink-0 ${
+                      isOpen ? 'rotate-45' : ''
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`grid transition-all duration-300 ease-out ${
+                    isOpen ? 'grid-rows-[1fr] opacity-100 pb-4' : 'grid-rows-[0fr] opacity-0'
+                  }`}
+                >
+                  <div className="overflow-hidden flex flex-col gap-1">
+                    {section.items?.map(renderItem)}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: 4-column grid (Legal stays in bottom bar) */}
+        <div className="hidden md:grid grid-cols-4 gap-1 md:ml-auto md:max-w-[60%] lg:max-w-[48%] mt-20">
           {sections.map((section) => (
             <div key={section.title} className="flex flex-col gap-1">
               <h3 className="text-xs font-[Arial,sans-serif] font-light tracking-[0.18em] text-footer-foreground uppercase mb-1 whitespace-pre-wrap">
                 {section.title}
               </h3>
-              {section.items?.map((item) => (
-                item.to ? (
-                  <Link
-                    key={item.label}
-                    to={item.to}
-                    className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6 hover:text-footer-foreground transition-colors cursor-pointer"
-                  >
-                    {item.label}
-                  </Link>
-                ) : (
-                  <span
-                    key={item.label}
-                    className="text-sm font-[Arial,sans-serif] font-light text-footer-foreground/70 leading-6"
-                  >
-                    {item.label}
-                  </span>
-                )
-              ))}
+              {section.items?.map(renderItem)}
             </div>
           ))}
         </div>
 
-        {/* Bottom bar: brand, social icons, legal links, copyright */}
+        {/* Bottom bar: brand, social icons, legal links (desktop only), copyright */}
         <div className="mt-[5.1rem] flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             {/* Brand + social icons */}
@@ -123,54 +170,33 @@ export const Footer = () => {
               </Link>
 
               <div className="flex items-center gap-4">
-                <span
-                  aria-label="Instagram"
-                  className="text-footer-foreground/70"
-                >
+                <span aria-label="Instagram" className="text-footer-foreground/70">
                   <Instagram className="w-5 h-5" />
                 </span>
-                <span
-                  aria-label="Facebook"
-                  className="text-footer-foreground/70"
-                >
+                <span aria-label="Facebook" className="text-footer-foreground/70">
                   <Facebook className="w-5 h-5" />
                 </span>
-                <span
-                  aria-label="Youtube"
-                  className="text-footer-foreground/70"
-                >
+                <span aria-label="Youtube" className="text-footer-foreground/70">
                   <Youtube className="w-5 h-5" />
                 </span>
-                <span
-                  aria-label="TikTok"
-                  className="text-footer-foreground/70"
-                >
+                <span aria-label="TikTok" className="text-footer-foreground/70">
                   <TikTokIcon className="w-5 h-5" />
                 </span>
-                <span
-                  aria-label="LinkedIn"
-                  className="text-footer-foreground/70"
-                >
+                <span aria-label="LinkedIn" className="text-footer-foreground/70">
                   <Linkedin className="w-5 h-5" />
                 </span>
-                <span
-                  aria-label="Customer support chat"
-                  className="text-footer-foreground/70"
-                >
+                <span aria-label="Customer support chat" className="text-footer-foreground/70">
                   <MessageCircle className="w-5 h-5" />
                 </span>
-                <span
-                  aria-label="X"
-                  className="text-footer-foreground/70"
-                >
+                <span aria-label="X" className="text-footer-foreground/70">
                   <XIcon className="w-5 h-5" />
                 </span>
               </div>
             </div>
 
-            {/* Legal links */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              {legalLinks.map((link) => (
+            {/* Legal links — desktop only (mobile shows them in the accordion) */}
+            <div className="hidden md:flex flex-wrap items-center gap-x-5 gap-y-2">
+              {legalLinks.map((link) =>
                 link.to && link.to !== '#' ? (
                   <Link
                     key={link.label}
@@ -187,7 +213,7 @@ export const Footer = () => {
                     {link.label}
                   </span>
                 )
-              ))}
+              )}
             </div>
           </div>
 
