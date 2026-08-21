@@ -349,19 +349,12 @@ export const Navbar = () => {
         </div>
       )}
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — full-screen slide-down like desktop blind */}
       {createPortal(
         <>
-          {mobileMenuOpen && (
-            <div
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity md:hidden"
-              style={{ zIndex: 9996 }}
-              onClick={() => setMobileMenuOpen(false)}
-            />
-          )}
           <div
-            className={`fixed top-0 left-0 h-screen w-[280px] border-r border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col md:hidden ${
-              mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            className={`fixed inset-0 w-full h-screen transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col md:hidden ${
+              mobileMenuOpen ? 'translate-y-0' : '-translate-y-full pointer-events-none'
             }`}
             style={{ zIndex: 9997, backgroundColor: 'hsl(var(--background))' }}
           >
