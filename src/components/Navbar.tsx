@@ -200,10 +200,10 @@ export const Navbar = () => {
       <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
-            <Link to="/" className="flex items-center space-x-2 ml-3 md:ml-6">
+            <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem]">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] object-contain self-center" />
             </Link>
-            <span className="hidden md:inline-block text-black text-2xl font-light leading-none select-none pb-0.5">|</span>
+            <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
             <button
               className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors ml-auto"
               onClick={() => setMobileMenuOpen(true)}
