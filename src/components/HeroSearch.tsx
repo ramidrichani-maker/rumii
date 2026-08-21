@@ -116,7 +116,7 @@ const HeroSearch = () => {
           aria-label="Search"
           className="absolute bottom-0 md:right-0 h-20 w-20 md:h-24 md:w-24 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
         >
-          <Search className="w-14 h-14 md:w-16 md:h-16 text-foreground" strokeWidth={0.6} style={{ transform: 'scaleX(-1)' }} />
+          <img src={searchIconAsset.url} alt="Search" className="w-14 h-14 md:w-16 md:h-16" style={{ transform: 'scaleX(-1)' }} />
         </button>
       </div>
 
