@@ -90,7 +90,7 @@ export const Navbar = () => {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [hidden, setHidden] = useState(false);
 
-  // Hide navbar on scroll down, reveal on scroll up
+  // Hide navbar on scroll down, reveal on scroll up or when at the very top
   useEffect(() => {
     let lastY = window.scrollY;
     let raf = 0;
@@ -99,6 +99,12 @@ export const Navbar = () => {
       raf = requestAnimationFrame(() => {
         raf = 0;
         const y = window.scrollY;
+        // Always show when back at the top of the page
+        if (y <= 0) {
+          setHidden(false);
+          lastY = y;
+          return;
+        }
         const delta = y - lastY;
         if (Math.abs(delta) < 6) return;
         if (delta > 0 && y > 80) {
