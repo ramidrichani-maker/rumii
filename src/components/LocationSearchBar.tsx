@@ -224,14 +224,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   }, [isMobile, mobileFiltersOpen]);
 
   useEffect(() => {
-    if (!isMobile || !advancedFilterOpen) return;
+    if (!advancedFilterOpen) return;
 
     let animationFrame = 0;
     const pinAdvancedFilterToViewport = () => {
       const content = document.querySelector('.advanced-filter-popover');
       const wrapper = content?.closest('[data-radix-popper-content-wrapper]') as HTMLElement | null;
 
-      if (wrapper) {
+      if (!wrapper) return;
+      if (isMobile) {
         Object.assign(wrapper.style, {
           position: 'fixed',
           inset: '0px',
@@ -245,6 +246,20 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           maxWidth: 'none',
           maxHeight: '100dvh',
           zIndex: '10060',
+        });
+      } else {
+        // Desktop: left half of the viewport, full height, slides in from the left.
+        Object.assign(wrapper.style, {
+          position: 'fixed',
+          top: '0px',
+          left: '0px',
+          bottom: '0px',
+          transform: 'none',
+          width: '50vw',
+          height: '100dvh',
+          maxWidth: '50vw',
+          maxHeight: '100dvh',
+          zIndex: '10050',
         });
       }
     };
@@ -1071,8 +1086,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  align="end"
-                  className="advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-4 z-[10050] w-[400px] max-h-[80vh] rounded-2xl bg-background/15"
+                  align="start"
+                  className="advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-6 z-[10050] w-[50vw] h-[100dvh] max-h-none rounded-r-2xl rounded-l-none bg-background/15 data-[state=open]:animate-in data-[state=open]:slide-in-from-left-full data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left-full data-[state=closed]:duration-200"
                 >
                   {advancedFilterBody}
                 </PopoverContent>
