@@ -1093,6 +1093,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               </Button>
             </div>
           )}
+          {trailingContent && (
+            <div className="hidden md:flex md:ml-2 items-center">{trailingContent}</div>
+          )}
         </div>
         </>
         );
