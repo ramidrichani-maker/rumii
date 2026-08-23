@@ -114,7 +114,7 @@ const HeroSearch = () => {
         <button
           onClick={handleSearch}
           aria-label="Search"
-          className="absolute bottom-0 md:right-0 h-20 w-20 md:h-24 md:w-24 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
+          className="absolute bottom-0 right-0 h-20 w-20 md:h-24 md:w-24 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
         >
           <img src={searchIconAsset.url} alt="Search" className="w-[4.55rem] h-[4.55rem] md:w-[5.2rem] md:h-[5.2rem]" style={{ transform: 'scaleX(-1)', filter: 'invert(1)' }} />
         </button>
