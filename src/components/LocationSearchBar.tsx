@@ -717,7 +717,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 5: Advanced Filter */}
-        <div className="flex flex-col gap-1 md:contents">
+        <div className="flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-2">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
           {(() => {
             const advancedFilterBody = (
