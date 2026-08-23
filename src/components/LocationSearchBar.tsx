@@ -224,14 +224,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   }, [isMobile, mobileFiltersOpen]);
 
   useEffect(() => {
-    if (!isMobile || !advancedFilterOpen) return;
+    if (!advancedFilterOpen) return;
 
     let animationFrame = 0;
     const pinAdvancedFilterToViewport = () => {
       const content = document.querySelector('.advanced-filter-popover');
       const wrapper = content?.closest('[data-radix-popper-content-wrapper]') as HTMLElement | null;
 
-      if (wrapper) {
+      if (!wrapper) return;
+      if (isMobile) {
         Object.assign(wrapper.style, {
           position: 'fixed',
           inset: '0px',
@@ -245,6 +246,20 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           maxWidth: 'none',
           maxHeight: '100dvh',
           zIndex: '10060',
+        });
+      } else {
+        // Desktop: left half of the viewport, full height, slides in from the left.
+        Object.assign(wrapper.style, {
+          position: 'fixed',
+          top: '0px',
+          left: '0px',
+          bottom: '0px',
+          transform: 'none',
+          width: '50vw',
+          height: '100dvh',
+          maxWidth: '50vw',
+          maxHeight: '100dvh',
+          zIndex: '10050',
         });
       }
     };
