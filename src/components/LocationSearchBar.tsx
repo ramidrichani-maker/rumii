@@ -1079,6 +1079,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               </Popover>
             );
           })()}
+          {trailingContent && (
+            <div className="hidden md:flex items-center">{trailingContent}</div>
+          )}
         </div>
           {isMobile && mobileFiltersOpen && (
             <div className="mt-3 md:hidden">
@@ -1092,9 +1095,6 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 Apply{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
               </Button>
             </div>
-          )}
-          {trailingContent && (
-            <div className="hidden md:flex md:ml-2 items-center">{trailingContent}</div>
           )}
         </div>
         </>
