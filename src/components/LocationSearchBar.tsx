@@ -1086,8 +1086,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  align="end"
-                  className="advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-4 z-[10050] w-[400px] max-h-[80vh] rounded-2xl bg-background/15"
+                  align="start"
+                  className="advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-6 z-[10050] w-[50vw] h-[100dvh] max-h-none rounded-r-2xl rounded-l-none bg-background/15 data-[state=open]:animate-in data-[state=open]:slide-in-from-left-full data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left-full data-[state=closed]:duration-200"
                 >
                   {advancedFilterBody}
                 </PopoverContent>
