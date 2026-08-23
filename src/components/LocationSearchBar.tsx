@@ -256,7 +256,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
       <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
-      <div className="flex flex-col md:flex-row gap-3">
+      <div className="flex flex-col md:flex-row md:flex-wrap gap-3">
         <div className="flex gap-2 items-stretch md:flex-1 md:min-w-0">
           <div className="relative flex-1 min-w-0 group">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -311,7 +311,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
         <div
           id="mobile-filters-panel"
-          className={`${mobileFiltersOpen ? 'flex' : 'hidden'} md:flex flex-col gap-2 md:flex-row md:gap-3 md:overflow-x-visible w-full md:w-auto shrink-0 ${
+          className={`${mobileFiltersOpen ? 'flex' : 'hidden'} flex-col gap-2 w-full md:contents ${
             isMobile && mobileFiltersOpen
               ? 'fixed inset-x-0 top-0 max-h-[90vh] z-[9999] overflow-y-auto overscroll-contain bg-background rounded-b-2xl p-4 pb-4 shadow-2xl animate-in slide-in-from-top duration-300 md:static md:max-h-none md:overflow-visible md:bg-transparent md:rounded-none md:p-0 md:shadow-none'
               : ''
@@ -717,7 +717,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 5: Advanced Filter */}
-        <div className="flex flex-col gap-1 md:contents">
+        <div className="flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-2">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
           {(() => {
             const advancedFilterBody = (
@@ -1079,6 +1079,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               </Popover>
             );
           })()}
+          {trailingContent && (
+            <div className="hidden md:flex items-center">{trailingContent}</div>
+          )}
         </div>
           {isMobile && mobileFiltersOpen && (
             <div className="mt-3 md:hidden">
@@ -1092,9 +1095,6 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 Apply{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
               </Button>
             </div>
-          )}
-          {trailingContent && (
-            <div className="hidden md:flex md:ml-2 items-center">{trailingContent}</div>
           )}
         </div>
         </>
