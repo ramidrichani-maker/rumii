@@ -259,8 +259,6 @@ export const Navbar = () => {
                 </button>
               {user ? <>
                 {/* My rumi (icon only) */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <button
                       aria-label="My rumi"
                       className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] shrink-0 flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
@@ -268,21 +266,11 @@ export const Navbar = () => {
                     >
                       <img src={profileIcon.url} alt="My rumi" className="h-5 w-5 md:h-[2.7rem] md:w-[2.7rem] translate-y-[0.15rem] md:translate-y-[0.3rem] object-contain" />
                     </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">My rumi</TooltipContent>
-                </Tooltip>
               </> : <>
                 {/* Desktop Sign In */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <Button className="hidden md:inline-flex" onClick={() => setAuthPanelOpen(true)}>Sign In</Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Sign in to your account</TooltipContent>
-                </Tooltip>
 
                 {/* Mobile Sign In */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <button
                       className="md:hidden h-10 w-10 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                       onClick={() => setAuthPanelOpen(true)}
@@ -291,9 +279,6 @@ export const Navbar = () => {
                         <img src={profileIcon.url} alt="Sign in" className="h-5 w-5 object-contain" />
                       </div>
                     </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Sign in</TooltipContent>
-                </Tooltip>
               </>}
           </div>
         </div>
