@@ -266,7 +266,7 @@ export const Navbar = () => {
                   className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <img src={profileIcon.url} alt="My rumi" className="h-5 w-5 md:h-[2.1rem] md:w-[2.1rem] object-contain" />
+                  <img src={profileIcon.url} alt="My rumi" className="h-5 w-5 md:h-[2.31rem] md:w-[2.31rem] object-contain" />
                 </button>
               </> : <>
                 {/* Desktop Sign In */}
