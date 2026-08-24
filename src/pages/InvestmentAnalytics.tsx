@@ -357,6 +357,11 @@ const InvestmentAnalytics = () => {
           <div className="space-y-6">
             {results ? (
               <>
+                <Button variant="outline" className="w-full" onClick={exportPdf}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export results as PDF
+                </Button>
+
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
