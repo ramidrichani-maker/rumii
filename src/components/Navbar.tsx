@@ -251,9 +251,9 @@ export const Navbar = () => {
             <button
               onClick={() => navigate('/purchase')}
               aria-label="Properties for sale"
-              className="p-1.5 text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
+              className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-center justify-center text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 md:h-[1.5625rem] md:w-[1.5625rem]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 md:h-[2.3rem] md:w-[2.3rem]">
                 <path d="M4 11 L12 4 L20 11" />
                 <path d="M6 10.5 V20 H18 V10.5" />
                 <path d="M10 20 V14 H14 V20" opacity="0" />
