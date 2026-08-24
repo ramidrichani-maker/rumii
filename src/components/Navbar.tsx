@@ -278,10 +278,7 @@ export const Navbar = () => {
                   onClick={() => setAuthPanelOpen(true)}
                 >
                   <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-                      <circle cx="12" cy="7" r="4.5" />
-                      <path d="M4 20a8 8 0 0 1 16 0" />
-                    </svg>
+                    <img src={profileIcon.url} alt="Sign in" className="h-5 w-5 object-contain" />
                   </div>
                   <span className="text-[10px] font-medium leading-none">Sign in</span>
                 </button>
