@@ -2,7 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
-import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal, X } from 'lucide-react';
+import { MapPin, ChevronDown, BedDouble, DollarSign, Home, X } from 'lucide-react';
+
+const FilterLinesIcon = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className={className} aria-hidden="true">
+    <circle cx="5" cy="7" r="2.2" fill="currentColor" stroke="none" />
+    <line x1="7.2" y1="7" x2="21" y2="7" />
+    <line x1="3" y1="17" x2="16.8" y2="17" />
+    <circle cx="19" cy="17" r="2.2" fill="currentColor" stroke="none" />
+  </svg>
+);
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
@@ -300,7 +309,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             aria-controls="mobile-filters-panel"
             className="md:hidden h-12 px-4 rounded-md border border-border bg-background/40 text-sm font-medium flex items-center gap-2 shrink-0 hover:border-primary/50 transition-colors"
           >
-            <SlidersHorizontal className="w-4 h-4" />
+            <FilterLinesIcon className="w-4 h-4" />
             Filters
             {activeFilterCount > 0 && (
               <span className="ml-1 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
@@ -1053,7 +1062,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     onClick={() => setAdvancedFilterOpen(true)}
                     className="h-10 px-4 gap-2 min-w-[110px] flex-1"
                   >
-                    <SlidersHorizontal className="w-4 h-4" />
+                    <FilterLinesIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">Filter</span>
                     <ChevronDown className="w-4 h-4" />
                   </Button>
@@ -1080,7 +1089,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <Popover open={advancedFilterOpen} onOpenChange={setAdvancedFilterOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="h-12 px-4 gap-2 min-w-[110px]">
-                    <SlidersHorizontal className="w-4 h-4" />
+                    <FilterLinesIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">Filter</span>
                     <ChevronDown className="w-4 h-4" />
                   </Button>
