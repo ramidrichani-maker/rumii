@@ -95,14 +95,12 @@ const HeroSearch = () => {
       </div>
 
       {/* Buy / Rent Toggle */}
-      <div className="flex mt-6 bg-muted/60 backdrop-blur-sm rounded-xl p-1.5 max-w-xs mx-auto">
+      <div className="relative flex mt-6 max-w-xs mx-auto">
         <button
           onClick={() => setListingMode('buy')}
           className={cn(
-            'flex-1 py-2.5 px-6 rounded-lg text-sm font-semibold transition-all duration-300',
-            listingMode === 'buy'
-              ? 'bg-primary text-primary-foreground shadow-md'
-              : 'text-muted-foreground hover:text-foreground'
+            'flex-1 py-2.5 px-6 text-sm font-semibold transition-colors duration-300',
+            listingMode === 'buy' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
           )}
         >
           Buy
@@ -110,14 +108,16 @@ const HeroSearch = () => {
         <button
           onClick={() => setListingMode('rent')}
           className={cn(
-            'flex-1 py-2.5 px-6 rounded-lg text-sm font-semibold transition-all duration-300',
-            listingMode === 'rent'
-              ? 'bg-primary text-primary-foreground shadow-md'
-              : 'text-muted-foreground hover:text-foreground'
+            'flex-1 py-2.5 px-6 text-sm font-semibold transition-colors duration-300',
+            listingMode === 'rent' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
           )}
         >
           Rent
         </button>
+        <span
+          className="absolute bottom-0 h-[1.5px] bg-foreground transition-transform duration-300 ease-out"
+          style={{ left: 0, width: '50%', transform: listingMode === 'buy' ? 'translateX(0%)' : 'translateX(100%)' }}
+        />
       </div>
 
       {/* Draw map */}
