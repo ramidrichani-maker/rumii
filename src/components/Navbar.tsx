@@ -266,10 +266,7 @@ export const Navbar = () => {
                   className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 md:h-[2.1rem] md:w-[2.1rem] text-muted-foreground">
-                    <circle cx="12" cy="6" r="3.5" />
-                    <path d="M5 20 C 5 14 8 12 12 12 C 16 12 19 14 19 20 Z" />
-                  </svg>
+                  <img src={profileIcon.url} alt="My rumi" className="h-5 w-5 md:h-[2.1rem] md:w-[2.1rem] object-contain" />
                 </button>
               </> : <>
                 {/* Desktop Sign In */}
