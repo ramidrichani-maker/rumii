@@ -15,6 +15,20 @@ const HeroSearch = () => {
   const [showDrawMap, setShowDrawMap] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [drawnPolygon, setDrawnPolygon] = useState<{ latitude: number; longitude: number }[] | null>(null);
+  const toggleRef = useRef<HTMLDivElement>(null);
+  const buyTextRef = useRef<HTMLSpanElement>(null);
+  const rentTextRef = useRef<HTMLSpanElement>(null);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+
+  useLayoutEffect(() => {
+    const container = toggleRef.current;
+    const txt = listingMode === 'buy' ? buyTextRef.current : rentTextRef.current;
+    if (!container || !txt) return;
+    const cRect = container.getBoundingClientRect();
+    const tRect = txt.getBoundingClientRect();
+    setIndicator({ left: tRect.left - cRect.left, width: tRect.width });
+  }, [listingMode]);
+
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
