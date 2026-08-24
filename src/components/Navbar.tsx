@@ -278,11 +278,18 @@ export const Navbar = () => {
                 </Tooltip>
               </> : <>
                 {/* Desktop Sign In */}
-                <Button className="hidden md:inline-flex" onClick={() => setAuthPanelOpen(true)}>Sign In</Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button className="hidden md:inline-flex" onClick={() => setAuthPanelOpen(true)}>Sign In</Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Sign in to your account</TooltipContent>
+                </Tooltip>
 
                 {/* Mobile Sign In */}
-                <button
-                  className="md:hidden h-10 w-10 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="md:hidden h-10 w-10 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setAuthPanelOpen(true)}
                 >
                   <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
