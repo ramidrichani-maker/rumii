@@ -51,32 +51,6 @@ const HeroSearch = () => {
 
   return (
     <div className="w-[95%] mx-auto md:w-auto md:mx-[4.5rem] relative z-[60]">
-      {/* Buy / Rent Toggle */}
-      <div className="flex mb-6 bg-muted/60 backdrop-blur-sm rounded-xl p-1.5 max-w-xs mx-auto">
-        <button
-          onClick={() => setListingMode('buy')}
-          className={cn(
-            'flex-1 py-2.5 px-6 rounded-lg text-sm font-semibold transition-all duration-300',
-            listingMode === 'buy'
-              ? 'bg-primary text-primary-foreground shadow-md'
-              : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          Buy
-        </button>
-        <button
-          onClick={() => setListingMode('rent')}
-          className={cn(
-            'flex-1 py-2.5 px-6 rounded-lg text-sm font-semibold transition-all duration-300',
-            listingMode === 'rent'
-              ? 'bg-primary text-primary-foreground shadow-md'
-              : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          Rent
-        </button>
-      </div>
-
       {/* Search bar */}
       <div className="relative" onKeyDown={handleKeyDown}>
         <div className="flex-1 relative">
@@ -117,6 +91,32 @@ const HeroSearch = () => {
           className="absolute bottom-0 right-0 h-20 w-20 md:h-24 md:w-24 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
         >
           <img src={searchIconAsset.url} alt="Search" className="w-[4.55rem] h-[4.55rem] md:w-[5.2rem] md:h-[5.2rem]" style={{ transform: 'scaleX(-1)', filter: 'invert(1)' }} />
+        </button>
+      </div>
+
+      {/* Buy / Rent Toggle */}
+      <div className="flex mt-6 bg-muted/60 backdrop-blur-sm rounded-xl p-1.5 max-w-xs mx-auto">
+        <button
+          onClick={() => setListingMode('buy')}
+          className={cn(
+            'flex-1 py-2.5 px-6 rounded-lg text-sm font-semibold transition-all duration-300',
+            listingMode === 'buy'
+              ? 'bg-primary text-primary-foreground shadow-md'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          Buy
+        </button>
+        <button
+          onClick={() => setListingMode('rent')}
+          className={cn(
+            'flex-1 py-2.5 px-6 rounded-lg text-sm font-semibold transition-all duration-300',
+            listingMode === 'rent'
+              ? 'bg-primary text-primary-foreground shadow-md'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          Rent
         </button>
       </div>
 
