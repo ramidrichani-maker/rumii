@@ -212,15 +212,9 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
         </div>
         <CardHeader className="pb-1 pt-3">
           <div className="flex justify-end items-start mb-1">
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-2xl font-bold text-primary">
-                {formatPrice(property)}
-              </span>
-              <div className="flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 max-w-[10rem]">
-                <img src={agencyLogo} alt={agencyName} className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
-                <span className="text-[10px] font-medium text-muted-foreground truncate">{agencyName}</span>
-              </div>
-            </div>
+            <span className="text-2xl font-bold text-primary">
+              {formatPrice(property)}
+            </span>
           </div>
           <CardTitle className="text-lg leading-tight">{property.city}</CardTitle>
         </CardHeader>
