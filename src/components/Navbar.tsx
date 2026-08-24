@@ -252,15 +252,15 @@ export const Navbar = () => {
             <button
               onClick={() => navigate('/purchase')}
               aria-label="Properties for sale"
-              className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-center justify-center text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
+              className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-end justify-center text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
             >
-              <img src={houseIcon.url} alt="Properties for sale" className="h-5 w-5 md:h-[3.1878rem] md:w-[3.1878rem] object-contain" />
+              <img src={houseIcon.url} alt="Properties for sale" className="h-5 w-5 md:h-[2.7rem] md:w-[2.7rem] object-contain" />
             </button>
              {user ? <>
                 {/* My rumi (icon only) */}
                 <button
                   aria-label="My rumi"
-                  className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
+                  className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-end justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
                   <img src={profileIcon.url} alt="My rumi" className="h-5 w-5 md:h-[3.1878rem] md:w-[3.1878rem] object-contain" />
