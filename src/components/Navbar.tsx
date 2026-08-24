@@ -290,12 +290,15 @@ export const Navbar = () => {
                   <TooltipTrigger asChild>
                     <button
                       className="md:hidden h-10 w-10 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => setAuthPanelOpen(true)}
-                >
-                  <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
-                    <img src={profileIcon.url} alt="Sign in" className="h-5 w-5 object-contain" />
-                  </div>
-                </button>
+                      onClick={() => setAuthPanelOpen(true)}
+                    >
+                      <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
+                        <img src={profileIcon.url} alt="Sign in" className="h-5 w-5 object-contain" />
+                      </div>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Sign in</TooltipContent>
+                </Tooltip>
               </>}
           </div>
         </div>
