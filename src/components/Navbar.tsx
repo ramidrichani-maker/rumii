@@ -250,8 +250,6 @@ export const Navbar = () => {
 
           <div className="flex items-center gap-3 md:gap-0 md:mr-[4.5rem]">
             {/* Home icon — quick link to properties for sale */}
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <button
                   onClick={() => navigate('/purchase')}
                   aria-label="Properties for sale"
@@ -259,9 +257,6 @@ export const Navbar = () => {
                 >
                   <img src={houseIcon.url} alt="Properties for sale" className="h-5 w-5 md:h-[2.7rem] md:w-[2.7rem] translate-y-[0.15rem] md:translate-y-[0.3rem] object-contain" />
                 </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Properties for sale</TooltipContent>
-            </Tooltip>
               {user ? <>
                 {/* My rumi (icon only) */}
                 <Tooltip>
