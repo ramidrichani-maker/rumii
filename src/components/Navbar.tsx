@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, Menu, Mail, Map } from 'lucide-react';
 import rumiLogo from '@/assets/rumi-logo.png';
+import profileIcon from '@/assets/profile-icon.png.asset.json';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
@@ -265,10 +266,7 @@ export const Navbar = () => {
                   className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 md:h-[2.1rem] md:w-[2.1rem] text-muted-foreground">
-                    <circle cx="12" cy="6" r="3.5" />
-                    <path d="M5 20 C 5 14 8 12 12 12 C 16 12 19 14 19 20 Z" />
-                  </svg>
+                  <img src={profileIcon.url} alt="My rumi" className="h-5 w-5 md:h-[2.1rem] md:w-[2.1rem] object-contain" />
                 </button>
               </> : <>
                 {/* Desktop Sign In */}
@@ -280,10 +278,7 @@ export const Navbar = () => {
                   onClick={() => setAuthPanelOpen(true)}
                 >
                   <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-                      <circle cx="12" cy="7" r="4.5" />
-                      <path d="M4 20a8 8 0 0 1 16 0" />
-                    </svg>
+                    <img src={profileIcon.url} alt="Sign in" className="h-5 w-5 object-contain" />
                   </div>
                   <span className="text-[10px] font-medium leading-none">Sign in</span>
                 </button>
