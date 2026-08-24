@@ -255,7 +255,7 @@ export const Navbar = () => {
                   aria-label="Properties for sale"
                   className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] shrink-0 flex items-center justify-center text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
                 >
-                  <img src={houseIcon.url} alt="Properties for sale" className="h-5 w-5 md:h-[2.7rem] md:w-[2.7rem] translate-y-[0.15rem] md:translate-y-[0.3rem] object-contain" />
+                  <img src={houseIcon.url} alt="Properties for sale" className="h-[40px] w-[40px] md:h-[2.7rem] md:w-[2.7rem] translate-y-[0.15rem] md:translate-y-[0.3rem] object-contain" />
                 </button>
               {user ? <>
                 {/* My rumi (icon only) */}
