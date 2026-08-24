@@ -265,7 +265,7 @@ export const Navbar = () => {
                   className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 md:h-[2.8rem] md:w-[2.8rem] text-muted-foreground">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 md:h-[2.1rem] md:w-[2.1rem] text-muted-foreground">
                     <circle cx="12" cy="7" r="4.5" />
                     <path d="M4 20a8 8 0 0 1 16 0" />
                   </svg>
