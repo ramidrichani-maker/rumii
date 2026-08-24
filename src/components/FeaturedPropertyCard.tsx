@@ -211,8 +211,7 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
           )}
         </div>
         <CardHeader className="pb-1 pt-3">
-          <div className="flex justify-between items-start mb-1">
-            <Badge variant={badgeVariant}>{badgeLabel}</Badge>
+          <div className="flex justify-end items-start mb-1">
             <div className="flex flex-col items-end gap-1">
               <span className="text-2xl font-bold text-primary">
                 {formatPrice(property)}
