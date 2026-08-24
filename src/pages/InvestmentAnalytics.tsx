@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Calculator, TrendingUp, DollarSign, Percent } from 'lucide-react';
+import { ArrowLeft, Calculator, TrendingUp, DollarSign, Percent, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
 import { Link } from 'react-router-dom';
 import PropertyMap from '@/components/PropertyMap';
 
