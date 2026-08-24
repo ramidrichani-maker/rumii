@@ -1,4 +1,4 @@
-import { useState, useCallback, lazy, Suspense } from 'react';
+import { useState, useCallback, lazy, Suspense, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -15,6 +15,20 @@ const HeroSearch = () => {
   const [showDrawMap, setShowDrawMap] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [drawnPolygon, setDrawnPolygon] = useState<{ latitude: number; longitude: number }[] | null>(null);
+  const toggleRef = useRef<HTMLDivElement>(null);
+  const buyTextRef = useRef<HTMLSpanElement>(null);
+  const rentTextRef = useRef<HTMLSpanElement>(null);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+
+  useLayoutEffect(() => {
+    const container = toggleRef.current;
+    const txt = listingMode === 'buy' ? buyTextRef.current : rentTextRef.current;
+    if (!container || !txt) return;
+    const cRect = container.getBoundingClientRect();
+    const tRect = txt.getBoundingClientRect();
+    setIndicator({ left: tRect.left - cRect.left, width: tRect.width });
+  }, [listingMode]);
+
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -95,28 +109,28 @@ const HeroSearch = () => {
       </div>
 
       {/* Buy / Rent Toggle */}
-      <div className="relative flex mt-6 max-w-xs mx-auto">
+      <div ref={toggleRef} className="relative flex mt-6 max-w-xs mx-auto">
         <button
           onClick={() => setListingMode('buy')}
           className={cn(
-            'flex-1 py-2.5 px-6 text-sm font-semibold transition-colors duration-300',
+            'flex-1 py-2.5 px-6 text-sm font-semibold transition-colors duration-300 flex items-center justify-center',
             listingMode === 'buy' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          Buy
+          <span ref={buyTextRef}>Buy</span>
         </button>
         <button
           onClick={() => setListingMode('rent')}
           className={cn(
-            'flex-1 py-2.5 px-6 text-sm font-semibold transition-colors duration-300',
+            'flex-1 py-2.5 px-6 text-sm font-semibold transition-colors duration-300 flex items-center justify-center',
             listingMode === 'rent' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          Rent
+          <span ref={rentTextRef}>Rent</span>
         </button>
         <span
-          className="absolute bottom-0 h-[1.5px] bg-foreground transition-transform duration-300 ease-out"
-          style={{ left: 0, width: '50%', transform: listingMode === 'buy' ? 'translateX(0%)' : 'translateX(100%)' }}
+          className="absolute bottom-0 h-[1.5px] bg-foreground transition-all duration-300 ease-out"
+          style={{ left: indicator.left, width: indicator.width }}
         />
       </div>
 
