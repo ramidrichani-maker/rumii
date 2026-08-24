@@ -99,14 +99,6 @@ const Index = () => {
           </div>
         ) : (featuredRentals.length > 0 || featuredSales.length > 0) && (
           <div className="mt-12 mb-8">
-            <ScrollReveal animation="fade-up">
-              <div className="text-center mb-12">
-                <h2 className="font-bold mb-4 text-2xl text-[#b8a694]">Featured Listings</h2>
-                <p className="text-lg text-[#b8a694]/80">
-                  Discover the most sought-after properties&nbsp;
-                </p>
-              </div>
-            </ScrollReveal>
             
             {featuredSales.length > 0 && (
               <div className="mb-16">
