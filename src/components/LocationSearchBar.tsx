@@ -1089,7 +1089,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               <Popover open={advancedFilterOpen} onOpenChange={setAdvancedFilterOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="h-12 px-4 gap-2 min-w-[110px]">
-                    <SlidersHorizontal className="w-4 h-4" />
+                    <FilterLinesIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">Filter</span>
                     <ChevronDown className="w-4 h-4" />
                   </Button>
