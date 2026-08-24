@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Calculator, TrendingUp, DollarSign, Percent } from 'lucide-react';
+import { ArrowLeft, Calculator, TrendingUp, DollarSign, Percent, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
 import { Link } from 'react-router-dom';
 import PropertyMap from '@/components/PropertyMap';
 
@@ -140,6 +141,81 @@ const InvestmentAnalytics = () => {
       setIsCalculating(false);
     }, 1500);
   };
+
+  const exportPdf = () => {
+    if (!results) return;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const marginX = 48;
+    let y = 64;
+    const money = (n: number) => `$${n.toLocaleString()}`;
+
+    doc.setFontSize(20);
+    doc.text('Investment Analytics Report', marginX, y);
+    y += 20;
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    doc.text(`Generated ${new Date().toLocaleDateString()}`, marginX, y);
+    doc.setTextColor(0);
+    y += 32;
+
+    const section = (title: string, rows: [string, string][]) => {
+      doc.setFontSize(13);
+      doc.text(title, marginX, y);
+      y += 8;
+      doc.setDrawColor(200);
+      doc.line(marginX, y, 547, y);
+      y += 16;
+      doc.setFontSize(11);
+      rows.forEach(([label, value]) => {
+        doc.setTextColor(90);
+        doc.text(label, marginX, y);
+        doc.setTextColor(0);
+        doc.text(value, 547, y, { align: 'right' });
+        y += 18;
+      });
+      y += 18;
+    };
+
+    section('Key Assumptions', [
+      ['Governorate', formData.location || '—'],
+      ['City', formData.city || '—'],
+      ['Property type', formData.propertyType || '—'],
+      ['Area (sqm)', formData.squareMeters || '—'],
+      ['Year built', formData.yearBuilt || '—'],
+      ['Last renovated', formData.lastRenovated || '—'],
+      ['Purchase price', formData.purchasePrice ? money(Number(formData.purchasePrice)) : '—'],
+      ['Loan amount', formData.loanAmount ? money(Number(formData.loanAmount)) : '—'],
+      ['Interest rate', formData.interestRate ? `${formData.interestRate}%` : '—'],
+      ['Loan term', formData.loanTerm ? `${formData.loanTerm} years` : '—'],
+      ['Monthly expenses', formData.monthlyExpenses ? money(Number(formData.monthlyExpenses)) : '—'],
+      ['Coordinates', `${coordinates.lat.toFixed(4)}, ${coordinates.lng.toFixed(4)}`],
+    ]);
+
+    section('Rental Estimates', [
+      ['Monthly rental', money(results.monthlyRental)],
+      ['Annual rental', money(results.annualRental)],
+    ]);
+
+    section('Return on Investment', [
+      ['Gross yield', `${results.grossYield}%`],
+      ['Net yield', `${results.netYield}%`],
+      ['Monthly cash flow', money(results.monthlyCashflow)],
+      ['Annual cash flow', money(results.annualCashflow)],
+    ]);
+
+    doc.setFontSize(9);
+    doc.setTextColor(130);
+    doc.text(
+      'Estimates only, based on general market data. Actual results may vary — consult a real estate professional.',
+      marginX,
+      y,
+      { maxWidth: 499 }
+    );
+
+    doc.save('investment-analytics.pdf');
+  };
+
+
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -357,6 +433,11 @@ const InvestmentAnalytics = () => {
           <div className="space-y-6">
             {results ? (
               <>
+                <Button variant="outline" className="w-full" onClick={exportPdf}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export results as PDF
+                </Button>
+
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
