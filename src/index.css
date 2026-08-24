@@ -309,3 +309,13 @@ All colors MUST be HSL.
   background: #c084fc !important;
   border-color: #a855f7 !important;
 }
+
+/* Homepage search bar — carve glyph strokes to render thinner than the
+   lightest font weight (100) allows. White stroke blends into the white
+   page background; only the inner half thins the glyph. Kept subtle to
+   avoid a hollow look. */
+.thin-search-text,
+.thin-search-text::placeholder {
+  -webkit-text-stroke: 0.4px #ffffff;
+  text-stroke: 0.4px #ffffff;
+}
