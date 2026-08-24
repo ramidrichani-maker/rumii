@@ -2,7 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
-import { MapPin, ChevronDown, BedDouble, DollarSign, Home, SlidersHorizontal, X } from 'lucide-react';
+import { MapPin, ChevronDown, BedDouble, DollarSign, Home, X } from 'lucide-react';
+
+const FilterLinesIcon = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className={className} aria-hidden="true">
+    <circle cx="5" cy="7" r="2.2" fill="currentColor" stroke="none" />
+    <line x1="7.2" y1="7" x2="21" y2="7" />
+    <line x1="3" y1="17" x2="16.8" y2="17" />
+    <circle cx="19" cy="17" r="2.2" fill="currentColor" stroke="none" />
+  </svg>
+);
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
