@@ -247,12 +247,12 @@ export const Navbar = () => {
             <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a', letterSpacing: '0.02em', display: 'inline-flex', alignItems: 'baseline' }}><span style={{ fontWeight: 300, display: 'inline-block', verticalAlign: 'baseline' }}>r</span><span style={{ fontSize: '0.72em', display: 'inline-block', verticalAlign: 'baseline', letterSpacing: '0.03em' }}>UM</span><span style={{ fontWeight: 300, display: 'inline-block', verticalAlign: 'baseline' }}>ı</span></span>
           </Link>
 
-          <div className="flex items-center space-x-4 md:space-x-0 md:mr-[4.5rem]">
+          <div className="flex items-center gap-3 md:gap-0 md:mr-[4.5rem]">
             {/* Home icon — quick link to properties for sale */}
             <button
               onClick={() => navigate('/purchase')}
               aria-label="Properties for sale"
-              className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-end justify-center text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
+              className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] shrink-0 flex items-center justify-center text-muted-foreground hover:opacity-60 hover:bg-transparent transition-opacity duration-200"
             >
               <img src={houseIcon.url} alt="Properties for sale" className="h-5 w-5 md:h-[2.7rem] md:w-[2.7rem] object-contain" />
             </button>
@@ -260,7 +260,7 @@ export const Navbar = () => {
                 {/* My rumi (icon only) */}
                 <button
                   aria-label="My rumi"
-                  className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] flex items-end justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
+                  className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] shrink-0 flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                   onClick={() => setProfilePanelOpen(true)}
                 >
                   <img src={profileIcon.url} alt="My rumi" className="h-5 w-5 md:h-[3.1878rem] md:w-[3.1878rem] object-contain" />
@@ -271,13 +271,12 @@ export const Navbar = () => {
 
                 {/* Mobile Sign In */}
                 <button
-                  className="md:hidden flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                  className="md:hidden h-10 w-10 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setAuthPanelOpen(true)}
                 >
                   <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
                     <img src={profileIcon.url} alt="Sign in" className="h-5 w-5 object-contain" />
                   </div>
-                  <span className="text-[10px] font-medium leading-none">Sign in</span>
                 </button>
               </>}
           </div>
