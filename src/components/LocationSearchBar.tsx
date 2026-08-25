@@ -154,6 +154,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [radiusOpen, setRadiusOpen] = useState(false);
   const [advancedFilterOpen, setAdvancedFilterOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    propertyType: false,
+    mustHaves: false,
+    propertyFeatures: false,
+  });
+  const toggleSection = (key: string) =>
+    setOpenSections((s) => ({ ...s, [key]: !s[key] }));
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
   const radiusDisabled = !location?.trim() && !hasDrawnArea;
   useEffect(() => {
