@@ -268,17 +268,13 @@ export const Navbar = () => {
                       <img src={profileIconFilled} alt="My rumi" className="h-[40px] w-[40px] md:h-[3.51rem] md:w-[3.51rem] translate-y-[0.2rem] md:translate-y-[0.5rem] object-contain" />
                     </button>
               </> : <>
-                {/* Desktop Sign In */}
-                    <Button className="hidden md:inline-flex" onClick={() => setAuthPanelOpen(true)}>Sign In</Button>
-
-                {/* Mobile Sign In */}
+                    {/* Profile icon — opens sign-in panel when not logged in */}
                     <button
-                      className="md:hidden h-10 w-10 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label="Sign in"
+                      className="h-10 w-10 md:h-[3.5rem] md:w-[3.5rem] shrink-0 flex items-center justify-center rounded-full hover:bg-transparent hover:opacity-60 transition-opacity duration-200"
                       onClick={() => setAuthPanelOpen(true)}
                     >
-                      <div className="h-9 w-9 rounded-full bg-muted/50 flex items-center justify-center">
-                        <img src={profileIcon.url} alt="Sign in" className="h-5 w-5 object-contain" />
-                      </div>
+                      <img src={profileIcon.url} alt="Sign in" className="h-[40px] w-[40px] md:h-[3.51rem] md:w-[3.51rem] translate-y-[0.2rem] md:translate-y-[0.5rem] object-contain" />
                     </button>
               </>}
           </div>
