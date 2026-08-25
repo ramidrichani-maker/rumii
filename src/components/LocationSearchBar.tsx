@@ -1038,13 +1038,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   </Button>
                   {advancedFilterOpen && createPortal(
                     <>
-                      {/* Backdrop - closes on click outside */}
+                      {/* Solid backdrop - blocks interaction, closes on click outside */}
                       <div
-                        className="fixed inset-0 z-[10059] bg-black/50"
+                        className="fixed inset-0 z-[10059] bg-black animate-in fade-in duration-200"
                         onClick={() => setAdvancedFilterOpen(false)}
                       />
                       {/* Popup - 10% smaller than full screen (90% viewport) */}
-                      <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl">
+                      <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="flex-1 overflow-y-auto p-4">
                           {advancedFilterBody}
                         </div>
