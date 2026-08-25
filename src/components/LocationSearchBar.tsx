@@ -1040,7 +1040,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     <>
                       {/* Solid backdrop - blocks interaction, closes on click outside */}
                       <div
-                        className="fixed inset-0 z-[10059] bg-black animate-in fade-in duration-200"
+                        className="fixed inset-0 z-[10059] bg-black/50 animate-in fade-in duration-200"
                         onClick={() => setAdvancedFilterOpen(false)}
                       />
                       {/* Popup - 10% smaller than full screen (90% viewport) */}
@@ -1070,7 +1070,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   <>
                     {/* Solid backdrop - blocks all interaction, closes on click outside */}
                     <div
-                      className="fixed inset-0 z-[10049] bg-black animate-in fade-in duration-200"
+                      className="fixed inset-0 z-[10049] bg-black/50 animate-in fade-in duration-200"
                       onClick={() => setAdvancedFilterOpen(false)}
                     />
                     {/* Panel - left half of viewport, solid background, slides in from the left */}
