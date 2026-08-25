@@ -232,50 +232,20 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     };
   }, [isMobile, mobileFiltersOpen]);
 
+  // Lock body scroll + close on Escape while the advanced filter modal is open.
   useEffect(() => {
     if (!advancedFilterOpen) return;
-
-    let animationFrame = 0;
-    const pinAdvancedFilterToViewport = () => {
-      const content = document.querySelector('.advanced-filter-popover');
-      const wrapper = content?.closest('[data-radix-popper-content-wrapper]') as HTMLElement | null;
-
-      if (!wrapper) return;
-      if (isMobile) {
-        Object.assign(wrapper.style, {
-          position: 'fixed',
-          inset: '0px',
-          top: '0px',
-          left: '0px',
-          right: '0px',
-          bottom: '0px',
-          transform: 'none',
-          width: '100vw',
-          height: '100dvh',
-          maxWidth: 'none',
-          maxHeight: '100dvh',
-          zIndex: '10060',
-        });
-      } else {
-        // Desktop: left half of the viewport, full height, slides in from the left.
-        Object.assign(wrapper.style, {
-          position: 'fixed',
-          top: '0px',
-          left: '0px',
-          bottom: '0px',
-          transform: 'none',
-          width: '50vw',
-          height: '100dvh',
-          maxWidth: '50vw',
-          maxHeight: '100dvh',
-          zIndex: '10050',
-        });
-      }
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAdvancedFilterOpen(false);
     };
-
-    animationFrame = requestAnimationFrame(pinAdvancedFilterToViewport);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [isMobile, advancedFilterOpen]);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = original;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [advancedFilterOpen]);
 
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
@@ -1068,13 +1038,13 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   </Button>
                   {advancedFilterOpen && createPortal(
                     <>
-                      {/* Backdrop - closes on click outside */}
+                      {/* Solid backdrop - blocks interaction, closes on click outside */}
                       <div
-                        className="fixed inset-0 z-[10059] bg-black/50"
+                        className="fixed inset-0 z-[10059] bg-black animate-in fade-in duration-200"
                         onClick={() => setAdvancedFilterOpen(false)}
                       />
                       {/* Popup - 10% smaller than full screen (90% viewport) */}
-                      <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl">
+                      <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="flex-1 overflow-y-auto p-4">
                           {advancedFilterBody}
                         </div>
@@ -1086,21 +1056,33 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               );
             }
             return (
-              <Popover open={advancedFilterOpen} onOpenChange={setAdvancedFilterOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-12 px-4 gap-2 min-w-[110px]">
-                    <FilterLinesIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">Filter</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-6 z-[10050] w-[50vw] h-[100dvh] max-h-none rounded-r-2xl rounded-l-none bg-background/15 data-[state=open]:animate-in data-[state=open]:slide-in-from-left-full data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left-full data-[state=closed]:duration-200"
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setAdvancedFilterOpen(true)}
+                  className="h-12 px-4 gap-2 min-w-[110px]"
                 >
-                  {advancedFilterBody}
-                </PopoverContent>
-              </Popover>
+                  <FilterLinesIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">Filter</span>
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+                {advancedFilterOpen && createPortal(
+                  <>
+                    {/* Solid backdrop - blocks all interaction, closes on click outside */}
+                    <div
+                      className="fixed inset-0 z-[10049] bg-black animate-in fade-in duration-200"
+                      onClick={() => setAdvancedFilterOpen(false)}
+                    />
+                    {/* Panel - left half of viewport, solid background, slides in from the left */}
+                    <div className="advanced-filter-popover fixed left-0 top-0 bottom-0 w-[50vw] z-[10050] bg-background flex flex-col shadow-2xl animate-in slide-in-from-left-full duration-300">
+                      <div className="flex-1 overflow-y-auto p-6">
+                        {advancedFilterBody}
+                      </div>
+                    </div>
+                  </>,
+                  document.body
+                )}
+              </>
             );
           })()}
           {trailingContent && (
