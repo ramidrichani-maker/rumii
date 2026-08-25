@@ -232,50 +232,20 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     };
   }, [isMobile, mobileFiltersOpen]);
 
+  // Lock body scroll + close on Escape while the advanced filter modal is open.
   useEffect(() => {
     if (!advancedFilterOpen) return;
-
-    let animationFrame = 0;
-    const pinAdvancedFilterToViewport = () => {
-      const content = document.querySelector('.advanced-filter-popover');
-      const wrapper = content?.closest('[data-radix-popper-content-wrapper]') as HTMLElement | null;
-
-      if (!wrapper) return;
-      if (isMobile) {
-        Object.assign(wrapper.style, {
-          position: 'fixed',
-          inset: '0px',
-          top: '0px',
-          left: '0px',
-          right: '0px',
-          bottom: '0px',
-          transform: 'none',
-          width: '100vw',
-          height: '100dvh',
-          maxWidth: 'none',
-          maxHeight: '100dvh',
-          zIndex: '10060',
-        });
-      } else {
-        // Desktop: left half of the viewport, full height, slides in from the left.
-        Object.assign(wrapper.style, {
-          position: 'fixed',
-          top: '0px',
-          left: '0px',
-          bottom: '0px',
-          transform: 'none',
-          width: '50vw',
-          height: '100dvh',
-          maxWidth: '50vw',
-          maxHeight: '100dvh',
-          zIndex: '10050',
-        });
-      }
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAdvancedFilterOpen(false);
     };
-
-    animationFrame = requestAnimationFrame(pinAdvancedFilterToViewport);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [isMobile, advancedFilterOpen]);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = original;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [advancedFilterOpen]);
 
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
