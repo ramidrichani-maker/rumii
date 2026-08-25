@@ -448,10 +448,6 @@ const Rent = () => {
       <div className="container mx-auto px-4 py-8 pb-0">
         <ScrollReveal animation="fade-up">
           <div className="mb-8">
-            <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Link>
             <h1 className="text-4xl font-bold text-foreground mb-2">Properties for Rent</h1>
             <p className="text-lg text-muted-foreground">Find and filter rental properties that match your criteria</p>
           </div>
