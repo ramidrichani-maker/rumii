@@ -982,7 +982,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Property Features section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Property Features</h4>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('propertyFeatures')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Property Features</h4>
+                  <span className="text-lg leading-none font-light">{openSections.propertyFeatures ? '−' : '+'}</span>
+                </button>
+                {openSections.propertyFeatures && (
                 <div className="grid grid-cols-2 gap-1">
                   {propertyFeatureOptions.map((item) => {
                     const isSelected = selectedFeatures.includes(item);
@@ -1004,6 +1012,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     );
                   })}
                 </div>
+                )}
               </div>
 
               <div className="border-t border-border" />
