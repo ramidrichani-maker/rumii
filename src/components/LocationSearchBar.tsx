@@ -866,7 +866,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Property Type section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Property Type</h4>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('propertyType')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Property Type</h4>
+                  <span className="text-lg leading-none font-light">{openSections.propertyType ? '−' : '+'}</span>
+                </button>
+                {openSections.propertyType && (
                 <div className="grid grid-cols-2 gap-1 rounded-2xl p-2">
                   <button
                     onClick={() => onPropertyTypesChange([])}
