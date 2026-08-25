@@ -1056,21 +1056,33 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               );
             }
             return (
-              <Popover open={advancedFilterOpen} onOpenChange={setAdvancedFilterOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-12 px-4 gap-2 min-w-[110px]">
-                    <FilterLinesIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">Filter</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="advanced-filter-popover bg-background backdrop-blur-md border-border/50 overflow-y-auto p-6 z-[10050] w-[50vw] h-[100dvh] max-h-none rounded-r-2xl rounded-l-none bg-background/15 data-[state=open]:animate-in data-[state=open]:slide-in-from-left-full data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left-full data-[state=closed]:duration-200"
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setAdvancedFilterOpen(true)}
+                  className="h-12 px-4 gap-2 min-w-[110px]"
                 >
-                  {advancedFilterBody}
-                </PopoverContent>
-              </Popover>
+                  <FilterLinesIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">Filter</span>
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+                {advancedFilterOpen && createPortal(
+                  <>
+                    {/* Solid backdrop - blocks all interaction, closes on click outside */}
+                    <div
+                      className="fixed inset-0 z-[10049] bg-black animate-in fade-in duration-200"
+                      onClick={() => setAdvancedFilterOpen(false)}
+                    />
+                    {/* Panel - left half of viewport, solid background, slides in from the left */}
+                    <div className="advanced-filter-popover fixed left-0 top-0 bottom-0 w-[50vw] z-[10050] bg-background flex flex-col shadow-2xl animate-in slide-in-from-left-full duration-300">
+                      <div className="flex-1 overflow-y-auto p-6">
+                        {advancedFilterBody}
+                      </div>
+                    </div>
+                  </>,
+                  document.body
+                )}
+              </>
             );
           })()}
           {trailingContent && (
