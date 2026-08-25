@@ -912,6 +912,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     );
                   })}
                 </div>
+                )}
               </div>
 
               {/* Unfurnished toggle */}
