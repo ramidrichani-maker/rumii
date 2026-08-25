@@ -860,10 +860,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               {/* Property Type section */}
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-2">Property Type</h4>
-                <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
+                <div className="grid grid-cols-2 gap-1 rounded-2xl p-2">
                   <button
                     onClick={() => onPropertyTypesChange([])}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                    className={`col-span-2 flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                       selectedPropertyTypes.length === 0
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-transparent bg-transparent hover:border-primary/50'
@@ -885,14 +885,14 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                             onPropertyTypesChange([...selectedPropertyTypes, typeId]);
                           }
                         }}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                        className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
                           isSelected
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-transparent bg-transparent hover:border-primary/50'
                         }`}
                       >
-                        <Checkbox checked={isSelected} className="pointer-events-none" />
-                        {type}
+                        <Checkbox checked={isSelected} className="pointer-events-none shrink-0" />
+                        <span className="truncate">{type}</span>
                       </button>
                     );
                   })}
