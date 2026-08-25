@@ -945,7 +945,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Must-Haves section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Must-Haves</h4>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('mustHaves')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Must-Haves</h4>
+                  <span className="text-lg leading-none font-light">{openSections.mustHaves ? '−' : '+'}</span>
+                </button>
+                {openSections.mustHaves && (
                 <div className="flex flex-col gap-2">
                   {mustHaveOptions.map((item) => {
                     const isSelected = selectedMustHaves.includes(item);
@@ -967,6 +975,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     );
                   })}
                 </div>
+                )}
               </div>
 
               <div className="border-t border-border" />
