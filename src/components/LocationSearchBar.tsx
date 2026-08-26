@@ -155,6 +155,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [radiusOpen, setRadiusOpen] = useState(false);
   const [advancedFilterOpen, setAdvancedFilterOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    bedrooms: false,
+    price: false,
     propertyType: false,
     mustHaves: false,
     propertyFeatures: false,
