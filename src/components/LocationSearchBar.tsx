@@ -1046,7 +1046,15 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Added to rumi section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Added to rumi</h4>
+                <button
+                  type="button"
+                  onClick={() => setOpenSections(s => ({ ...s, addedToRumi: !s.addedToRumi }))}
+                  className="flex items-center justify-between w-full text-sm font-semibold text-foreground mb-1"
+                >
+                  <span>Added to rumi</span>
+                  <span className="text-base leading-none">{openSections.addedToRumi ? '−' : '+'}</span>
+                </button>
+                {openSections.addedToRumi && (
                 <div className="flex flex-col gap-1">
                   {addedToRumiOptions.map((option) => (
                     <button
@@ -1069,6 +1077,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     </button>
                   ))}
                 </div>
+                )}
               </div>
 
               <div className="border-t border-border" />
