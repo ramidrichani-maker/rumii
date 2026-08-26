@@ -160,6 +160,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     propertyType: false,
     mustHaves: false,
     propertyFeatures: false,
+    addedToRumi: false,
   });
   const toggleSection = (key: string) =>
     setOpenSections((s) => ({ ...s, [key]: !s[key] }));
