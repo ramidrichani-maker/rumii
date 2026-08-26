@@ -1180,6 +1180,24 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     />
                     {/* Panel - left half of viewport, solid background, slides in from the left */}
                     <div className="advanced-filter-popover fixed left-0 top-0 bottom-0 w-[50vw] z-[10050] bg-background flex flex-col shadow-2xl animate-in slide-in-from-left-full duration-300">
+                      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                        <button
+                          type="button"
+                          onClick={clearAllFilters}
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Clear
+                        </button>
+                        <h4 className="text-base font-semibold text-foreground">Filters</h4>
+                        <button
+                          type="button"
+                          onClick={() => setAdvancedFilterOpen(false)}
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Close filters"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
                       <div className="flex-1 overflow-y-auto p-6">
                         {advancedFilterBody}
                       </div>
