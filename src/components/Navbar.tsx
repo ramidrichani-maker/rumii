@@ -246,7 +246,7 @@ export const Navbar = () => {
           </div>
 
           <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center hover:opacity-60 transition-opacity duration-200">
-            <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a', letterSpacing: '0.02em', display: 'inline-flex', alignItems: 'baseline' }}><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline' }}>r</span><span style={{ fontSize: '0.72em', display: 'inline-block', verticalAlign: 'baseline', letterSpacing: '0.03em' }}>UM</span><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline' }}>ı</span></span>
+            <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a', letterSpacing: '0.02em', display: 'inline-flex', alignItems: 'baseline' }}><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline', transform: 'scaleX(0.85)', transformOrigin: 'left center' }}>r</span><span style={{ fontSize: '0.72em', display: 'inline-block', verticalAlign: 'baseline', letterSpacing: '0.03em' }}>UM</span><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline', transform: 'scaleX(0.85)', transformOrigin: 'left center' }}>ı</span></span>
           </Link>
 
           <div className="flex items-center gap-3 md:gap-0 md:mr-[4.5rem]">
