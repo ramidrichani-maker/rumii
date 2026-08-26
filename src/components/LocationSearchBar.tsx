@@ -1080,7 +1080,6 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 )}
               </div>
 
-              <div className="border-t border-border" />
 
               {/* Keywords section */}
               <div>
