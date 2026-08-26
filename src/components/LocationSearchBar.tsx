@@ -1206,7 +1206,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         >
                           Clear
                         </button>
-                        <h4 className="text-base font-semibold text-foreground">Filters</h4>
+                        <h4 className="text-base font-extralight text-foreground">Filters</h4>
                         <button
                           type="button"
                           onClick={() => setAdvancedFilterOpen(false)}
