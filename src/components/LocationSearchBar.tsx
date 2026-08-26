@@ -1131,7 +1131,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         onClick={() => setAdvancedFilterOpen(false)}
                       />
                       {/* Popup - 10% smaller than full screen (90% viewport) */}
-                      <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                      <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl animate-in slide-in-from-left-full duration-300">
                         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                           <button
                             type="button"
