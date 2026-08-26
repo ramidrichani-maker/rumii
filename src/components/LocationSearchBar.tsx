@@ -164,6 +164,24 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   });
   const toggleSection = (key: string) =>
     setOpenSections((s) => ({ ...s, [key]: !s[key] }));
+
+  const clearAllFilters = () => {
+    onMinBedroomsChange('');
+    onMaxBedroomsChange('');
+    onBarMinPriceChange('');
+    onBarMaxPriceChange('');
+    onPropertyTypesChange([]);
+    onMustHavesChange([]);
+    onFeaturesChange([]);
+    onAddedToOracleChange('');
+    onKeywordsChange('');
+    onRadiusChange(0);
+    if (onUnfurnishedChange) onUnfurnishedChange(false);
+    setActiveBedroomTab(null);
+    setActivePriceTab(null);
+    setActiveFilterBedroomTab(null);
+    setActiveFilterPriceTab(null);
+  };
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
   const radiusDisabled = !location?.trim() && !hasDrawnArea;
   useEffect(() => {
