@@ -1117,13 +1117,12 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               return (
                 <>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setAdvancedFilterOpen(true)}
-                    className="h-10 px-4 gap-2 min-w-[110px] flex-1"
+                    className="h-10 px-4 gap-2 min-w-[110px] flex-1 border-0"
                   >
                     <FilterLinesIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">Filter</span>
-                    <ChevronDown className="w-4 h-4" />
+                    <span className="text-sm font-semibold">Filter</span>
                   </Button>
                   {advancedFilterOpen && createPortal(
                     <>
