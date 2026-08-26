@@ -155,6 +155,8 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [radiusOpen, setRadiusOpen] = useState(false);
   const [advancedFilterOpen, setAdvancedFilterOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    bedrooms: false,
+    price: false,
     propertyType: false,
     mustHaves: false,
     propertyFeatures: false,
@@ -725,69 +727,80 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             <div className="space-y-5 pb-6">
               {/* Bedrooms section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Bedrooms</h4>
-                <div className="flex gap-2 mb-2">
-                  <button
-                    onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'min' ? null : 'min')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activeFilterBedroomTab === 'min'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
-                  >
-                    Min: {minBedrooms || 'No min'}
-                  </button>
-                  <button
-                    onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'max' ? null : 'max')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activeFilterBedroomTab === 'max'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
-                  >
-                    Max: {maxBedrooms || 'No max'}
-                  </button>
-                </div>
-                {activeFilterBedroomTab && (
-                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
-                    <button
-                      onClick={() => {
-                        if (activeFilterBedroomTab === 'min') onMinBedroomsChange('');
-                        else onMaxBedroomsChange('');
-                        setActiveFilterBedroomTab(null);
-                      }}
-                      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                        (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-transparent bg-transparent hover:border-primary/50'
-                      }`}
-                    >
-                      {activeFilterBedroomTab === 'min' ? 'No min' : 'No max'}
-                    </button>
-                    {bedroomOptions.map((opt) => {
-                      const currentVal = activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms;
-                      const onChange = activeFilterBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
-                      const disabled = isBedroomOptionDisabled(opt, activeFilterBedroomTab);
-                      return (
+                <button
+                  type="button"
+                  onClick={() => toggleSection('bedrooms')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Bedrooms</h4>
+                  <span className="text-lg leading-none font-light">{openSections.bedrooms ? '−' : '+'}</span>
+                </button>
+                {openSections.bedrooms && (
+                  <>
+                    <div className="flex gap-2 mb-2">
+                      <button
+                        onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'min' ? null : 'min')}
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                          activeFilterBedroomTab === 'min'
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background/15 hover:border-primary/50'
+                        }`}
+                      >
+                        Min: {minBedrooms || 'No min'}
+                      </button>
+                      <button
+                        onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'max' ? null : 'max')}
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                          activeFilterBedroomTab === 'max'
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background/15 hover:border-primary/50'
+                        }`}
+                      >
+                        Max: {maxBedrooms || 'No max'}
+                      </button>
+                    </div>
+                    {activeFilterBedroomTab && (
+                      <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
                         <button
-                          key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
-                          disabled={disabled}
                           onClick={() => {
-                            if (disabled) return;
-                            onChange(currentVal === opt ? '' : opt);
+                            if (activeFilterBedroomTab === 'min') onMinBedroomsChange('');
+                            else onMaxBedroomsChange('');
                             setActiveFilterBedroomTab(null);
                           }}
                           className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                            currentVal === opt
+                            (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
                               ? 'border-primary bg-primary text-primary-foreground'
                               : 'border-transparent bg-transparent hover:border-primary/50'
-                          } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                          }`}
                         >
-                          {opt}
+                          {activeFilterBedroomTab === 'min' ? 'No min' : 'No max'}
                         </button>
-                      );
-                    })}
-                  </div>
+                        {bedroomOptions.map((opt) => {
+                          const currentVal = activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms;
+                          const onChange = activeFilterBedroomTab === 'min' ? onMinBedroomsChange : onMaxBedroomsChange;
+                          const disabled = isBedroomOptionDisabled(opt, activeFilterBedroomTab);
+                          return (
+                            <button
+                              key={`filter-bed-${activeFilterBedroomTab}-${opt}`}
+                              disabled={disabled}
+                              onClick={() => {
+                                if (disabled) return;
+                                onChange(currentVal === opt ? '' : opt);
+                                setActiveFilterBedroomTab(null);
+                              }}
+                              className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                                currentVal === opt
+                                  ? 'border-primary bg-primary text-primary-foreground'
+                                  : 'border-transparent bg-transparent hover:border-primary/50'
+                              } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                            >
+                              {opt}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -795,70 +808,81 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
 
               {/* Price section */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">Price</h4>
-                <div className="flex gap-2 mb-2">
-                  <button
-                    onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'min' ? null : 'min')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activeFilterPriceTab === 'min'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
-                  >
-                    Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
-                  </button>
-                  <button
-                    onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'max' ? null : 'max')}
-                    className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                      activeFilterPriceTab === 'max'
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background/15 hover:border-primary/50'
-                    }`}
-                  >
-                    Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
-                  </button>
-                </div>
-                {activeFilterPriceTab && (
-                  <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
+                <button
+                  type="button"
+                  onClick={() => toggleSection('price')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Price</h4>
+                  <span className="text-lg leading-none font-light">{openSections.price ? '−' : '+'}</span>
+                </button>
+                {openSections.price && (
+                  <>
+                    <div className="flex gap-2 mb-2">
                       <button
-                        onClick={() => {
-                          if (activeFilterPriceTab === 'min') onBarMinPriceChange('');
-                          else onBarMaxPriceChange('');
-                          setActiveFilterPriceTab(null);
-                        }}
-                        className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                          (activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
+                        onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'min' ? null : 'min')}
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                          activeFilterPriceTab === 'min'
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-transparent bg-transparent hover:border-primary/50'
+                            : 'border-border bg-background/15 hover:border-primary/50'
                         }`}
                       >
-                        {activeFilterPriceTab === 'min' ? 'No min' : 'No max'}
+                        Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
                       </button>
-                      {priceOptions.map((price) => {
-                        const val = String(price);
-                        const currentVal = activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice;
-                        const onChange = activeFilterPriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
-                        const disabled = isPriceOptionDisabled(price, activeFilterPriceTab);
-                        return (
+                      <button
+                        onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'max' ? null : 'max')}
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                          activeFilterPriceTab === 'max'
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background/15 hover:border-primary/50'
+                        }`}
+                      >
+                        Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
+                      </button>
+                    </div>
+                    {activeFilterPriceTab && (
+                      <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-300px)] overflow-y-auto rounded-2xl p-2 w-fit">
                           <button
-                            key={`filter-price-${activeFilterPriceTab}-${price}`}
-                            disabled={disabled}
                             onClick={() => {
-                              if (disabled) return;
-                              onChange(currentVal === val ? '' : val);
+                              if (activeFilterPriceTab === 'min') onBarMinPriceChange('');
+                              else onBarMaxPriceChange('');
                               setActiveFilterPriceTab(null);
                             }}
                             className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                              currentVal === val
+                              (activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
                                 ? 'border-primary bg-primary text-primary-foreground'
                                 : 'border-transparent bg-transparent hover:border-primary/50'
-                            } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                            }`}
                           >
-                            {formatPrice(price)}{price === 10000000 ? '+' : ''}
+                            {activeFilterPriceTab === 'min' ? 'No min' : 'No max'}
                           </button>
-                        );
-                      })}
-                  </div>
+                          {priceOptions.map((price) => {
+                            const val = String(price);
+                            const currentVal = activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice;
+                            const onChange = activeFilterPriceTab === 'min' ? onBarMinPriceChange : onBarMaxPriceChange;
+                            const disabled = isPriceOptionDisabled(price, activeFilterPriceTab);
+                            return (
+                              <button
+                                key={`filter-price-${activeFilterPriceTab}-${price}`}
+                                disabled={disabled}
+                                onClick={() => {
+                                  if (disabled) return;
+                                  onChange(currentVal === val ? '' : val);
+                                  setActiveFilterPriceTab(null);
+                                }}
+                                className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                                  currentVal === val
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : 'border-transparent bg-transparent hover:border-primary/50'
+                                } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
+                              >
+                                {formatPrice(price)}{price === 10000000 ? '+' : ''}
+                              </button>
+                            );
+                          })}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
