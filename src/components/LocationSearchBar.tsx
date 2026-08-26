@@ -1236,23 +1236,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           {activeFilterCount > 0 && (
             <button
               type="button"
-              onClick={() => {
-                onMinBedroomsChange('');
-                onMaxBedroomsChange('');
-                onBarMinPriceChange('');
-                onBarMaxPriceChange('');
-                onPropertyTypesChange([]);
-                onMustHavesChange([]);
-                onFeaturesChange([]);
-                onAddedToOracleChange('');
-                onKeywordsChange('');
-                onRadiusChange(0);
-                if (onUnfurnishedChange) onUnfurnishedChange(false);
-                setActiveBedroomTab(null);
-                setActivePriceTab(null);
-                setActiveFilterBedroomTab(null);
-                setActiveFilterPriceTab(null);
-              }}
+              onClick={clearAllFilters}
               className="h-9 px-4 rounded-xl border border-border bg-background/40 text-sm font-medium hover:border-primary/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
             >
               <X className="w-3.5 h-3.5" />
