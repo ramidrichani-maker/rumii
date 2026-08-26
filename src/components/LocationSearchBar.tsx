@@ -761,20 +761,20 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     <div className="flex gap-2 mb-2">
                       <button
                         onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'min' ? null : 'min')}
-                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-light transition-colors ${
                           activeFilterBedroomTab === 'min'
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background/15 hover:border-primary/50'
+                            : 'border-border bg-background/15 text-muted-foreground hover:border-primary/50'
                         }`}
                       >
                         Min: {minBedrooms || 'No min'}
                       </button>
                       <button
                         onClick={() => setActiveFilterBedroomTab(activeFilterBedroomTab === 'max' ? null : 'max')}
-                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-light transition-colors ${
                           activeFilterBedroomTab === 'max'
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background/15 hover:border-primary/50'
+                            : 'border-border bg-background/15 text-muted-foreground hover:border-primary/50'
                         }`}
                       >
                         Max: {maxBedrooms || 'No max'}
@@ -788,10 +788,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                             else onMaxBedroomsChange('');
                             setActiveFilterBedroomTab(null);
                           }}
-                          className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          className={`px-3 py-1.5 rounded-xl border text-sm font-light transition-colors text-left ${
                             (activeFilterBedroomTab === 'min' ? minBedrooms : maxBedrooms) === ''
                               ? 'border-primary bg-primary text-primary-foreground'
-                              : 'border-transparent bg-transparent hover:border-primary/50'
+                              : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
                           }`}
                         >
                           {activeFilterBedroomTab === 'min' ? 'No min' : 'No max'}
@@ -809,10 +809,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                                 onChange(currentVal === opt ? '' : opt);
                                 setActiveFilterBedroomTab(null);
                               }}
-                              className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                              className={`px-3 py-1.5 rounded-xl border text-sm font-light transition-colors text-left ${
                                 currentVal === opt
                                   ? 'border-primary bg-primary text-primary-foreground'
-                                  : 'border-transparent bg-transparent hover:border-primary/50'
+                                  : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
                               } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                             >
                               {opt}
@@ -825,7 +825,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 )}
               </div>
 
-              <div className="border-t border-border" />
+              <div className="border-t border-foreground/40" />
 
               {/* Price section */}
               <div>
@@ -842,20 +842,20 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     <div className="flex gap-2 mb-2">
                       <button
                         onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'min' ? null : 'min')}
-                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-light transition-colors ${
                           activeFilterPriceTab === 'min'
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background/15 hover:border-primary/50'
+                            : 'border-border bg-background/15 text-muted-foreground hover:border-primary/50'
                         }`}
                       >
                         Min: {barMinPrice ? formatPrice(Number(barMinPrice)) : 'No min'}
                       </button>
                       <button
                         onClick={() => setActiveFilterPriceTab(activeFilterPriceTab === 'max' ? null : 'max')}
-                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        className={`flex-1 px-3 py-2 rounded-xl border text-sm font-light transition-colors ${
                           activeFilterPriceTab === 'max'
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-background/15 hover:border-primary/50'
+                            : 'border-border bg-background/15 text-muted-foreground hover:border-primary/50'
                         }`}
                       >
                         Max: {barMaxPrice ? formatPrice(Number(barMaxPrice)) : 'No max'}
@@ -869,10 +869,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                               else onBarMaxPriceChange('');
                               setActiveFilterPriceTab(null);
                             }}
-                            className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                            className={`px-3 py-1.5 rounded-xl border text-sm font-light transition-colors text-left ${
                               (activeFilterPriceTab === 'min' ? barMinPrice : barMaxPrice) === ''
                                 ? 'border-primary bg-primary text-primary-foreground'
-                                : 'border-transparent bg-transparent hover:border-primary/50'
+                                : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
                             }`}
                           >
                             {activeFilterPriceTab === 'min' ? 'No min' : 'No max'}
@@ -891,10 +891,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                                   onChange(currentVal === val ? '' : val);
                                   setActiveFilterPriceTab(null);
                                 }}
-                                className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                                className={`px-3 py-1.5 rounded-xl border text-sm font-light transition-colors text-left ${
                                   currentVal === val
                                     ? 'border-primary bg-primary text-primary-foreground'
-                                    : 'border-transparent bg-transparent hover:border-primary/50'
+                                    : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
                                 } ${disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
                               >
                                 {formatPrice(price)}{price === 10000000 ? '+' : ''}
@@ -907,7 +907,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 )}
               </div>
 
-              <div className="border-t border-border" />
+              <div className="border-t border-foreground/40" />
 
               {/* Property Type section */}
               <div>
@@ -924,10 +924,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     <div className="grid grid-cols-2 gap-1 rounded-2xl p-2">
                       <button
                         onClick={() => onPropertyTypesChange([])}
-                        className={`col-span-2 flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                        className={`col-span-2 flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-light transition-colors text-left ${
                           selectedPropertyTypes.length === 0
                             ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-transparent bg-transparent hover:border-primary/50'
+                            : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
                         }`}
                       >
                         <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
@@ -946,10 +946,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                                 onPropertyTypesChange([...selectedPropertyTypes, typeId]);
                               }
                             }}
-                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-sm font-light transition-colors text-left ${
                               isSelected
                                 ? 'border-primary bg-primary text-primary-foreground'
-                                : 'border-transparent bg-transparent hover:border-primary/50'
+                                : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
                             }`}
                           >
                             <Checkbox checked={isSelected} className="pointer-events-none shrink-0" />
@@ -967,7 +967,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
                         >
                           <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
-                          <span className="text-sm font-medium">Show only unfurnished properties</span>
+                          <span className="text-sm font-light text-muted-foreground">Show only unfurnished properties</span>
                         </button>
                       </div>
                     )}
@@ -980,7 +980,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
                         >
                           <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
-                          <span className="text-sm font-medium">Show only new homes</span>
+                          <span className="text-sm font-light text-muted-foreground">Show only new homes</span>
                         </button>
                       </div>
                     )}
@@ -988,7 +988,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 )}
               </div>
 
-              <div className="border-t border-border" />
+              <div className="border-t border-foreground/40" />
 
               {/* Must-Haves section */}
               <div>
@@ -1017,7 +1017,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
                       >
                         <Checkbox checked={isSelected} className="pointer-events-none" />
-                        <span className="text-sm font-medium">{item}</span>
+                        <span className="text-sm font-light text-muted-foreground">{item}</span>
                       </button>
                     );
                   })}
@@ -1025,7 +1025,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 )}
               </div>
 
-              <div className="border-t border-border" />
+              <div className="border-t border-foreground/40" />
 
               {/* Property Features section */}
               <div>
@@ -1054,7 +1054,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
                       >
                         <Checkbox checked={isSelected} className="pointer-events-none" />
-                        <span className="text-sm font-medium">{item}</span>
+                        <span className="text-sm font-light text-muted-foreground">{item}</span>
                       </button>
                     );
                   })}
@@ -1062,7 +1062,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 )}
               </div>
 
-              <div className="border-t border-border" />
+              <div className="border-t border-foreground/40" />
 
               {/* Added to rumi section */}
               <div>
@@ -1080,10 +1080,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     <button
                       key={option.label}
                       onClick={() => onAddedToOracleChange(option.value)}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-left ${
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-light transition-colors text-left ${
                         addedToOracle === option.value
                           ? 'bg-primary text-primary-foreground'
-                          : 'hover:bg-muted/50'
+                          : 'hover:bg-muted/50 text-muted-foreground'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
