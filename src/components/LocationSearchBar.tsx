@@ -1165,7 +1165,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           <button
                             type="button"
                             onClick={() => setAdvancedFilterOpen(false)}
-                            className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+                            className="px-5 py-2 rounded-none bg-black text-white text-sm font-semibold hover:bg-zinc-900 transition-colors"
                           >
                             Show {resultCount ?? 0} results
                           </button>
@@ -1229,7 +1229,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         <button
                           type="button"
                           onClick={() => setAdvancedFilterOpen(false)}
-                          className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+                          className="px-5 py-2 rounded-none bg-black text-white text-sm font-semibold hover:bg-zinc-900 transition-colors"
                         >
                           Show {resultCount ?? 0} results
                         </button>
