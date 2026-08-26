@@ -146,6 +146,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     trailingContent,
     onApplyMobileFilters,
     hasDrawnArea,
+    resultCount,
   } = props;
   const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
