@@ -875,69 +875,71 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   <span className="text-lg leading-none font-light">{openSections.propertyType ? '−' : '+'}</span>
                 </button>
                 {openSections.propertyType && (
-                <div className="grid grid-cols-2 gap-1 rounded-2xl p-2">
-                  <button
-                    onClick={() => onPropertyTypesChange([])}
-                    className={`col-span-2 flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
-                      selectedPropertyTypes.length === 0
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-transparent bg-transparent hover:border-primary/50'
-                    }`}
-                  >
-                    <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
-                    Show All
-                  </button>
-                  {propertyTypeOptions.map((type) => {
-                    const typeId = type.toLowerCase();
-                    const isSelected = selectedPropertyTypes.includes(typeId);
-                    return (
+                  <>
+                    <div className="grid grid-cols-2 gap-1 rounded-2xl p-2">
                       <button
-                        key={`filter-type-${type}`}
-                        onClick={() => {
-                          if (isSelected) {
-                            onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
-                          } else {
-                            onPropertyTypesChange([...selectedPropertyTypes, typeId]);
-                          }
-                        }}
-                        className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
-                          isSelected
+                        onClick={() => onPropertyTypesChange([])}
+                        className={`col-span-2 flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                          selectedPropertyTypes.length === 0
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-transparent bg-transparent hover:border-primary/50'
                         }`}
                       >
-                        <Checkbox checked={isSelected} className="pointer-events-none shrink-0" />
-                        <span className="truncate">{type}</span>
+                        <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
+                        Show All
                       </button>
-                    );
-                  })}
-                </div>
+                      {propertyTypeOptions.map((type) => {
+                        const typeId = type.toLowerCase();
+                        const isSelected = selectedPropertyTypes.includes(typeId);
+                        return (
+                          <button
+                            key={`filter-type-${type}`}
+                            onClick={() => {
+                              if (isSelected) {
+                                onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
+                              } else {
+                                onPropertyTypesChange([...selectedPropertyTypes, typeId]);
+                              }
+                            }}
+                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-sm font-medium transition-colors text-left ${
+                              isSelected
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-transparent bg-transparent hover:border-primary/50'
+                            }`}
+                          >
+                            <Checkbox checked={isSelected} className="pointer-events-none shrink-0" />
+                            <span className="truncate">{type}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                {/* Unfurnished toggle */}
-                {onUnfurnishedChange !== undefined && (
-                  <div className="mt-2">
-                    <button
-                      onClick={() => onUnfurnishedChange(!unfurnishedOnly)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
-                    >
-                      <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
-                      <span className="text-sm font-medium">Show only unfurnished properties</span>
-                    </button>
-                  </div>
-                )}
+                    {/* Unfurnished toggle */}
+                    {onUnfurnishedChange !== undefined && (
+                      <div className="mt-2">
+                        <button
+                          onClick={() => onUnfurnishedChange(!unfurnishedOnly)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                        >
+                          <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
+                          <span className="text-sm font-medium">Show only unfurnished properties</span>
+                        </button>
+                      </div>
+                    )}
 
-                {/* New homes only toggle */}
-                {onNewHomesOnlyChange !== undefined && (
-                  <div className="mt-2">
-                    <button
-                      onClick={() => onNewHomesOnlyChange(!newHomesOnly)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
-                    >
-                      <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
-                      <span className="text-sm font-medium">Show only new homes</span>
-                    </button>
-                  </div>
-                )}
+                    {/* New homes only toggle */}
+                    {onNewHomesOnlyChange !== undefined && (
+                      <div className="mt-2">
+                        <button
+                          onClick={() => onNewHomesOnlyChange(!newHomesOnly)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                        >
+                          <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
+                          <span className="text-sm font-medium">Show only new homes</span>
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
