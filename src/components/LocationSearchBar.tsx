@@ -936,7 +936,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
                   >
                     <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
-                    <span className="text-sm font-medium">Show only new homes (built in last 5 years)</span>
+                    <span className="text-sm font-medium">Show only new homes</span>
                   </button>
                 </div>
               )}
