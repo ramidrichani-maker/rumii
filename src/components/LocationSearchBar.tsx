@@ -112,6 +112,7 @@ interface LocationSearchBarProps {
   trailingContent?: React.ReactNode;
   onApplyMobileFilters?: () => void;
   hasDrawnArea?: boolean;
+  resultCount?: number;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
