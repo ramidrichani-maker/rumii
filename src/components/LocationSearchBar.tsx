@@ -164,6 +164,24 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   });
   const toggleSection = (key: string) =>
     setOpenSections((s) => ({ ...s, [key]: !s[key] }));
+
+  const clearAllFilters = () => {
+    onMinBedroomsChange('');
+    onMaxBedroomsChange('');
+    onBarMinPriceChange('');
+    onBarMaxPriceChange('');
+    onPropertyTypesChange([]);
+    onMustHavesChange([]);
+    onFeaturesChange([]);
+    onAddedToOracleChange('');
+    onKeywordsChange('');
+    onRadiusChange(0);
+    if (onUnfurnishedChange) onUnfurnishedChange(false);
+    setActiveBedroomTab(null);
+    setActivePriceTab(null);
+    setActiveFilterBedroomTab(null);
+    setActiveFilterPriceTab(null);
+  };
   const selectedLabel = radius === 0 ? 'None' : (radiusOptions.find(r => r.value === radius)?.label || `+${radius} km`);
   const radiusDisabled = !location?.trim() && !hasDrawnArea;
   useEffect(() => {
@@ -1114,6 +1132,24 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       />
                       {/* Popup - 10% smaller than full screen (90% viewport) */}
                       <div className="fixed inset-[5%] z-[10060] bg-background flex flex-col rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                          <button
+                            type="button"
+                            onClick={clearAllFilters}
+                            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            Clear
+                          </button>
+                          <h4 className="text-base font-semibold text-foreground">Filters</h4>
+                          <button
+                            type="button"
+                            onClick={() => setAdvancedFilterOpen(false)}
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                            aria-label="Close filters"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
                         <div className="flex-1 overflow-y-auto p-4">
                           {advancedFilterBody}
                         </div>
@@ -1144,6 +1180,24 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     />
                     {/* Panel - left half of viewport, solid background, slides in from the left */}
                     <div className="advanced-filter-popover fixed left-0 top-0 bottom-0 w-[50vw] z-[10050] bg-background flex flex-col shadow-2xl animate-in slide-in-from-left-full duration-300">
+                      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                        <button
+                          type="button"
+                          onClick={clearAllFilters}
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Clear
+                        </button>
+                        <h4 className="text-base font-semibold text-foreground">Filters</h4>
+                        <button
+                          type="button"
+                          onClick={() => setAdvancedFilterOpen(false)}
+                          className="text-muted-foreground hover:text-foreground transition-colors"
+                          aria-label="Close filters"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
                       <div className="flex-1 overflow-y-auto p-6">
                         {advancedFilterBody}
                       </div>
@@ -1182,23 +1236,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           {activeFilterCount > 0 && (
             <button
               type="button"
-              onClick={() => {
-                onMinBedroomsChange('');
-                onMaxBedroomsChange('');
-                onBarMinPriceChange('');
-                onBarMaxPriceChange('');
-                onPropertyTypesChange([]);
-                onMustHavesChange([]);
-                onFeaturesChange([]);
-                onAddedToOracleChange('');
-                onKeywordsChange('');
-                onRadiusChange(0);
-                if (onUnfurnishedChange) onUnfurnishedChange(false);
-                setActiveBedroomTab(null);
-                setActivePriceTab(null);
-                setActiveFilterBedroomTab(null);
-                setActiveFilterPriceTab(null);
-              }}
+              onClick={clearAllFilters}
               className="h-9 px-4 rounded-xl border border-border bg-background/40 text-sm font-medium hover:border-primary/50 hover:text-primary transition-colors inline-flex items-center gap-1.5"
             >
               <X className="w-3.5 h-3.5" />
