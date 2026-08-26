@@ -912,34 +912,34 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                     );
                   })}
                 </div>
+
+                {/* Unfurnished toggle */}
+                {onUnfurnishedChange !== undefined && (
+                  <div className="mt-2">
+                    <button
+                      onClick={() => onUnfurnishedChange(!unfurnishedOnly)}
+                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                    >
+                      <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
+                      <span className="text-sm font-medium">Show only unfurnished properties</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* New homes only toggle */}
+                {onNewHomesOnlyChange !== undefined && (
+                  <div className="mt-2">
+                    <button
+                      onClick={() => onNewHomesOnlyChange(!newHomesOnly)}
+                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                    >
+                      <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
+                      <span className="text-sm font-medium">Show only new homes</span>
+                    </button>
+                  </div>
+                )}
                 )}
               </div>
-
-              {/* Unfurnished toggle */}
-              {onUnfurnishedChange !== undefined && (
-                <div className="mt-2">
-                  <button
-                    onClick={() => onUnfurnishedChange(!unfurnishedOnly)}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
-                  >
-                    <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
-                    <span className="text-sm font-medium">Show only unfurnished properties</span>
-                  </button>
-                </div>
-              )}
-
-              {/* New homes only toggle */}
-              {onNewHomesOnlyChange !== undefined && (
-                <div className="mt-2">
-                  <button
-                    onClick={() => onNewHomesOnlyChange(!newHomesOnly)}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
-                  >
-                    <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
-                    <span className="text-sm font-medium">Show only new homes</span>
-                  </button>
-                </div>
-              )}
 
               <div className="border-t border-border" />
 
