@@ -493,6 +493,7 @@ const Purchase = () => {
           onApplyMobileFilters={() => {
             document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
+          resultCount={sortedProperties.length}
           trailingContent={
             <button
               onClick={() => showMap ? closeMap() : setShowMap(true)}

@@ -112,6 +112,7 @@ interface LocationSearchBarProps {
   trailingContent?: React.ReactNode;
   onApplyMobileFilters?: () => void;
   hasDrawnArea?: boolean;
+  resultCount?: number;
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -145,6 +146,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     trailingContent,
     onApplyMobileFilters,
     hasDrawnArea,
+    resultCount,
   } = props;
   const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
@@ -1153,6 +1155,22 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         <div className="flex-1 overflow-y-auto p-4">
                           {advancedFilterBody}
                         </div>
+                        <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-border bg-background">
+                          <button
+                            type="button"
+                            onClick={clearAllFilters}
+                            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            Clear all
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAdvancedFilterOpen(false)}
+                            className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+                          >
+                            Show {resultCount ?? 0} results
+                          </button>
+                        </div>
                       </div>
                     </>,
                     document.body
@@ -1200,6 +1218,22 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                       </div>
                       <div className="flex-1 overflow-y-auto p-6">
                         {advancedFilterBody}
+                      </div>
+                      <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-border bg-background">
+                        <button
+                          type="button"
+                          onClick={clearAllFilters}
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Clear all
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAdvancedFilterOpen(false)}
+                          className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+                        >
+                          Show {resultCount ?? 0} results
+                        </button>
                       </div>
                     </div>
                   </>,
