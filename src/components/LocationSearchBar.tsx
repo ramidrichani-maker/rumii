@@ -1158,7 +1158,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                           <button
                             type="button"
                             onClick={clearAllFilters}
-                            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                            className="px-5 py-2 rounded-none bg-white text-black border border-black text-sm font-semibold hover:bg-zinc-100 transition-colors"
                           >
                             Clear all
                           </button>
@@ -1222,7 +1222,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                         <button
                           type="button"
                           onClick={clearAllFilters}
-                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          className="px-5 py-2 rounded-none bg-white text-black border border-black text-sm font-semibold hover:bg-zinc-100 transition-colors"
                         >
                           Clear all
                         </button>
