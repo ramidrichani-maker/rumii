@@ -308,7 +308,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             onClick={() => setMobileFiltersOpen(o => !o)}
             aria-expanded={mobileFiltersOpen}
             aria-controls="mobile-filters-panel"
-            className="md:hidden h-12 px-4 rounded-md border border-border bg-background/40 text-sm font-medium flex items-center gap-2 shrink-0 hover:border-primary/50 transition-colors"
+            className="md:hidden h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium flex items-center gap-2 shrink-0 transition-colors"
           >
             <FilterLinesIcon className="w-4 h-4" />
             Filters
@@ -317,9 +317,6 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                 {activeFilterCount}
               </span>
             )}
-            <ChevronDown
-              className={`w-4 h-4 transition-transform ${mobileFiltersOpen ? 'rotate-180' : ''}`}
-            />
           </button>
         </div>
 
@@ -1181,13 +1178,12 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             return (
               <>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => setAdvancedFilterOpen(true)}
-                  className="h-12 px-4 gap-2 min-w-[110px]"
+                  className="h-12 px-4 gap-2 min-w-[110px] bg-white hover:bg-white border-0"
                 >
                   <FilterLinesIcon className="w-4 h-4" />
                   <span className="text-sm font-medium">Filter</span>
-                  <ChevronDown className="w-4 h-4" />
                 </Button>
                 {advancedFilterOpen && createPortal(
                   <>
