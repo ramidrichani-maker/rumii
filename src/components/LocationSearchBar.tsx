@@ -179,6 +179,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onKeywordsChange('');
     onRadiusChange(0);
     if (onUnfurnishedChange) onUnfurnishedChange(false);
+    if (onNewHomesOnlyChange) onNewHomesOnlyChange(false);
     setActiveBedroomTab(null);
     setActivePriceTab(null);
     setActiveFilterBedroomTab(null);
