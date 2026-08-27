@@ -1,18 +1,17 @@
-import { useState, useCallback, lazy, Suspense } from 'react';
+import { useState, useCallback, lazy, Suspense, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import TypewriterSearch from './TypewriterSearch';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import searchIconAsset from '@/assets/search_icon.png.asset.json';
 
 const DrawSearchArea = lazy(() => import('./DrawSearchArea'));
 
 const SearchToXIcon = ({ active }: { active: boolean }) => {
   // Four lines: line 0 is the magnifier handle; lines 1-3 fade in and rotate
   // until all four form an "X". The circle fades/scales out when active.
-  const lineStyle = (i: number): React.CSSProperties => {
+  const lineStyle = (i: number): CSSProperties => {
     const isHandle = i === 0;
     const rot = active ? (isHandle ? 0 : i * 90) : 0;
     return {
