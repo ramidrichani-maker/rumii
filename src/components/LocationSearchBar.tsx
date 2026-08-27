@@ -1117,7 +1117,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   <Button
                     variant="ghost"
                     onClick={() => setAdvancedFilterOpen(true)}
-                    className="h-10 px-4 gap-2 min-w-[110px] flex-1 border-0"
+                    className="h-10 px-4 gap-2 min-w-[110px] flex-1 border-0 hover:text-muted-foreground"
                   >
                     <FilterLinesIcon className="w-4 h-4" />
                     <span className="text-sm font-semibold">Filter</span>
