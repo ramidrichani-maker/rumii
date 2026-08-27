@@ -1,13 +1,69 @@
-import { useState, useCallback, lazy, Suspense } from 'react';
+import { useState, useCallback, lazy, Suspense, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import TypewriterSearch from './TypewriterSearch';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import searchIconAsset from '@/assets/search_icon.png.asset.json';
 
 const DrawSearchArea = lazy(() => import('./DrawSearchArea'));
+
+const SearchToXIcon = ({ active }: { active: boolean }) => {
+  // Four lines: line 0 is the magnifier handle; lines 1-3 fade in and rotate
+  // until all four form an "X". The circle fades/scales out when active.
+  const lineStyle = (i: number): CSSProperties => {
+    const isHandle = i === 0;
+    const rot = active ? (isHandle ? 0 : i * 90) : 0;
+    return {
+      transform: `rotate(${rot}deg)`,
+      transformOrigin: '32px 32px',
+      transformBox: 'view-box',
+      opacity: isHandle ? 1 : active ? 1 : 0,
+      transition: `transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) ${isHandle ? 0 : i * 60}ms, opacity 0.3s ease ${isHandle ? 0 : i * 60}ms`,
+    };
+  };
+
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      className="w-[4.55rem] h-[4.55rem] md:w-[5.2rem] md:h-[5.2rem]"
+      style={{ filter: 'invert(1)' }}
+      aria-hidden="true"
+    >
+      <circle
+        cx="32"
+        cy="32"
+        r="15"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        style={{
+          opacity: active ? 0 : 1,
+          transform: active ? 'scale(1.6)' : 'scale(1)',
+          transformOrigin: '32px 32px',
+          transformBox: 'view-box',
+          transition: 'opacity 0.35s ease 0.15s, transform 0.45s ease 0.15s',
+        }}
+      />
+      {[0, 1, 2, 3].map((i) => (
+        <line
+          key={i}
+          x1={active || i > 0 ? 32 : 41}
+          y1={active || i > 0 ? 32 : 41}
+          x2={active || i > 0 ? 44 : 53}
+          y2={active || i > 0 ? 44 : 53}
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{
+            ...lineStyle(i),
+            transition: `${lineStyle(i).transition}, x1 0.45s cubic-bezier(0.22, 1, 0.36, 1), y1 0.45s cubic-bezier(0.22, 1, 0.36, 1), x2 0.45s cubic-bezier(0.22, 1, 0.36, 1), y2 0.45s cubic-bezier(0.22, 1, 0.36, 1)`,
+          }}
+        />
+      ))}
+    </svg>
+  );
+};
 
 const HeroSearch = () => {
   const [listingMode, setListingMode] = useState<'buy' | 'rent'>('buy');
@@ -86,11 +142,11 @@ const HeroSearch = () => {
           )}
         </div>
         <button
-          onClick={handleSearch}
-          aria-label="Search"
+          onClick={searchQuery ? () => setSearchQuery('') : handleSearch}
+          aria-label={searchQuery ? 'Clear search' : 'Search'}
           className="absolute bottom-0 right-0 h-20 w-20 md:h-24 md:w-24 flex items-center justify-center hover:opacity-60 transition-opacity duration-200"
         >
-          <img src={searchIconAsset.url} alt="Search" className="w-[4.55rem] h-[4.55rem] md:w-[5.2rem] md:h-[5.2rem]" style={{ filter: 'invert(1)' }} />
+          <SearchToXIcon active={!!searchQuery} />
         </button>
       </div>
 
