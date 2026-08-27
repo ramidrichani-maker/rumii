@@ -308,7 +308,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
             onClick={() => setMobileFiltersOpen(o => !o)}
             aria-expanded={mobileFiltersOpen}
             aria-controls="mobile-filters-panel"
-            className="md:hidden h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium flex items-center gap-2 shrink-0 transition-colors"
+            className="md:hidden h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground flex items-center gap-2 shrink-0 transition-colors"
           >
             <FilterLinesIcon className="w-4 h-4" />
             Filters
@@ -1117,7 +1117,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   <Button
                     variant="ghost"
                     onClick={() => setAdvancedFilterOpen(true)}
-                    className="h-10 px-4 gap-2 min-w-[110px] flex-1 border-0"
+                    className="h-10 px-4 gap-2 min-w-[110px] flex-1 border-0 hover:text-muted-foreground"
                   >
                     <FilterLinesIcon className="w-4 h-4" />
                     <span className="text-sm font-semibold">Filter</span>
