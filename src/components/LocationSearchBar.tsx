@@ -1244,10 +1244,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               </>
             );
           })()}
-          {trailingContent && (
-            <div className="hidden md:flex items-center">{trailingContent}</div>
-          )}
-        </div>
+</div>
           {isMobile && mobileFiltersOpen && (
             <div className="mt-3 md:hidden">
               <Button
