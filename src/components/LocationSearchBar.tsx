@@ -293,7 +293,7 @@ document.addEventListener('keydown', onKey);
 
 return (
     <div className={`mb-6 sticky rumi-sticky-under-nav z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed && !isMobile ? 'rumi-bar-collapsed' : ''}`}>
-      <p className="rumi-collapse-hide text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
+      
       <div className="rumi-filter-bar flex flex-col md:flex-row md:flex-wrap gap-3">
         <div className="rumi-collapse-hide flex gap-2 items-stretch md:flex-1 md:min-w-0">
           <div className="relative flex-1 min-w-0 group">
