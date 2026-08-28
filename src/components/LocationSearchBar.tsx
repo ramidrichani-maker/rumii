@@ -1281,7 +1281,7 @@ return (
         })()}
       </div>
       {activeFilterCount > 0 && (
-        <div className="mt-3 flex flex-wrap justify-end items-center gap-2">
+        <div className="rumi-clear-chips mt-3 flex flex-wrap justify-end items-center gap-2">
           {activeFilterCount > 0 && (
             <button
               type="button"
