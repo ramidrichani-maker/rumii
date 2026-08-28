@@ -468,6 +468,7 @@ const Rent = () => {
           </div>
         </ScrollReveal>
 
+<div className="sticky top-0 z-30 bg-background pt-2 pb-1">
         <LocationSearchBar
           location={locationInput}
           onLocationChange={handleLocationChange}
@@ -542,7 +543,8 @@ const Rent = () => {
               Map View
             </button>
           }
-        />
+/>
+        </div>
 
 
         <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
