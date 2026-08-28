@@ -339,7 +339,10 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               : ''
           }`}
         >
-        {/* Row 1: Radius */}
+{/* Row 1: Map View + Radius */}
+        {trailingContent && (
+          <div className="md:hidden">{trailingContent}</div>
+        )}
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
           <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
@@ -1275,10 +1278,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           )}
         </div>
       )}
-      {trailingContent && (
-        <div className="mt-3 md:hidden">{trailingContent}</div>
-      )}
-    </div>
+</div>
   );
 };
 
