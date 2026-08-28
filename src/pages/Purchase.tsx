@@ -524,8 +524,33 @@ const Purchase = () => {
               )}
               {compareMode && (
                 <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4 animate-compare-bar">
-                  <div className="mx-auto max-w-[1280px] rounded-lg bg-card border border-border shadow-xl px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
-                    <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
+<div className="mx-auto max-w-[1280px] rounded-lg bg-card border border-border shadow-xl px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {compareIds.map((id) => {
+                          const p = sortedProperties.find((x: any) => x.id === id);
+                          const img = p?.images?.[0];
+                          return (
+                            <div key={id} className="relative w-12 h-12 rounded-md overflow-hidden border border-border flex-shrink-0">
+                              {img ? (
+                                <img src={img} alt="Selected property" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full bg-muted" />
+                              )}
+                              <button
+                                type="button"
+                                aria-label="Remove selected property"
+                                onClick={() => setCompareIds((prev) => prev.filter((x) => x !== id))}
+                                className="absolute top-0 right-0 w-4 h-4 bg-black/70 text-white text-[10px] leading-none flex items-center justify-center rounded-bl-md hover:bg-black"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
