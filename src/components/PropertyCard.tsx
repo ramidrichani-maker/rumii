@@ -298,8 +298,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
   const hasMultipleImages = property.images && property.images.length > 1;
 
   return (
-    <Card
-className={`animate-fade-in hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-row overflow-hidden relative bg-muted ${
+<Card
+className={`animate-fade-in hover:shadow-xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex flex-row overflow-hidden relative bg-muted ${
         selectable && selected ? 'ring-2 ring-primary' : ''
       }`}
       onClick={(e) => {
