@@ -468,6 +468,7 @@ const Rent = () => {
           </div>
         </ScrollReveal>
 
+<div className="sticky top-0 z-30 bg-background pt-2 pb-1">
         <LocationSearchBar
           location={locationInput}
           onLocationChange={handleLocationChange}
