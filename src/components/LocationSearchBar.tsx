@@ -1278,10 +1278,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
           )}
         </div>
       )}
-      {trailingContent && (
-        <div className="mt-3 md:hidden">{trailingContent}</div>
-      )}
-    </div>
+</div>
   );
 };
 
