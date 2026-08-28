@@ -110,6 +110,7 @@ interface LocationSearchBarProps {
   newHomesOnly?: boolean;
   onNewHomesOnlyChange?: (value: boolean) => void;
   trailingContent?: React.ReactNode;
+  compareContent?: React.ReactNode;
   onApplyMobileFilters?: () => void;
   hasDrawnArea?: boolean;
   resultCount?: number;
