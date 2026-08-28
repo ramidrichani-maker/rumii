@@ -556,7 +556,6 @@ const Purchase = () => {
 />
 </div>
         </div>
-      </div>
 
       {/* Results header */}
       <div className="container mx-auto px-4">
