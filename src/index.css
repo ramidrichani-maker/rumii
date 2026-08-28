@@ -321,15 +321,13 @@ All colors MUST be HSL.
 }
 
 /* Buy / Rent filter bar — when scrolled down, collapse the bar so only the
-   Filters + Compare row stays pinned at the top. Hides the location search
-   input, map view, radius, bedrooms, price, property type, and clear chips.
-   Desktop only — mobile has its own collapsed Filters sheet. */
+   Filters + Compare row stays pinned at the top. Rows marked with
+   `rumi-collapse-hide` (location search, map view, radius, bedrooms, price,
+   property type, clear chips) are hidden; the Filters + Compare row
+   (`.rumi-filter-sticky`) stays visible. Desktop only — mobile has its own
+   collapsed Filters sheet. */
 @media (min-width: 768px) {
-  .rumi-bar-collapsed .rumi-filter-bar > *:not(.rumi-filter-sticky) {
-    display: none;
-  }
-  .rumi-bar-collapsed > p,
-  .rumi-bar-collapsed .rumi-clear-chips {
+  .rumi-bar-collapsed .rumi-collapse-hide {
     display: none;
   }
 }
