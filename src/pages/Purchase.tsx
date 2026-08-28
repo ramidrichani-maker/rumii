@@ -554,8 +554,12 @@ const Purchase = () => {
             </button>
           }
 />
+</div>
         </div>
+      </div>
 
+      {/* Results header */}
+      <div className="container mx-auto px-4">
 
         <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
           <div className="text-center sm:text-left">
