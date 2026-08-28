@@ -293,9 +293,9 @@ document.addEventListener('keydown', onKey);
 
 return (
     <div className={`mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed && !isMobile ? 'rumi-bar-collapsed' : ''}`}>
-      <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
+      <p className="rumi-collapse-hide text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
       <div className="rumi-filter-bar flex flex-col md:flex-row md:flex-wrap gap-3">
-        <div className="flex gap-2 items-stretch md:flex-1 md:min-w-0">
+        <div className="rumi-collapse-hide flex gap-2 items-stretch md:flex-1 md:min-w-0">
           <div className="relative flex-1 min-w-0 group">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -354,12 +354,12 @@ return (
         >
 {/* Row 1: Map View + Radius */}
         {trailingContent && (
-          <div className="md:hidden">{trailingContent}</div>
+          <div className="rumi-collapse-hide md:hidden">{trailingContent}</div>
         )}
 {trailingContent && (
-          <div className="hidden md:flex items-center">{trailingContent}</div>
+          <div className="rumi-collapse-hide hidden md:flex items-center">{trailingContent}</div>
         )}
-        <div className="flex flex-col gap-1 md:contents">
+<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
           <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
             <PopoverTrigger asChild>
@@ -397,7 +397,7 @@ return (
         </div>
 
         {/* Row 2: Bedrooms */}
-        <div className="flex flex-col gap-1 md:contents">
+<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">No. of bedrooms</span>
           {/* Mobile: inline min/max */}
           {isMobile ? (
