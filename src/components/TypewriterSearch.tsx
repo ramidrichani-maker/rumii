@@ -62,6 +62,7 @@ className={cn(
         className
       )}
       style={{ transform: 'scaleX(0.8)' }}
+    />
   );
 };
 
