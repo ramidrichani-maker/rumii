@@ -442,6 +442,18 @@ const Rent = () => {
     hasActiveFiltersRef.current = filterChips.length > 0 || !!searchQuery || hasDrawnArea;
   }, [filterChips.length, searchQuery, hasDrawnArea]);
 
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const toggleCompareSelect = (property: any) => {
+    setCompareIds((prev) =>
+      prev.includes(property.id)
+        ? prev.filter((id) => id !== property.id)
+        : prev.length >= 2
+          ? [prev[1], property.id]
+          : [...prev, property.id]
+    );
+  };
+
   return (
     <div className="min-h-screen bg-transparent">
       {/* Header & Filters - always in container */}
@@ -486,6 +498,35 @@ const Rent = () => {
           onApplyMobileFilters={() => {
             document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
+          compareContent={
+            compareMode ? (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setCompareMode(false); setCompareIds([]); }}
+                  className="h-10 md:h-12 px-4 rounded-md border border-border bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={compareIds.length < 2}
+                  onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
+                  className="h-10 md:h-12 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Compare ({compareIds.length}/2)
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setCompareMode(true)}
+                className="h-10 md:h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground transition-colors"
+              >
+                Compare
+              </button>
+            )
+          }
           resultCount={sortedProperties.length}
           trailingContent={
             <button
@@ -573,6 +614,9 @@ const Rent = () => {
                         property={property}
                         onClick={handlePropertySelect}
                         compact={showMap}
+                        selectable={compareMode}
+                        selected={compareIds.includes(property.id)}
+                        onToggleSelect={toggleCompareSelect}
                       />
                     </ScrollReveal>
                   ))}
