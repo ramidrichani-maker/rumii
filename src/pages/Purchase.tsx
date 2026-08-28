@@ -453,13 +453,14 @@ const Purchase = () => {
   const [compareMode, setCompareMode] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const toggleCompareSelect = (property: any) => {
-    setCompareIds((prev) =>
-      prev.includes(property.id)
-        ? prev.filter((id) => id !== property.id)
-        : prev.length >= 2
-          ? [prev[1], property.id]
-          : [...prev, property.id]
-    );
+    setCompareIds((prev) => {
+      if (prev.includes(property.id)) return prev.filter((id) => id !== property.id);
+      if (prev.length >= 3) {
+        toast({ title: "Maximum reached", description: "You can compare up to 3 properties." });
+        return prev;
+      }
+      return [...prev, property.id];
+    });
   };
 
   return (
@@ -511,33 +512,41 @@ const Purchase = () => {
             document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
           compareContent={
-            compareMode ? (
-              <div className="flex items-center gap-2">
+            <>
+              {!compareMode && (
                 <button
                   type="button"
-                  onClick={() => { setCompareMode(false); setCompareIds([]); }}
-                  className="h-10 md:h-12 px-4 rounded-md border border-border bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
+                  onClick={() => setCompareMode(true)}
+                  className="h-10 md:h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground transition-colors"
                 >
-                  Cancel
+                  Compare
                 </button>
-                <button
-                  type="button"
-                  disabled={compareIds.length < 2}
-                  onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
-                  className="h-10 md:h-12 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Compare ({compareIds.length}/2)
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setCompareMode(true)}
-                className="h-10 md:h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground transition-colors"
-              >
-                Compare
-              </button>
-            )
+              )}
+              {compareMode && (
+                <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4 animate-compare-bar">
+                  <div className="mx-auto max-w-[1280px] rounded-lg bg-card border border-border shadow-xl px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+                    <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setCompareMode(false); setCompareIds([]); }}
+                        className="h-10 px-4 rounded-md border border-border bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        disabled={compareIds.length < 2}
+                        onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
+                        className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Compare ({compareIds.length}/3)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           }
           resultCount={sortedProperties.length}
           trailingContent={
