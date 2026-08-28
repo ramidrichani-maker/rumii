@@ -145,6 +145,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     newHomesOnly,
     onNewHomesOnlyChange,
     trailingContent,
+    compareContent,
     onApplyMobileFilters,
     hasDrawnArea,
     resultCount,
