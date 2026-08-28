@@ -543,7 +543,8 @@ const Rent = () => {
               Map View
             </button>
           }
-        />
+/>
+        </div>
 
 
         <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
