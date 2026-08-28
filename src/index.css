@@ -326,6 +326,14 @@ All colors MUST be HSL.
    property type, clear chips) are hidden; the Filters + Compare row
    (`.rumi-filter-sticky`) stays visible. Desktop only — mobile has its own
    collapsed Filters sheet. */
+
+/* Sticky bars that must sit below the auto-hiding navbar. The navbar sets
+   --navbar-visible-h to its height when visible and 0 when hidden, so pinned
+   bars slide down/up instead of being overlapped. */
+.rumi-sticky-under-nav {
+  top: var(--navbar-visible-h, 0px) !important;
+  transition: top 0.3s ease;
+}
 @media (min-width: 768px) {
   .rumi-bar-collapsed .rumi-collapse-hide {
     display: none;

@@ -94,6 +94,13 @@ export const Navbar = () => {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [hidden, setHidden] = useState(false);
 
+  // Expose the navbar's visible height as a CSS variable so sticky bars
+  // (e.g. the buy/rent filter bar) can shift down instead of being overlapped.
+  useEffect(() => {
+    const h = hidden ? 0 : (navRef.current?.offsetHeight ?? 56);
+    document.documentElement.style.setProperty('--navbar-visible-h', `${h}px`);
+  }, [hidden]);
+
   // Hide navbar on scroll down, reveal on scroll up or when at the very top
   useEffect(() => {
     let lastY = window.scrollY;
