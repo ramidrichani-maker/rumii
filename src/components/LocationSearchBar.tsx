@@ -548,7 +548,7 @@ return (
         </div>
 
         {/* Row 3: Price */}
-        <div className="flex flex-col gap-1 md:contents">
+<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Price range</span>
           {isMobile ? (
             <div className="space-y-2" ref={priceMobileRef}>
@@ -699,7 +699,7 @@ return (
         </div>
 
         {/* Row 4: Property Type */}
-        <div className="flex flex-col gap-1 md:contents">
+        <div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Property type</span>
           <Popover>
             <PopoverTrigger asChild>
@@ -1281,7 +1281,7 @@ return (
         })()}
       </div>
       {activeFilterCount > 0 && (
-        <div className="rumi-clear-chips mt-3 flex flex-wrap justify-end items-center gap-2">
+        <div className="rumi-collapse-hide rumi-clear-chips mt-3 flex flex-wrap justify-end items-center gap-2">
           {activeFilterCount > 0 && (
             <button
               type="button"
