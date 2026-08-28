@@ -319,3 +319,15 @@ All colors MUST be HSL.
   -webkit-text-stroke: 0.4px #ffffff;
   text-stroke: 0.4px #ffffff;
 }
+
+/* Buy / Rent filter bar — when scrolled down, collapse the bar so only the
+   Filters + Compare row stays pinned at the top. Rows marked with
+   `rumi-collapse-hide` (location search, map view, radius, bedrooms, price,
+   property type, clear chips) are hidden; the Filters + Compare row
+   (`.rumi-filter-sticky`) stays visible. Desktop only — mobile has its own
+   collapsed Filters sheet. */
+@media (min-width: 768px) {
+  .rumi-bar-collapsed .rumi-collapse-hide {
+    display: none;
+  }
+}

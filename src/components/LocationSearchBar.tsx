@@ -273,18 +273,29 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setAdvancedFilterOpen(false);
     };
-    document.addEventListener('keydown', onKey);
+document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = original;
       document.removeEventListener('keydown', onKey);
     };
   }, [advancedFilterOpen]);
 
-  return (
-    <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
-      <p className="text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
-      <div className="flex flex-col md:flex-row md:flex-wrap gap-3">
-        <div className="flex gap-2 items-stretch md:flex-1 md:min-w-0">
+  // Collapse the bar to just the Filters + Compare row once the user scrolls
+  // down, so the search bar / map view / bedrooms / price / property type
+  // filters scroll away while the essential buttons stay pinned.
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setCollapsed(window.scrollY > 140);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+return (
+    <div className={`mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed && !isMobile ? 'rumi-bar-collapsed' : ''}`}>
+      <p className="rumi-collapse-hide text-sm text-muted-foreground mb-2 ml-1 font-medium">Enter location</p>
+      <div className="rumi-filter-bar flex flex-col md:flex-row md:flex-wrap gap-3">
+        <div className="rumi-collapse-hide flex gap-2 items-stretch md:flex-1 md:min-w-0">
           <div className="relative flex-1 min-w-0 group">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -343,12 +354,12 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         >
 {/* Row 1: Map View + Radius */}
         {trailingContent && (
-          <div className="md:hidden">{trailingContent}</div>
+          <div className="rumi-collapse-hide md:hidden">{trailingContent}</div>
         )}
 {trailingContent && (
-          <div className="hidden md:flex items-center">{trailingContent}</div>
+          <div className="rumi-collapse-hide hidden md:flex items-center">{trailingContent}</div>
         )}
-        <div className="flex flex-col gap-1 md:contents">
+<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
           <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
             <PopoverTrigger asChild>
@@ -386,7 +397,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 2: Bedrooms */}
-        <div className="flex flex-col gap-1 md:contents">
+<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">No. of bedrooms</span>
           {/* Mobile: inline min/max */}
           {isMobile ? (
@@ -537,7 +548,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 3: Price */}
-        <div className="flex flex-col gap-1 md:contents">
+<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Price range</span>
           {isMobile ? (
             <div className="space-y-2" ref={priceMobileRef}>
@@ -688,7 +699,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 4: Property Type */}
-        <div className="flex flex-col gap-1 md:contents">
+        <div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Property type</span>
           <Popover>
             <PopoverTrigger asChild>
@@ -747,7 +758,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         </div>
 
         {/* Row 5: Advanced Filter */}
-        <div className="flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-2">
+        <div className="rumi-filter-sticky flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-2">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
           {(() => {
             const advancedFilterBody = (
@@ -1270,7 +1281,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         })()}
       </div>
       {activeFilterCount > 0 && (
-        <div className="mt-3 flex flex-wrap justify-end items-center gap-2">
+        <div className="rumi-collapse-hide rumi-clear-chips mt-3 flex flex-wrap justify-end items-center gap-2">
           {activeFilterCount > 0 && (
             <button
               type="button"
