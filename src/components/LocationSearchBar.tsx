@@ -343,6 +343,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
         {trailingContent && (
           <div className="md:hidden">{trailingContent}</div>
         )}
+        <div className="hidden md:flex items-center">{trailingContent}</div>
         <div className="flex flex-col gap-1 md:contents">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
           <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
