@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -23,6 +23,7 @@ const formatPrice = (value: number | null | undefined) =>
 
 const CompareProperties = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const ids = (searchParams.get('ids') || '').split(',').filter(Boolean);
   const [properties, setProperties] = useState<CompareProperty[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,10 +65,14 @@ const CompareProperties = () => {
   return (
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-8">
-        <Link to={-1 as any} className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
-        </Link>
+        </button>
         <h1 className="text-3xl font-semibold text-foreground mb-6">Compare properties</h1>
 
         {isLoading ? (
