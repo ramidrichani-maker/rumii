@@ -57,11 +57,10 @@ const TypewriterSearch = ({ value, onChange, className, onFocus, onBlur }: Typew
       onFocus={onFocus}
       onBlur={onBlur}
       placeholder={placeholder || 'Search for area'}
-className={cn(
-        'thin-search-text h-20 md:h-24 text-3xl md:text-5xl font-extralight text-black placeholder:text-gray-400 font-[\'Inter\'] border-0 border-b-[0.8px] border-black bg-transparent rounded-none px-5 md:ml-0 md:mr-0 outline-none focus-visible:ring-0 focus-visible:outline-none',
+      className={cn(
+        'thin-search-text h-20 md:h-24 text-3xl md:text-5xl font-thin text-black placeholder:text-gray-400 font-[\'Inter\'] border-0 border-b-[0.8px] border-black bg-transparent rounded-none px-5 md:ml-0 md:mr-0 outline-none focus-visible:ring-0 focus-visible:outline-none',
         className
       )}
-      style={{ transform: 'scaleX(0.8)' }}
     />
   );
 };
