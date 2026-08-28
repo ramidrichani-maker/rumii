@@ -473,9 +473,12 @@ const Purchase = () => {
               Back to Home
             </Link>
           </div>
-        </ScrollReveal>
+</ScrollReveal>
+      </div>
 
-<div className="sticky top-0 z-30 bg-background pt-2 pb-1">
+      {/* Sticky filter bar - direct child of full-height wrapper so it stays visible through the listings */}
+      <div className="sticky top-0 z-30 bg-background pt-2 pb-1 px-4">
+        <div className="mx-auto max-w-[1280px]">
         <LocationSearchBar
           location={locationInput}
           onLocationChange={handleLocationChange}
@@ -551,8 +554,11 @@ const Purchase = () => {
             </button>
           }
 />
+</div>
         </div>
 
+      {/* Results header */}
+      <div className="container mx-auto px-4">
 
         <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
           <div className="text-center sm:text-left">
