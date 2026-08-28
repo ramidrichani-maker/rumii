@@ -273,12 +273,23 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setAdvancedFilterOpen(false);
     };
-    document.addEventListener('keydown', onKey);
+document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = original;
       document.removeEventListener('keydown', onKey);
     };
   }, [advancedFilterOpen]);
+
+  // Collapse the bar to just the Filters + Compare row once the user scrolls
+  // down, so the search bar / map view / bedrooms / price / property type
+  // filters scroll away while the essential buttons stay pinned.
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setCollapsed(window.scrollY > 140);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <div className="mb-6 sticky top-0 z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none">
