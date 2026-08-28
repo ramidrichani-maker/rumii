@@ -299,12 +299,29 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
 
   return (
     <Card
-      className="animate-fade-in hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-row overflow-hidden"
-      onClick={() => {
+      className={`animate-fade-in hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-row overflow-hidden relative ${
+        selectable && selected ? 'ring-2 ring-primary' : ''
+      }`}
+      onClick={(e) => {
         if (imageCarousel.wasSwipe()) return;
+        if (selectable) {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggleSelect?.(property);
+          return;
+        }
         navigate(`/property/${property.id}`);
       }}
     >
+      {selectable && (
+        <div
+          className={`absolute top-2 right-2 z-30 w-6 h-6 rounded-md border-2 flex items-center justify-center ${
+            selected ? 'bg-primary border-primary text-primary-foreground' : 'bg-background/90 border-border'
+          }`}
+        >
+          {selected && <Check className="w-4 h-4" />}
+        </div>
+      )}
       {/* Left: Image */}
       <div
         className="relative w-32 min-w-[8rem] md:w-96 md:min-w-[24rem] h-auto min-h-[10rem] md:min-h-[14rem] flex-shrink-0 group bg-muted overflow-hidden touch-pan-y"
