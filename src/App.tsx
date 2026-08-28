@@ -9,6 +9,7 @@ import { Navbar } from "./components/Navbar";
 import Index from "./pages/Index";
 import Purchase from "./pages/Purchase";
 import ChangePassword from "./pages/ChangePassword";
+import CompareProperties from "./pages/CompareProperties";
 import Rent from "./pages/Rent";
 import ListProperty from "./pages/ListProperty";
 import Auth from "./pages/Auth";
@@ -72,6 +73,7 @@ const AppRoutes = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/purchase" element={<Purchase />} />
           <Route path="/rent" element={<Rent />} />
+          <Route path="/compare" element={<CompareProperties />} />
           <Route path="/list-property" element={<ListProperty />} />
           <Route path="/my-listings" element={<MyListings />} />
           <Route path="/investment-analytics" element={<InvestmentAnalytics />} />

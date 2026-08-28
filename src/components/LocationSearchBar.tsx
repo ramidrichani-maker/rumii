@@ -110,6 +110,7 @@ interface LocationSearchBarProps {
   newHomesOnly?: boolean;
   onNewHomesOnlyChange?: (value: boolean) => void;
   trailingContent?: React.ReactNode;
+  compareContent?: React.ReactNode;
   onApplyMobileFilters?: () => void;
   hasDrawnArea?: boolean;
   resultCount?: number;
@@ -144,6 +145,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     newHomesOnly,
     onNewHomesOnlyChange,
     trailingContent,
+    compareContent,
     onApplyMobileFilters,
     hasDrawnArea,
     resultCount,
@@ -1244,6 +1246,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
               </>
             );
           })()}
+          {compareContent && (
+            <div className="flex items-center md:ml-auto">{compareContent}</div>
+          )}
 </div>
           {isMobile && mobileFiltersOpen && (
             <div className="mt-3 md:hidden">

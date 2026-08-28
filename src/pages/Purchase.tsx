@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Home, Building, Trees, Waves, Mountain, Crown, Building2, Tractor, Store, Sofa, House, Map, Maximize2, Minimize2, X, ArrowUpDown } from "lucide-react";
-import { Link, useSearchParams, useLocation } from "react-router-dom";
+import { Link, useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import CompactPropertyMap from "@/components/CompactPropertyMap";
@@ -449,6 +449,19 @@ const Purchase = () => {
     hasActiveFiltersRef.current = filterChips.length > 0 || !!searchQuery || hasDrawnArea;
   }, [filterChips.length, searchQuery, hasDrawnArea]);
 
+  const navigate = useNavigate();
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const toggleCompareSelect = (property: any) => {
+    setCompareIds((prev) =>
+      prev.includes(property.id)
+        ? prev.filter((id) => id !== property.id)
+        : prev.length >= 2
+          ? [prev[1], property.id]
+          : [...prev, property.id]
+    );
+  };
+
   return (
     <div className="min-h-screen bg-transparent">
       {/* Header & Filters - always in container */}
@@ -493,6 +506,35 @@ const Purchase = () => {
           onApplyMobileFilters={() => {
             document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
+          compareContent={
+            compareMode ? (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setCompareMode(false); setCompareIds([]); }}
+                  className="h-10 md:h-12 px-4 rounded-md border border-border bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={compareIds.length < 2}
+                  onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
+                  className="h-10 md:h-12 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Compare ({compareIds.length}/2)
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setCompareMode(true)}
+                className="h-10 md:h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground transition-colors"
+              >
+                Compare
+              </button>
+            )
+          }
           resultCount={sortedProperties.length}
           trailingContent={
             <button
@@ -580,6 +622,9 @@ const Purchase = () => {
                         property={property}
                         onClick={handlePropertySelect}
                         compact={showMap}
+                        selectable={compareMode}
+                        selected={compareIds.includes(property.id)}
+                        onToggleSelect={toggleCompareSelect}
                       />
                     </ScrollReveal>
                   ))}
