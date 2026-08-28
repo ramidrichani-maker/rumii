@@ -1189,7 +1189,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
                   className="h-12 px-4 gap-2 min-w-[110px] bg-white hover:bg-white border-0"
                 >
                   <FilterLinesIcon className="w-4 h-4" />
-                  <span className="text-sm font-medium">Filter</span>
+                  <span className="text-sm font-medium">Filters</span>
                 </Button>
                 {advancedFilterOpen && createPortal(
                   <>
