@@ -577,7 +577,7 @@ const Rent = () => {
                             : "bg-black text-white hover:bg-black/90"
                         }`}
                       >
-                        Compare ({compareIds.length}/3)
+                        Compare
                       </button>
                     </div>
                   </div>
