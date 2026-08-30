@@ -518,31 +518,46 @@ const Rent = () => {
               {compareMode && (
                 <div className="fixed bottom-0 left-0 right-0 z-40 animate-compare-bar">
 <div className="w-full bg-card border-t border-border shadow-2xl px-6 py-8 flex items-center justify-between gap-4 flex-wrap min-h-[140px]">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {compareIds.map((id) => {
-                          const p = sortedProperties.find((x: any) => x.id === id);
-                          const img = p?.images?.[0];
-                          return (
-                            <div key={id} className="relative w-12 h-12 rounded-md overflow-hidden border border-border flex-shrink-0">
-                              {img ? (
-                                <img src={img} alt="Selected property" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full bg-muted" />
-                              )}
-                              <button
-                                type="button"
-                                aria-label="Remove selected property"
-                                onClick={() => setCompareIds((prev) => prev.filter((x) => x !== id))}
-                                className="absolute top-0 right-0 w-4 h-4 bg-black/70 text-white text-[10px] leading-none flex items-center justify-center rounded-bl-md hover:bg-black"
-                              >
-                                ✕
-                              </button>
+                    <div className="flex items-center gap-3 min-w-0">
+                      {compareIds.length === 0 ? (
+                        <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
+                      ) : (
+                        <div className="flex items-center gap-3 flex-wrap">
+                          {compareIds.map((id) => {
+                            const p = sortedProperties.find((x: any) => x.id === id);
+                            const img = p?.images?.[0];
+                            return (
+                              <div key={id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border flex-shrink-0">
+                                {img ? (
+                                  <img src={img} alt="Selected property" className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full bg-muted" />
+                                )}
+                                <button
+                                  type="button"
+                                  aria-label="Remove selected property"
+                                  onClick={() => setCompareIds((prev) => prev.filter((x) => x !== id))}
+                                  className="absolute top-0 right-0 w-5 h-5 bg-black/70 text-white text-[11px] leading-none flex items-center justify-center rounded-bl-lg hover:bg-black"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            );
+                          })}
+                          {Array.from({ length: Math.max(0, 3 - compareIds.length) }).map((_, i) => (
+                            <div
+                              key={`placeholder-${i}`}
+                              className="w-16 h-16 rounded-lg border border-dashed border-border flex items-center justify-center flex-shrink-0 text-muted-foreground/60"
+                              aria-hidden="true"
+                            >
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                              </svg>
                             </div>
-                          );
-                        })}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <button
