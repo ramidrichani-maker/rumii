@@ -517,7 +517,7 @@ const Rent = () => {
               )}
               {compareMode && (
                 <div className="fixed bottom-0 left-0 right-0 z-40 animate-compare-bar">
-<div className="w-full bg-card border-t border-border shadow-2xl px-6 py-8 flex items-center justify-between gap-4 flex-wrap min-h-[140px]">
+<div className="w-full bg-card border-t border-border shadow-2xl px-6 py-8 flex items-center justify-between gap-4 flex-wrap min-h-[161px]">
                     <div className="flex items-center gap-3 min-w-0">
                       {compareIds.length === 0 ? (
                         <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
