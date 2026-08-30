@@ -1212,7 +1212,7 @@ return (
                       onClick={() => setAdvancedFilterOpen(false)}
                     />
                     {/* Panel - left half of viewport, solid background, slides in from the left */}
-                    <div className="advanced-filter-popover fixed left-0 top-0 bottom-0 w-[58vw] z-[10050] bg-background flex flex-col shadow-2xl animate-in slide-in-from-left-full duration-300">
+                    <div className="advanced-filter-popover fixed left-0 top-0 bottom-0 w-[54vw] z-[10050] bg-background flex flex-col shadow-2xl animate-in slide-in-from-left-full duration-300">
                       <div className="flex items-center justify-between px-6 py-8 border-b border-border">
                         <button
                           type="button"
