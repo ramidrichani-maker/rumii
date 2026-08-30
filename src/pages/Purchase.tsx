@@ -523,8 +523,8 @@ const Purchase = () => {
                 </button>
               )}
               {compareMode && (
-                <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4 animate-compare-bar">
-<div className="mx-auto max-w-[1280px] rounded-lg bg-card border border-border shadow-xl px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+                <div className="fixed bottom-0 left-0 right-0 z-40 animate-compare-bar">
+<div className="w-full bg-card border-t border-border shadow-2xl px-6 py-8 flex items-center justify-between gap-4 flex-wrap min-h-[140px]">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
                       <div className="flex items-center gap-2 flex-wrap">
