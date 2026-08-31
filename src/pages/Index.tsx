@@ -123,7 +123,7 @@ const Index = () => {
               <div>
                 <ScrollReveal animation="fade-left">
                   <div className="flex justify-start mb-4">
-                    <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
+                    <span className="inline-flex items-center px-5 py-2 rounded-none text-sm font-medium bg-white text-black border border-black tracking-wide">
                       For rent
                     </span>
                   </div>
