@@ -86,9 +86,9 @@ const Index = () => {
             </div>
             <div>
               <div className="flex justify-start mb-4">
-                <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
-                  For rent
-                </span>
+                <span className="inline-flex items-center px-5 py-2 rounded-none text-sm font-medium bg-white text-black border border-black tracking-wide">
+                   For rent
+                 </span>
               </div>
               <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {Array.from({ length: 4 }).map((_, i) => (
