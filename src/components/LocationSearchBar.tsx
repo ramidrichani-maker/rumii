@@ -1257,9 +1257,6 @@ return (
               </>
             );
           })()}
-          {compareContent && (
-            <div className="flex items-center md:ml-auto">{compareContent}</div>
-          )}
 </div>
           {isMobile && mobileFiltersOpen && (
             <div className="mt-3 md:hidden">
@@ -1279,6 +1276,9 @@ return (
         );
         return (isMobile && mobileFiltersOpen) ? createPortal(__panel, document.body) : __panel;
         })()}
+        {compareContent && (
+          <div className="flex items-center md:ml-auto">{compareContent}</div>
+        )}
       </div>
       {activeFilterCount > 0 && (
         <div className="rumi-collapse-hide rumi-clear-chips mt-3 flex flex-wrap justify-end items-center gap-2">
