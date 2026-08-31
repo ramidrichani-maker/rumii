@@ -589,7 +589,8 @@ const Purchase = () => {
                       </button>
                     </div>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </>
           }
