@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -522,7 +523,7 @@ const Purchase = () => {
                   Compare
                 </button>
               )}
-              {compareMode && (
+              {compareMode && createPortal(
                 <div className="fixed bottom-0 left-0 right-0 z-40 animate-compare-bar">
 <div className="w-full bg-card border-t border-border shadow-2xl px-6 py-8 flex items-center justify-between gap-4 flex-wrap min-h-[161px]">
                     <div className="flex items-center gap-3 min-w-0">
@@ -588,7 +589,8 @@ const Purchase = () => {
                       </button>
                     </div>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </>
           }
