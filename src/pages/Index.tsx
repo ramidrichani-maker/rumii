@@ -74,9 +74,9 @@ const Index = () => {
             </div>
             <div className="mb-16">
               <div className="flex justify-start mb-4">
-                <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
-                  For sale
-                </span>
+                <span className="inline-flex items-center px-5 py-2 rounded-none text-sm font-medium bg-white text-black border border-black tracking-wide">
+                   For sale
+                 </span>
               </div>
               <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -86,9 +86,9 @@ const Index = () => {
             </div>
             <div>
               <div className="flex justify-start mb-4">
-                <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
-                  For rent
-                </span>
+                <span className="inline-flex items-center px-5 py-2 rounded-none text-sm font-medium bg-white text-black border border-black tracking-wide">
+                   For rent
+                 </span>
               </div>
               <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {Array.from({ length: 4 }).map((_, i) => (
@@ -104,7 +104,7 @@ const Index = () => {
               <div className="mb-16">
                 <ScrollReveal animation="fade-right">
                   <div className="flex justify-start mb-4">
-                    <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
+                    <span className="inline-flex items-center px-5 py-2 rounded-none text-sm font-medium bg-white text-black border border-black tracking-wide">
                       For sale
                     </span>
                   </div>
@@ -123,7 +123,7 @@ const Index = () => {
               <div>
                 <ScrollReveal animation="fade-left">
                   <div className="flex justify-start mb-4">
-                    <span className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium bg-[#b8a694] text-white shadow-sm tracking-wide opacity-90">
+                    <span className="inline-flex items-center px-5 py-2 rounded-none text-sm font-medium bg-white text-black border border-black tracking-wide">
                       For rent
                     </span>
                   </div>
