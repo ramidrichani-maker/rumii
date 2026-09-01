@@ -524,11 +524,7 @@ const Purchase = () => {
                     setCompareMode(true);
                   }
                 }}
-                className={`h-10 md:h-12 px-4 rounded-md border-0 text-sm font-medium transition-colors ${
-                  compareMode
-                    ? "bg-black text-white hover:bg-black/90"
-                    : "bg-white hover:bg-white hover:text-muted-foreground"
-                }`}
+                className="h-10 md:h-12 px-4 rounded-md border-0 text-sm font-medium transition-colors bg-white hover:bg-white hover:text-muted-foreground"
               >
                 Compare
               </button>
