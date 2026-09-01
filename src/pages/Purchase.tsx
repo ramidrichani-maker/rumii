@@ -576,7 +576,7 @@ const Purchase = () => {
                       <button
                         type="button"
                         onClick={() => { setCompareMode(false); setCompareIds([]); }}
-                        className="h-24 px-16 rounded-none border border-black bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
+                        className="h-16 px-20 rounded-none border border-black bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
                       >
                         Cancel
                       </button>
@@ -584,7 +584,7 @@ const Purchase = () => {
                         type="button"
                         disabled={compareIds.length < 2}
                         onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
-                        className={`h-24 px-16 rounded-none text-sm font-medium transition-colors ${
+                        className={`-ml-[5vw] h-16 px-20 rounded-none text-sm font-medium transition-colors ${
                           compareIds.length < 2
                             ? "bg-muted text-muted-foreground cursor-not-allowed"
                             : "bg-black text-white hover:bg-black/90"
