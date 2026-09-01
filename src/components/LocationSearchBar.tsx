@@ -1254,9 +1254,12 @@ return (
                   </>,
                   document.body
                 )}
-              </>
-            );
-          })()}
+               </>
+             );
+           })()}
+          {compareContent && (
+            <div className="flex items-center md:ml-auto">{compareContent}</div>
+          )}
 </div>
           {isMobile && mobileFiltersOpen && (
             <div className="mt-3 md:hidden">
