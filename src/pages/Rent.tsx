@@ -507,15 +507,24 @@ const Rent = () => {
           }}
           compareContent={
             <>
-              {!compareMode && (
-                <button
-                  type="button"
-                  onClick={() => setCompareMode(true)}
-                  className="h-10 md:h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground transition-colors"
-                >
-                  Compare
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  if (compareMode) {
+                    setCompareMode(false);
+                    setCompareIds([]);
+                  } else {
+                    setCompareMode(true);
+                  }
+                }}
+                className={`h-10 md:h-12 px-4 rounded-md border-0 text-sm font-medium transition-colors ${
+                  compareMode
+                    ? "bg-black text-white hover:bg-black/90"
+                    : "bg-white hover:bg-white hover:text-muted-foreground"
+                }`}
+              >
+                Compare
+              </button>
               {compareMode && createPortal(
                 <div className="fixed bottom-0 left-0 right-0 z-40 animate-compare-bar">
 <div className="w-full bg-card border-t border-border shadow-2xl px-6 py-8 flex items-center justify-between gap-4 flex-wrap min-h-[161px]">
