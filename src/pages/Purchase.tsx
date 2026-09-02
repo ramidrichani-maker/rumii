@@ -584,9 +584,9 @@ const Purchase = () => {
                         type="button"
                         disabled={compareIds.length < 2}
                         onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
-                        className={`h-16 px-20 rounded-none text-sm font-medium transition-colors ${
+                        className={`ml-[1vw] h-16 px-20 rounded-none text-sm font-medium transition-colors ${
                           compareIds.length < 2
-                            ? "bg-muted text-muted-foreground cursor-not-allowed"
+                            ? "bg-muted-foreground/30 text-muted-foreground cursor-not-allowed"
                             : "bg-black text-white hover:bg-black/90"
                         }`}
                       >
