@@ -572,7 +572,7 @@ const Purchase = () => {
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 mr-[5vw]">
+                    <div className="flex items-center gap-3 mr-[4vw]">
                       <button
                         type="button"
                         onClick={() => { setCompareMode(false); setCompareIds([]); }}
