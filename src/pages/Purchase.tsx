@@ -467,7 +467,7 @@ const Purchase = () => {
   return (
     <div className="min-h-screen bg-transparent">
       {/* Header & Filters - always in container */}
-      <div className="container mx-auto px-4 py-8 pb-0">
+      <div className="px-[4vw] py-8 pb-0">
         <ScrollReveal animation="fade-up">
           <div className="mb-8">
             <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
@@ -479,7 +479,7 @@ const Purchase = () => {
       </div>
 
       {/* Sticky filter bar - direct child of full-height wrapper so it stays visible through the listings */}
-      <div className="sticky rumi-sticky-under-nav z-30 bg-background pt-2 pb-1 px-4">
+      <div className="sticky rumi-sticky-under-nav z-30 bg-background pt-2 pb-1 px-[4vw]">
         <div className="mx-auto max-w-[1280px]">
         <LocationSearchBar
           location={locationInput}
@@ -530,7 +530,7 @@ const Purchase = () => {
               </button>
               {compareMode && createPortal(
                 <div className="fixed bottom-0 left-0 right-0 z-40 animate-compare-bar">
-<div className="w-full bg-card border-t border-border shadow-2xl px-6 py-8 flex items-center justify-between gap-4 flex-wrap min-h-[161px]">
+<div className="w-full bg-card border-t border-border shadow-2xl px-[4vw] py-8 flex items-center justify-between gap-4 flex-wrap min-h-[161px]">
                     <div className="flex items-center gap-3 min-w-0">
                       {compareIds.length === 0 ? (
                         <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
@@ -618,7 +618,7 @@ const Purchase = () => {
         </div>
 
       {/* Results header */}
-      <div className="container mx-auto px-4">
+      <div className="px-[4vw]">
 
         <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
           <div className="text-center sm:text-left">
@@ -666,7 +666,7 @@ const Purchase = () => {
       </div>
 
       {/* Split Layout: full-width when map is shown */}
-      <div className={`${showMap ? 'px-4' : 'container mx-auto px-4'}`}>
+      <div className="px-[4vw]">
         <div className={`flex ${showMap ? 'flex-col-reverse md:flex-row' : 'flex-col'} gap-6`}>
           {/* Property Grid */}
           <div
