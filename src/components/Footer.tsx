@@ -96,7 +96,7 @@ export const Footer = () => {
 
   return (
     <footer className="bg-footer text-footer-foreground mt-auto">
-      <div className="mx-auto px-[4vw] pt-12">
+      <div className="container mx-auto px-4 pt-12">
         <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-10 md:gap-32 pb-10">
           <div className="flex flex-col items-center">
             <h2 className="text-2xl font-title text-footer-foreground tracking-[0.18em] uppercase leading-none text-center">
@@ -112,7 +112,7 @@ export const Footer = () => {
         </div>
       </div>
       <div className="w-full border-t border-[hsl(30_18%_58%)]/64" />
-      <div className="mx-auto px-[4vw] pb-12">
+      <div className="container mx-auto px-4 pb-12">
         {/* Mobile: stacked accordions with + toggle */}
         <div className="md:hidden mt-10 flex flex-col">
           {mobileSections.map((section) => {

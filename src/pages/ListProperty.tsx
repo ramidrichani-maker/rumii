@@ -636,7 +636,7 @@ const ListProperty = () => {
   if (profile?.role === 'agent') {
     return (
       <div className="min-h-screen bg-transparent">
-        <div className="mx-auto px-[4vw] py-8">
+        <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
               <ArrowLeft className="h-4 w-4" />
@@ -1001,7 +1001,7 @@ const ListProperty = () => {
     }
   };
   return <div className="min-h-screen bg-transparent">
-      <div className="mx-auto px-[4vw] py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="h-4 w-4" />
