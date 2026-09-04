@@ -234,6 +234,9 @@ export const Navbar = () => {
                 <div onClick={() => toggleMenu('properties')}>
                   <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
                 </div>
+                <div onClick={() => toggleMenu('our-world')}>
+                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={ourWorldTextRef}>Our World</span></Button>
+                </div>
                 <div onClick={() => toggleMenu('services')}>
                   <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
                 </div>
