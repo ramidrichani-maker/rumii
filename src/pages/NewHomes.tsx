@@ -67,7 +67,7 @@ const NewHomes = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16">
+      <div className="mx-auto px-[4vw] py-16">
         <ScrollReveal animation="fade-up">
           <div className="max-w-2xl mx-auto text-center mb-10">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">

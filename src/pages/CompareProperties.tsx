@@ -64,7 +64,7 @@ const CompareProperties = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto px-[4vw] py-8">
         <button
           type="button"
           onClick={() => navigate(-1)}
