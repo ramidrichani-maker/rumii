@@ -18,12 +18,13 @@ import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<'properties' | 'services' | null>(null);
+  const [activeMenu, setActiveMenu] = useState<'properties' | 'our-world' | 'services' | null>(null);
   const [closingMenu, setClosingMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const megaNavRef = useRef<HTMLElement>(null);
   const propertiesTextRef = useRef<HTMLSpanElement>(null);
+  const ourWorldTextRef = useRef<HTMLSpanElement>(null);
   const servicesTextRef = useRef<HTMLSpanElement>(null);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0, top: 0, opacity: 0 });
 
