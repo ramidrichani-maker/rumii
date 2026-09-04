@@ -569,7 +569,7 @@ const Rent = () => {
                       <button
                         type="button"
                         onClick={() => { setCompareMode(false); setCompareIds([]); }}
-                        className="h-16 px-[5.5rem] rounded-none border border-black bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
+                        className="h-[3.8rem] px-[7.43rem] rounded-none border border-black bg-background text-sm font-medium hover:text-muted-foreground transition-colors"
                       >
                         Cancel
                       </button>
