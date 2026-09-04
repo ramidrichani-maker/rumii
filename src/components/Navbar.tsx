@@ -309,7 +309,7 @@ export const Navbar = () => {
             willChange: 'max-height',
           }}
         >
-          <div className="w-full h-full flex" style={{ transform: activeMenu === 'services' ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
+          <div className="w-full h-full flex" style={{ transform: `translateX(-${activeMenu === 'our-world' ? 100 : activeMenu === 'services' ? 200 : 0}%)`, transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
             {/* Properties panel */}
             <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.675s both' }}>
               <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.71s' }}>
