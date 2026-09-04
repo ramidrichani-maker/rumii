@@ -29,7 +29,7 @@ export const Navbar = () => {
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0, top: 0, opacity: 0 });
 
 
-  const openMenuImmediate = (menu: 'properties' | 'services') => {
+  const openMenuImmediate = (menu: 'properties' | 'our-world' | 'services') => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
     setClosingMenu(false);
     setActiveMenu(menu);
@@ -45,7 +45,7 @@ export const Navbar = () => {
     }, 325);
   };
 
-  const toggleMenu = (menu: 'properties' | 'services') => {
+  const toggleMenu = (menu: 'properties' | 'our-world' | 'services') => {
     if (activeMenu === menu && !closingMenu) {
       closeMenu();
     } else {
