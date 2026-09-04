@@ -430,6 +430,23 @@ export const Navbar = () => {
                     </Link>
                   </div>
 
+                  {/* Our World */}
+                  <div className="space-y-1">
+                    <p className="px-3 py-2 text-sm font-semibold text-foreground">Who We <span className="font-bold">Are</span></p>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Born in Beirut
+                    </span>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Sustainability
+                    </span>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Maison Atelier
+                    </span>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Foundations rumi
+                    </span>
+                  </div>
+
                   {/* Services */}
                   <div className="space-y-1">
                     <p className="px-3 py-2 text-sm font-semibold text-foreground">Services</p>
