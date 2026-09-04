@@ -74,7 +74,7 @@ const Favorites = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
+        <div className="mx-auto px-[4vw] py-8">
           <div className="flex items-center gap-4 mb-8">
             <Link to="/">
               <Button variant="ghost" size="icon">
@@ -98,7 +98,7 @@ const Favorites = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto px-[4vw] py-8">
         <div className="flex items-center gap-4 mb-8">
           <Link to="/">
             <Button variant="ghost" size="icon">

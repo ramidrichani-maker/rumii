@@ -51,7 +51,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="container mx-auto px-4 py-4 text-primary">
+      <div className="mx-auto px-[4vw] py-4 text-primary">
         <ScrollReveal animation="fade-up">
           <div className="text-center mb-2 md:mb-3 px-2 whitespace-pre-wrap">
             {"\n"}
@@ -63,7 +63,7 @@ const Index = () => {
         <HeroSearch />
       </ScrollReveal>
 
-      <div className="container mx-auto px-4 py-8 text-primary">
+      <div className="mx-auto px-[4vw] py-8 text-primary">
         {isLoading ? (
           <div className="mt-12">
             <div className="text-center mb-12">
