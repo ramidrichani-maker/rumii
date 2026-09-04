@@ -208,7 +208,7 @@ export const Navbar = () => {
     }
   };
   return <nav ref={navRef} className={`sticky top-0 bg-background transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`} style={{ zIndex: 9990, overflow: 'visible' }}>
-      <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
+      <div className="w-full mx-auto px-[4vw] py-[1.58rem] bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
             <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
