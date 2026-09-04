@@ -18,17 +18,18 @@ import { AuthSlidePanel } from './AuthSlidePanel';
 export const Navbar = () => {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [profilePanelOpen, setProfilePanelOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<'properties' | 'services' | null>(null);
+  const [activeMenu, setActiveMenu] = useState<'properties' | 'our-world' | 'services' | null>(null);
   const [closingMenu, setClosingMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const megaNavRef = useRef<HTMLElement>(null);
   const propertiesTextRef = useRef<HTMLSpanElement>(null);
+  const ourWorldTextRef = useRef<HTMLSpanElement>(null);
   const servicesTextRef = useRef<HTMLSpanElement>(null);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0, top: 0, opacity: 0 });
 
 
-  const openMenuImmediate = (menu: 'properties' | 'services') => {
+  const openMenuImmediate = (menu: 'properties' | 'our-world' | 'services') => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
     setClosingMenu(false);
     setActiveMenu(menu);
@@ -44,7 +45,7 @@ export const Navbar = () => {
     }, 325);
   };
 
-  const toggleMenu = (menu: 'properties' | 'services') => {
+  const toggleMenu = (menu: 'properties' | 'our-world' | 'services') => {
     if (activeMenu === menu && !closingMenu) {
       closeMenu();
     } else {
@@ -68,7 +69,8 @@ export const Navbar = () => {
   useEffect(() => {
     const measure = () => {
       const nav = megaNavRef.current;
-      const txt = activeMenu === 'properties' ? propertiesTextRef.current : servicesTextRef.current;
+      const txtRef = activeMenu === 'properties' ? propertiesTextRef : activeMenu === 'our-world' ? ourWorldTextRef : servicesTextRef;
+      const txt = txtRef?.current;
       if (!nav || !txt || !activeMenu || closingMenu) {
         setUnderlineStyle(s => ({ ...s, opacity: 0 }));
         return;
@@ -232,6 +234,9 @@ export const Navbar = () => {
                 <div onClick={() => toggleMenu('properties')}>
                   <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
                 </div>
+                <div onClick={() => toggleMenu('our-world')}>
+                  <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={ourWorldTextRef}>Our World</span></Button>
+                </div>
                 <div onClick={() => toggleMenu('services')}>
                   <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={servicesTextRef}>Services</span></Button>
                 </div>
@@ -304,7 +309,7 @@ export const Navbar = () => {
             willChange: 'max-height',
           }}
         >
-          <div className="w-full h-full flex" style={{ transform: activeMenu === 'services' ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
+          <div className="w-full h-full flex" style={{ transform: `translateX(-${activeMenu === 'our-world' ? 100 : activeMenu === 'services' ? 200 : 0}%)`, transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
             {/* Properties panel */}
             <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.675s both' }}>
               <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.71s' }}>
@@ -328,6 +333,27 @@ export const Navbar = () => {
               <Link to="/purchase?type=land" onClick={closeMenu} style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '1.035s' }} className="w-full text-left px-4 py-0.5 rounded-md text-sm font-[Arial,sans-serif] font-light text-foreground hover:text-muted-foreground/60 transition-colors">
                 Land
               </Link>
+            </div>
+            {/* Our World panel */}
+            <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.675s both' }}>
+              <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.71s' }}>
+                <h2 className="text-2xl leading-none uppercase">
+                  <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Who We</span>{' '}
+                  <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-bold text-foreground">Are</span>
+                </h2>
+              </div>
+              <span style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.825s' }} className="w-full text-left px-4 py-0.5 text-sm font-[Arial,sans-serif] font-light text-foreground">
+                Born in Beirut
+              </span>
+              <span style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.875s' }} className="w-full text-left px-4 py-0.5 text-sm font-[Arial,sans-serif] font-light text-foreground">
+                Sustainability
+              </span>
+              <span style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.93s' }} className="w-full text-left px-4 py-0.5 text-sm font-[Arial,sans-serif] font-light text-foreground">
+                Maison Atelier
+              </span>
+              <span style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.98s' }} className="w-full text-left px-4 py-0.5 text-sm font-[Arial,sans-serif] font-light text-foreground">
+                Foundations rumi
+              </span>
             </div>
             {/* Services panel */}
             <div className="w-full h-full shrink-0 flex flex-col items-start justify-start gap-0 px-6 py-4" style={closingMenu ? { animation: 'mega-menu-content-out 0.3s ease-in both' } : { animation: 'mega-menu-content 0.4s ease-out 0.675s both' }}>
@@ -402,6 +428,23 @@ export const Navbar = () => {
                     <Link to="/purchase?type=land" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent">
                       Land
                     </Link>
+                  </div>
+
+                  {/* Our World */}
+                  <div className="space-y-1">
+                    <p className="px-3 py-2 text-sm font-semibold text-foreground">Who We <span className="font-bold">Are</span></p>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Born in Beirut
+                    </span>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Sustainability
+                    </span>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Maison Atelier
+                    </span>
+                    <span className="block px-6 py-2 text-sm text-muted-foreground">
+                      Foundations rumi
+                    </span>
                   </div>
 
                   {/* Services */}
