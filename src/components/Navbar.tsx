@@ -69,7 +69,8 @@ export const Navbar = () => {
   useEffect(() => {
     const measure = () => {
       const nav = megaNavRef.current;
-      const txt = activeMenu === 'properties' ? propertiesTextRef.current : servicesTextRef.current;
+      const txtRef = activeMenu === 'properties' ? propertiesTextRef : activeMenu === 'our-world' ? ourWorldTextRef : servicesTextRef;
+      const txt = txtRef?.current;
       if (!nav || !txt || !activeMenu || closingMenu) {
         setUnderlineStyle(s => ({ ...s, opacity: 0 }));
         return;
