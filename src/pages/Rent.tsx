@@ -577,7 +577,7 @@ const Rent = () => {
                         type="button"
                         disabled={compareIds.length < 2}
                         onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
-                        className={`ml-[1vw] h-16 px-[5.5rem] rounded-none text-sm font-medium transition-colors ${
+                        className={`ml-[1vw] h-[3.8rem] px-[7.43rem] rounded-none text-sm font-medium transition-colors ${
                           compareIds.length < 2
                             ? "bg-muted-foreground/30 text-muted-foreground cursor-not-allowed"
                             : "bg-black text-white hover:bg-black/90"
