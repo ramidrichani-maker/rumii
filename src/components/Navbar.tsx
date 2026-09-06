@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { AuthSlidePanel } from './AuthSlidePanel';
 
 export const Navbar = () => {
