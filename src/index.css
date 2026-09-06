@@ -331,7 +331,9 @@ All colors MUST be HSL.
    --navbar-visible-h to its height when visible and 0 when hidden, so pinned
    bars slide down/up instead of being overlapped. */
 .rumi-sticky-under-nav {
-  top: var(--navbar-visible-h, 0px) !important;
+  /* One-pixel overlap prevents sub-pixel compositing from exposing the page
+     background while both sticky bars animate. */
+  top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px)) !important;
   transition: top 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 @media (min-width: 768px) {
