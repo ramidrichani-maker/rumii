@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from './NotificationBell';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { AuthSlidePanel } from './AuthSlidePanel';
 
 export const Navbar = () => {
@@ -98,7 +98,10 @@ export const Navbar = () => {
 
   // Expose the navbar's visible height as a CSS variable so sticky bars
   // (e.g. the buy/rent filter bar) can shift down instead of being overlapped.
-  useEffect(() => {
+  // useLayoutEffect (not useEffect) so the value updates in the same paint as
+  // the navbar's transform class change — otherwise the filter bar lags a frame
+  // and a gap flashes between the navbar and the sticky bar while scrolling.
+  useLayoutEffect(() => {
     const h = hidden ? 0 : (navRef.current?.offsetHeight ?? 56);
     document.documentElement.style.setProperty('--navbar-visible-h', `${h}px`);
   }, [hidden]);
