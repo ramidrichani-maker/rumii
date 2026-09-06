@@ -102,7 +102,9 @@ export const Navbar = () => {
   // the navbar's transform class change — otherwise the filter bar lags a frame
   // and a gap flashes between the navbar and the sticky bar while scrolling.
   useLayoutEffect(() => {
-    const h = hidden ? 0 : (navRef.current?.offsetHeight ?? 56);
+    // Keep the fractional rendered height. offsetHeight rounds to an integer,
+    // which left a visible sub-pixel seam above the filter bar on some screens.
+    const h = hidden ? 0 : (navRef.current?.getBoundingClientRect().height ?? 56);
     document.documentElement.style.setProperty('--navbar-visible-h', `${h}px`);
   }, [hidden]);
 
