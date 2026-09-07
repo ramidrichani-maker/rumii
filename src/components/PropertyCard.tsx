@@ -339,6 +339,40 @@ className={`animate-fade-in border-0 hover:shadow-xl hover:bg-[#F8F8F8] transiti
           }
         }}
       >
+        {/* Desktop grid (vertical) overlay: agency + share + favorite on image top-right */}
+        {!compact && (
+          <div className="hidden md:flex absolute top-2 right-2 z-20 items-center gap-1">
+            {agencyName && (
+              <div className="flex items-center gap-1.5 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1">
+                {agencyLogo ? (
+                  <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                  <Building2 className="w-4 h-4 text-muted-foreground" />
+                )}
+                <span className="text-xs font-medium text-foreground">{agencyName}</span>
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
+              onClick={handleShare}
+              aria-label="Share property"
+              title="Share link"
+            >
+              <Share2 className="w-5 h-5 text-muted-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
+              onClick={toggleFavorite}
+              disabled={isTogglingFavorite}
+            >
+              <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+            </Button>
+          </div>
+        )}
         {isJustListed(property.created_at) && (
           <Badge className="absolute top-2 left-2 z-20 bg-primary text-primary-foreground hover:bg-primary/90">
             Just Listed
