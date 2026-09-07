@@ -490,7 +490,7 @@ className={`animate-fade-in border-0 hover:shadow-xl hover:bg-[#F8F8F8] transiti
         </h3>
 
         {/* Beds, Baths, Size */}
-        <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap">
+        <div className={`flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap ${compact ? '' : 'md:order-3 md:justify-center'}`}>
           {property.property_type === 'stacked_unit' && stackedRange && stackedRange.unitCount > 0 && (
             <span className="flex items-center gap-1">
               <Building2 className="w-3 h-3 md:w-4 md:h-4" />
@@ -514,14 +514,14 @@ className={`animate-fade-in border-0 hover:shadow-xl hover:bg-[#F8F8F8] transiti
         </div>
 
         {/* Location */}
-        <p className="text-xs md:text-sm text-foreground mt-1 md:mt-2 truncate">
+        <p className={`text-xs md:text-sm text-foreground mt-1 md:mt-2 truncate max-w-full ${compact ? '' : 'md:order-1 md:mt-0'}`}>
           {userRole === 'admin' || isAssignedAgent
             ? `${property.city}, ${property.address}`
             : property.city}
         </p>
 
         {/* Description (max 2 lines) */}
-        <p className="hidden md:block text-sm text-muted-foreground mt-1 line-clamp-2">
+        <p className={`hidden md:block text-sm text-muted-foreground mt-1 line-clamp-2 ${compact ? '' : 'md:order-4'}`}>
           {truncateDescription((property as any).description)}
         </p>
 
