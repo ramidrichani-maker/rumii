@@ -438,9 +438,9 @@ className={`animate-fade-in border-0 hover:shadow-xl hover:bg-[#F8F8F8] transiti
       </div>
 
       {/* Right: Details */}
-      <div className="flex flex-col flex-1 p-2 md:p-4 relative min-w-0">
-        {/* Top-right: Agency + Favorite */}
-        <div className="absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1">
+      <div className={`flex flex-col flex-1 p-2 md:p-4 relative min-w-0 ${compact ? '' : 'md:items-center md:text-center'}`}>
+        {/* Top-right: Agency + Favorite (hidden on desktop grid cards — shown over the image instead) */}
+        <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'md:hidden'}`}>
           <div className="flex items-center gap-1">
             {agencyName && !compact && (
               <div className="hidden md:flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
@@ -485,7 +485,7 @@ className={`animate-fade-in border-0 hover:shadow-xl hover:bg-[#F8F8F8] transiti
         </div>
 
         {/* Price */}
-        <h3 className="text-sm md:text-2xl font-bold text-primary pr-8 md:pr-10">
+        <h3 className={`text-sm md:text-2xl font-bold text-primary pr-8 md:pr-10 ${compact ? '' : 'md:order-2 md:pr-0'}`}>
           {formatPrice(property.price, property.listing_type, property.rental_price)}
         </h3>
 
