@@ -542,8 +542,8 @@ className={`animate-fade-in border-0 hover:shadow-xl hover:bg-[#F8F8F8] transiti
           </div>
         )}
 
-        {/* Bottom-right: Request Viewing, Call & Email */}
-        <div className="flex items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap">
+        {/* Bottom-right: Request Viewing, Call & Email (hidden on desktop grid cards — available on the property page) */}
+        <div className={`flex items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap ${compact ? '' : 'md:hidden'}`}>
           <Button
             variant="outline"
             size="sm"
