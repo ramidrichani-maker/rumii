@@ -314,6 +314,9 @@ className={`animate-fade-in border-0 hover:shadow-xl hover:bg-[#F8F8F8] transiti
       }}
     >
       {selectable && (
+        <div className="absolute inset-0 z-20" aria-hidden="true" />
+      )}
+      {selectable && (
         <div
           className={`absolute top-2 right-2 z-30 w-6 h-6 rounded-md border-2 flex items-center justify-center ${
             selected ? 'bg-primary border-primary text-primary-foreground' : 'bg-background/90 border-border'
