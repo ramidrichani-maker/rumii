@@ -316,8 +316,8 @@ All colors MUST be HSL.
    avoid a hollow look. */
 .thin-search-text,
 .thin-search-text::placeholder {
-  -webkit-text-stroke: 0.4px #ffffff;
-  text-stroke: 0.4px #ffffff;
+  -webkit-text-stroke: 0.46px #ffffff;
+  text-stroke: 0.46px #ffffff;
 }
 
 /* Buy / Rent filter bar — when scrolled down, collapse the bar so only the
