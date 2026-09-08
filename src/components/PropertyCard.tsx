@@ -318,11 +318,9 @@ className={`animate-fade-in border-0 hover:bg-[#F8F8F8] transition-all duration-
       )}
       {selectable && (
         <div
-          className={`absolute top-2 right-2 z-30 w-6 h-6 rounded-md border-2 flex items-center justify-center ${
-            selected ? 'bg-primary border-primary text-primary-foreground' : 'bg-background/90 border-border'
-          }`}
+          className={`absolute top-3 right-3 z-30 w-10 h-10 rounded-md border-2 flex items-center justify-center bg-background/90 border-border`}
         >
-          {selected && <Check className="w-4 h-4" />}
+          {selected && <div className="w-5 h-5 bg-black" />}
         </div>
       )}
       {/* Left: Image */}
