@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Car, Plus, X, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +32,7 @@ interface Destination extends Place {
   loading?: boolean;
 }
 
-const STORAGE_KEY = "oracle:commute-destinations";
+
 
 const TYPE_LABELS: Record<DestType, string> = {
   mall: "Mall",
