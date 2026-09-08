@@ -143,19 +143,11 @@ export default function CommuteTimes({ originLat, originLng }: CommuteTimesProps
         variant: "destructive",
       });
     }
-    setDestinations(prev => {
-      const next = prev.map(d => (d.id === newDest.id ? computed : d));
-      persist(next);
-      return next;
-    });
+    setDestinations(prev => prev.map(d => (d.id === newDest.id ? computed : d)));
   };
 
   const removeDestination = (id: string) => {
-    setDestinations(prev => {
-      const next = prev.filter(d => d.id !== id);
-      persist(next);
-      return next;
-    });
+    setDestinations(prev => prev.filter(d => d.id !== id));
   };
 
   const alreadyAdded = new Set(destinations.map(d => `${d.type}:${d.name}`));
