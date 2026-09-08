@@ -344,7 +344,7 @@ export const Navbar = () => {
               <div className="w-1/4 ml-[17%] text-center mb-8 mt-4" style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.71s' }}>
                 <h2 className="text-2xl leading-none uppercase">
                   <span className="font-[Couture,Playfair_Display,Georgia,serif] font-thin tracking-[0.15em] text-foreground">Who We</span>{' '}
-                  <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-bold text-foreground">Are</span>
+                  <span className="italic font-[Bodoni_Moda,Playfair_Display,Georgia,serif] font-light text-foreground">Are</span>
                 </h2>
               </div>
               <span style={{ animation: closingMenu ? 'none' : 'mega-menu-content 0.4s ease-out both', animationDelay: closingMenu ? '0s' : '0.825s' }} className="w-full text-left px-4 py-0.5 text-sm font-[Arial,sans-serif] font-light text-foreground">
