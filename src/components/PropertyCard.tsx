@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2, Share2, MessageCircle, Check } from "lucide-react";
+import { Bed, Bath, Square, Heart, Phone, Mail, ChevronLeft, ChevronRight, CalendarCheck, Building2, Share2, MessageCircle } from "lucide-react";
 import ViewingBookingModal from "@/components/ViewingBookingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -318,11 +318,9 @@ className={`animate-fade-in border-0 hover:bg-[#F8F8F8] transition-all duration-
       )}
       {selectable && (
         <div
-          className={`absolute top-2 right-2 z-30 w-6 h-6 rounded-md border-2 flex items-center justify-center ${
-            selected ? 'bg-primary border-primary text-primary-foreground' : 'bg-background/90 border-border'
-          }`}
+          className={`absolute top-3 right-3 z-30 w-10 h-10 rounded-md border-2 flex items-center justify-center bg-background/90 border-border`}
         >
-          {selected && <Check className="w-4 h-4" />}
+          {selected && <div className="w-5 h-5 bg-black" />}
         </div>
       )}
       {/* Left: Image */}
