@@ -533,7 +533,7 @@ const Rent = () => {
                             const p = sortedProperties.find((x: any) => x.id === id);
                             const img = p?.images?.[0];
                             return (
-                              <div key={id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border flex-shrink-0">
+                              <div key={id} className="relative w-24 h-24 rounded-lg overflow-hidden border border-border flex-shrink-0">
                                 {img ? (
                                   <img src={img} alt="Selected property" className="w-full h-full object-cover" />
                                 ) : (
@@ -553,7 +553,7 @@ const Rent = () => {
                           {Array.from({ length: Math.max(0, 3 - compareIds.length) }).map((_, i) => (
                             <div
                               key={`placeholder-${i}`}
-                              className="w-16 h-16 rounded-lg border border-dashed border-border flex items-center justify-center flex-shrink-0 text-muted-foreground/60"
+                              className="w-24 h-24 rounded-lg border border-dashed border-border flex items-center justify-center flex-shrink-0 text-muted-foreground/60"
                               aria-hidden="true"
                             >
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
