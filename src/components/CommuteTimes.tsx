@@ -109,33 +109,8 @@ export default function CommuteTimes({ originLat, originLng }: CommuteTimesProps
   const [type, setType] = useState<DestType>("mall");
   const [placeId, setPlaceId] = useState<string>("");
 
-  const storageKey = `${STORAGE_KEY}:${originLat.toFixed(4)}:${originLng.toFixed(4)}`;
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const saved: Destination[] = JSON.parse(raw);
-        if (Array.isArray(saved)) {
-          setDestinations(saved.map(d => ({ ...d, loading: false })));
-        }
-      }
-    } catch {
-      // ignore
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storageKey]);
-
-  const persist = (dests: Destination[]) => {
-    try {
-      const slim = dests.map(({ id, name, lat, lng, type, driving }) => ({
-        id, name, lat, lng, type, driving,
-      }));
-      localStorage.setItem(storageKey, JSON.stringify(slim));
-    } catch {
-      // ignore
-    }
-  };
+  // Destinations are kept in memory only — not persisted across page
+  // leaves or refreshes, per product requirements.
 
   const computeForDestination = async (dest: Destination): Promise<Destination> => {
     const origin = { lat: originLat, lng: originLng };
