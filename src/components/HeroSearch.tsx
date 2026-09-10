@@ -50,7 +50,7 @@ const HeroSearch = () => {
   );
 
   return (
-    <div className="w-[95%] mx-auto md:w-auto md:mx-[4.5rem] relative z-[60]">
+    <div className="w-full relative z-[60]">
       {/* Search bar */}
       <div className="relative" onKeyDown={handleKeyDown}>
         <div className="flex-1 relative">

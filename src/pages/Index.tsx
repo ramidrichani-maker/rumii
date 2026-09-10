@@ -59,11 +59,11 @@ const Index = () => {
         </ScrollReveal>
       </div>
 
-      <ScrollReveal animation="fade-up" delay={150} className="relative z-[60] w-full max-w-[2520px] mx-auto px-4">
+      <ScrollReveal animation="fade-up" delay={150} className="relative z-[60] w-full home-gutter">
         <HeroSearch />
       </ScrollReveal>
 
-      <div className="container mx-auto px-4 py-8 text-primary">
+      <div className="home-gutter py-8 text-primary">
         {isLoading ? (
           <div className="mt-12">
             <div className="text-center mb-12">
