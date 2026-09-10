@@ -331,6 +331,7 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
         onTouchEnd={imageCarousel.onTouchEnd}
+        onWheel={imageCarousel.onWheel}
         onClick={(e) => {
           if (imageCarousel.wasSwipe()) {
             e.stopPropagation();
