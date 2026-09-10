@@ -347,7 +347,7 @@ document.addEventListener('keydown', onKey);
   );
 
 return (
-    <div className={`mb-6 sticky rumi-sticky-under-nav z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed && !isMobile ? 'rumi-bar-collapsed' : ''}`}>
+    <div className={`mb-6 sticky rumi-sticky-under-nav z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed ? 'rumi-bar-collapsed' : ''}`}>
       
       <div className="rumi-filter-bar flex flex-col md:flex-row md:flex-wrap gap-3">
         <div className="rumi-collapse-hide flex gap-2 items-stretch md:flex-1 md:min-w-0">
@@ -395,7 +395,7 @@ return (
 
         {/* Mobile: map view button (visible outside the panel) */}
         {trailingContent && (
-          <div className="md:hidden">{trailingContent}</div>
+          <div className="md:hidden rumi-collapse-hide">{trailingContent}</div>
         )}
 
         {(() => {
