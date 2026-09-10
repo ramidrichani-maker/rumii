@@ -486,12 +486,12 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
         </div>
 
         {/* Price */}
-        <h3 className={`text-sm md:text-2xl font-bold text-primary pr-8 md:pr-10 ${compact ? '' : 'md:order-2 md:pr-0'}`}>
+        <h3 className={`text-sm md:text-2xl font-bold text-primary ${compact ? 'pr-8 md:pr-10' : 'order-2 mt-1'}`}>
           {formatPrice(property.price, property.listing_type, property.rental_price)}
         </h3>
 
         {/* Beds, Baths, Size */}
-        <div className={`flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap ${compact ? '' : 'md:order-3 md:justify-center'}`}>
+        <div className={`flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap ${compact ? '' : 'order-3 justify-center'}`}>
           {property.property_type === 'stacked_unit' && stackedRange && stackedRange.unitCount > 0 && (
             <span className="flex items-center gap-1">
               <Building2 className="w-3 h-3 md:w-4 md:h-4" />
@@ -515,14 +515,14 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
         </div>
 
         {/* Location */}
-        <p className={`text-xs md:text-sm text-foreground mt-1 md:mt-2 truncate max-w-full ${compact ? '' : 'md:order-1 md:mt-0'}`}>
+        <p className={`text-xs md:text-sm text-foreground truncate max-w-full ${compact ? 'mt-1 md:mt-2' : 'order-1 mt-0'}`}>
           {userRole === 'admin' || isAssignedAgent
             ? `${property.city}, ${property.address}`
             : property.city}
         </p>
 
         {/* Description (max 2 lines) */}
-        <p className={`hidden md:block text-sm text-muted-foreground mt-1 line-clamp-2 ${compact ? '' : 'md:order-4'}`}>
+        <p className={`${compact ? 'hidden md:block' : 'block order-4'} text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2`}>
           {truncateDescription((property as any).description)}
         </p>
 
@@ -543,8 +543,8 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
           </div>
         )}
 
-        {/* Bottom-right: Request Viewing, Call & Email (hidden on desktop grid cards — available on the property page) */}
-        <div className={`flex items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap ${compact ? '' : 'md:hidden'}`}>
+        {/* Bottom-right: Request Viewing, Call & Email (hidden on grid cards — available on the property page) */}
+        <div className={`${compact ? 'flex' : 'hidden'} items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap`}>
           <Button
             variant="outline"
             size="sm"
