@@ -106,6 +106,7 @@ export const Navbar = () => {
     // which left a visible sub-pixel seam above the filter bar on some screens.
     const h = hidden ? 0 : (navRef.current?.getBoundingClientRect().height ?? 56);
     document.documentElement.style.setProperty('--navbar-visible-h', `${h}px`);
+    document.documentElement.classList.toggle('rumi-nav-hidden', hidden);
   }, [hidden]);
 
   // Hide navbar on scroll down, reveal on scroll up or when at the very top
