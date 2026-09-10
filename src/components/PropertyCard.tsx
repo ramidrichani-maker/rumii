@@ -521,8 +521,8 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
             : property.city}
         </p>
 
-        {/* Description (max 2 lines) */}
-        <p className={`${compact ? 'hidden md:block' : 'block order-4'} text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2`}>
+        {/* Description (desktop only — mobile shows it on the property page) */}
+        <p className="hidden md:block order-4 text-sm text-muted-foreground mt-1 line-clamp-2">
           {truncateDescription((property as any).description)}
         </p>
 
