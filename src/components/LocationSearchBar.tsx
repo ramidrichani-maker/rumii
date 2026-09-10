@@ -370,12 +370,13 @@ return (
               </button>
             )}
           </div>
-          {/* Mobile-only: collapse all filters behind a single button */}
+          {/* Mobile: radius filter to the right of search bar */}
+          {isMobile && <div className="shrink-0">{renderRadiusControl(true)}</div>}
+          {/* Mobile-only: Filters button opens advanced popup directly */}
           <button
             type="button"
-            onClick={() => setMobileFiltersOpen(o => !o)}
-            aria-expanded={mobileFiltersOpen}
-            aria-controls="mobile-filters-panel"
+            onClick={() => setAdvancedFilterOpen(true)}
+            aria-expanded={advancedFilterOpen}
             className="md:hidden h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground flex items-center gap-2 shrink-0 transition-colors"
           >
             <FilterLinesIcon className="w-4 h-4" />
@@ -387,6 +388,11 @@ return (
             )}
           </button>
         </div>
+
+        {/* Mobile: map view button (visible outside the panel) */}
+        {trailingContent && (
+          <div className="md:hidden">{trailingContent}</div>
+        )}
 
         {(() => {
         const __panel = (
