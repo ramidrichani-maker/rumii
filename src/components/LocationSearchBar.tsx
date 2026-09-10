@@ -788,7 +788,7 @@ return (
                   className="flex items-center justify-between w-full mb-2"
                 >
                   <h4 className="text-sm font-semibold text-foreground">Property Type</h4>
-                  <span className="text-lg leading-none font-light">{openSections.propertyType ? '−' : '+'}</span>
+                  <TogglePlus open={openSections.propertyType} />
                 </button>
                 {openSections.propertyType && (
                   <>
@@ -869,7 +869,7 @@ return (
                   className="flex items-center justify-between w-full mb-2"
                 >
                   <h4 className="text-sm font-semibold text-foreground">Size</h4>
-                  <span className="text-lg leading-none font-light">{openSections.size ? '−' : '+'}</span>
+                  <TogglePlus open={openSections.size} />
                 </button>
                 {openSections.size && onSquareMetersRangeChange && squareMetersRange && (
                   <RangeSlider
@@ -895,7 +895,7 @@ return (
                   className="flex items-center justify-between w-full mb-2"
                 >
                   <h4 className="text-sm font-semibold text-foreground">Bedrooms</h4>
-                  <span className="text-lg leading-none font-light">{openSections.bedrooms ? '−' : '+'}</span>
+                  <TogglePlus open={openSections.bedrooms} />
                 </button>
                 {openSections.bedrooms && (
                   <>
@@ -976,7 +976,7 @@ return (
                   className="flex items-center justify-between w-full mb-2"
                 >
                   <h4 className="text-sm font-semibold text-foreground">Must-Haves</h4>
-                  <span className="text-lg leading-none font-light">{openSections.mustHaves ? '−' : '+'}</span>
+                  <TogglePlus open={openSections.mustHaves} />
                 </button>
                 {openSections.mustHaves && (
                 <div className="flex flex-col gap-2">
@@ -1013,7 +1013,7 @@ return (
                   className="flex items-center justify-between w-full mb-2"
                 >
                   <h4 className="text-sm font-semibold text-foreground">Property Features</h4>
-                  <span className="text-lg leading-none font-light">{openSections.propertyFeatures ? '−' : '+'}</span>
+                  <TogglePlus open={openSections.propertyFeatures} />
                 </button>
                 {openSections.propertyFeatures && (
                 <div className="grid grid-cols-2 gap-1">
@@ -1050,7 +1050,7 @@ return (
                   className="flex items-center justify-between w-full mb-2"
                 >
                   <h4 className="text-sm font-semibold text-foreground">Price</h4>
-                  <span className="text-lg leading-none font-light">{openSections.price ? '−' : '+'}</span>
+                  <TogglePlus open={openSections.price} />
                 </button>
                 {openSections.price && (
                   <>
@@ -1132,7 +1132,7 @@ return (
                   className="flex items-center justify-between w-full text-sm font-semibold text-foreground mb-1"
                 >
                   <span>Added to rumi</span>
-                  <span className="text-base leading-none">{openSections.addedToRumi ? '−' : '+'}</span>
+                  <TogglePlus open={openSections.addedToRumi} />
                 </button>
                 {openSections.addedToRumi && (
                 <div className="flex flex-col gap-1">
