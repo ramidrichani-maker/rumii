@@ -299,7 +299,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
 
   return (
 <Card
-className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex flex-row ${compact ? '' : 'md:flex-col'} overflow-hidden relative bg-muted ${
+className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex ${compact ? 'flex-row' : 'flex-col'} overflow-hidden relative bg-muted ${
         selectable && selected ? 'ring-2 ring-primary' : ''
       }`}
       onClick={(e) => {
@@ -325,8 +325,10 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
       )}
       {/* Left: Image */}
       <div
-        className={`relative w-32 min-w-[8rem] h-auto min-h-[10rem] flex-shrink-0 group bg-muted overflow-hidden touch-pan-y ${
-          compact ? 'md:w-96 md:min-w-[24rem] md:min-h-[14rem]' : 'md:w-full md:min-w-0 md:h-[22rem] md:min-h-0'
+        className={`relative flex-shrink-0 group bg-muted overflow-hidden touch-pan-y ${
+          compact
+            ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
+            : 'w-full h-40 md:h-[22rem]'
         }`}
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
