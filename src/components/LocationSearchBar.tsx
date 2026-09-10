@@ -376,42 +376,11 @@ return (
 {trailingContent && (
           <div className="rumi-collapse-hide hidden md:flex items-center">{trailingContent}</div>
         )}
-<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
-          <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                disabled={radiusDisabled}
-                title={radiusDisabled ? 'Enter or draw a search area first' : undefined}
-                className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="text-sm font-medium">Radius: {selectedLabel}</span>
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto bg-popover backdrop-blur-md z-[10050] p-3 border-border/50 rounded-2xl shadow-lg">
-              <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
-                {radiusOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      onRadiusChange(option.value);
-                      setRadiusOpen(false);
-                    }}
-                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                      radius === option.value
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-transparent bg-transparent hover:border-primary/50'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
+        {!isMobile && (
+          <div className="rumi-collapse-hide md:contents">
+            {renderRadiusControl(false)}
+          </div>
+        )}
 
         {/* Row 2: Bedrooms */}
 <div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
