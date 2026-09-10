@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, TouchEvent } from "react";
+import { useState, useRef, useCallback, TouchEvent, WheelEvent } from "react";
 
 export function useSwipeCarousel(totalImages: number) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,7 +55,30 @@ export function useSwipeCarousel(totalImages: number) {
 
   const wasSwipe = useCallback(() => didSwipe.current, []);
 
+  // Desktop trackpad: two-finger horizontal swipe emits wheel events with
+  // a dominant deltaX. Accumulate and flip one image per gesture.
+  const wheelAccum = useRef(0);
+  const wheelTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onWheel = useCallback(
+    (e: WheelEvent) => {
+      if (totalImages <= 1) return;
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      wheelAccum.current += e.deltaX;
+      if (wheelTimeout.current) clearTimeout(wheelTimeout.current);
+      wheelTimeout.current = setTimeout(() => {
+        wheelAccum.current = 0;
+      }, 200);
+      if (Math.abs(wheelAccum.current) > 40) {
+        didSwipe.current = true;
+        goTo(wheelAccum.current > 0 ? "right" : "left");
+        wheelAccum.current = 0;
+      }
+    },
+    [goTo, totalImages]
+  );
+
   return {
+    onWheel,
     currentIndex,
     setCurrentIndex,
     swipeOffset,
