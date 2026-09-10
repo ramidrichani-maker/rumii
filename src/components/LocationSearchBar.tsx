@@ -308,6 +308,44 @@ document.addEventListener('keydown', onKey);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const renderRadiusControl = (compact = false) => (
+    <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          disabled={radiusDisabled}
+          title={radiusDisabled ? 'Enter or draw a search area first' : undefined}
+          className={`${compact ? 'h-12 px-3 gap-1 min-w-[80px]' : 'h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial'} shrink-0 disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          <span className={`text-sm font-medium ${compact ? 'truncate' : ''}`}>
+            {compact ? selectedLabel : `Radius: ${selectedLabel}`}
+          </span>
+          <ChevronDown className="w-4 h-4 shrink-0" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-auto bg-popover backdrop-blur-md z-[10050] p-3 border-border/50 rounded-2xl shadow-lg">
+        <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+          {radiusOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => {
+                onRadiusChange(option.value);
+                setRadiusOpen(false);
+              }}
+              className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                radius === option.value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-transparent bg-transparent hover:border-primary/50'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+
 return (
     <div className={`mb-6 sticky rumi-sticky-under-nav z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed && !isMobile ? 'rumi-bar-collapsed' : ''}`}>
       
@@ -332,12 +370,13 @@ return (
               </button>
             )}
           </div>
-          {/* Mobile-only: collapse all filters behind a single button */}
+          {/* Mobile: radius filter to the right of search bar */}
+          {isMobile && <div className="shrink-0">{renderRadiusControl(true)}</div>}
+          {/* Mobile-only: Filters button opens advanced popup directly */}
           <button
             type="button"
-            onClick={() => setMobileFiltersOpen(o => !o)}
-            aria-expanded={mobileFiltersOpen}
-            aria-controls="mobile-filters-panel"
+            onClick={() => setAdvancedFilterOpen(true)}
+            aria-expanded={advancedFilterOpen}
             className="md:hidden h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground flex items-center gap-2 shrink-0 transition-colors"
           >
             <FilterLinesIcon className="w-4 h-4" />
@@ -349,6 +388,11 @@ return (
             )}
           </button>
         </div>
+
+        {/* Mobile: map view button (visible outside the panel) */}
+        {trailingContent && (
+          <div className="md:hidden">{trailingContent}</div>
+        )}
 
         {(() => {
         const __panel = (
@@ -376,42 +420,11 @@ return (
 {trailingContent && (
           <div className="rumi-collapse-hide hidden md:flex items-center">{trailingContent}</div>
         )}
-<div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Search radius</span>
-          <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                disabled={radiusDisabled}
-                title={radiusDisabled ? 'Enter or draw a search area first' : undefined}
-                className="h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="text-sm font-medium">Radius: {selectedLabel}</span>
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto bg-popover backdrop-blur-md z-[10050] p-3 border-border/50 rounded-2xl shadow-lg">
-              <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
-                {radiusOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      onRadiusChange(option.value);
-                      setRadiusOpen(false);
-                    }}
-                    className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
-                      radius === option.value
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-transparent bg-transparent hover:border-primary/50'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
+        {!isMobile && (
+          <div className="rumi-collapse-hide md:contents">
+            {renderRadiusControl(false)}
+          </div>
+        )}
 
         {/* Row 2: Bedrooms */}
 <div className="rumi-collapse-hide flex flex-col gap-1 md:contents">
