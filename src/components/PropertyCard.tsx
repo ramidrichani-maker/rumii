@@ -339,7 +339,7 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
         }}
       >
         {/* Desktop grid (vertical) overlay: agency + share + favorite on image top-right */}
-        {!compact && (
+        {!compact && !selectable && (
           <div className="hidden md:flex absolute top-2 right-2 z-20 items-center gap-1">
             {agencyName && (
               <div className="flex items-center gap-1.5 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1">
@@ -439,7 +439,7 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
       {/* Right: Details */}
       <div className={`flex flex-col flex-1 p-2 md:p-4 relative min-w-0 ${compact ? '' : 'md:items-center md:text-center'}`}>
         {/* Top-right: Agency + Favorite (hidden on desktop grid cards — shown over the image instead) */}
-        <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'md:hidden'}`}>
+        <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'md:hidden'} ${selectable ? 'hidden' : ''}`}>
           <div className="flex items-center gap-1">
             {agencyName && !compact && (
               <div className="hidden md:flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
