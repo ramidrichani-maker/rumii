@@ -341,10 +341,8 @@ All colors MUST be HSL.
 .rumi-nav-hidden .rumi-sticky-under-nav {
   transition: none;
 }
-@media (min-width: 768px) {
-  .rumi-bar-collapsed .rumi-collapse-hide {
-    display: none;
-  }
+.rumi-bar-collapsed .rumi-collapse-hide {
+  display: none;
 }
 
 /* Filter section toggle: plus icon that rotates its vertical bar into a dash. */
