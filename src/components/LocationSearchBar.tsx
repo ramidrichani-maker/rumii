@@ -308,6 +308,44 @@ document.addEventListener('keydown', onKey);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const renderRadiusControl = (compact = false) => (
+    <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          disabled={radiusDisabled}
+          title={radiusDisabled ? 'Enter or draw a search area first' : undefined}
+          className={`${compact ? 'h-12 px-3 gap-1 min-w-[80px]' : 'h-10 md:h-12 px-4 gap-2 min-w-[130px] flex-1 md:flex-initial'} shrink-0 disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          <span className={`text-sm font-medium ${compact ? 'truncate' : ''}`}>
+            {compact ? selectedLabel : `Radius: ${selectedLabel}`}
+          </span>
+          <ChevronDown className="w-4 h-4 shrink-0" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-auto bg-popover backdrop-blur-md z-[10050] p-3 border-border/50 rounded-2xl shadow-lg">
+        <div className="grid grid-cols-1 gap-1 max-h-[calc(100vh-200px)] overflow-y-auto rounded-2xl p-2 w-fit">
+          {radiusOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => {
+                onRadiusChange(option.value);
+                setRadiusOpen(false);
+              }}
+              className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-colors text-left ${
+                radius === option.value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-transparent bg-transparent hover:border-primary/50'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+
 return (
     <div className={`mb-6 sticky rumi-sticky-under-nav z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed && !isMobile ? 'rumi-bar-collapsed' : ''}`}>
       
