@@ -526,7 +526,7 @@ const Rent = () => {
 <div className="w-full bg-card border-t border-border shadow-2xl px-[4vw] py-8 flex items-center justify-between gap-4 flex-wrap min-h-[161px]">
                     <div className="flex items-center gap-3 min-w-0">
                       {compareIds.length === 0 ? (
-                        <span className="text-sm text-muted-foreground">Select at least two properties to compare</span>
+                        <span className="text-sm text-gray-400">Select at least two properties to compare</span>
                       ) : (
                         <div className="flex items-center gap-3 flex-wrap">
                           {compareIds.map((id) => {
@@ -579,7 +579,7 @@ const Rent = () => {
                         onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
                         className={`ml-[1vw] h-[3.8rem] px-[6.69rem] rounded-none text-sm font-medium transition-colors ${
                           compareIds.length < 2
-                            ? "bg-muted-foreground/30 text-muted-foreground cursor-not-allowed"
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                             : "bg-black text-white hover:bg-black/90"
                         }`}
                       >
