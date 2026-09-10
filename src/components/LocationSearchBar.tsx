@@ -13,6 +13,13 @@ const FilterLinesIcon = ({ className = '' }: { className?: string }) => (
     <circle cx="19" cy="17" r="2.2" fill="currentColor" stroke="none" />
   </svg>
 );
+
+const TogglePlus = ({ open }: { open: boolean }) => (
+  <span className="rumi-toggle-plus inline-flex items-center justify-center w-4 h-4 shrink-0">
+    <span className="rumi-toggle-plus-h" />
+    <span className={`rumi-toggle-plus-v ${open ? 'rumi-toggle-open' : ''}`} />
+  </span>
+);
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
