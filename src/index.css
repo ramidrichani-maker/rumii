@@ -362,7 +362,11 @@ All colors MUST be HSL.
   left: 0;
   right: 0;
   height: 1.5px;
-  transform: translateY(-50%);
+  transform: translateY(-50%) rotate(0deg);
+  transition: transform 0.25s ease-in-out;
+}
+.rumi-toggle-plus-h.rumi-toggle-open {
+  transform: translateY(-50%) rotate(180deg);
 }
 .rumi-toggle-plus-v {
   top: 0;
