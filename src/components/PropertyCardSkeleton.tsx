@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const PropertyCardSkeleton: React.FC = () => {
   return (
-    <Card className="border-0 rounded-2xl overflow-hidden bg-muted flex flex-row md:flex-col">
+    <Card className="border-0 rounded-2xl overflow-hidden bg-muted flex flex-row md:flex-col w-full h-full min-h-[10rem] md:min-h-[32rem]">
       {/* Image skeleton: left column on mobile, full-width banner on desktop */}
       <div className="w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-full md:min-w-0 md:h-[22rem] md:min-h-0 flex-shrink-0 bg-muted">
         <Skeleton className="w-full h-full rounded-none" />
