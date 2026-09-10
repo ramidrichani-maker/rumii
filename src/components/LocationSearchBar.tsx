@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
 import { MapPin, ChevronDown, BedDouble, DollarSign, Home, X } from 'lucide-react';
+import RangeSlider from "@/components/RangeSlider";
 
 const FilterLinesIcon = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className={className} aria-hidden="true">
@@ -114,6 +115,9 @@ interface LocationSearchBarProps {
   onApplyMobileFilters?: () => void;
   hasDrawnArea?: boolean;
   resultCount?: number;
+  squareMetersRange?: [number, number];
+  onSquareMetersRangeChange?: (v: [number, number]) => void;
+  sqmDefault?: [number, number];
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -149,6 +153,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onApplyMobileFilters,
     hasDrawnArea,
     resultCount,
+    squareMetersRange,
+    onSquareMetersRangeChange,
+    sqmDefault,
   } = props;
   const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
@@ -159,11 +166,12 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [radiusOpen, setRadiusOpen] = useState(false);
   const [advancedFilterOpen, setAdvancedFilterOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    bedrooms: false,
-    price: false,
     propertyType: false,
+    size: false,
+    bedrooms: false,
     mustHaves: false,
     propertyFeatures: false,
+    price: false,
     addedToRumi: false,
   });
   const toggleSection = (key: string) =>
@@ -182,6 +190,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onRadiusChange(0);
     if (onUnfurnishedChange) onUnfurnishedChange(false);
     if (onNewHomesOnlyChange) onNewHomesOnlyChange(false);
+    if (onSquareMetersRangeChange && sqmDefault) onSquareMetersRangeChange(sqmDefault);
     setActiveBedroomTab(null);
     setActivePriceTab(null);
     setActiveFilterBedroomTab(null);
@@ -231,6 +240,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     !!keywords,
     !!unfurnishedOnly,
     !!newHomesOnly,
+    !!(squareMetersRange && sqmDefault && (squareMetersRange[0] !== sqmDefault[0] || squareMetersRange[1] !== sqmDefault[1])),
   ].filter(Boolean).length;
 
   const bedroomMobileRef = useRef<HTMLDivElement>(null);
