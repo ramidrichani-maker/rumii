@@ -344,7 +344,35 @@ All colors MUST be HSL.
 @media (min-width: 768px) {
   .rumi-bar-collapsed .rumi-collapse-hide {
     display: none;
-  }
+}
+
+/* Filter section toggle: plus icon that rotates its vertical bar into a dash. */
+.rumi-toggle-plus {
+  position: relative;
+}
+.rumi-toggle-plus-h,
+.rumi-toggle-plus-v {
+  position: absolute;
+  background: currentColor;
+  border-radius: 2px;
+}
+.rumi-toggle-plus-h {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  transform: translateY(-50%);
+}
+.rumi-toggle-plus-v {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1.5px;
+  transform: translateX(-50%) rotate(0deg);
+  transition: transform 0.25s ease-in-out;
+}
+.rumi-toggle-plus-v.rumi-toggle-open {
+  transform: translateX(-50%) rotate(90deg);
 }
 
 /* Shared homepage gutter: aligns all homepage content to the exact horizontal
