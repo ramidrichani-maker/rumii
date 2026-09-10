@@ -299,7 +299,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
 
   return (
 <Card
-className={`animate-fade-in border-0 hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex flex-row ${compact ? '' : 'md:flex-col'} overflow-hidden relative bg-muted ${
+className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex flex-row ${compact ? '' : 'md:flex-col'} overflow-hidden relative bg-muted ${
         selectable && selected ? 'ring-2 ring-primary' : ''
       }`}
       onClick={(e) => {
