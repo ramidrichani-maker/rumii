@@ -669,7 +669,7 @@ const Rent = () => {
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto max-h-[calc(50vh-120px)] md:max-h-[calc(100vh-120px)]' : 'w-full'} transition-all duration-300`}
           >
             {isLoading ? (
-              <div className={`mb-8 grid grid-cols-1 ${showMap ? '' : 'md:grid-cols-3'} gap-6`}>
+              <div className={`mb-8 grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-3 md:gap-6`}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <PropertyCardSkeleton key={i} />
                 ))}
@@ -679,7 +679,7 @@ const Rent = () => {
                 <ScrollReveal animation="fade-up">
                   <h3 className="text-2xl font-semibold mb-6 text-foreground">Properties for Rent</h3>
                 </ScrollReveal>
-                <div className={`grid grid-cols-1 ${showMap ? '' : 'md:grid-cols-3'} gap-6`}>
+                <div className={`grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-3 md:gap-6`}>
                   {paginatedProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
