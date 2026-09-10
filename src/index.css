@@ -346,3 +346,14 @@ All colors MUST be HSL.
     display: none;
   }
 }
+
+/* Shared homepage gutter: aligns all homepage content to the exact horizontal
+   edges of the search bar underline (mobile: px-4 + 2.5%; desktop: 5.5rem). */
+.home-gutter {
+  padding-inline: calc(1rem + 2.5%);
+}
+@media (min-width: 768px) {
+  .home-gutter {
+    padding-inline: 5.5rem;
+  }
+}
