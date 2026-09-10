@@ -372,12 +372,15 @@ return (
           </div>
           {/* Mobile: radius filter to the right of search bar */}
           {isMobile && <div className="shrink-0">{renderRadiusControl(true)}</div>}
-          {/* Mobile-only: Filters button opens advanced popup directly */}
+        </div>
+
+        {/* Mobile: Filters + Compare row below search bar (mirrors desktop layout) */}
+        <div className="md:hidden flex items-center gap-3">
           <button
             type="button"
             onClick={() => setAdvancedFilterOpen(true)}
             aria-expanded={advancedFilterOpen}
-            className="md:hidden h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground flex items-center gap-2 shrink-0 transition-colors"
+            className="h-12 px-4 rounded-md bg-white hover:bg-white border-0 text-sm font-medium hover:text-muted-foreground flex items-center gap-2 shrink-0 transition-colors"
           >
             <FilterLinesIcon className="w-4 h-4" />
             Filters
@@ -387,6 +390,7 @@ return (
               </span>
             )}
           </button>
+          {compareContent}
         </div>
 
         {/* Mobile: map view button (visible outside the panel) */}
