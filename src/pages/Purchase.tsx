@@ -673,7 +673,7 @@ const Purchase = () => {
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto max-h-[calc(50vh-120px)] md:max-h-[calc(100vh-120px)]' : 'w-full'} transition-all duration-300`}
           >
             {isLoading ? (
-              <div className="mb-8 grid grid-cols-1 gap-6">
+              <div className={`mb-8 grid grid-cols-1 ${showMap ? '' : 'md:grid-cols-3'} gap-6`}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <PropertyCardSkeleton key={i} />
                 ))}
