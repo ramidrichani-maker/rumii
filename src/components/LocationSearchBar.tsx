@@ -16,7 +16,7 @@ const FilterLinesIcon = ({ className = '' }: { className?: string }) => (
 
 const TogglePlus = ({ open }: { open: boolean }) => (
   <span className="rumi-toggle-plus inline-flex items-center justify-center w-[0.8rem] h-[0.8rem] shrink-0">
-    <span className="rumi-toggle-plus-h" />
+    <span className={`rumi-toggle-plus-h ${open ? 'rumi-toggle-open' : ''}`} />
     <span className={`rumi-toggle-plus-v ${open ? 'rumi-toggle-open' : ''}`} />
   </span>
 );
