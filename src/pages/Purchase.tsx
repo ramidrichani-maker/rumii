@@ -509,6 +509,9 @@ const Purchase = () => {
           onUnfurnishedChange={setUnfurnishedOnly}
           newHomesOnly={newHomesOnly}
           onNewHomesOnlyChange={setNewHomesOnly}
+          squareMetersRange={squareMetersRange}
+          onSquareMetersRangeChange={setSquareMetersRange}
+          sqmDefault={[50, 1000]}
           onApplyMobileFilters={() => {
             document.getElementById('results-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
 import { MapPin, ChevronDown, BedDouble, DollarSign, Home, X } from 'lucide-react';
+import RangeSlider from "@/components/RangeSlider";
 
 const FilterLinesIcon = ({ className = '' }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className={className} aria-hidden="true">
@@ -114,6 +115,9 @@ interface LocationSearchBarProps {
   onApplyMobileFilters?: () => void;
   hasDrawnArea?: boolean;
   resultCount?: number;
+  squareMetersRange?: [number, number];
+  onSquareMetersRangeChange?: (v: [number, number]) => void;
+  sqmDefault?: [number, number];
 }
 
 const LocationSearchBar = (props: LocationSearchBarProps) => {
@@ -149,6 +153,9 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onApplyMobileFilters,
     hasDrawnArea,
     resultCount,
+    squareMetersRange,
+    onSquareMetersRangeChange,
+    sqmDefault,
   } = props;
   const isMobile = useIsMobile();
   const [activePriceTab, setActivePriceTab] = useState<'min' | 'max' | null>(null);
@@ -159,11 +166,12 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
   const [radiusOpen, setRadiusOpen] = useState(false);
   const [advancedFilterOpen, setAdvancedFilterOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    bedrooms: false,
-    price: false,
     propertyType: false,
+    size: false,
+    bedrooms: false,
     mustHaves: false,
     propertyFeatures: false,
+    price: false,
     addedToRumi: false,
   });
   const toggleSection = (key: string) =>
@@ -182,6 +190,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     onRadiusChange(0);
     if (onUnfurnishedChange) onUnfurnishedChange(false);
     if (onNewHomesOnlyChange) onNewHomesOnlyChange(false);
+    if (onSquareMetersRangeChange && sqmDefault) onSquareMetersRangeChange(sqmDefault);
     setActiveBedroomTab(null);
     setActivePriceTab(null);
     setActiveFilterBedroomTab(null);
@@ -231,6 +240,7 @@ const LocationSearchBar = (props: LocationSearchBarProps) => {
     !!keywords,
     !!unfurnishedOnly,
     !!newHomesOnly,
+    !!(squareMetersRange && sqmDefault && (squareMetersRange[0] !== sqmDefault[0] || squareMetersRange[1] !== sqmDefault[1])),
   ].filter(Boolean).length;
 
   const bedroomMobileRef = useRef<HTMLDivElement>(null);
@@ -763,6 +773,113 @@ return (
           {(() => {
             const advancedFilterBody = (
             <div className="space-y-5 pb-6">
+              {/* Property Type section */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('propertyType')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Property Type</h4>
+                  <span className="text-lg leading-none font-light">{openSections.propertyType ? '−' : '+'}</span>
+                </button>
+                {openSections.propertyType && (
+                  <>
+                    <div className="grid grid-cols-2 gap-1 rounded-2xl p-2">
+                      <button
+                        onClick={() => onPropertyTypesChange([])}
+                        className={`col-span-2 flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-light transition-colors text-left ${
+                          selectedPropertyTypes.length === 0
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
+                        }`}
+                      >
+                        <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
+                        Show All
+                      </button>
+                      {propertyTypeOptions.map((type) => {
+                        const typeId = type.toLowerCase();
+                        const isSelected = selectedPropertyTypes.includes(typeId);
+                        return (
+                          <button
+                            key={`filter-type-${type}`}
+                            onClick={() => {
+                              if (isSelected) {
+                                onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
+                              } else {
+                                onPropertyTypesChange([...selectedPropertyTypes, typeId]);
+                              }
+                            }}
+                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-sm font-light transition-colors text-left ${
+                              isSelected
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
+                            }`}
+                          >
+                            <Checkbox checked={isSelected} className="pointer-events-none shrink-0" />
+                            <span className="truncate">{type}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Unfurnished toggle */}
+                    {onUnfurnishedChange !== undefined && (
+                      <div className="mt-2">
+                        <button
+                          onClick={() => onUnfurnishedChange(!unfurnishedOnly)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                        >
+                          <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
+                          <span className="text-sm font-light text-muted-foreground">Show only unfurnished properties</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* New homes only toggle */}
+                    {onNewHomesOnlyChange !== undefined && (
+                      <div className="mt-2">
+                        <button
+                          onClick={() => onNewHomesOnlyChange(!newHomesOnly)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
+                        >
+                          <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
+                          <span className="text-sm font-light text-muted-foreground">Show only new homes</span>
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div className="border-t border-foreground/40" />
+
+              {/* Size section */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('size')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Size</h4>
+                  <span className="text-lg leading-none font-light">{openSections.size ? '−' : '+'}</span>
+                </button>
+                {openSections.size && onSquareMetersRangeChange && squareMetersRange && (
+                  <RangeSlider
+                    value={squareMetersRange}
+                    onValueChange={onSquareMetersRangeChange}
+                    min={50}
+                    max={1000}
+                    step={10}
+                    label="Size"
+                    unit=" m²"
+                    maxLabel="1000+ m²"
+                  />
+                )}
+              </div>
+
+              <div className="border-t border-foreground/40" />
+
               {/* Bedrooms section */}
               <div>
                 <button
@@ -839,6 +956,80 @@ return (
                       </div>
                     )}
                   </>
+                )}
+              </div>
+
+              <div className="border-t border-foreground/40" />
+
+              {/* Must-Haves section */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('mustHaves')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Must-Haves</h4>
+                  <span className="text-lg leading-none font-light">{openSections.mustHaves ? '−' : '+'}</span>
+                </button>
+                {openSections.mustHaves && (
+                <div className="flex flex-col gap-2">
+                  {mustHaveOptions.map((item) => {
+                    const isSelected = selectedMustHaves.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => {
+                          if (isSelected) {
+                            onMustHavesChange(selectedMustHaves.filter(m => m !== item));
+                          } else {
+                            onMustHavesChange([...selectedMustHaves, item]);
+                          }
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <Checkbox checked={isSelected} className="pointer-events-none" />
+                        <span className="text-sm font-light text-muted-foreground">{item}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                )}
+              </div>
+
+              <div className="border-t border-foreground/40" />
+
+              {/* Property Features section */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('propertyFeatures')}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <h4 className="text-sm font-semibold text-foreground">Property Features</h4>
+                  <span className="text-lg leading-none font-light">{openSections.propertyFeatures ? '−' : '+'}</span>
+                </button>
+                {openSections.propertyFeatures && (
+                <div className="grid grid-cols-2 gap-1">
+                  {propertyFeatureOptions.map((item) => {
+                    const isSelected = selectedFeatures.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => {
+                          if (isSelected) {
+                            onFeaturesChange(selectedFeatures.filter(f => f !== item));
+                          } else {
+                            onFeaturesChange([...selectedFeatures, item]);
+                          }
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <Checkbox checked={isSelected} className="pointer-events-none" />
+                        <span className="text-sm font-light text-muted-foreground">{item}</span>
+                      </button>
+                    );
+                  })}
+                </div>
                 )}
               </div>
 
@@ -926,161 +1117,6 @@ return (
 
               <div className="border-t border-foreground/40" />
 
-              {/* Property Type section */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleSection('propertyType')}
-                  className="flex items-center justify-between w-full mb-2"
-                >
-                  <h4 className="text-sm font-semibold text-foreground">Property Type</h4>
-                  <span className="text-lg leading-none font-light">{openSections.propertyType ? '−' : '+'}</span>
-                </button>
-                {openSections.propertyType && (
-                  <>
-                    <div className="grid grid-cols-2 gap-1 rounded-2xl p-2">
-                      <button
-                        onClick={() => onPropertyTypesChange([])}
-                        className={`col-span-2 flex items-center gap-3 px-3 py-2 rounded-xl border text-sm font-light transition-colors text-left ${
-                          selectedPropertyTypes.length === 0
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
-                        }`}
-                      >
-                        <Checkbox checked={selectedPropertyTypes.length === 0} className="pointer-events-none" />
-                        Show All
-                      </button>
-                      {propertyTypeOptions.map((type) => {
-                        const typeId = type.toLowerCase();
-                        const isSelected = selectedPropertyTypes.includes(typeId);
-                        return (
-                          <button
-                            key={`filter-type-${type}`}
-                            onClick={() => {
-                              if (isSelected) {
-                                onPropertyTypesChange(selectedPropertyTypes.filter(t => t !== typeId));
-                              } else {
-                                onPropertyTypesChange([...selectedPropertyTypes, typeId]);
-                              }
-                            }}
-                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-sm font-light transition-colors text-left ${
-                              isSelected
-                                ? 'border-primary bg-primary text-primary-foreground'
-                                : 'border-transparent bg-transparent text-muted-foreground hover:border-primary/50'
-                            }`}
-                          >
-                            <Checkbox checked={isSelected} className="pointer-events-none shrink-0" />
-                            <span className="truncate">{type}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Unfurnished toggle */}
-                    {onUnfurnishedChange !== undefined && (
-                      <div className="mt-2">
-                        <button
-                          onClick={() => onUnfurnishedChange(!unfurnishedOnly)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
-                        >
-                          <Checkbox checked={!!unfurnishedOnly} className="pointer-events-none" />
-                          <span className="text-sm font-light text-muted-foreground">Show only unfurnished properties</span>
-                        </button>
-                      </div>
-                    )}
-
-                    {/* New homes only toggle */}
-                    {onNewHomesOnlyChange !== undefined && (
-                      <div className="mt-2">
-                        <button
-                          onClick={() => onNewHomesOnlyChange(!newHomesOnly)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left w-full"
-                        >
-                          <Checkbox checked={!!newHomesOnly} className="pointer-events-none" />
-                          <span className="text-sm font-light text-muted-foreground">Show only new homes</span>
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              <div className="border-t border-foreground/40" />
-
-              {/* Must-Haves section */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleSection('mustHaves')}
-                  className="flex items-center justify-between w-full mb-2"
-                >
-                  <h4 className="text-sm font-semibold text-foreground">Must-Haves</h4>
-                  <span className="text-lg leading-none font-light">{openSections.mustHaves ? '−' : '+'}</span>
-                </button>
-                {openSections.mustHaves && (
-                <div className="flex flex-col gap-2">
-                  {mustHaveOptions.map((item) => {
-                    const isSelected = selectedMustHaves.includes(item);
-                    return (
-                      <button
-                        key={item}
-                        onClick={() => {
-                          if (isSelected) {
-                            onMustHavesChange(selectedMustHaves.filter(m => m !== item));
-                          } else {
-                            onMustHavesChange([...selectedMustHaves, item]);
-                          }
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
-                      >
-                        <Checkbox checked={isSelected} className="pointer-events-none" />
-                        <span className="text-sm font-light text-muted-foreground">{item}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                )}
-              </div>
-
-              <div className="border-t border-foreground/40" />
-
-              {/* Property Features section */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleSection('propertyFeatures')}
-                  className="flex items-center justify-between w-full mb-2"
-                >
-                  <h4 className="text-sm font-semibold text-foreground">Property Features</h4>
-                  <span className="text-lg leading-none font-light">{openSections.propertyFeatures ? '−' : '+'}</span>
-                </button>
-                {openSections.propertyFeatures && (
-                <div className="grid grid-cols-2 gap-1">
-                  {propertyFeatureOptions.map((item) => {
-                    const isSelected = selectedFeatures.includes(item);
-                    return (
-                      <button
-                        key={item}
-                        onClick={() => {
-                          if (isSelected) {
-                            onFeaturesChange(selectedFeatures.filter(f => f !== item));
-                          } else {
-                            onFeaturesChange([...selectedFeatures, item]);
-                          }
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
-                      >
-                        <Checkbox checked={isSelected} className="pointer-events-none" />
-                        <span className="text-sm font-light text-muted-foreground">{item}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                )}
-              </div>
-
-              <div className="border-t border-foreground/40" />
-
               {/* Added to rumi section */}
               <div>
                 <button
@@ -1116,7 +1152,6 @@ return (
                 </div>
                 )}
               </div>
-
 
               {/* Keywords section */}
               <div>
