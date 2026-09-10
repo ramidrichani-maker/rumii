@@ -299,7 +299,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
 
   return (
 <Card
-className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex flex-row ${compact ? '' : 'md:flex-col'} overflow-hidden relative bg-muted ${
+className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex ${compact ? 'flex-row' : 'flex-col'} overflow-hidden relative bg-muted ${
         selectable && selected ? 'ring-2 ring-primary' : ''
       }`}
       onClick={(e) => {
@@ -325,8 +325,10 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
       )}
       {/* Left: Image */}
       <div
-        className={`relative w-32 min-w-[8rem] h-auto min-h-[10rem] flex-shrink-0 group bg-muted overflow-hidden touch-pan-y ${
-          compact ? 'md:w-96 md:min-w-[24rem] md:min-h-[14rem]' : 'md:w-full md:min-w-0 md:h-[22rem] md:min-h-0'
+        className={`relative flex-shrink-0 group bg-muted overflow-hidden touch-pan-y ${
+          compact
+            ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
+            : 'w-full h-40 md:h-[22rem]'
         }`}
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
@@ -338,37 +340,37 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
           }
         }}
       >
-        {/* Desktop grid (vertical) overlay: agency + share + favorite on image top-right */}
+        {/* Grid (vertical) overlay: agency + share + favorite on image top-right */}
         {!compact && !selectable && (
-          <div className="hidden md:flex absolute top-2 right-2 z-20 items-center gap-1">
+          <div className="flex absolute top-2 right-2 z-20 items-center gap-1">
             {agencyName && (
-              <div className="flex items-center gap-1.5 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1">
+              <div className="flex items-center gap-1 md:gap-1.5 bg-background/90 backdrop-blur-sm rounded-full px-1.5 py-0.5 md:px-2.5 md:py-1 max-w-[7rem] md:max-w-none">
                 {agencyLogo ? (
-                  <img src={agencyLogo} alt={agencyName} className="w-5 h-5 rounded-full object-cover" />
+                  <img src={agencyLogo} alt={agencyName} className="w-3.5 h-3.5 md:w-5 md:h-5 rounded-full object-cover flex-shrink-0" />
                 ) : (
-                  <Building2 className="w-4 h-4 text-muted-foreground" />
+                  <Building2 className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
                 )}
-                <span className="text-xs font-medium text-foreground">{agencyName}</span>
+                <span className="text-[10px] md:text-xs font-medium text-foreground truncate">{agencyName}</span>
               </div>
             )}
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
+              className="h-6 w-6 md:h-8 md:w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
               onClick={handleShare}
               aria-label="Share property"
               title="Share link"
             >
-              <Share2 className="w-5 h-5 text-muted-foreground" />
+              <Share2 className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
+              className="h-6 w-6 md:h-8 md:w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
               onClick={toggleFavorite}
               disabled={isTogglingFavorite}
             >
-              <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+              <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
             </Button>
           </div>
         )}
@@ -437,9 +439,9 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
       </div>
 
       {/* Right: Details */}
-      <div className={`flex flex-col flex-1 p-2 md:p-4 relative min-w-0 ${compact ? '' : 'md:items-center md:text-center'}`}>
-        {/* Top-right: Agency + Favorite (hidden on desktop grid cards — shown over the image instead) */}
-        <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'md:hidden'} ${selectable ? 'hidden' : ''}`}>
+      <div className={`flex flex-col flex-1 p-2 md:p-4 relative min-w-0 ${compact ? '' : 'items-center text-center'}`}>
+        {/* Top-right: Agency + Favorite (hidden on grid cards — shown over the image instead) */}
+        <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'hidden'} ${selectable ? 'hidden' : ''}`}>
           <div className="flex items-center gap-1">
             {agencyName && !compact && (
               <div className="hidden md:flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
@@ -484,12 +486,12 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
         </div>
 
         {/* Price */}
-        <h3 className={`text-sm md:text-2xl font-bold text-primary pr-8 md:pr-10 ${compact ? '' : 'md:order-2 md:pr-0'}`}>
+        <h3 className={`text-sm md:text-2xl font-bold text-primary ${compact ? 'pr-8 md:pr-10' : 'order-2 mt-1'}`}>
           {formatPrice(property.price, property.listing_type, property.rental_price)}
         </h3>
 
         {/* Beds, Baths, Size */}
-        <div className={`flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap ${compact ? '' : 'md:order-3 md:justify-center'}`}>
+        <div className={`flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap ${compact ? '' : 'order-3 justify-center'}`}>
           {property.property_type === 'stacked_unit' && stackedRange && stackedRange.unitCount > 0 && (
             <span className="flex items-center gap-1">
               <Building2 className="w-3 h-3 md:w-4 md:h-4" />
@@ -513,14 +515,14 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
         </div>
 
         {/* Location */}
-        <p className={`text-xs md:text-sm text-foreground mt-1 md:mt-2 truncate max-w-full ${compact ? '' : 'md:order-1 md:mt-0'}`}>
+        <p className={`text-xs md:text-sm text-foreground truncate max-w-full ${compact ? 'mt-1 md:mt-2' : 'order-1 mt-0'}`}>
           {userRole === 'admin' || isAssignedAgent
             ? `${property.city}, ${property.address}`
             : property.city}
         </p>
 
         {/* Description (max 2 lines) */}
-        <p className={`hidden md:block text-sm text-muted-foreground mt-1 line-clamp-2 ${compact ? '' : 'md:order-4'}`}>
+        <p className={`${compact ? 'hidden md:block' : 'block order-4'} text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2`}>
           {truncateDescription((property as any).description)}
         </p>
 
@@ -541,8 +543,8 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
           </div>
         )}
 
-        {/* Bottom-right: Request Viewing, Call & Email (hidden on desktop grid cards — available on the property page) */}
-        <div className={`flex items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap ${compact ? '' : 'md:hidden'}`}>
+        {/* Bottom-right: Request Viewing, Call & Email (hidden on grid cards — available on the property page) */}
+        <div className={`${compact ? 'flex' : 'hidden'} items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap`}>
           <Button
             variant="outline"
             size="sm"
