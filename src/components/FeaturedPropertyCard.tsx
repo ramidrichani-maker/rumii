@@ -139,7 +139,7 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
 
   return (
     <Link to={`/property/${property.id}`} onClick={(e) => { if (wasSwipe()) e.preventDefault(); }}>
-      <Card className="hover:shadow-none md:hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 ease-out h-full cursor-pointer group touch-pan-y rounded-none border-0">
+      <Card className="hover:shadow-none md:hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 ease-out h-full cursor-pointer group touch-pan-y rounded-2xl border-0 overflow-hidden">
         <div
           className="relative h-48 bg-muted overflow-hidden touch-pan-y"
           onTouchStart={onTouchStart}
