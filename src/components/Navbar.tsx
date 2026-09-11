@@ -219,9 +219,9 @@ export const Navbar = () => {
       <div className="w-full max-w-[2520px] mx-auto px-4 py-[1.58rem] bg-destructive-foreground">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
-            <Link to="/" className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
+            <button onClick={() => { window.location.href = '/'; }} className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
               <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
-            </Link>
+            </button>
             <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
             {/* Vertical divider between logo and hamburger on mobile */}
             <div className="md:hidden self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
@@ -263,9 +263,9 @@ export const Navbar = () => {
             )}
           </div>
 
-          <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center hover:opacity-60 transition-opacity duration-200">
+          <button onClick={() => { window.location.href = '/'; }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center hover:opacity-60 transition-opacity duration-200">
             <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a', letterSpacing: '0.02em', display: 'inline-flex', alignItems: 'baseline' }}><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline', transform: 'scaleX(0.85)', transformOrigin: 'left center' }}>r</span><span style={{ fontSize: '0.72em', display: 'inline-block', verticalAlign: 'baseline', letterSpacing: '0.03em' }}>UM</span><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline', transform: 'scaleX(0.85)', transformOrigin: 'left center' }}>ı</span></span>
-          </Link>
+          </button>
 
           <div className="flex items-center gap-3 md:gap-0 md:mr-[4.5rem]">
             {/* Home icon — quick link to properties for sale */}
@@ -399,10 +399,10 @@ export const Navbar = () => {
             style={{ zIndex: 9997, backgroundColor: 'hsl(var(--background))' }}
           >
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center space-x-2">
+              <button onClick={() => { setMobileMenuOpen(false); window.location.href = '/'; }} className="flex items-center space-x-2">
                 <Home className="w-5 h-5 text-primary" />
                 <span className="text-lg font-bold">Rumi</span>
-              </Link>
+              </button>
               <button onClick={() => setMobileMenuOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
