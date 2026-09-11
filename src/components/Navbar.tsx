@@ -399,10 +399,10 @@ export const Navbar = () => {
             style={{ zIndex: 9997, backgroundColor: 'hsl(var(--background))' }}
           >
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center space-x-2">
+              <button onClick={() => { setMobileMenuOpen(false); window.location.href = '/'; }} className="flex items-center space-x-2">
                 <Home className="w-5 h-5 text-primary" />
                 <span className="text-lg font-bold">Rumi</span>
-              </Link>
+              </button>
               <button onClick={() => setMobileMenuOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
