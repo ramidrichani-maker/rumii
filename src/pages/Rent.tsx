@@ -471,8 +471,9 @@ const Rent = () => {
 </ScrollReveal>
       </div>
 
-      {/* Sticky filter bar - direct child of full-height wrapper */}
-      <div className="sticky rumi-sticky-under-nav z-30 bg-background pt-2 pb-1 px-[4vw]">
+      {/* Sticky filter bar - direct child of full-height wrapper. When compare mode is
+          active the bar is allowed to scroll away so it doesn't overlap the compare popup. */}
+      <div className={`${compareMode ? '' : 'sticky rumi-sticky-under-nav'} z-30 bg-background pt-2 pb-1 px-[4vw]`}>
         <div className="mx-auto max-w-[1280px]">
         <LocationSearchBar
           location={locationInput}
