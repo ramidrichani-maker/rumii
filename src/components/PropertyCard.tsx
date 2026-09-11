@@ -318,9 +318,9 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
       )}
       {selectable && (
         <div
-          className={`absolute top-3 right-3 z-30 w-[1.875rem] h-[1.875rem] rounded-md border-2 flex items-center justify-center bg-background/90 border-border`}
+          className={`absolute top-3 right-3 z-30 w-[1.6875rem] h-[1.6875rem] rounded-none border-2 flex items-center justify-center bg-background/90 border-border`}
         >
-          {selected && <div className="w-[0.9375rem] h-[0.9375rem] bg-black" />}
+          {selected && <div className="w-[0.84375rem] h-[0.84375rem] bg-black" />}
         </div>
       )}
       {/* Left: Image */}
