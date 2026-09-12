@@ -486,7 +486,7 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
         </div>
 
         {/* Price */}
-        <h3 className={`text-sm md:text-2xl font-bold text-primary ${compact ? 'pr-8 md:pr-10' : 'order-2 mt-1'}`}>
+        <h3 className={`text-sm md:text-2xl font-bold text-primary transition-opacity duration-300 group-hover:opacity-0 ${compact ? 'pr-8 md:pr-10' : 'order-1 mt-1'}`}>
           {formatPrice(property.price, property.listing_type, property.rental_price)}
         </h3>
 
@@ -515,14 +515,14 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
         </div>
 
         {/* Location */}
-        <p className={`text-xs md:text-sm text-foreground truncate max-w-full ${compact ? 'mt-1 md:mt-2' : 'order-1 mt-0'}`}>
+        <p className={`text-xs md:text-sm text-foreground truncate max-w-full ${compact ? 'mt-1 md:mt-2' : 'order-2 mt-1'}`}>
           {userRole === 'admin' || isAssignedAgent
             ? `${property.city}, ${property.address}`
             : property.city}
         </p>
 
         {/* Description (desktop only — mobile shows it on the property page) */}
-        <p className="hidden md:block order-4 text-sm text-muted-foreground mt-1 line-clamp-2">
+        <p className="hidden md:block order-4 text-sm text-muted-foreground mt-1 line-clamp-2 transition-opacity duration-300 group-hover:opacity-0">
           {truncateDescription((property as any).description)}
         </p>
 
