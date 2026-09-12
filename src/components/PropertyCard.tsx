@@ -522,8 +522,10 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
         </p>
 
         {/* Description (desktop only — mobile shows it on the property page) */}
-        <p className="hidden md:block order-4 text-sm text-muted-foreground mt-1 line-clamp-2 transition-opacity duration-300 group-hover:opacity-0">
-          {truncateDescription((property as any).description)}
+        <p className="hidden md:block order-4 text-sm text-muted-foreground mt-1 transition-opacity duration-300 group-hover:opacity-0">
+          {(property as any).description
+            ? (property as any).description.trim().split(/\s+/).slice(0, 4).join(' ') + '...'
+            : ''}
         </p>
 
         {/* Spacer */}
