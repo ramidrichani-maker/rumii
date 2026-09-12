@@ -299,7 +299,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
 
   return (
 <Card
-className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex ${compact ? 'flex-row' : 'flex-col'} overflow-hidden relative bg-muted ${
+className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex ${compact ? 'flex-row overflow-hidden' : 'flex-col overflow-visible hover:z-10'} relative bg-muted ${
         selectable && selected ? 'ring-2 ring-primary' : ''
       }`}
       onClick={(e) => {
@@ -325,10 +325,10 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
       )}
       {/* Left: Image */}
       <div
-        className={`relative flex-shrink-0 group bg-muted overflow-hidden touch-pan-y ${
+        className={`relative flex-shrink-0 bg-muted overflow-hidden touch-pan-y ${
           compact
             ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
-            : 'w-full h-40 md:h-[22rem]'
+            : 'w-full h-[9.3rem] md:h-[20.46rem] rounded-t-2xl group-hover:scale-[1.06] transition-transform duration-500 ease-out origin-center'
         }`}
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
@@ -421,7 +421,7 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
                 <img
                   src={img}
                   alt={`${property.property_type} in ${property.city}`}
-                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                  className="w-full h-full object-cover"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
@@ -439,7 +439,7 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
       </div>
 
       {/* Right: Details */}
-      <div className={`flex flex-col flex-1 p-2 md:p-4 relative min-w-0 ${compact ? '' : 'items-center text-center'}`}>
+      <div className={`flex flex-col flex-1 p-2 md:p-4 relative min-w-0 ${compact ? '' : 'items-center text-center rounded-b-2xl'}`}>
         {/* Top-right: Agency + Favorite (hidden on grid cards — shown over the image instead) */}
         <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'hidden'} ${selectable ? 'hidden' : ''}`}>
           <div className="flex items-center gap-1">
