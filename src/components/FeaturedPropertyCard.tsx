@@ -151,14 +151,16 @@ const FeaturedPropertyCard = ({ property, badgeLabel, badgeVariant = "default" }
               Just Listed
             </Badge>
           )}
-          <button
-            onClick={toggleFavorite}
-            disabled={isTogglingFavorite}
-            aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-            className="absolute top-2 right-2 z-20 bg-background/80 hover:bg-background rounded-full w-8 h-8 flex items-center justify-center shadow-sm transition-colors"
-          >
-            <Heart className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
-          </button>
+          {property.property_type !== 'stacked_unit' && (
+            <button
+              onClick={toggleFavorite}
+              disabled={isTogglingFavorite}
+              aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+              className="absolute top-2 right-2 z-20 bg-background/80 hover:bg-background rounded-full w-8 h-8 flex items-center justify-center shadow-sm transition-colors"
+            >
+              <Heart className={`w-4 h-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+            </button>
+          )}
           {images.length > 0 ? (
             <div
               className="flex h-full"
