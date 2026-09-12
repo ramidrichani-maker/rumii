@@ -363,15 +363,17 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
             >
               <Share2 className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 md:h-8 md:w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
-              onClick={toggleFavorite}
-              disabled={isTogglingFavorite}
-            >
-              <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
-            </Button>
+            {property.property_type !== 'stacked_unit' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 md:h-8 md:w-8 bg-background/90 backdrop-blur-sm hover:bg-background"
+                onClick={toggleFavorite}
+                disabled={isTogglingFavorite}
+              >
+                <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+              </Button>
+            )}
           </div>
         )}
         {isJustListed(property.created_at) && (
@@ -463,15 +465,17 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
           >
             <Share2 className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 md:h-8 md:w-8"
-            onClick={toggleFavorite}
-            disabled={isTogglingFavorite}
-          >
-            <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
-          </Button>
+          {property.property_type !== 'stacked_unit' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 md:h-8 md:w-8"
+              onClick={toggleFavorite}
+              disabled={isTogglingFavorite}
+            >
+              <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+            </Button>
+          )}
           </div>
           {agencyName && (
             <div className="flex md:hidden items-center gap-1 bg-muted/60 rounded-full px-1.5 py-0.5 max-w-[8rem]">
