@@ -421,7 +421,7 @@ className={`animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transition-a
                 <img
                   src={img}
                   alt={`${property.property_type} in ${property.city}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
