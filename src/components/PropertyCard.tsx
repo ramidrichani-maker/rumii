@@ -328,7 +328,7 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
         className={`relative flex-shrink-0 bg-muted overflow-hidden touch-pan-y ${
           compact
             ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
-            : 'w-full h-[8.37rem] md:h-[18.41rem] rounded-t-2xl group-hover:scale-[1.06] transition-transform duration-500 ease-out origin-center'
+            : 'w-full h-[7.53rem] md:h-[16.57rem] rounded-t-2xl group-hover:scale-[1.06] transition-transform duration-500 ease-out origin-center'
         }`}
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
@@ -441,7 +441,7 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
       </div>
 
       {/* Right: Details */}
-      <div className={`flex flex-col flex-1 p-2 md:p-4 relative min-w-0 ${compact ? '' : 'items-center text-center rounded-b-2xl'}`}>
+      <div className={`flex flex-col flex-1 p-3 md:p-6 relative min-w-0 ${compact ? '' : 'items-center text-center rounded-b-2xl'}`}>
         {/* Top-right: Agency + Favorite (hidden on grid cards — shown over the image instead) */}
         <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'hidden'} ${selectable ? 'hidden' : ''}`}>
           <div className="flex items-center gap-1">
