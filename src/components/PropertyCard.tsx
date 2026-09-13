@@ -441,7 +441,7 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] transi
       </div>
 
       {/* Right: Details */}
-      <div className={`flex flex-col flex-1 p-3 md:p-6 relative min-w-0 ${compact ? '' : 'items-center text-center rounded-b-2xl'}`}>
+      <div className={`flex flex-col flex-1 p-4 md:p-8 relative min-w-0 ${compact ? '' : 'items-center text-center rounded-b-2xl'}`}>
         {/* Top-right: Agency + Favorite (hidden on grid cards — shown over the image instead) */}
         <div className={`absolute top-1 right-1 md:top-2 md:right-2 flex flex-col items-end gap-1 ${compact ? '' : 'hidden'} ${selectable ? 'hidden' : ''}`}>
           <div className="flex items-center gap-1">
