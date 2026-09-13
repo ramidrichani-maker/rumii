@@ -6,12 +6,12 @@ const PropertyCardSkeleton: React.FC = () => {
   return (
     <Card className="border-0 rounded-2xl overflow-hidden bg-muted flex flex-col w-full h-full">
       {/* Image skeleton: full-width banner on all sizes */}
-      <div className="w-full h-[7.53rem] md:h-[16.57rem] flex-shrink-0 bg-muted">
+      <div className="w-full h-[9.5rem] md:h-[20rem] flex-shrink-0 bg-muted">
         <Skeleton className="w-full h-full rounded-none" />
       </div>
 
       {/* Details skeleton: centered rows like the real card */}
-      <div className="flex flex-col flex-1 p-3 md:p-6 min-w-0 gap-2 items-center text-center">
+      <div className="flex flex-col flex-1 p-4 md:p-8 min-w-0 gap-2 items-center text-center">
         {/* Area / city */}
         <Skeleton className="h-4 md:h-5 w-24 md:w-40" />
 
