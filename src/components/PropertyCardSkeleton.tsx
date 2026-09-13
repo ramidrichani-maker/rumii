@@ -6,7 +6,7 @@ const PropertyCardSkeleton: React.FC = () => {
   return (
     <Card className="border-0 rounded-2xl overflow-hidden bg-muted flex flex-col w-full h-full">
       {/* Image skeleton: full-width banner on all sizes */}
-      <div className="w-[85%] mx-auto h-[5.44rem] md:h-[11.97rem] flex-shrink-0 bg-muted">
+      <div className="w-[85%] mx-auto mt-[2vw] h-[5.44rem] md:h-[11.97rem] flex-shrink-0 bg-muted">
         <Skeleton className="w-full h-full rounded-none" />
       </div>
 
