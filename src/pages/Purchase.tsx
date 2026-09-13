@@ -677,7 +677,7 @@ const Purchase = () => {
             className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto max-h-[calc(50vh-120px)] md:max-h-[calc(100vh-120px)]' : 'w-full'} transition-all duration-300`}
           >
             {isLoading ? (
-              <div className={`mb-8 grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-3 md:gap-6`}>
+              <div className={`mb-8 grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-4 md:gap-8`}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <PropertyCardSkeleton key={i} />
                 ))}
