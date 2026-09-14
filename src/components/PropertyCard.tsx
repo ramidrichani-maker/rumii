@@ -423,7 +423,7 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] md:hov
                 <img
                   src={img}
                   alt={`${property.property_type} in ${property.city}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
