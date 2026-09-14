@@ -328,7 +328,7 @@ className={`group animate-fade-in border-0 rounded-none hover:bg-[#F8F8F8] trans
         className={`relative flex-shrink-0 bg-muted overflow-hidden touch-pan-y ${
           compact
             ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
-            : 'w-[85%] mx-auto mt-[2vw] h-[5.44rem] md:h-[11.97rem] rounded-t-2xl group-hover:scale-[1.28] transition-transform duration-500 ease-out origin-center'
+            : 'w-full mt-[2vw] h-[5.44rem] md:h-[11.97rem] rounded-t-2xl'
         }`}
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
