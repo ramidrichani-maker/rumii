@@ -328,7 +328,7 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] md:hov
         className={`relative flex-shrink-0 bg-muted overflow-hidden touch-pan-y ${
           compact
             ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
-            : 'w-full h-[6.26rem] md:h-[13.77rem]'
+            : 'w-full h-[7.2rem] md:h-[15.84rem]'
         }`}
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
