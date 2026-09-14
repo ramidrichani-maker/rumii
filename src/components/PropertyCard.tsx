@@ -299,7 +299,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
 
   return (
 <Card
-className={`group animate-fade-in border-0 rounded-none hover:bg-[#F8F8F8] transition-all duration-300 cursor-pointer flex ${compact ? 'flex-row overflow-hidden' : 'flex-col overflow-visible hover:z-10'} relative bg-muted ${
+className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] md:hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 ease-out cursor-pointer flex ${compact ? 'flex-row overflow-hidden' : 'flex-col overflow-hidden'} relative bg-muted ${
         selectable && selected ? 'ring-2 ring-primary' : ''
       }`}
       onClick={(e) => {
@@ -328,7 +328,7 @@ className={`group animate-fade-in border-0 rounded-none hover:bg-[#F8F8F8] trans
         className={`relative flex-shrink-0 bg-muted overflow-hidden touch-pan-y ${
           compact
             ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
-            : 'w-full mt-[2vw] h-[5.44rem] md:h-[11.97rem] rounded-t-2xl'
+            : 'w-full h-[5.44rem] md:h-[11.97rem]'
         }`}
         onTouchStart={imageCarousel.onTouchStart}
         onTouchMove={imageCarousel.onTouchMove}
@@ -423,7 +423,7 @@ className={`group animate-fade-in border-0 rounded-none hover:bg-[#F8F8F8] trans
                 <img
                   src={img}
                   alt={`${property.property_type} in ${property.city}`}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
