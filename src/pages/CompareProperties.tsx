@@ -88,17 +88,7 @@ const CompareProperties = () => {
                   {properties.map((p) => (
                     <th key={p.id} className="p-3 text-left align-bottom">
                       <Link to={`/property/${p.id}`} className="block group">
-                        <div className="aspect-[4/3] w-full bg-muted rounded-lg overflow-hidden mb-2">
-                          {p.images?.[0] && (
-                            <img
-                              src={p.images[0]}
-                              alt={p.address || p.city}
-                              loading="lazy"
-                              decoding="async"
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          )}
-                        </div>
+                        <PropertyCompareImages images={p.images || []} alt={p.address || p.city} />
                         <span className="text-base font-medium text-foreground">{p.city}</span>
                       </Link>
                     </th>
