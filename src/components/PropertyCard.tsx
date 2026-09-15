@@ -551,68 +551,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
           </div>
         )}
 
-        {/* Bottom-right: Request Viewing, Call & Email (hidden on grid cards — available on the property page) */}
-        <div className={`${compact ? 'flex' : 'hidden'} items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap`}>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowViewingModal(true);
-            }}
-          >
-            <CalendarCheck className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="hidden md:inline">Request Viewing</span>
-            <span className="md:hidden">View</span>
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Phone className="w-3 h-3 md:w-4 md:h-4" />
-                <span className="hidden md:inline">Call</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-2 space-y-1" onClick={(e) => e.stopPropagation()}>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.location.href = `tel:${(agentPhone || '+96170612686').replace(/[^+\d]/g, '')}`;
-                }}
-              >
-                <Phone className="w-4 h-4" />
-                {agentPhone || '+96170612686'}
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-2 text-green-600 hover:text-green-700"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const clean = (agentPhone || '+96170612686').replace(/[^+\d]/g, '').replace('+', '');
-                  window.open(`https://wa.me/${clean}`, '_blank');
-                }}
-              >
-                <MessageCircle className="w-4 h-4" />
-                WhatsApp
-              </Button>
-            </PopoverContent>
-          </Popover>
-          <Button
-            size="sm"
-            className="gap-1 text-xs md:text-sm h-7 md:h-9 px-2 md:px-3"
-            onClick={handleEmail}
-          >
-            <Mail className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="hidden md:inline">Email</span>
-          </Button>
-        </div>
+        {/* Request Viewing, Call & Email are only available on the property page */}
       </div>
 
       {showViewingModal && (
