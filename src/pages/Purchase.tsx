@@ -365,6 +365,17 @@ const Purchase = () => {
     }
   }, [setDrawnPolygon, locationInput, searchParams, setSearchParams, setLocationInput]);
 
+  const clearSearchedArea = useCallback(() => {
+    clearPolygon();
+    setLocationInput('');
+    setRadius(0);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('search');
+    newParams.delete('polygon');
+    newParams.delete('radius');
+    setSearchParams(newParams, { replace: true });
+  }, [clearPolygon, setLocationInput, setRadius, searchParams, setSearchParams]);
+
   const handleSaveArea = useCallback(async (coordinates: { latitude: number; longitude: number }[]) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
