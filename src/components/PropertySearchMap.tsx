@@ -93,10 +93,17 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
 
     const addMarkers = async () => {
       let cityCenters: Record<string, { lat: number; lng: number }> = {};
-      if (!isAdmin) {
-        const uniqueCities = [...new Set(properties.map((p) => p.city).filter(Boolean))];
+      const needFallback = [
+        ...new Set(
+          properties
+            .filter((p) => !(p.latitude && p.longitude))
+            .map((p) => p.city)
+            .filter(Boolean)
+        ),
+      ];
+      if (needFallback.length > 0) {
         await Promise.all(
-          uniqueCities.map(async (city) => {
+          needFallback.map(async (city) => {
             const center = await getCityCenter(city);
             if (center) cityCenters[city] = center;
           })
@@ -108,7 +115,7 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
 
       properties.forEach((property) => {
         let pos: { lat: number; lng: number };
-        if (isAdmin && property.latitude && property.longitude) {
+        if (property.latitude && property.longitude) {
           pos = { lat: property.latitude, lng: property.longitude };
         } else {
           const c = cityCenters[property.city];
