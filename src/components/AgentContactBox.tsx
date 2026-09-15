@@ -154,7 +154,7 @@ const AgentContactBox = ({ propertyId, agencyId, propertyAddress, propertyType, 
       </Popover>
 
       <Button
-        className="w-full gap-2"
+        className="w-full gap-2 bg-gray-200 text-gray-800 hover:bg-gray-300"
         onClick={() =>
           navigate(`/property/${propertyId}/enquiry`, {
             state: { agentId: agent?.user_id, agencyId },
