@@ -345,15 +345,17 @@ All colors MUST be HSL.
   display: none;
 }
 
-/* When hovering a card in buy/rent grids, dim all siblings by 10%. */
+/* When hovering a card in buy/rent grids, dim and darken all siblings. */
 .rumi-card-grid > * {
-  transition: opacity 200ms ease;
+  transition: opacity 200ms ease, filter 200ms ease;
 }
 .rumi-card-grid:hover > * {
-  opacity: 0.9;
+  opacity: 0.8;
+  filter: brightness(0.9);
 }
 .rumi-card-grid:hover > *:hover {
   opacity: 1;
+  filter: none;
 }
 
 /* Filter section toggle: plus icon that rotates its vertical bar into a dash. */
