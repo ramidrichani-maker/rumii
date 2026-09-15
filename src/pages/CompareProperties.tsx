@@ -124,7 +124,7 @@ const CompareProperties = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </button>
-        <h1 className="text-3xl font-semibold text-foreground mb-6">Compare properties</h1>
+        <h1 className="text-3xl font-thin text-foreground mb-6">Compare properties</h1>
 
         {isLoading ? (
           <p className="text-muted-foreground">Loading comparison...</p>
