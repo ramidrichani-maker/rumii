@@ -21,6 +21,7 @@ import ActiveFilterChips from "@/components/ActiveFilterChips";
 import { buildFilterChips } from "@/lib/buildFilterChips";
 import { loadFilters, saveFilters, clearStoredFilters } from "@/lib/persistFilters";
 import PropertyPagination from "@/components/PropertyPagination";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PAGE_SIZE = 12;
 
@@ -49,6 +50,7 @@ const amenities = [
 ];
 
 const Rent = () => {
+  const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const searchQuery = searchParams.get('search') || '';
@@ -692,7 +694,7 @@ const Rent = () => {
         <div className={`flex ${showMap ? 'flex-col-reverse md:flex-row' : 'flex-col'} gap-6`}>
           {/* Property Grid */}
           <div
-            className={`${showMap ? 'w-full md:w-[45%] overflow-y-auto max-h-[calc(50vh-120px)] md:max-h-[calc(100vh-120px)]' : 'w-full'} transition-all duration-300`}
+            className={`${showMap ? 'w-full md:w-[45%] md:overflow-y-auto md:max-h-[calc(100vh-120px)]' : 'w-full'} transition-all duration-300`}
           >
             {isLoading ? (
               <div className={`mb-8 grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
@@ -727,7 +729,7 @@ const Rent = () => {
                       <PropertyCard
                         property={property}
                         onClick={handlePropertySelect}
-                        compact={showMap}
+                        compact={showMap && !isMobile}
                         selectable={compareMode}
                         selected={compareIds.includes(property.id)}
                         onToggleSelect={toggleCompareSelect}
