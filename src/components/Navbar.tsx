@@ -117,6 +117,14 @@ export const Navbar = () => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
+        // While a fullscreen map overlay is open, keep the navbar hidden so it
+        // never drops down over the map. It is revealed again once fullscreen
+        // closes (see the rumi-nav-show listener below).
+        if (document.documentElement.classList.contains('rumi-map-fullscreen')) {
+          setHidden(true);
+          lastY = window.scrollY;
+          return;
+        }
         const y = window.scrollY;
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
         const nearBottom = y >= maxScroll - 4;
@@ -142,6 +150,19 @@ export const Navbar = () => {
     return () => {
       window.removeEventListener('scroll', onScroll);
       if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Fullscreen map overlay requests the navbar stay hidden while open and
+  // reveal again once it closes.
+  useEffect(() => {
+    const onHide = () => setHidden(true);
+    const onShow = () => setHidden(false);
+    window.addEventListener('rumi-nav-hide', onHide);
+    window.addEventListener('rumi-nav-show', onShow);
+    return () => {
+      window.removeEventListener('rumi-nav-hide', onHide);
+      window.removeEventListener('rumi-nav-show', onShow);
     };
   }, []);
 

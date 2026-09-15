@@ -83,6 +83,20 @@ const Purchase = () => {
   const [showMap, setShowMap] = useState(!!searchQuery);
   const [mapClosing, setMapClosing] = useState(false);
   const [mapFullscreen, setMapFullscreen] = useState(false);
+
+  // Signal the navbar to stay hidden while the fullscreen map overlay is open.
+  useEffect(() => {
+    if (mapFullscreen) {
+      document.documentElement.classList.add('rumi-map-fullscreen');
+      window.dispatchEvent(new Event('rumi-nav-hide'));
+    } else {
+      document.documentElement.classList.remove('rumi-map-fullscreen');
+      window.dispatchEvent(new Event('rumi-nav-show'));
+    }
+    return () => {
+      document.documentElement.classList.remove('rumi-map-fullscreen');
+    };
+  }, [mapFullscreen]);
   const [sortBy, setSortBy] = useState<string>("newest");
   const [hasNewUpdates, setHasNewUpdates] = useState(false);
   const hasActiveFiltersRef = useRef(false);
