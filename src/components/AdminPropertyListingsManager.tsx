@@ -43,6 +43,7 @@ interface Property {
   latitude: number | null;
   longitude: number | null;
   property_code: number;
+  parent_property_id?: string | null;
   profiles?: {
     full_name: string;
   };
