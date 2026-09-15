@@ -1234,14 +1234,14 @@ return (
                           <button
                             type="button"
                             onClick={clearAllFilters}
-                            className="px-[3.125rem] py-4 rounded-none bg-white text-black border border-black text-sm font-semibold hover:bg-zinc-100 transition-colors whitespace-nowrap"
+                            className="flex-1 py-4 rounded-none bg-white text-black border border-black text-sm font-semibold hover:bg-zinc-100 transition-colors whitespace-nowrap"
                           >
                             Clear all
                           </button>
                           <button
                             type="button"
                             onClick={() => setAdvancedFilterOpen(false)}
-                            className="px-[3.125rem] py-4 rounded-none bg-black text-white text-sm font-semibold hover:bg-zinc-900 transition-colors whitespace-nowrap"
+                            className="flex-1 py-4 rounded-none bg-black text-white text-sm font-semibold hover:bg-zinc-900 transition-colors whitespace-nowrap"
                           >
                             <span className="whitespace-nowrap">Show {resultCount ?? 0} results</span>
                           </button>
