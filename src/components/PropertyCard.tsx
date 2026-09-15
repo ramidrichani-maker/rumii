@@ -489,10 +489,12 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] md:hov
           )}
         </div>
 
-        {/* Price */}
-        <h3 className={`text-sm md:text-2xl font-bold text-primary transition-opacity duration-300 group-hover:opacity-0 ${compact ? 'pr-8 md:pr-10' : 'order-1 mt-1'}`}>
-          {formatPrice(property.price, property.listing_type, property.rental_price)}
-        </h3>
+        {/* Price (hidden for stacked units — shown per-unit on the detail page) */}
+        {property.property_type !== 'stacked_unit' && (
+          <h3 className={`text-sm md:text-2xl font-bold text-primary transition-opacity duration-300 group-hover:opacity-0 ${compact ? 'pr-8 md:pr-10' : 'order-1 mt-1'}`}>
+            {formatPrice(property.price, property.listing_type, property.rental_price)}
+          </h3>
+        )}
 
         {/* Beds, Baths, Size */}
         <div className={`flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mt-1 flex-wrap ${compact ? '' : 'order-3 justify-center'}`}>
