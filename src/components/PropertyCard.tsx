@@ -525,12 +525,12 @@ className={`group animate-fade-in border-0 rounded-2xl hover:bg-[#F8F8F8] md:hov
             : property.city}
         </p>
 
-        {/* Description (desktop only — mobile shows it on the property page) */}
-        <p className="hidden md:block order-4 text-sm text-muted-foreground mt-1 transition-opacity duration-300 group-hover:opacity-0">
-          {(property as any).description
-            ? (property as any).description.trim().split(/\s+/).slice(0, 4).join(' ') + '...'
-            : ''}
-        </p>
+        {/* Stacked-unit label (desktop only — replaces description) */}
+        {property.property_type === 'stacked_unit' && stackedRange && stackedRange.unitCount > 0 ? (
+          <p className="hidden md:block order-4 text-sm text-muted-foreground mt-1 transition-opacity duration-300 group-hover:opacity-0">
+            Building with {stackedRange.unitCount} {stackedRange.unitCount === 1 ? 'unit' : 'units'}
+          </p>
+        ) : null}
 
         {/* Spacer */}
         <div className="flex-1" />
