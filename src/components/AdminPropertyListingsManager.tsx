@@ -150,7 +150,13 @@ export const AdminPropertyListingsManager = () => {
   };
 
   const filterProperties = () => {
-    let filtered = [...properties];
+    // A stacked unit building is not an editable listing on its own — only its
+    // individual units are. Hide the building row when its units are listed.
+    const parentsWithUnits = new Set(
+      properties.map((p) => p.parent_property_id).filter(Boolean) as string[]
+    );
+    let filtered = properties.filter((p) => !parentsWithUnits.has(p.id));
+
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
