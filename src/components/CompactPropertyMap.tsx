@@ -225,11 +225,19 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     let cancelled = false;
 
     const addMarkers = async () => {
+      // Only properties without stored coordinates need a city-center fallback.
       let cityCenters: Record<string, { lat: number; lng: number }> = {};
-      if (!isAdmin) {
-        const uniqueCities = [...new Set(properties.map((p) => p.city).filter(Boolean))];
+      const needFallback = [
+        ...new Set(
+          properties
+            .filter((p) => !(p.latitude && p.longitude))
+            .map((p) => p.city)
+            .filter(Boolean)
+        ),
+      ];
+      if (needFallback.length > 0) {
         await Promise.all(
-          uniqueCities.map(async (city) => {
+          needFallback.map(async (city) => {
             const c = await getCityCenter(city);
             if (c) cityCenters[city] = c;
           })
@@ -241,7 +249,9 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
 
       properties.forEach((property) => {
         let pos: google.maps.LatLngLiteral;
-        if (isAdmin && property.latitude && property.longitude) {
+        if (property.latitude && property.longitude) {
+          // Stored coordinates are already privacy-masked server-side and never
+          // change unless the listing itself is edited.
           pos = { lat: property.latitude, lng: property.longitude };
         } else {
           const c = cityCenters[property.city];

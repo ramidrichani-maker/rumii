@@ -227,9 +227,10 @@ const PropertyDetail = () => {
     }
   }, [property?.description]);
 
-  // Admins see exact location; regular users see city center for privacy
+  // Stored coordinates are privacy-masked server-side for non-admins and stay
+  // fixed; the city center is only a fallback when no coordinates exist.
   useEffect(() => {
-    if (isAdmin && property?.latitude && property?.longitude) {
+    if (property?.latitude && property?.longitude) {
       setCityCoords({ lat: property.latitude, lng: property.longitude });
       return;
     }
