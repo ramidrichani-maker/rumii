@@ -680,7 +680,7 @@ const Rent = () => {
                 <ScrollReveal animation="fade-up">
                   <h3 className="text-3xl font-thin mb-6 text-foreground">Properties for Rent</h3>
                 </ScrollReveal>
-                <div className={`rumi-card-grid grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
+<div className={`grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
                   {paginatedProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
