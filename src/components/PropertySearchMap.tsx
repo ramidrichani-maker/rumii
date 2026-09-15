@@ -108,7 +108,7 @@ const PropertySearchMap: React.FC<PropertySearchMapProps> = ({
 
       properties.forEach((property) => {
         let pos: { lat: number; lng: number };
-        if (property.latitude && property.longitude) {
+        if (isAdmin && property.latitude && property.longitude) {
           pos = { lat: property.latitude, lng: property.longitude };
         } else {
           const c = cityCenters[property.city];
