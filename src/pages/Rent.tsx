@@ -358,6 +358,17 @@ const Rent = () => {
     }
   }, [setDrawnPolygon, locationInput, searchParams, setSearchParams, setLocationInput]);
 
+  const clearSearchedArea = useCallback(() => {
+    clearPolygon();
+    setLocationInput('');
+    setRadius(0);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('search');
+    newParams.delete('polygon');
+    newParams.delete('radius');
+    setSearchParams(newParams, { replace: true });
+  }, [clearPolygon, setLocationInput, setRadius, searchParams, setSearchParams]);
+
   const handleSaveArea = useCallback(async (coordinates: { latitude: number; longitude: number }[]) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -680,6 +691,22 @@ const Rent = () => {
                 <ScrollReveal animation="fade-up">
                   <h3 className="text-3xl font-thin mb-6 text-foreground">Properties for Rent</h3>
                 </ScrollReveal>
+                {(locationInput || hasDrawnArea) && (
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/20 bg-muted px-3 py-1 text-sm text-foreground">
+                      <Map className="w-3.5 h-3.5" />
+                      {locationInput || 'Selected area'}
+                      <button
+                        type="button"
+                        onClick={clearSearchedArea}
+                        className="ml-1 -mr-1 rounded-full p-0.5 hover:bg-foreground/10"
+                        aria-label="Remove searched area"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  </div>
+                )}
 <div className={`grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
                   {paginatedProperties.map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
