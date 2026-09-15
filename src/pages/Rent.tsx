@@ -580,7 +580,7 @@ const Rent = () => {
                       <button
                         type="button"
                         disabled={compareIds.length < 2}
-                        onClick={() => navigate(`/compare?ids=${compareIds.join(',')}`)}
+                        onClick={() => { navigate(`/compare?ids=${compareIds.join(',')}`); window.scrollTo(0, 0); }}
                         className={`ml-[1vw] h-[3.8rem] px-[6.69rem] rounded-none text-sm font-medium transition-colors ${
                           compareIds.length < 2
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
