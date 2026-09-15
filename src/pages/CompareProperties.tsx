@@ -21,6 +21,57 @@ interface CompareProperty {
 const formatPrice = (value: number | null | undefined) =>
   value == null ? '—' : `$${value.toLocaleString()}`;
 
+const PropertyCompareImages = ({ images, alt }: { images: string[]; alt: string }) => {
+  const [index, setIndex] = useState(0);
+  const hasMultiple = images.length > 1;
+  const safeIndex = Math.min(index, Math.max(0, images.length - 1));
+
+  return (
+    <div className="relative w-[260px] h-[195px] bg-muted rounded-lg overflow-hidden mb-2 mx-auto group/img">
+      {images.length === 0 ? null : (
+        <img
+          src={images[safeIndex]}
+          alt={`${alt} - image ${safeIndex + 1}`}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover"
+        />
+      )}
+      {hasMultiple && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIndex((i) => (i - 1 + images.length) % images.length);
+            }}
+            className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm"
+            aria-label="Previous image"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIndex((i) => (i + 1) % images.length);
+            }}
+            className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm"
+            aria-label="Next image"
+          >
+            ›
+          </button>
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/40 text-white text-[10px] px-2 py-0.5 rounded-full">
+            {safeIndex + 1} / {images.length}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const CompareProperties = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
