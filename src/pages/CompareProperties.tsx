@@ -27,7 +27,7 @@ const PropertyCompareImages = ({ images, alt }: { images: string[]; alt: string 
   const safeIndex = Math.min(index, Math.max(0, images.length - 1));
 
   return (
-    <div className="relative w-[260px] h-[195px] bg-muted rounded-lg overflow-hidden mb-2 mx-auto group/img">
+    <div className="relative w-[312px] h-[234px] bg-muted rounded-lg overflow-hidden mb-2 ml-[3vw] group/img">
       {images.length === 0 ? null : (
         <img
           src={images[safeIndex]}
