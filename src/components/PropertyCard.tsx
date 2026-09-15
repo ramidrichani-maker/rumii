@@ -551,8 +551,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
           </div>
         )}
 
-        {/* Bottom-right: Request Viewing, Call & Email (hidden on grid cards — available on the property page) */}
-        <div className={`${compact ? 'flex' : 'hidden'} items-center gap-1 md:gap-2 justify-end mt-2 md:mt-3 flex-wrap`}>
+        {/* Request Viewing, Call & Email are only available on the property page */}
           <Button
             variant="outline"
             size="sm"
