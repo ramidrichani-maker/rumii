@@ -241,7 +241,9 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
 
       properties.forEach((property) => {
         let pos: google.maps.LatLngLiteral;
-        if (isAdmin && property.latitude && property.longitude) {
+        if (property.latitude && property.longitude) {
+          // Use the property's own stored position (already privacy-masked
+          // server-side for non-privileged viewers) so pins stay where they were placed.
           pos = { lat: property.latitude, lng: property.longitude };
         } else {
           const c = cityCenters[property.city];
