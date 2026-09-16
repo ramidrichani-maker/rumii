@@ -700,7 +700,7 @@ const Purchase = () => {
       <div className="px-[4vw]">
         {/* Desktop with map: map takes the full first row, all cards below */}
         {showMap && !isMobile && !mapFullscreen && (
-          <div className={`w-full h-[60vh] mb-6 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
+          <div className={`w-full h-[60vh] mb-6 bg-background relative isolate overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
             <div className="absolute top-2 right-2 z-[1000] flex gap-1">
               <button
                 onClick={() => setMapFullscreen(true)}
@@ -735,7 +735,7 @@ const Purchase = () => {
 
         {/* Mobile with map: map sits above the grid */}
         {showMap && isMobile && !mapFullscreen && (
-          <div className={`w-full h-[50vh] min-h-[250px] mb-6 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
+          <div className={`w-full h-[50vh] min-h-[250px] mb-6 bg-background relative isolate overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
             <div className="absolute top-2 right-2 z-[1000] flex gap-1">
               <button
                 onClick={() => setMapFullscreen(true)}
