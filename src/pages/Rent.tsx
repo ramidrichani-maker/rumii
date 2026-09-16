@@ -694,11 +694,11 @@ const Rent = () => {
         <div className={`flex ${showMap ? 'flex-col-reverse md:flex-row' : 'flex-col'} gap-6`}>
           {/* Property Grid */}
           <div
-            className={`${showMap ? 'w-full md:w-[45%] md:overflow-y-auto md:max-h-[calc(100vh-120px)]' : 'w-full'} transition-all duration-300`}
+            className={`${showMap ? 'w-full md:w-[45%]' : 'w-full'} transition-all duration-300`}
           >
             {isLoading ? (
               <div className={`mb-8 grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: showMap && !isMobile ? 2 : 6 }).map((_, i) => (
                   <PropertyCardSkeleton key={i} />
                 ))}
               </div>
@@ -724,7 +724,7 @@ const Rent = () => {
                   </div>
                 )}
 <div className={`grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
-                  {paginatedProperties.map((property, index) => (
+                  {(showMap && !isMobile ? paginatedProperties.slice(0, 2) : paginatedProperties).map((property, index) => (
                     <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
                       <PropertyCard
                         property={property}
@@ -737,11 +737,13 @@ const Rent = () => {
                     </ScrollReveal>
                   ))}
                 </div>
-                <PropertyPagination
-                  currentPage={safePage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                {(!showMap || isMobile) && (
+                  <PropertyPagination
+                    currentPage={safePage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </div>
             ) : null}
           </div>
@@ -781,6 +783,29 @@ const Rent = () => {
             </div>
           )}
         </div>
+
+        {showMap && !isMobile && !isLoading && paginatedProperties.length > 2 && (
+          <div className="mb-8 mt-6 grid grid-cols-3 gap-[0.7vw]">
+            {paginatedProperties.slice(2).map((property, index) => (
+              <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 3) * 100}>
+                <PropertyCard
+                  property={property}
+                  onClick={handlePropertySelect}
+                  selectable={compareMode}
+                  selected={compareIds.includes(property.id)}
+                  onToggleSelect={toggleCompareSelect}
+                />
+              </ScrollReveal>
+            ))}
+          </div>
+        )}
+        {showMap && !isMobile && !isLoading && sortedProperties.length > 0 && (
+          <PropertyPagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
 
       {/* Fullscreen Map Overlay */}
