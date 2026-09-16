@@ -342,8 +342,10 @@ All colors MUST be HSL.
   transition: none;
 }
 /* Desktop: hide collapsible rows instantly (they reflow in the wrap layout). */
-.rumi-bar-collapsed .rumi-collapse-hide {
-  display: none;
+@media (min-width: 768px) {
+  .rumi-bar-collapsed .rumi-collapse-hide {
+    display: none;
+  }
 }
 /* Mobile: animate the collapse so the bar shrinks smoothly instead of
    jumping when it pins to the top. display:none can't transition, so we
@@ -359,8 +361,7 @@ All colors MUST be HSL.
     max-height: 260px;
     overflow: hidden;
   }
-  .rumi-bar-collapsed.rumi-sticky-under-nav .rumi-collapse-hide,
-  .rumi-bar-collapsed .rumi-sticky-under-nav .rumi-collapse-hide {
+  .rumi-bar-collapsed .rumi-collapse-hide {
     max-height: 0;
     opacity: 0;
     margin-top: 0;
