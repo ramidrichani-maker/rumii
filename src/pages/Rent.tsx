@@ -596,11 +596,11 @@ const Rent = () => {
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mr-2">
+                    <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                       <button
                         type="button"
                         onClick={() => { setCompareMode(false); setCompareIds([]); }}
-                        className="h-11 flex-1 min-w-0 rounded-none border border-black bg-background text-sm font-medium hover:text-muted-foreground transition-colors whitespace-nowrap"
+                        className="h-11 w-40 sm:w-48 rounded-none border border-black bg-background text-sm font-medium hover:text-muted-foreground transition-colors whitespace-nowrap"
                       >
                         Cancel
                       </button>
@@ -608,7 +608,7 @@ const Rent = () => {
                         type="button"
                         disabled={compareIds.length < 2}
                         onClick={() => { navigate(`/compare?ids=${compareIds.join(',')}`); window.scrollTo(0, 0); }}
-                        className={`h-11 flex-1 min-w-0 rounded-none text-sm font-medium transition-colors whitespace-nowrap ${
+                        className={`h-11 w-40 sm:w-48 rounded-none text-sm font-medium transition-colors whitespace-nowrap ${
                           compareIds.length < 2
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                             : "bg-black text-white hover:bg-black/90"
