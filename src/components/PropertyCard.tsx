@@ -314,9 +314,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
       }}
     >
       {selectable && (
-        <div className="absolute inset-0 z-20" aria-hidden="true" />
-      )}
-      {selectable && (
         <div
           className={`absolute top-3 right-3 z-30 w-[1.6875rem] h-[1.6875rem] rounded-none border-2 flex items-center justify-center bg-background/90 border-border`}
         >
