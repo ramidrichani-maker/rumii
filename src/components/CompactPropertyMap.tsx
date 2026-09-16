@@ -134,7 +134,26 @@ const CompactPropertyMap: React.FC<CompactPropertyMapProps> = ({
     mapInstance.current.addListener('click', () => {
       infoWindowRef.current?.close();
     });
+
+    // Embedded maps initialize before their container has its final height,
+    // which leaves blank space above the tiles. Trigger resize shortly after
+    // mount so Google Maps fills the container, and keep it sized via
+    // ResizeObserver as the surrounding layout changes.
+    const triggerResize = () => {
+      if (mapInstance.current) google.maps.event.trigger(mapInstance.current, 'resize');
+    };
+    requestAnimationFrame(triggerResize);
+    const r1 = window.setTimeout(triggerResize, 100);
+    const r2 = window.setTimeout(triggerResize, 300);
+    const r3 = window.setTimeout(triggerResize, 600);
+    const ro = new ResizeObserver(() => triggerResize());
+    if (mapRef.current) ro.observe(mapRef.current);
+
     return () => {
+      window.clearTimeout(r1);
+      window.clearTimeout(r2);
+      window.clearTimeout(r3);
+      ro.disconnect();
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
       drawnPolygonRef.current?.setMap(null);
