@@ -303,7 +303,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
         selectable && selected ? 'ring-2 ring-primary' : ''
       }`}
       onClick={(e) => {
-        if (imageCarousel.wasSwipe()) return;
+        if (!selectable && imageCarousel.wasSwipe()) return;
         if (selectable) {
           e.preventDefault();
           e.stopPropagation();
@@ -327,12 +327,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
             ? 'w-32 min-w-[8rem] h-auto min-h-[10rem] md:w-96 md:min-w-[24rem] md:min-h-[14rem]'
             : 'w-full h-[calc(7.2rem+2vw)] md:h-[calc(15.84rem+2vw)]'
         }`}
-        onTouchStart={imageCarousel.onTouchStart}
-        onTouchMove={imageCarousel.onTouchMove}
-        onTouchEnd={imageCarousel.onTouchEnd}
-        onWheel={imageCarousel.onWheel}
+        onTouchStart={selectable ? undefined : imageCarousel.onTouchStart}
+        onTouchMove={selectable ? undefined : imageCarousel.onTouchMove}
+        onTouchEnd={selectable ? undefined : imageCarousel.onTouchEnd}
+        onWheel={selectable ? undefined : imageCarousel.onWheel}
         onClick={(e) => {
-          if (imageCarousel.wasSwipe()) {
+          if (!selectable && imageCarousel.wasSwipe()) {
             e.stopPropagation();
           }
         }}
@@ -378,7 +378,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, compact 
             Just Listed
           </Badge>
         )}
-        {hasMultipleImages && (
+        {hasMultipleImages && !selectable && (
           <>
             <Button
               variant="ghost"
