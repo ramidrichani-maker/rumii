@@ -341,8 +341,34 @@ All colors MUST be HSL.
 .rumi-nav-hidden .rumi-sticky-under-nav {
   transition: none;
 }
+/* Desktop: hide collapsible rows instantly (they reflow in the wrap layout). */
 .rumi-bar-collapsed .rumi-collapse-hide {
   display: none;
+}
+/* Mobile: animate the collapse so the bar shrinks smoothly instead of
+   jumping when it pins to the top. display:none can't transition, so we
+   drive the shrink with max-height + opacity and let the Filters + Compare
+   row glide up. Scoped to mobile only so desktop's `md:contents` wrappers
+   keep their grid behaviour. */
+@media (max-width: 767px) {
+  .rumi-sticky-under-nav .rumi-collapse-hide {
+    transition: max-height 320ms cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 240ms ease,
+                margin 320ms cubic-bezier(0.4, 0, 0.2, 1),
+                padding 320ms cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 260px;
+    overflow: hidden;
+  }
+  .rumi-bar-collapsed.rumi-sticky-under-nav .rumi-collapse-hide,
+  .rumi-bar-collapsed .rumi-sticky-under-nav .rumi-collapse-hide {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+  }
 }
 
 
