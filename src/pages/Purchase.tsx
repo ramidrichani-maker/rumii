@@ -696,123 +696,126 @@ const Purchase = () => {
         )}
       </div>
 
-      {/* Split Layout: full-width when map is shown */}
+      {/* Property listings + map */}
       <div className="px-[4vw]">
-        <div className={`flex ${showMap ? 'flex-col-reverse md:flex-row' : 'flex-col'} gap-6`}>
-          {/* Property Grid */}
-          <div
-            className={`${showMap ? 'w-full md:w-[45%]' : 'w-full'} transition-all duration-300`}
-          >
-            {isLoading ? (
-              <div className={`mb-8 grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
-                {Array.from({ length: showMap && !isMobile ? 2 : 6 }).map((_, i) => (
-                  <PropertyCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : sortedProperties.length > 0 ? (
-              <div className="mb-8">
-                <ScrollReveal animation="fade-up">
-                  <h3 className="text-3xl font-thin mb-6 text-foreground">Properties for Sale</h3>
-                </ScrollReveal>
-                {(locationInput || hasDrawnArea) && (
-                  <div className="mb-4 flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/20 bg-muted px-3 py-1 text-sm text-foreground">
-                      <Map className="w-3.5 h-3.5" />
-                      {locationInput || 'Selected area'}
-                      <button
-                        type="button"
-                        onClick={clearSearchedArea}
-                        className="ml-1 -mr-1 rounded-full p-0.5 hover:bg-foreground/10"
-                        aria-label="Remove searched area"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </span>
-                  </div>
-                )}
-<div className={`grid grid-cols-2 ${showMap ? 'md:grid-cols-1' : 'md:grid-cols-3'} gap-[0.7vw] md:gap-[0.7vw]`}>
-                  {(showMap && !isMobile ? paginatedProperties.slice(0, 2) : paginatedProperties).map((property, index) => (
-                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
-                      <PropertyCard
-                        property={property}
-                        onClick={handlePropertySelect}
-                        compact={showMap && !isMobile}
-                        selectable={compareMode}
-                        selected={compareIds.includes(property.id)}
-                        onToggleSelect={toggleCompareSelect}
-                      />
-                    </ScrollReveal>
-                  ))}
-                </div>
-                {(!showMap || isMobile) && (
-                  <PropertyPagination
-                    currentPage={safePage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                )}
-              </div>
-            ) : null}
-          </div>
-
-          {/* Map Panel - right half of viewport */}
-          {showMap && !mapFullscreen && (
-            <div className={`w-full h-[50vh] md:h-[calc(100vh-120px)] md:w-[55%] md:sticky md:top-0 md:self-start z-30 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
-              <div className="absolute top-2 right-2 z-[1000] flex gap-1">
-                <button
-                  onClick={() => setMapFullscreen(true)}
-                  className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
-                  title="Fullscreen"
-                >
-                  <Maximize2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={closeMap}
-                  className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
-                  title="Close map"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <CompactPropertyMap
-                properties={sortedProperties}
-                height="100%"
-                defaultExpanded={false}
-                onPropertySelect={handlePropertySelect}
-                onDrawnAreaChange={handleDrawnAreaChange}
-                enableDrawing={true}
-                initialSearchLocation={locationInput}
-                searchRadius={radius}
-                embedded={true}
-                onSaveArea={handleSaveArea}
-                initialPolygon={initialPolygon}
-              />
+        {/* Desktop with map: map takes the full first row, all cards below */}
+        {showMap && !isMobile && !mapFullscreen && (
+          <div className={`w-full h-[60vh] mb-6 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
+            <div className="absolute top-2 right-2 z-[1000] flex gap-1">
+              <button
+                onClick={() => setMapFullscreen(true)}
+                className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                title="Fullscreen"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={closeMap}
+                className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                title="Close map"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-          )}
-        </div>
+            <CompactPropertyMap
+              properties={sortedProperties}
+              height="100%"
+              defaultExpanded={false}
+              onPropertySelect={handlePropertySelect}
+              onDrawnAreaChange={handleDrawnAreaChange}
+              enableDrawing={true}
+              initialSearchLocation={locationInput}
+              searchRadius={radius}
+              embedded={true}
+              onSaveArea={handleSaveArea}
+              initialPolygon={initialPolygon}
+            />
+          </div>
+        )}
 
-        {showMap && !isMobile && !isLoading && paginatedProperties.length > 2 && (
-          <div className="mb-8 mt-6 grid grid-cols-3 gap-[0.7vw]">
-            {paginatedProperties.slice(2).map((property, index) => (
-              <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 3) * 100}>
-                <PropertyCard
-                  property={property}
-                  onClick={handlePropertySelect}
-                  selectable={compareMode}
-                  selected={compareIds.includes(property.id)}
-                  onToggleSelect={toggleCompareSelect}
-                />
-              </ScrollReveal>
+        {/* Mobile with map: map sits above the grid */}
+        {showMap && isMobile && !mapFullscreen && (
+          <div className={`w-full h-[50vh] min-h-[250px] mb-6 bg-background relative overflow-hidden rounded-lg ${mapClosing ? 'animate-slide-fade-out-right' : 'animate-slide-fade-in-right'}`}>
+            <div className="absolute top-2 right-2 z-[1000] flex gap-1">
+              <button
+                onClick={() => setMapFullscreen(true)}
+                className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                title="Fullscreen"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={closeMap}
+                className="p-1.5 rounded-md bg-background/90 border border-border shadow-sm hover:bg-accent transition-colors"
+                title="Close map"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <CompactPropertyMap
+              properties={sortedProperties}
+              height="100%"
+              defaultExpanded={false}
+              onPropertySelect={handlePropertySelect}
+              onDrawnAreaChange={handleDrawnAreaChange}
+              enableDrawing={true}
+              initialSearchLocation={locationInput}
+              searchRadius={radius}
+              embedded={true}
+              onSaveArea={handleSaveArea}
+              initialPolygon={initialPolygon}
+            />
+          </div>
+        )}
+
+        {/* Property grid - always full width */}
+        {isLoading ? (
+          <div className="mb-8 grid grid-cols-2 md:grid-cols-3 gap-[0.7vw]">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <PropertyCardSkeleton key={i} />
             ))}
           </div>
-        )}
-        {showMap && !isMobile && !isLoading && sortedProperties.length > 0 && (
-          <PropertyPagination
-            currentPage={safePage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        )}
+        ) : sortedProperties.length > 0 ? (
+          <div className="mb-8">
+            <ScrollReveal animation="fade-up">
+              <h3 className="text-3xl font-thin mb-6 text-foreground">Properties for Sale</h3>
+            </ScrollReveal>
+            {(locationInput || hasDrawnArea) && (
+              <div className="mb-4 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/20 bg-muted px-3 py-1 text-sm text-foreground">
+                  <Map className="w-3.5 h-3.5" />
+                  {locationInput || 'Selected area'}
+                  <button
+                    type="button"
+                    onClick={clearSearchedArea}
+                    className="ml-1 -mr-1 rounded-full p-0.5 hover:bg-foreground/10"
+                    aria-label="Remove searched area"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              </div>
+            )}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.7vw]">
+              {paginatedProperties.map((property, index) => (
+                <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
+                  <PropertyCard
+                    property={property}
+                    onClick={handlePropertySelect}
+                    selectable={compareMode}
+                    selected={compareIds.includes(property.id)}
+                    onToggleSelect={toggleCompareSelect}
+                  />
+                </ScrollReveal>
+              ))}
+            </div>
+            <PropertyPagination
+              currentPage={safePage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        ) : null}
       </div>
 
       {/* Fullscreen Map Overlay */}
