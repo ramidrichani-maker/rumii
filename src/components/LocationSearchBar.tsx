@@ -374,6 +374,11 @@ return (
           {isMobile && <div className="shrink-0">{renderRadiusControl(true)}</div>}
         </div>
 
+        {/* Mobile: map view button (visible outside the panel) */}
+        {trailingContent && (
+          <div className="md:hidden rumi-collapse-hide">{trailingContent}</div>
+        )}
+
         {/* Mobile: Filters + Compare row below search bar (mirrors desktop layout) */}
         <div className="md:hidden flex items-center justify-between gap-3">
           <button
@@ -392,11 +397,6 @@ return (
           </button>
           {compareContent}
         </div>
-
-        {/* Mobile: map view button (visible outside the panel) */}
-        {trailingContent && (
-          <div className="md:hidden rumi-collapse-hide">{trailingContent}</div>
-        )}
 
         {(() => {
         const __panel = (
