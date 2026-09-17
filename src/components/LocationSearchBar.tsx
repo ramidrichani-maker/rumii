@@ -323,7 +323,7 @@ document.addEventListener('keydown', onKey);
     };
 
     const onResize = () => {
-      if (stickyBarRef.current && !collapsed) {
+      if (stickyBarRef.current && window.scrollY === 0) {
         naturalTop = stickyBarRef.current.getBoundingClientRect().top + window.scrollY;
       }
       onScroll();
@@ -337,7 +337,7 @@ document.addEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
       if (frameId !== null) window.cancelAnimationFrame(frameId);
     };
-  }, [collapsed]);
+  }, []);
 
   const renderRadiusControl = (compact = false) => (
     <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
