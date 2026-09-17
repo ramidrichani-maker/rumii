@@ -641,54 +641,6 @@ const Rent = () => {
         </div>
       </div>
 
-      {/* Results header */}
-      <div className="px-[4vw]">
-
-        <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
-          <div className="text-center sm:text-left">
-            {isLoading ? (
-              <p className="text-muted-foreground">Loading properties...</p>
-            ) : sortedProperties.length > 0 ? (
-              <p className="text-muted-foreground">
-                Showing {startIdx + 1}–{endIdx} of {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for rent
-                {hasDrawnArea && ` in selected area`}
-              </p>
-            ) : (
-              <p className="text-muted-foreground">
-                No properties match your current filters. Try adjusting your search criteria.
-              </p>
-            )}
-          </div>
-          {!isLoading && sortedProperties.length > 0 && (
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[200px] text-sm">
-                <ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" />
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest first</SelectItem>
-                <SelectItem value="price-asc">Price: low to high</SelectItem>
-                <SelectItem value="price-desc">Price: high to low</SelectItem>
-                <SelectItem value="size-desc">Largest first</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        </div>
-        <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
-        {hasNewUpdates && (
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary/5 px-4 py-2 text-sm">
-            <span className="text-foreground">New listings available</span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => { setHasNewUpdates(false); fetchProperties(); }}
-            >
-              Refresh results
-            </Button>
-          </div>
-        )}
-      </div>
-
       {/* Property listings + map */}
       <div className="px-[4vw]">
         {/* Desktop with map: map takes the full first row, all cards below */}
@@ -761,6 +713,74 @@ const Rent = () => {
           </div>
         )}
 
+        {/* Title + searched area chip (only when results exist) */}
+        {!isLoading && sortedProperties.length > 0 && (
+          <ScrollReveal animation="fade-up">
+            <h3 className="text-3xl font-thin mb-6 text-foreground">Properties for Rent</h3>
+          </ScrollReveal>
+        )}
+        {!isLoading && sortedProperties.length > 0 && (locationInput || hasDrawnArea) && (
+          <div className="mb-4 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/20 bg-muted px-3 py-1 text-sm text-foreground">
+              <Map className="w-3.5 h-3.5" />
+              {locationInput || 'Selected area'}
+              <button
+                type="button"
+                onClick={clearSearchedArea}
+                className="ml-1 -mr-1 rounded-full p-0.5 hover:bg-foreground/10"
+                aria-label="Remove searched area"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </span>
+          </div>
+        )}
+
+        {/* Results header - under the map and title */}
+        <div id="results-anchor" className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 scroll-mt-4">
+          <div className="text-center sm:text-left">
+            {isLoading ? (
+              <p className="text-muted-foreground">Loading properties...</p>
+            ) : sortedProperties.length > 0 ? (
+              <p className="text-muted-foreground">
+                Showing {startIdx + 1}–{endIdx} of {sortedProperties.length} {sortedProperties.length === 1 ? 'property' : 'properties'} for rent
+                {hasDrawnArea && ` in selected area`}
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                No properties match your current filters. Try adjusting your search criteria.
+              </p>
+            )}
+          </div>
+          {!isLoading && sortedProperties.length > 0 && (
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[200px] text-sm">
+                <ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="price-asc">Price: low to high</SelectItem>
+                <SelectItem value="price-desc">Price: high to low</SelectItem>
+                <SelectItem value="size-desc">Largest first</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+        <ActiveFilterChips chips={filterChips} onClearAll={handleClearFilters} />
+        {hasNewUpdates && (
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary/5 px-4 py-2 text-sm">
+            <span className="text-foreground">New listings available</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { setHasNewUpdates(false); fetchProperties(); }}
+            >
+              Refresh results
+            </Button>
+          </div>
+        )}
+
         {/* Property grid - always full width */}
         {isLoading ? (
           <div className="mb-8 grid grid-cols-2 md:grid-cols-3 gap-[0.7vw]">
@@ -770,25 +790,6 @@ const Rent = () => {
           </div>
         ) : sortedProperties.length > 0 ? (
           <div className="mb-8">
-            <ScrollReveal animation="fade-up">
-              <h3 className="text-3xl font-thin mb-6 text-foreground">Properties for Rent</h3>
-            </ScrollReveal>
-            {(locationInput || hasDrawnArea) && (
-              <div className="mb-4 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/20 bg-muted px-3 py-1 text-sm text-foreground">
-                  <Map className="w-3.5 h-3.5" />
-                  {locationInput || 'Selected area'}
-                  <button
-                    type="button"
-                    onClick={clearSearchedArea}
-                    className="ml-1 -mr-1 rounded-full p-0.5 hover:bg-foreground/10"
-                    aria-label="Remove searched area"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </span>
-              </div>
-            )}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.7vw]">
               {paginatedProperties.map((property, index) => (
                 <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
