@@ -297,25 +297,26 @@ document.addEventListener('keydown', onKey);
     };
   }, [advancedFilterOpen]);
 
-  // Collapse the bar to just the Filters + Compare row once the user scrolls
-  // down, so the search bar / map view / bedrooms / price / property type
-  // filters scroll away while the essential buttons stay pinned. Use the
-  // bar's actual document position so it never collapses before reaching its
-  // sticky edge.
+  // Collapse the bar to just the Filters + Compare row once the top of the
+  // page scrolls past the upper controls (search area, map view, radius,
+  // bedrooms, price, property type). The trigger is the Filters + Compare
+  // row's natural document position: the moment the viewport top reaches that
+  // row, it sticks and everything above it collapses away.
   const [collapsed, setCollapsed] = useState(false);
   const stickyBarRef = useRef<HTMLDivElement>(null);
+  const filterRowRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let frameId: number | null = null;
-    let naturalTop = stickyBarRef.current
-      ? stickyBarRef.current.getBoundingClientRect().top + window.scrollY
+    let naturalFilterTop = filterRowRef.current
+      ? filterRowRef.current.getBoundingClientRect().top + window.scrollY
       : 0;
 
     const updateCollapsed = () => {
       frameId = null;
       const rootStyles = getComputedStyle(document.documentElement);
       const navbarHeight = Number.parseFloat(rootStyles.getPropertyValue('--navbar-visible-h')) || 0;
-      const stickyStart = naturalTop - Math.max(0, navbarHeight - 1);
-      setCollapsed(window.scrollY >= stickyStart);
+      const stickyOffset = Math.max(0, navbarHeight - 1);
+      setCollapsed(window.scrollY >= naturalFilterTop - stickyOffset);
     };
 
     const onScroll = () => {
@@ -323,8 +324,8 @@ document.addEventListener('keydown', onKey);
     };
 
     const onResize = () => {
-      if (stickyBarRef.current && window.scrollY === 0) {
-        naturalTop = stickyBarRef.current.getBoundingClientRect().top + window.scrollY;
+      if (filterRowRef.current && window.scrollY === 0) {
+        naturalFilterTop = filterRowRef.current.getBoundingClientRect().top;
       }
       onScroll();
     };
@@ -378,7 +379,7 @@ document.addEventListener('keydown', onKey);
   );
 
 return (
-    <div ref={stickyBarRef} className={`mb-6 sticky rumi-sticky-under-nav z-30 bg-background/15 backdrop-blur-md pt-2 pb-1 md:static md:z-auto md:pt-0 md:pb-0 md:bg-transparent md:backdrop-blur-none ${collapsed ? 'rumi-bar-collapsed' : ''}`}>
+    <div ref={stickyBarRef} className={`mb-6 pt-2 pb-1 md:pt-0 md:pb-0 ${collapsed ? 'rumi-bar-collapsed' : ''}`}>
       
       <div className="rumi-filter-bar flex flex-col md:flex-row md:flex-wrap gap-3">
         <div className="rumi-collapse-hide flex gap-2 items-stretch md:flex-1 md:min-w-0">
@@ -823,7 +824,7 @@ return (
         </div>
 
         {/* Row 5: Advanced Filter */}
-        <div className="rumi-filter-sticky flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-2">
+        <div ref={filterRowRef} className="rumi-filter-sticky flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-2">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
           {(() => {
             const advancedFilterBody = (

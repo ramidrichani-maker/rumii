@@ -332,13 +332,9 @@ All colors MUST be HSL.
    bars slide down/up instead of being overlapped. */
 .rumi-sticky-under-nav {
   /* One-pixel overlap prevents sub-pixel compositing from exposing the page
-     background while both sticky bars animate. */
+     background while both sticky bars animate. No top transition: the bar
+     must stick instantly when the navbar hides, not drift behind it. */
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px)) !important;
-  transition: top 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-/* Keep the sticky bar moving with the navbar rather than snapping to the top. */
-.rumi-nav-hidden .rumi-sticky-under-nav {
-  transition: top 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* Desktop: the upper controls leave the layout at the sticky boundary, while
    the essential row glides into their place instead of jumping there. */
