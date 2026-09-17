@@ -306,22 +306,15 @@ document.addEventListener('keydown', onKey);
   const stickyBarRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let frameId: number | null = null;
-
-    const getDocumentTop = () => {
-      let top = 0;
-      let element: HTMLElement | null = stickyBarRef.current;
-      while (element) {
-        top += element.offsetTop;
-        element = element.offsetParent as HTMLElement | null;
-      }
-      return top;
-    };
+    let naturalTop = stickyBarRef.current
+      ? stickyBarRef.current.getBoundingClientRect().top + window.scrollY
+      : 0;
 
     const updateCollapsed = () => {
       frameId = null;
       const rootStyles = getComputedStyle(document.documentElement);
       const navbarHeight = Number.parseFloat(rootStyles.getPropertyValue('--navbar-visible-h')) || 0;
-      const stickyStart = getDocumentTop() - Math.max(0, navbarHeight - 1);
+      const stickyStart = naturalTop - Math.max(0, navbarHeight - 1);
       setCollapsed(window.scrollY >= stickyStart);
     };
 
@@ -329,15 +322,22 @@ document.addEventListener('keydown', onKey);
       if (frameId === null) frameId = window.requestAnimationFrame(updateCollapsed);
     };
 
+    const onResize = () => {
+      if (stickyBarRef.current && !collapsed) {
+        naturalTop = stickyBarRef.current.getBoundingClientRect().top + window.scrollY;
+      }
+      onScroll();
+    };
+
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onResize);
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
       if (frameId !== null) window.cancelAnimationFrame(frameId);
     };
-  }, []);
+  }, [collapsed]);
 
   const renderRadiusControl = (compact = false) => (
     <Popover open={radiusOpen} onOpenChange={(o) => !radiusDisabled && setRadiusOpen(o)}>
