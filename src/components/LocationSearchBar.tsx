@@ -412,7 +412,7 @@ return (
         )}
 
         {/* Mobile: Filters + Compare row below search bar (mirrors desktop layout) */}
-        <div className="md:hidden flex items-center justify-between gap-3">
+        <div className="md:hidden flex items-center justify-between gap-3 border-t border-border/60 pt-3 mt-1">
           <button
             type="button"
             onClick={() => setAdvancedFilterOpen(true)}
@@ -824,7 +824,7 @@ return (
         </div>
 
         {/* Row 5: Advanced Filter */}
-        <div ref={filterRowRef} className="rumi-filter-sticky flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-2">
+        <div ref={filterRowRef} className="rumi-filter-sticky flex flex-col gap-1 md:w-full md:flex md:flex-row md:items-center md:justify-start md:gap-3 md:mt-4 md:border-t md:border-border/60 md:pt-4">
           <span className="text-xs font-medium text-muted-foreground whitespace-nowrap md:hidden">Advanced</span>
           {(() => {
             const advancedFilterBody = (
