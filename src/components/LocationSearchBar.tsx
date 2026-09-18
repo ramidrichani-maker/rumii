@@ -304,12 +304,27 @@ document.addEventListener('keydown', onKey);
   // row, it sticks and everything above it collapses away.
   const [collapsed, setCollapsed] = useState(false);
   const stickyBarRef = useRef<HTMLDivElement>(null);
-  const filterRowRef = useRef<HTMLDivElement>(null);
+
+  // Find the Filters + Compare row that is actually rendered/visible. On
+  // mobile the desktop filter row lives inside the hidden mobile-filters
+  // panel (display:none), so its position reads as 0 and would wrongly trigger
+  // collapse at scroll 0. Pick the row whose layout box has height > 0.
+  const getVisibleFilterRow = (): HTMLElement | null => {
+    const rows = document.querySelectorAll<HTMLElement>('.rumi-filter-sticky');
+    for (const row of rows) {
+      if (row.offsetHeight > 0) return row;
+    }
+    return rows[0] ?? null;
+  };
+
   useEffect(() => {
     let frameId: number | null = null;
-    let naturalFilterTop = filterRowRef.current
-      ? filterRowRef.current.getBoundingClientRect().top + window.scrollY
-      : 0;
+    let naturalFilterTop = 0;
+    const measure = () => {
+      const row = getVisibleFilterRow();
+      naturalFilterTop = row ? row.getBoundingClientRect().top + window.scrollY : 0;
+    };
+    measure();
 
     const updateCollapsed = () => {
       frameId = null;
@@ -324,9 +339,8 @@ document.addEventListener('keydown', onKey);
     };
 
     const onResize = () => {
-      if (filterRowRef.current && window.scrollY === 0) {
-        naturalFilterTop = filterRowRef.current.getBoundingClientRect().top;
-      }
+      // Re-measure only while at the top so the natural position stays stable.
+      if (window.scrollY === 0) measure();
       onScroll();
     };
 
