@@ -504,9 +504,9 @@ const Rent = () => {
 </ScrollReveal>
       </div>
 
-      {/* Sticky filter bar - direct child of full-height wrapper. When compare mode is
-          active the bar is allowed to scroll away so it doesn't overlap the compare popup. */}
-      <div className={`${compareMode ? '' : 'sticky rumi-sticky-under-nav'} z-30 bg-background pt-2 pb-1 px-[4vw]`}>
+      {/* The complete filter controls scroll normally. Only after the Filters + Compare
+          row reaches the viewport top does this shell become sticky and collapse. */}
+      <div className={`${compareMode ? '' : 'rumi-filter-shell'} z-30 bg-background pt-2 pb-1 px-[4vw]`}>
         <div className="mx-auto max-w-[1280px]">
         <LocationSearchBar
           location={locationInput}

@@ -336,6 +336,13 @@ All colors MUST be HSL.
      must stick instantly when the navbar hides, not drift behind it. */
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px)) !important;
 }
+
+/* The full Buy / Rent controls remain in normal document flow. The shell only
+   becomes sticky once its child has collapsed to the Filters + Compare row. */
+.rumi-filter-shell:has(.rumi-bar-collapsed) {
+  position: sticky;
+  top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px));
+}
 /* Desktop: the upper controls leave the layout at the sticky boundary, while
    the essential row glides into their place instead of jumping there. */
 @media (min-width: 768px) {
