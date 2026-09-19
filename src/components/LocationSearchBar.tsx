@@ -307,16 +307,28 @@ document.addEventListener('keydown', onKey);
   const filterRowRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let frameId: number | null = null;
-    let naturalFilterTop = filterRowRef.current
-      ? filterRowRef.current.getBoundingClientRect().top + window.scrollY
-      : 0;
+    let stickyThreshold: number | null = null;
+    let isCollapsed = false;
 
     const updateCollapsed = () => {
       frameId = null;
-      const rootStyles = getComputedStyle(document.documentElement);
-      const navbarHeight = Number.parseFloat(rootStyles.getPropertyValue('--navbar-visible-h')) || 0;
-      const stickyOffset = Math.max(0, navbarHeight - 1);
-      setCollapsed(window.scrollY >= naturalFilterTop - stickyOffset);
+      const row = filterRowRef.current;
+      if (!row) return;
+
+      if (!isCollapsed) {
+        if (row.getBoundingClientRect().top <= 0) {
+          stickyThreshold = window.scrollY;
+          isCollapsed = true;
+          setCollapsed(true);
+        }
+        return;
+      }
+
+      if (stickyThreshold !== null && window.scrollY < stickyThreshold) {
+        isCollapsed = false;
+        stickyThreshold = null;
+        setCollapsed(false);
+      }
     };
 
     const onScroll = () => {
@@ -324,9 +336,6 @@ document.addEventListener('keydown', onKey);
     };
 
     const onResize = () => {
-      if (filterRowRef.current && window.scrollY === 0) {
-        naturalFilterTop = filterRowRef.current.getBoundingClientRect().top;
-      }
       onScroll();
     };
 
