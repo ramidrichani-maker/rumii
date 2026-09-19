@@ -337,51 +337,21 @@ All colors MUST be HSL.
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px)) !important;
 }
 
-/* The full Buy / Rent controls remain in normal document flow. The shell only
-   becomes sticky once its child has collapsed to the Filters + Compare row. */
-.rumi-filter-shell:has(.rumi-bar-collapsed) {
-  position: sticky;
+/* Keep the full controls in document flow at all times. Removing their height
+   at the threshold changes scrollY and can repeatedly flip the collapsed state,
+   which feels like the page is pulling upward during a slow scroll. Only the
+   final row is lifted into a fixed layer; the untouched layout acts as its
+   placeholder and keeps scrolling stable. */
+.rumi-bar-collapsed .rumi-filter-sticky {
+  position: fixed;
+  z-index: 30;
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px));
-}
-/* Desktop: the upper controls leave the layout at the sticky boundary, while
-   the essential row glides into their place instead of jumping there. */
-@media (min-width: 768px) {
-  .rumi-bar-collapsed .rumi-collapse-hide {
-    display: none;
-  }
-
-  .rumi-bar-collapsed .rumi-filter-sticky {
-    animation: rumi-filter-row-settle 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-@keyframes rumi-filter-row-settle {
-  from { transform: translateY(3.75rem); }
-  to { transform: translateY(0); }
-}
-/* Mobile: animate the collapse so the bar shrinks smoothly instead of
-   jumping when it pins to the top. display:none can't transition, so we
-   drive the shrink with max-height + opacity and let the Filters + Compare
-   row glide up. Scoped to mobile only so desktop's `md:contents` wrappers
-   keep their grid behaviour. */
-@media (max-width: 767px) {
-  .rumi-sticky-under-nav .rumi-collapse-hide {
-    transition: max-height 320ms cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 240ms ease,
-                margin 320ms cubic-bezier(0.4, 0, 0.2, 1),
-                padding 320ms cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 260px;
-    overflow: hidden;
-  }
-  .rumi-bar-collapsed .rumi-collapse-hide {
-    max-height: 0;
-    opacity: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    border-width: 0;
-  }
+  left: 50%;
+  width: min(92vw, 1280px);
+  transform: translateX(-50%);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  background: hsl(var(--background));
 }
 
 
