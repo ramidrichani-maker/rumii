@@ -346,6 +346,7 @@ All colors MUST be HSL.
   position: fixed;
   z-index: 30;
   top: 0;
+  margin-top: 0 !important;
   left: 50%;
   width: min(92vw, 1280px);
   transform: translateX(-50%);
