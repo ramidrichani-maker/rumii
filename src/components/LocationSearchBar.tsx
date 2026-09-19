@@ -313,10 +313,7 @@ document.addEventListener('keydown', onKey);
 
     const updateCollapsed = () => {
       frameId = null;
-      const rootStyles = getComputedStyle(document.documentElement);
-      const navbarHeight = Number.parseFloat(rootStyles.getPropertyValue('--navbar-visible-h')) || 0;
-      const stickyOffset = Math.max(0, navbarHeight - 1);
-      setCollapsed(window.scrollY >= naturalFilterTop - stickyOffset);
+      setCollapsed(window.scrollY >= naturalFilterTop);
     };
 
     const onScroll = () => {
