@@ -317,6 +317,10 @@ document.addEventListener('keydown', onKey);
 
       if (!isCollapsed) {
         if (row.getBoundingClientRect().top <= 0) {
+          const bar = stickyBarRef.current;
+          if (bar) {
+            bar.style.setProperty('--rumi-filter-row-height', `${row.getBoundingClientRect().height}px`);
+          }
           stickyThreshold = window.scrollY;
           isCollapsed = true;
           setCollapsed(true);
