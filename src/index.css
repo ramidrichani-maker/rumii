@@ -349,11 +349,16 @@ All colors MUST be HSL.
   z-index: 9989;
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px));
   margin-top: 0 !important;
-  left: 50%;
-  width: min(92vw, 1280px);
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  width: 100%;
+  transform: none;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  /* Full-width white background edge-to-edge; content stays aligned with the
+     page's 4vw / 1280px content column on every screen size. */
+  padding-left: max(4vw, calc((100% - 1280px) / 2));
+  padding-right: max(4vw, calc((100% - 1280px) / 2));
   background: hsl(var(--background));
 }
 
