@@ -346,7 +346,7 @@ All colors MUST be HSL.
 
 .rumi-bar-collapsed .rumi-filter-sticky {
   position: fixed;
-  z-index: 9991;
+  z-index: 9989;
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px));
   margin-top: 0 !important;
   left: 50%;
@@ -355,18 +355,6 @@ All colors MUST be HSL.
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   background: hsl(var(--background));
-}
-
-.rumi-bar-collapsed .rumi-collapse-hide {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
 }
 
 
