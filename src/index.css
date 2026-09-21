@@ -337,15 +337,17 @@ All colors MUST be HSL.
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px)) !important;
 }
 
-/* Keep the full controls in document flow at all times. Removing their height
-   at the threshold changes scrollY and can repeatedly flip the collapsed state,
-   which feels like the page is pulling upward during a slow scroll. Only the
-   final row is lifted into a fixed layer; the untouched layout acts as its
-   placeholder and keeps scrolling stable. */
+/* Preserve the fixed row's former space so pinning never shifts the listings. */
+.rumi-bar-collapsed::after {
+  content: '';
+  display: block;
+  height: var(--rumi-filter-row-height, 3rem);
+}
+
 .rumi-bar-collapsed .rumi-filter-sticky {
   position: fixed;
-  z-index: 30;
-  top: 0;
+  z-index: 9991;
+  top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px));
   margin-top: 0 !important;
   left: 50%;
   width: min(92vw, 1280px);
@@ -353,6 +355,18 @@ All colors MUST be HSL.
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   background: hsl(var(--background));
+}
+
+.rumi-bar-collapsed .rumi-collapse-hide {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 
