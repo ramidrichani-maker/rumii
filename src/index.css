@@ -346,7 +346,9 @@ All colors MUST be HSL.
 
 .rumi-bar-collapsed .rumi-filter-sticky {
   position: fixed;
-  z-index: 9989;
+  /* Above the navbar (9990) so the pinned bar paints in front when stuck,
+     but the top offset keeps it clear of the navbar — it never overlaps the menu. */
+  z-index: 9991;
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px));
   margin-top: 0 !important;
   left: 0;
