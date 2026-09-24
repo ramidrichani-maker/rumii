@@ -27,7 +27,7 @@ const PropertyCompareImages = ({ images, alt }: { images: string[]; alt: string 
   const safeIndex = Math.min(index, Math.max(0, images.length - 1));
 
   return (
-    <div className="relative w-[312px] h-[234px] bg-muted rounded-lg overflow-hidden mb-2 ml-[3vw] group/img">
+    <div className="relative w-full aspect-[4/3] md:w-[312px] md:h-[234px] md:aspect-auto bg-muted rounded-md md:rounded-lg overflow-hidden mb-1.5 md:mb-2 md:ml-[3vw] group/img">
       {images.length === 0 ? null : (
         <img
           src={images[safeIndex]}
@@ -46,7 +46,7 @@ const PropertyCompareImages = ({ images, alt }: { images: string[]; alt: string 
               e.stopPropagation();
               setIndex((i) => (i - 1 + images.length) % images.length);
             }}
-            className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm"
+            className="absolute left-0.5 md:left-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-5 h-5 md:w-7 md:h-7 rounded-full flex items-center justify-center text-xs md:text-sm"
             aria-label="Previous image"
           >
             ‹
@@ -58,12 +58,12 @@ const PropertyCompareImages = ({ images, alt }: { images: string[]; alt: string 
               e.stopPropagation();
               setIndex((i) => (i + 1) % images.length);
             }}
-            className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm"
+            className="absolute right-0.5 md:right-1 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-5 h-5 md:w-7 md:h-7 rounded-full flex items-center justify-center text-xs md:text-sm"
             aria-label="Next image"
           >
             ›
           </button>
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/40 text-white text-[10px] px-2 py-0.5 rounded-full">
+          <div className="absolute bottom-0.5 md:bottom-1 left-1/2 -translate-x-1/2 bg-black/40 text-white text-[8px] md:text-[10px] px-1 md:px-2 py-0.5 rounded-full whitespace-nowrap">
             {safeIndex + 1} / {images.length}
           </div>
         </>
@@ -115,7 +115,7 @@ const CompareProperties = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 md:px-4 py-5 md:py-8 overflow-x-hidden">
         <button
           type="button"
           onClick={() => navigate(-1)}
@@ -124,23 +124,23 @@ const CompareProperties = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </button>
-        <h1 className="text-3xl font-thin text-foreground mb-6">Compare properties</h1>
+        <h1 className="text-2xl md:text-3xl font-thin text-foreground mb-4 md:mb-6">Compare properties</h1>
 
         {isLoading ? (
           <p className="text-muted-foreground">Loading comparison...</p>
         ) : properties.length === 0 ? (
           <p className="text-muted-foreground">No properties selected to compare.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse">
+          <div className="w-full overflow-x-hidden">
+            <table className="w-full table-fixed md:table-auto md:min-w-[640px] border-collapse">
               <thead>
                 <tr>
-                  <th className="w-40 text-left p-3 text-sm font-medium text-muted-foreground align-bottom">Details</th>
+                  <th className="w-[68px] md:w-40 text-left p-1 md:p-3 text-[11px] md:text-sm font-medium text-muted-foreground align-bottom break-words">Details</th>
                   {properties.map((p) => (
-                    <th key={p.id} className="p-3 text-left align-bottom">
+                    <th key={p.id} className="p-1 md:p-3 text-left align-bottom min-w-0">
                       <Link to={`/property/${p.id}`} className="block group">
                         <PropertyCompareImages images={p.images || []} alt={p.address || p.city} />
-                        <span className="text-base font-medium text-foreground">{p.city}</span>
+                        <span className="block text-[11px] md:text-base leading-tight md:leading-normal font-medium text-foreground break-words">{p.city}</span>
                       </Link>
                     </th>
                   ))}
@@ -149,16 +149,16 @@ const CompareProperties = () => {
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.label} className="border-t border-border">
-                    <td className="p-3 text-sm font-medium text-muted-foreground">{row.label}</td>
+                    <td className="p-1.5 md:p-3 text-[10px] md:text-sm leading-tight font-medium text-muted-foreground break-words">{row.label}</td>
                     {properties.map((p) => (
-                      <td key={p.id} className="p-3 text-sm text-foreground">{row.render(p)}</td>
+                      <td key={p.id} className="p-1.5 md:p-3 text-[10px] md:text-sm leading-tight md:leading-normal text-foreground break-words">{row.render(p)}</td>
                     ))}
                   </tr>
                 ))}
                 <tr className="border-t border-border">
-                  <td className="p-3 text-sm font-medium text-muted-foreground align-top">Amenities</td>
+                  <td className="p-1.5 md:p-3 text-[10px] md:text-sm leading-tight font-medium text-muted-foreground align-top break-words">Amenities</td>
                   {properties.map((p) => (
-                    <td key={p.id} className="p-3 text-sm text-foreground align-top">
+                    <td key={p.id} className="p-1.5 md:p-3 text-[9px] md:text-sm leading-tight md:leading-normal text-foreground align-top break-words">
                       {allAmenities.length === 0 ? (
                         '—'
                       ) : (
