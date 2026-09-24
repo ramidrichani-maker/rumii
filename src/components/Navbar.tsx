@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, Menu, Mail, Map } from 'lucide-react';
-import rumiLogo from '@/assets/rumi-logo.png';
+import rumiMark from '@/assets/rumi-mark.png.asset.json';
 import rumiTitleLogo from '@/assets/rumi-title-logo.png.asset.json';
 import profileIcon from '@/assets/profile-icon.png.asset.json';
 import profileIconFilled from '@/assets/profile-icon-filled.png';
@@ -242,7 +242,7 @@ export const Navbar = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 shrink-0">
             <button onClick={() => { window.location.href = '/'; }} className="flex items-center space-x-2 ml-[2.25rem] md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
-              <img src={rumiLogo} alt="Rumi" className="w-[42px] h-[42px] md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
+              <img src={rumiMark.url} alt="Rumi" className="w-[42px] h-[42px] md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
             </button>
             <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
             {/* Vertical divider between logo and hamburger on mobile */}
