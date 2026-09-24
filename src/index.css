@@ -346,9 +346,11 @@ All colors MUST be HSL.
 
 .rumi-bar-collapsed .rumi-filter-sticky {
   position: fixed;
-  /* Above the navbar (9990) so the pinned bar paints in front when stuck,
-     but the top offset keeps it clear of the navbar — it never overlaps the menu. */
-  z-index: 9991;
+  /* Below the navbar (9990) so the pinned bar never covers the mega-menu
+     dropdown, which is a child of the nav and composites at the 9990 level.
+     The top offset seats the bar just under the navbar, so it stays visible
+     without needing a higher z-index. */
+  z-index: 9989;
   top: max(0px, calc(var(--navbar-visible-h, 0px) - 1px));
   margin-top: 0 !important;
   left: 0;
