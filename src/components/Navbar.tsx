@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Home, User, LogOut, Settings, BarChart3, Shield, Heart, Camera, PlusCircle, Bookmark, MessageSquare, HeadphonesIcon, X, Eye, Menu, Mail, Map } from 'lucide-react';
 import rumiLogo from '@/assets/rumi-logo.png';
+import rumiTitleLogo from '@/assets/rumi-title-logo.png.asset.json';
 import profileIcon from '@/assets/profile-icon.png.asset.json';
 import profileIconFilled from '@/assets/profile-icon-filled.png';
 import houseIcon from '@/assets/house-icon.png.asset.json';
@@ -285,7 +286,7 @@ export const Navbar = () => {
           </div>
 
           <button onClick={() => { window.location.href = '/'; }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center hover:opacity-60 transition-opacity duration-200">
-            <span className="text-3xl font-title leading-none" style={{ color: '#0a0a0a', letterSpacing: '0.02em', display: 'inline-flex', alignItems: 'baseline' }}><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline', transform: 'scaleX(0.85)', transformOrigin: 'left center' }}>r</span><span style={{ fontSize: '0.72em', display: 'inline-block', verticalAlign: 'baseline', letterSpacing: '0.03em' }}>UM</span><span style={{ fontWeight: 100, display: 'inline-block', verticalAlign: 'baseline', transform: 'scaleX(0.85)', transformOrigin: 'left center' }}>ı</span></span>
+            <img src={rumiTitleLogo.url} alt="Rumi" className="h-[1.75rem] w-auto object-contain" />
           </button>
 
           <div className="flex items-center gap-3 md:gap-0 md:mr-[4.5rem]">
