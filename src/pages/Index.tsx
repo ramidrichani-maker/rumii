@@ -3,6 +3,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import HeroSearch from "@/components/HeroSearch";
 import FeaturedPropertyCard from "@/components/FeaturedPropertyCard";
 import FeaturedPropertyCardSkeleton from "@/components/FeaturedPropertyCardSkeleton";
+import CurtainReveal from "@/components/CurtainReveal";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Property {
@@ -104,10 +105,10 @@ const Index = () => {
                   </div>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {featuredSales.map((property, index) => (
-                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
+                  {featuredSales.map((property) => (
+                    <CurtainReveal key={property.id}>
                       <FeaturedPropertyCard property={property} badgeLabel="For Sale" />
-                    </ScrollReveal>
+                    </CurtainReveal>
                   ))}
                 </div>
               </div>
@@ -123,10 +124,10 @@ const Index = () => {
                   </div>
                 </ScrollReveal>
                 <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {featuredRentals.map((property, index) => (
-                    <ScrollReveal key={property.id} animation="fade-up" delay={100 + index * 100}>
+                  {featuredRentals.map((property) => (
+                    <CurtainReveal key={property.id}>
                       <FeaturedPropertyCard property={property} badgeLabel="For Rent" badgeVariant="secondary" />
-                    </ScrollReveal>
+                    </CurtainReveal>
                   ))}
                 </div>
               </div>
