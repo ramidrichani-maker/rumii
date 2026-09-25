@@ -64,6 +64,11 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Loading curtain surface: medium grey that covers cards until they are
+       reached while scrolling, then slides down and off them */
+    --curtain: 0 0% 62%;
+    --curtain-deep: 0 0% 55%;
+
     /* Brand fonts */
     --font-display: 'Canela Display', 'Playfair Display', Georgia, serif;
     --font-title: 'Optima', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -119,6 +124,11 @@ All colors MUST be HSL.
     --border: 30 10% 30%;
     --input: 30 10% 30%;
     --ring: 30 35% 68%;
+
+    /* Loading curtain: darker grey so it stays a surface, not a spotlight */
+    --curtain: 30 8% 30%;
+    --curtain-deep: 30 8% 24%;
+
 
     --sidebar-background: 30 15% 12%;
     --sidebar-foreground: 0 0% 90%;
@@ -218,6 +228,11 @@ All colors MUST be HSL.
   .scroll-reveal {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .rumi-curtain {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
   }
 }
 
