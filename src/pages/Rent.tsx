@@ -13,6 +13,7 @@ import CompactPropertyMap from "@/components/CompactPropertyMap";
 import PropertyDetailModal from "@/components/PropertyDetailModal";
 import PropertyCard from "@/components/PropertyCard";
 import PropertyCardSkeleton from "@/components/PropertyCardSkeleton";
+import CurtainReveal from "@/components/CurtainReveal";
 import RangeSlider from "@/components/RangeSlider";
 import ScrollReveal from "@/components/ScrollReveal";
 import LocationSearchBar from "@/components/LocationSearchBar";
@@ -797,8 +798,8 @@ const Rent = () => {
         ) : sortedProperties.length > 0 ? (
           <div className="mb-8">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.7vw]">
-              {paginatedProperties.map((property, index) => (
-                <ScrollReveal key={property.id} animation="fade-up" delay={100 + (index % 4) * 100}>
+              {paginatedProperties.map((property) => (
+                <CurtainReveal key={property.id}>
                   <PropertyCard
                     property={property}
                     onClick={handlePropertySelect}
@@ -806,7 +807,7 @@ const Rent = () => {
                     selected={compareIds.includes(property.id)}
                     onToggleSelect={toggleCompareSelect}
                   />
-                </ScrollReveal>
+                </CurtainReveal>
               ))}
             </div>
             <PropertyPagination
