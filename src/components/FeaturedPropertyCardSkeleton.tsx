@@ -5,7 +5,7 @@
  */
 const FeaturedPropertyCardSkeleton = () => {
   return (
-    <div className="rumi-curtain-surface h-full w-full min-h-[18rem] md:min-h-[21rem] rounded-2xl overflow-hidden" />
+    <div className="rumi-curtain-surface h-full w-full min-h-[19.5rem] md:min-h-[21rem] rounded-2xl overflow-hidden" />
   );
 };
 
