@@ -5,3 +5,4 @@
   - [x] Grey curtain reveal component + tokens
   - [x] Skeletons show solid medium grey
   - [x] Apply on homepage featured cards and Buy/Rent listings
+- [x] Navbar centered title: swap to the taupe wordmark upload (verified: img src is the new asset, centered at x=640 of 1280, 55x28; asset serves 200 image/png)
