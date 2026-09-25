@@ -153,6 +153,25 @@ All colors MUST be HSL.
   100% { opacity: 0; transform: translateX(24px); }
 }
 
+/* Page loader: logo wipes in from left to right */
+@keyframes loader-reveal {
+  0% { clip-path: inset(0 100% 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+.animate-loader-reveal {
+  animation-name: loader-reveal;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-loader-reveal {
+    animation: none;
+    clip-path: none;
+  }
+}
+
 @keyframes engraving-shimmer {
   0% {
     background-position:
