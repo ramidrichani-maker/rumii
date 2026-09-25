@@ -7,7 +7,7 @@ import React from "react";
  */
 const PropertyCardSkeleton: React.FC = () => {
   return (
-    <div className="rumi-curtain-surface w-full h-full min-h-[15rem] md:min-h-[26rem] rounded-2xl overflow-hidden" />
+    <div className="rumi-curtain-surface w-full h-full min-h-[13rem] md:min-h-[25.5rem] rounded-2xl overflow-hidden" />
   );
 };
 
