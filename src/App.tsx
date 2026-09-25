@@ -40,6 +40,7 @@ import InvestmentConsulting from "./pages/InvestmentConsulting";
 import RequestInteriorDesign from "./pages/RequestInteriorDesign";
 
 import { Footer } from "./components/Footer";
+import { PageLoader } from "./components/PageLoader";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +116,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <PageLoader />
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <RouteProgress />
