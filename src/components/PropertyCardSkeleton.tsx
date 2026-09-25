@@ -1,37 +1,13 @@
 import React from "react";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * Loading state for a listing card: one solid medium-grey block that mirrors the
+ * real card's shape, so the swap to the loaded card (which starts under the same
+ * grey curtain) never flashes a different colour.
+ */
 const PropertyCardSkeleton: React.FC = () => {
   return (
-    <Card className="border-0 rounded-2xl overflow-hidden bg-muted flex flex-col w-full h-full">
-      {/* Image skeleton: full-width banner on all sizes */}
-      <div className="w-[85%] mx-auto mt-[2vw] h-[calc(7.2rem+2vw)] md:h-[calc(15.84rem+2vw)] flex-shrink-0 bg-muted">
-        <Skeleton className="w-full h-full rounded-none" />
-      </div>
-
-      {/* Details skeleton: centered rows like the real card */}
-      <div className="flex flex-col flex-1 p-3 md:p-6 min-w-0 gap-2 items-center text-center">
-        {/* Area / city */}
-        <Skeleton className="h-4 md:h-5 w-24 md:w-40" />
-
-        {/* Price */}
-        <Skeleton className="h-5 md:h-7 w-28 md:w-48" />
-
-        {/* Beds/Baths/Size row */}
-        <div className="flex items-center gap-2 md:gap-4 flex-wrap justify-center">
-          <Skeleton className="h-3 md:h-4 w-10 md:w-14" />
-          <Skeleton className="h-3 md:h-4 w-10 md:w-14" />
-          <Skeleton className="h-3 md:h-4 w-10 md:w-14" />
-        </div>
-
-        {/* Description */}
-        <div className="flex flex-col gap-1 mt-1 items-center w-full">
-          <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-3 w-5/6" />
-        </div>
-      </div>
-    </Card>
+    <div className="rumi-curtain-surface w-full h-full min-h-[15rem] md:min-h-[26rem] rounded-2xl overflow-hidden" />
   );
 };
 

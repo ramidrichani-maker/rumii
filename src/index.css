@@ -410,3 +410,27 @@ All colors MUST be HSL.
     padding-inline: 5.5rem;
   }
 }
+
+/* Loading curtain: a card starts covered by a medium-grey panel. When the card
+   is reached while scrolling, the panel's top inset grows until it has slid down
+   and out of the card, uncovering it from the top like a curtain being drawn.
+   The clip lives on the panel itself — not overflow:hidden on the card — so the
+   card's own hover scaling stays unclipped. */
+.rumi-curtain-surface {
+  background-color: hsl(var(--curtain));
+}
+
+.rumi-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: linear-gradient(to bottom, hsl(var(--curtain)), hsl(var(--curtain-deep)));
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 700ms cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: clip-path;
+}
+
+.rumi-curtain[data-revealed='true'] {
+  clip-path: inset(100% 0 0 0);
+}
