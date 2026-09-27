@@ -168,11 +168,29 @@ All colors MUST be HSL.
 /* The loading mark lands on the first glyph of the wordmark; only the remaining letters wipe in. */
 .rumi-loader-active [data-loader-mark] { opacity: 0; }
 .rumi-loader-active [data-loader-title] { opacity: 0; clip-path: inset(0 50% 0 0); }
-.rumi-loader-active.rumi-loader-landed [data-loader-mark] { opacity: 1; }
+.rumi-loader-active.rumi-loader-nav-visible [data-loader-mark] {
+  opacity: 1;
+  transition: opacity 420ms ease-out;
+}
 .rumi-loader-active.rumi-loader-landed [data-loader-title] {
   opacity: 1;
   clip-path: inset(0 0 0 0);
   transition: clip-path 750ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* The title finishes first; the rest of the navbar enters before the page. */
+.rumi-loader-active [data-loader-nav-control] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+.rumi-loader-active.rumi-loader-nav-visible [data-loader-nav-control] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 420ms ease-out, transform 420ms ease-out, visibility 0s;
 }
 .rumi-loader-flying {
   transform: translate(var(--loader-x), var(--loader-y)) scale(var(--loader-scale));
@@ -198,6 +216,8 @@ All colors MUST be HSL.
   .rumi-loader-flying, .rumi-loader-active.rumi-loader-landed [data-loader-title] {
     transition-duration: 1ms;
   }
+  .rumi-loader-active.rumi-loader-nav-visible [data-loader-nav-control],
+  .rumi-loader-active.rumi-loader-nav-visible [data-loader-mark],
   .rumi-loader-active.rumi-loader-page-visible [data-loader-page] {
     transition-duration: 1ms;
   }
