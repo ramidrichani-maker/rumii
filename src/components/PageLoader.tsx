@@ -25,7 +25,8 @@ export const PageLoader = () => {
     let retry: ReturnType<typeof setTimeout>;
     const start = Date.now();
     const fly = () => {
-      const target = document.querySelector<HTMLElement>("[data-loader-mark]");
+      const target = Array.from(document.querySelectorAll<HTMLImageElement>("[data-loader-title]"))
+        .find((image) => image.offsetParent !== null && image.complete && image.naturalWidth > 0);
       if (!target && Date.now() - start < MAX_MS) {
         retry = setTimeout(fly, 80);
         return;
@@ -33,9 +34,10 @@ export const PageLoader = () => {
       if (target) {
         const rect = target.getBoundingClientRect();
         setDestination({
-          x: rect.left + rect.width / 2 - window.innerWidth / 2,
+          // The first half of the wordmark artwork is the same mark as the loader.
+          x: rect.left + rect.width / 4 - window.innerWidth / 2,
           y: rect.top + rect.height / 2 - window.innerHeight / 2,
-          scale: rect.width / 144,
+          scale: (rect.width / 2) / 144,
         });
         setPhase("flight");
       } else {

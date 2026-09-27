@@ -243,9 +243,9 @@ export const Navbar = () => {
           <div className="flex items-center space-x-1 shrink-0">
             {/* Mobile: the mark is lifted out of the row and centered in the bar,
                 so the hamburger keeps the row's left gutter. */}
-            <button onClick={() => { window.location.href = '/'; }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 md:static md:left-auto md:top-auto md:translate-x-0 md:translate-y-0 md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
-              <img data-loader-mark src={rumiMark.url} alt="Rumi" className="w-[42px] h-[42px] md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
-              <img data-loader-title src={rumiTitleLogo.url} alt="" className="h-[22px] w-auto object-contain md:hidden" />
+            <button onClick={() => { window.location.href = '/'; }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center md:static md:left-auto md:top-auto md:translate-x-0 md:translate-y-0 md:ml-[4.5rem] hover:opacity-60 transition-opacity duration-200">
+              <img data-loader-mark src={rumiMark.url} alt="Rumi" className="hidden md:block md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
+              <img data-loader-title src={rumiTitleLogo.url} alt="Rumi" className="h-[22px] w-auto object-contain md:hidden" />
             </button>
             <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
             <button

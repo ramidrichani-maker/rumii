@@ -165,11 +165,12 @@ All colors MUST be HSL.
   animation-fill-mode: both;
 }
 
-/* The loading mark hands off to the navbar mark before the wordmark wipes in. */
+/* The loading mark lands on the first glyph of the wordmark; only the remaining letters wipe in. */
 .rumi-loader-active [data-loader-mark] { opacity: 0; }
-.rumi-loader-active [data-loader-title] { clip-path: inset(0 100% 0 0); }
+.rumi-loader-active [data-loader-title] { opacity: 0; clip-path: inset(0 50% 0 0); }
 .rumi-loader-active.rumi-loader-landed [data-loader-mark] { opacity: 1; }
 .rumi-loader-active.rumi-loader-landed [data-loader-title] {
+  opacity: 1;
   clip-path: inset(0 0 0 0);
   transition: clip-path 750ms cubic-bezier(0.65, 0, 0.35, 1);
 }
