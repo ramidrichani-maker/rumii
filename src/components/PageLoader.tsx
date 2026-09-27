@@ -5,7 +5,7 @@ const REVEAL_MS = 900;
 const HOLD_MS = 250;
 const FLIGHT_MS = 850;
 const TITLE_MS = 750;
-const FADE_MS = 350;
+const FADE_MS = 650;
 const MAX_MS = 2500;
 
 export const PageLoader = () => {
@@ -16,7 +16,7 @@ export const PageLoader = () => {
   useLayoutEffect(() => {
     document.documentElement.classList.add("rumi-loader-active");
     return () => {
-      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed");
+      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed", "rumi-loader-page-visible");
     };
   }, []);
 
@@ -73,8 +73,9 @@ export const PageLoader = () => {
 
   useEffect(() => {
     if (phase !== "fade") return;
+    document.documentElement.classList.add("rumi-loader-page-visible");
     const timer = setTimeout(() => {
-      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed");
+      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed", "rumi-loader-page-visible");
       setPhase("done");
     }, FADE_MS);
     return () => clearTimeout(timer);
@@ -83,10 +84,9 @@ export const PageLoader = () => {
   if (phase === "done") return null;
 
   return (
-    <div
-      aria-hidden="true"
-      className={`fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none ${phase === "reveal" ? "bg-background" : "bg-transparent"}`}
-    >
+    <>
+      <div aria-hidden="true" className={`fixed inset-0 z-[9989] pointer-events-none bg-background transition-opacity ${phase === "fade" ? "opacity-0" : "opacity-100"}`} style={{ transitionDuration: `${FADE_MS}ms` }} />
+      <div aria-hidden="true" className="fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none">
       <img
         src={loadingMark.url}
         alt=""
@@ -95,6 +95,7 @@ export const PageLoader = () => {
         className={`w-36 h-36 object-contain ${loaded ? "animate-loader-reveal" : "opacity-0"} ${phase === "flight" || phase === "title" || phase === "fade" ? "rumi-loader-flying" : ""} ${phase === "title" || phase === "fade" ? "opacity-0" : ""}`}
         style={{ animationDuration: `${REVEAL_MS}ms`, "--loader-x": `${destination.x}px`, "--loader-y": `${destination.y}px`, "--loader-scale": destination.scale, "--flight-ms": `${FLIGHT_MS}ms` } as CSSProperties}
       />
-    </div>
+      </div>
+    </>
   );
 };

@@ -119,9 +119,11 @@ const App = () => (
           <PageLoader />
           <div className="flex flex-col min-h-screen">
             <Navbar />
-            <RouteProgress />
-            <AppRoutes />
-            <Footer />
+            <div data-loader-page className="flex flex-col flex-1">
+              <RouteProgress />
+              <AppRoutes />
+              <Footer />
+            </div>
           </div>
         </BrowserRouter>
       </TooltipProvider>

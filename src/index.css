@@ -179,12 +179,26 @@ All colors MUST be HSL.
   transition: transform var(--flight-ms) cubic-bezier(0.65, 0, 0.35, 1), opacity 120ms ease;
 }
 
+/* Keep the page out of sight until the navbar wordmark has finished revealing. */
+.rumi-loader-active [data-loader-page] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.rumi-loader-active.rumi-loader-page-visible [data-loader-page] {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 650ms ease-out, transform 650ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-loader-reveal {
     animation: none;
     clip-path: none;
   }
   .rumi-loader-flying, .rumi-loader-active.rumi-loader-landed [data-loader-title] {
+    transition-duration: 1ms;
+  }
+  .rumi-loader-active.rumi-loader-page-visible [data-loader-page] {
     transition-duration: 1ms;
   }
 }
