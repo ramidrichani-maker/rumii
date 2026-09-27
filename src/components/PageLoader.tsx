@@ -1,26 +1,51 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState, type CSSProperties } from "react";
 import loadingMark from "@/assets/rumi-loading-mark.png.asset.json";
 
 const REVEAL_MS = 900;
 const HOLD_MS = 250;
-const FADE_MS = 400;
-// Fallback: never hold the loader longer than this, even if the image is slow.
+const FLIGHT_MS = 850;
+const TITLE_MS = 750;
+const FADE_MS = 350;
 const MAX_MS = 2500;
 
 export const PageLoader = () => {
   const [loaded, setLoaded] = useState(false);
-  const [phase, setPhase] = useState<"reveal" | "fade" | "done">("reveal");
+  const [phase, setPhase] = useState<"reveal" | "flight" | "title" | "fade" | "done">("reveal");
+  const [destination, setDestination] = useState({ x: 0, y: 0, scale: 1 });
+
+  useLayoutEffect(() => {
+    document.documentElement.classList.add("rumi-loader-active");
+    return () => {
+      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed");
+    };
+  }, []);
 
   useEffect(() => {
     if (!loaded) return;
-    const fadeTimer = setTimeout(() => setPhase("fade"), REVEAL_MS + HOLD_MS);
-    const doneTimer = setTimeout(
-      () => setPhase("done"),
-      REVEAL_MS + HOLD_MS + FADE_MS,
-    );
+    let retry: ReturnType<typeof setTimeout>;
+    const start = Date.now();
+    const fly = () => {
+      const target = document.querySelector<HTMLElement>("[data-loader-mark]");
+      if (!target && Date.now() - start < MAX_MS) {
+        retry = setTimeout(fly, 80);
+        return;
+      }
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        setDestination({
+          x: rect.left + rect.width / 2 - window.innerWidth / 2,
+          y: rect.top + rect.height / 2 - window.innerHeight / 2,
+          scale: rect.width / 144,
+        });
+        setPhase("flight");
+      } else {
+        setPhase("fade");
+      }
+    };
+    const flightTimer = setTimeout(fly, REVEAL_MS + HOLD_MS);
     return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(doneTimer);
+      clearTimeout(flightTimer);
+      clearTimeout(retry);
     };
   }, [loaded]);
 
@@ -29,22 +54,44 @@ export const PageLoader = () => {
     return () => clearTimeout(cap);
   }, []);
 
+  useEffect(() => {
+    if (phase !== "flight") return;
+    const timer = setTimeout(() => {
+      document.documentElement.classList.add("rumi-loader-landed");
+      setPhase("title");
+    }, FLIGHT_MS);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "title") return;
+    const timer = setTimeout(() => setPhase("fade"), TITLE_MS + 120);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "fade") return;
+    const timer = setTimeout(() => {
+      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed");
+      setPhase("done");
+    }, FADE_MS);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
   if (phase === "done") return null;
 
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[10000] flex items-center justify-center bg-background transition-opacity ${
-        phase === "fade" ? "opacity-0 pointer-events-none" : "opacity-100"
-      }`}
-      style={{ transitionDuration: `${FADE_MS}ms` }}
+      className={`fixed inset-0 z-[10000] flex items-center justify-center pointer-events-none ${phase === "reveal" ? "bg-background" : "bg-transparent"}`}
     >
       <img
         src={loadingMark.url}
         alt=""
         onLoad={() => setLoaded(true)}
-        className={`w-28 h-auto sm:w-36 ${loaded ? "animate-loader-reveal" : "opacity-0"}`}
-        style={{ animationDuration: `${REVEAL_MS}ms` }}
+        onError={() => setLoaded(true)}
+        className={`w-36 h-36 object-contain ${loaded ? "animate-loader-reveal" : "opacity-0"} ${phase === "flight" || phase === "title" || phase === "fade" ? "rumi-loader-flying" : ""} ${phase === "title" || phase === "fade" ? "opacity-0" : ""}`}
+        style={{ animationDuration: `${REVEAL_MS}ms`, "--loader-x": `${destination.x}px`, "--loader-y": `${destination.y}px`, "--loader-scale": destination.scale, "--flight-ms": `${FLIGHT_MS}ms` } as CSSProperties}
       />
     </div>
   );
