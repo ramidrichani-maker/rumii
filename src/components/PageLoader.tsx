@@ -5,18 +5,19 @@ const REVEAL_MS = 900;
 const HOLD_MS = 250;
 const FLIGHT_MS = 850;
 const TITLE_MS = 750;
+const NAV_MS = 420;
 const FADE_MS = 650;
 const MAX_MS = 2500;
 
 export const PageLoader = () => {
   const [loaded, setLoaded] = useState(false);
-  const [phase, setPhase] = useState<"reveal" | "flight" | "title" | "fade" | "done">("reveal");
+  const [phase, setPhase] = useState<"reveal" | "flight" | "title" | "nav" | "fade" | "done">("reveal");
   const [destination, setDestination] = useState({ x: 0, y: 0, scale: 1 });
 
   useLayoutEffect(() => {
     document.documentElement.classList.add("rumi-loader-active");
     return () => {
-      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed", "rumi-loader-page-visible");
+      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed", "rumi-loader-nav-visible", "rumi-loader-page-visible");
     };
   }, []);
 
@@ -67,7 +68,14 @@ export const PageLoader = () => {
 
   useEffect(() => {
     if (phase !== "title") return;
-    const timer = setTimeout(() => setPhase("fade"), TITLE_MS + 120);
+    const timer = setTimeout(() => setPhase("nav"), TITLE_MS + 120);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "nav") return;
+    document.documentElement.classList.add("rumi-loader-nav-visible");
+    const timer = setTimeout(() => setPhase("fade"), NAV_MS);
     return () => clearTimeout(timer);
   }, [phase]);
 
@@ -75,7 +83,7 @@ export const PageLoader = () => {
     if (phase !== "fade") return;
     document.documentElement.classList.add("rumi-loader-page-visible");
     const timer = setTimeout(() => {
-      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed", "rumi-loader-page-visible");
+      document.documentElement.classList.remove("rumi-loader-active", "rumi-loader-landed", "rumi-loader-nav-visible", "rumi-loader-page-visible");
       setPhase("done");
     }, FADE_MS);
     return () => clearTimeout(timer);
@@ -92,7 +100,7 @@ export const PageLoader = () => {
         alt=""
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
-        className={`w-36 h-36 object-contain ${loaded ? "animate-loader-reveal" : "opacity-0"} ${phase === "flight" || phase === "title" || phase === "fade" ? "rumi-loader-flying" : ""} ${phase === "title" || phase === "fade" ? "opacity-0" : ""}`}
+        className={`w-36 h-36 object-contain ${loaded ? "animate-loader-reveal" : "opacity-0"} ${phase === "flight" || phase === "title" || phase === "nav" || phase === "fade" ? "rumi-loader-flying" : ""} ${phase === "title" || phase === "nav" || phase === "fade" ? "opacity-0" : ""}`}
         style={{ animationDuration: `${REVEAL_MS}ms`, "--loader-x": `${destination.x}px`, "--loader-y": `${destination.y}px`, "--loader-scale": destination.scale, "--flight-ms": `${FLIGHT_MS}ms` } as CSSProperties}
       />
       </div>

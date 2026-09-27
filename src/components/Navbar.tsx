@@ -204,7 +204,7 @@ export const Navbar = () => {
 
   // Guard against auth context not being ready
   if (!auth || auth.loading) {
-    return <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    return <nav data-loader-nav-control className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <div className="w-full flex-1 md:w-auto md:flex-none">
@@ -247,8 +247,9 @@ export const Navbar = () => {
               <img data-loader-mark src={rumiMark.url} alt="Rumi" className="hidden md:block md:w-[52.5px] md:h-[52.5px] object-contain self-center" />
               <img data-loader-title src={rumiTitleLogo.url} alt="Rumi" className="h-[22px] w-auto object-contain md:hidden" />
             </button>
-            <div className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
+            <div data-loader-nav-control className="hidden md:block self-center" style={{ width: '1px', height: '1.75rem', backgroundColor: '#000', transform: 'scaleX(0.7)', opacity: 0.8 }} />
             <button
+              data-loader-nav-control
               className="md:hidden p-1.5 text-foreground hover:text-primary transition-colors ml-[2.25rem]"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
@@ -259,7 +260,7 @@ export const Navbar = () => {
               </svg>
             </button>
             {profile?.role !== 'customer_support' ? (
-            <nav ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
+            <nav data-loader-nav-control ref={megaNavRef} className="hidden md:flex items-center space-x-5 ml-1 pt-1.5 relative">
                 <div onClick={() => toggleMenu('properties')}>
                   <Button variant="ghost" size="sm" className="text-[0.9rem] font-['Arial',sans-serif] font-medium tracking-wide text-black hover:text-black/40 transition-colors hover:bg-transparent"><span ref={propertiesTextRef}>Properties</span></Button>
                 </div>
@@ -272,7 +273,7 @@ export const Navbar = () => {
                 <span className="absolute h-0.5 bg-foreground pointer-events-none transition-all duration-300 ease-out" style={{ left: underlineStyle.left, width: underlineStyle.width, top: underlineStyle.top, opacity: underlineStyle.opacity, marginLeft: 0 }} />
               </nav>
             ) : (
-              <nav className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
+              <nav data-loader-nav-control className="hidden md:flex items-center space-x-5 ml-1 pt-1.5">
                 <Link to="/purchase">
                   <Button variant="ghost" size="sm" className="text-[0.85rem] font-display tracking-wide">Buy</Button>
                 </Link>
@@ -290,7 +291,7 @@ export const Navbar = () => {
             <img data-loader-title src={rumiTitleLogo.url} alt="Rumi" className="h-[1.75rem] w-auto object-contain" />
           </button>
 
-          <div className="flex items-center gap-3 md:gap-0 md:mr-[4.5rem]">
+          <div data-loader-nav-control className="flex items-center gap-3 md:gap-0 md:mr-[4.5rem]">
             {/* Home icon — quick link to properties for sale */}
                 <button
                   onClick={() => navigate('/purchase')}
