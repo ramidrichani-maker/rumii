@@ -9,3 +9,4 @@
 - [x] Loading mark flies into the navbar and the title wipes in left to right (verified on desktop and mobile)
 - [x] Reveal the rest of the page only after the navbar title finishes appearing (verified on desktop and mobile)
 - [x] Keep navbar controls and page hidden until the title finishes; reveal navbar first, then page
+- [x] Navbar home icon: swap the house artwork for the taupe arch upload (verified: img src is the new asset, drawn at 30x42px upright, aspect 0.714 vs source 0.703, desktop and mobile)
